@@ -1,5 +1,8 @@
-# Kuwala
+![Logo Banner](./docs/images/Kuwala%20Title%20Banner.png)
+
 ![License](https://img.shields.io/github/license/kuwala-io/kuwala)
+
+
 ### The Vision of a Global Liquid Data Economy
 
 With Kuwala, we want to enable the global liquid data economy. You probably also envision a future of smart cities, autonomously driving cars, and sustainable living. For all of that, we need to leverage the power of data. Unfortunately, many promising data projects fail, however. That's because too many resources are necessary for gathering and cleaning data. Kuwala supports you as a data engineer, data scientist, or business analyst to create a holistic view of your ecosystem by integrating third-party data seamlessly.
@@ -39,3 +42,11 @@ Data we would like to integrate, but a scalable approach is still missing:
 
 - Small scale events (e.g., a festival, movie premiere, nightclub events)
 
+---
+
+## Using existing connectors
+
+To use our published connectors clone this repository and navigate to ```kuwala-connectors```. There is a separate README for each connector on how to get started with it.
+
+We currently have the following connectors published:
+- ```population-density```: Detailed population and demographic data

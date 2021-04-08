@@ -1,0 +1,14 @@
+.idea
+.DS_Store
+**/.DS_Store
+node_modules
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+
+config/env/*
+!config/env/.env.local
+
+tmp/*
+!tmp/countries/.gitkeep

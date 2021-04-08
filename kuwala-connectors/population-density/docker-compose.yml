@@ -1,0 +1,27 @@
+version: '3.1'
+
+services:
+
+  mongo:
+    image: mongo:4
+    command: --dbpath /data/db
+    restart: always
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodb:/data/db
+#    environment:
+#      MONGO_INITDB_ROOT_USERNAME: root
+#      MONGO_INITDB_ROOT_PASSWORD: example
+
+  mongo-express:
+    image: mongo-express:latest
+    restart: always
+    ports:
+      - '8081:8081'
+#    environment:
+#      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+#      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+
+volumes:
+  mongodb:
