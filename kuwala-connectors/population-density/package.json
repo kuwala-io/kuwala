@@ -2,24 +2,28 @@
   "name": "population-density",
   "version": "0.0.1",
   "description": "Making Facebook's \"Data for Good\" population data accessible worldwide through an API",
-  "main": "app.js",
+  "main": "src/app/app.js",
   "scripts": {
-    "start-processing:local": "NODE_ENV=local node --max-old-space-size=8192 src/data/index.js",
+    "start-docker": "docker-compose up -d",
+    "start-processing:local": "NODE_ENV=local node --max-old-space-size=8192 src/data/main.js",
     "start-api:local": "NODE_ENV=local nodemon src/app/app.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kuwala-io/population-density.git"
+    "url": "git+https://github.com/kuwala-io/kuwala.git"
   },
   "keywords": [
-    "population"
+    "population",
+    "data",
+    "importer",
+    "opendata"
   ],
   "author": "Kuwala.io",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/kuwala-io/population-density/issues"
+    "url": "https://github.com/kuwala-io/kuwala/issues"
   },
-  "homepage": "https://github.com/kuwala-io/population-density#readme",
+  "homepage": "https://github.com/kuwala-io/kuwala/tree/master/kuwala-connectors/population-density#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
     "cli-progress": "^3.9.0",

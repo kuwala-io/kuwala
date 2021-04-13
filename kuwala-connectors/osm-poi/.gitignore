@@ -6,5 +6,5 @@ node_modules
 config/env/*
 !config/env/.env.local
 
-tmp/*
-!tmp/countries/.gitkeep
+tmp
+!tmp/.gitkeep
