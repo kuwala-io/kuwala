@@ -11,17 +11,17 @@ With Kuwala, we want to enable the global liquid data economy. You probably also
 
 Kuwala explicitly focuses on integrating third-party data, so data that is not under your company's influence, e.g., weather or population information. To easily combine several different domains, we further narrow it down to data with a geo-component which still includes many sources. For matching data on different aggregation levels, such as POIs to a moving thunderstorm, we leverage [Uber's H3](https://eng.uber.com/h3/) spatial indexing.
 
-Connectors wrap individual data sources. Within the connector, raw data is cleaned and preprocessed. Based on that, the connector exposes query functions through REST and GraphQL endpoints. Through this, you can easily combine connectors and build further applications and pipelines on top of them. We plan on releasing an open-source solution specifically for this purpose.
+Pipelines wrap individual data sources. Within the pipeline, raw data is cleaned and preprocessed. Based on that, the pipeline exposes query functions through REST and GraphQL endpoints. Through this, you can easily combine pipelines and build further applications and pipelines on top of them. We plan on releasing an open-source solution specifically for this purpose.
 
 ### How you can contribute
 
-The best first step to get involved is to [join](https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-pXKFBjbnl7_P3nXtwca5ag) the Kuwala Community on Slack. There we discuss everything related to data integration and new connectors. Every connector will be open-source. We entirely decide, based on you, our community, which sources to integrate. You can reach out to us on Slack or [email](mailto:community@kuwala.io) to request a new connector or contribute yourself. If you want to contribute yourself, you can use your choice's programming language and database technology. We have the only requirement that it is possible to run the connector locally, query the data through REST-API endpoints, and use [Uber's H3](https://eng.uber.com/h3/) functionality to handle geographical transformations. We will then take the responsibility to maintain your connector.
+The best first step to get involved is to [join](https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-pXKFBjbnl7_P3nXtwca5ag) the Kuwala Community on Slack. There we discuss everything related to data integration and new pipelines. Every pipeline will be open-source. We entirely decide, based on you, our community, which sources to integrate. You can reach out to us on Slack or [email](mailto:community@kuwala.io) to request a new pipeline or contribute yourself. If you want to contribute yourself, you can use your choice's programming language and database technology. We have the only requirement that it is possible to run the pipeline locally, query the data through REST-API endpoints, and use [Uber's H3](https://eng.uber.com/h3/) functionality to handle geographical transformations. We will then take the responsibility to maintain your pipeline.
 
 ### Liberating the work with data
 
-By working together as a community of data enthusiasts, we can create a network of seamlessly integratable connectors. It is now causing headaches to integrate third-party data into applications. But together, we will make it straightforward to combine, merge and enrich data sources for powerful models.
+By working together as a community of data enthusiasts, we can create a network of seamlessly integratable pipelines. It is now causing headaches to integrate third-party data into applications. But together, we will make it straightforward to combine, merge and enrich data sources for powerful models.
 
-### What's coming next for the connectors?
+### What's coming next for the pipelines?
 Based on the use-cases we have discussed in the community and potential users, we have identified a variety of data sources to connect with next:
 
 #### Semi-structured data
@@ -44,9 +44,9 @@ Data we would like to integrate, but a scalable approach is still missing:
 
 ---
 
-## Using existing connectors
+## Using existing pipelines
 
-To use our published connectors clone this repository and navigate to ```kuwala-connectors```. There is a separate README for each connector on how to get started with it.
+To use our published pipelines clone this repository and navigate to [```kuwala-pipelines```](https://github.com/kuwala-io/kuwala/tree/master/kuwala-pipelines). There is a separate README for each pipeline on how to get started with it.
 
-We currently have the following connectors published:
-- ```population-density```: Detailed population and demographic data
+We currently have the following pipelines published:
+- [```population-density```](https://github.com/kuwala-io/kuwala/tree/master/kuwala-pipelines/population-density): Detailed population and demographic data
