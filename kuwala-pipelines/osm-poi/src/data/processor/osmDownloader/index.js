@@ -72,7 +72,7 @@ async function downloadFile() {
         throw new Error('No file selected');
     }
 
-    const filePath = `tmp${downloadUrl.split(baseUrl)[1]}`;
+    const filePath = `tmp/osmFiles${downloadUrl.split(baseUrl)[1]}`;
 
     await fse.ensureDir(filePath.split(filePath.split('/').pop())[0]);
 
@@ -123,7 +123,7 @@ function pickExistingFile() {
         throw new Error('No file selected');
     };
 
-    let selectedFile = './tmp';
+    let selectedFile = './tmp/osmFiles';
 
     while (fs.lstatSync(selectedFile).isDirectory()) {
         selectedFile += `/${selectElement(selectedFile)}`;

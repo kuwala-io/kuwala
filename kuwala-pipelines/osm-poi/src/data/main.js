@@ -20,6 +20,7 @@ const connectDb = async () => {
 connectDb()
     .then(async () => {
         await start();
+        process.exit();
     })
     .catch((error) => {
         console.error(error);

@@ -1,7 +1,8 @@
 const _ = require('lodash');
 const d3 = require('d3-polygon');
-const { Formatter } = require('../../../../../../shared/utils/js');
+const { Formatter } = require('../../../../../../../shared/utils/js');
 
+// Get coordinates of refs
 async function convertToGeoJSONCoords(refs, db) {
     // Get node coordinates from level db
     const getCoords = async (ref) => {
@@ -42,6 +43,7 @@ function convertMultiPolygon(members) {
     return coords;
 }
 
+// Create GeoJSON object based on coordinates
 function convertToGeoJSON(coords) {
     return {
         type: coords.length > 3 ? 'Polygon' : 'LineString',
@@ -49,6 +51,7 @@ function convertToGeoJSON(coords) {
     };
 }
 
+// Format lat lng coordinates
 function convertLocation(lat, lng) {
     return {
         lat: Formatter.coordToDecimal(lat),
@@ -56,6 +59,7 @@ function convertLocation(lat, lng) {
     };
 }
 
+// Get the center of a geometry as lat lng pair
 function getGeometryCenter(geometry) {
     let centroid;
 

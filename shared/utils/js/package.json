@@ -8,7 +8,6 @@
     "prettier": "^2.2.1"
   },
   "dependencies": {
-    "decimal.js": "^10.2.1",
     "readline-sync": "^1.4.10"
   }
 }

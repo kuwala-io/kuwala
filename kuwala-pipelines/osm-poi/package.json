@@ -35,6 +35,7 @@
     "h3-node": "^3.6.7",
     "jquery": "^3.6.0",
     "jsdom": "^16.5.3",
+    "json-stringify-pretty-compact": "^3.0.0",
     "level": "^6.0.1",
     "lodash": "^4.17.21",
     "mongoose": "^5.12.3",

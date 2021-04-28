@@ -1,3 +1,4 @@
+const categories = require('./categories.json');
 const continents = require('./continents.json');
 
-module.exports = { continents };
+module.exports = { categories, continents };

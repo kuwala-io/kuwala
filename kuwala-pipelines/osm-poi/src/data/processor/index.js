@@ -8,8 +8,6 @@ async function start() {
     } catch (error) {
         console.error(error);
     }
-
-    process.exit();
 }
 
 module.exports = {
