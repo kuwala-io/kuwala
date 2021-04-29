@@ -5,7 +5,8 @@
   "main": "src/app/app.js",
   "scripts": {
     "start-docker": "docker-compose up -d",
-    "start-processing:local": "NODE_ENV=local node --max-old-space-size=8192 src/data/main.js"
+    "start-processing:local": "NODE_ENV=local node --max-old-space-size=8192 src/data/main.js",
+    "start-api:local": "NODE_ENV=local nodemon src/app/app.js"
   },
   "repository": {
     "type": "git",
@@ -27,9 +28,13 @@
   "homepage": "https://github.com/kuwala-io/kuwala/tree/master/kuwala-pipelines/osm-poi#readme",
   "dependencies": {
     "axios": "^0.21.1",
+    "body-parser": "^1.19.0",
     "cli-progress": "^3.9.0",
+    "cors": "^2.8.5",
     "d3-polygon": "^2.0.0",
     "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-pino-logger": "^6.0.0",
     "fs-extra": "^9.1.0",
     "h3-js": "^3.7.1",
     "h3-node": "^3.6.7",

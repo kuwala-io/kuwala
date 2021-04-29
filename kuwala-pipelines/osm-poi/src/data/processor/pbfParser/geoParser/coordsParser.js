@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const d3 = require('d3-polygon');
-const { Formatter } = require('../../../../../../../shared/utils/js');
+const { Formatter } = require('../../../../../../../shared/js');
 
 // Get coordinates of refs
 async function convertToGeoJSONCoords(refs, db) {
@@ -36,6 +36,7 @@ async function convertToGeoJSONCoords(refs, db) {
 }
 
 function convertMultiPolygon(members) {
+    // TODO: Create building footprint for multi polygons
     // Polygon with holes: combine all "outer"; "inner" are holes
     // Polygon with inside parts: "outline" and "parts"
     const coords = [];
