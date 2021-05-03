@@ -4,7 +4,7 @@ const readlineSync = require('readline-sync');
 const Kepler = require('./kepler');
 const Processor = require('./processor');
 
-function connectDb() {
+async function connectDb() {
     const { MONGO_HOST, MONGO_PORT, MONGO_DATABASE } = process.env;
     const options = {
         useNewUrlParser: true,

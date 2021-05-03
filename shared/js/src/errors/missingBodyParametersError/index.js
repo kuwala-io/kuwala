@@ -1,13 +1,13 @@
-class MissingBodyParametersError extends Error {
+const GeneralError = require('../generalError');
+
+class MissingBodyParametersError extends GeneralError {
     constructor(missingBodyParameters) {
         super();
 
-        this.name = this.constructor.name;
         this.code = 400;
         this.message = 'Required body parameters are missing';
         // noinspection JSUnusedGlobalSymbols
         this.missingBodyParameters = missingBodyParameters;
-        Error.captureStackTrace(this, this.constructor);
     }
 }
 

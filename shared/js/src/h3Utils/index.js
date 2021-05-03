@@ -13,7 +13,7 @@ function transformQueryParams(req) {
     let resolution = DEFAULT_RESOLUTION;
 
     if (!(h3_index || lat || lng)) {
-        return new MissingQueryParametersError(['h3_index', 'lat', 'lng']);
+        throw new MissingQueryParametersError(['h3_index', 'lat', 'lng']);
     }
 
     if (h3_index) {
@@ -22,7 +22,7 @@ function transformQueryParams(req) {
     } else if (lat && lng) {
         h3Index = h3.geoToH3(Number(lat), Number(lng), DEFAULT_RESOLUTION);
     } else {
-        return new MissingQueryParametersError([lat ? 'lng' : 'lat']);
+        throw new MissingQueryParametersError([lat ? 'lng' : 'lat']);
     }
 
     return { h3Index, resolution };
@@ -64,7 +64,7 @@ function getCellsInRadius(cell, radius, resolution) {
     const centerCellRadius = totalEdgeLength.div(edges.length);
 
     if (centerCellRadius.greaterThan(radius)) {
-        return new RadiusError();
+        throw new RadiusError();
     }
 
     const ringSize = new Decimal(radius)

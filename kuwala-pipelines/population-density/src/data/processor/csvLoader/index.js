@@ -55,7 +55,7 @@ async function load(file, populationType, multiBar) {
                     const h3Index = h3.geoToH3(
                         lat,
                         lng,
-                        h3Config.DEFAULT_RESOLUTION
+                        h3Config.POPULATION_RESOLUTION
                     );
 
                     if (h3Index === null) {

@@ -1,41 +1,34 @@
 const Router = require('express');
-const h3 = require('h3-node');
-const h3Config = require('../../../../config/h3');
-const { MissingBodyParametersError } = require('../../errors');
+const { Errors, H3Utils } = require('../../../../../../shared/js');
+const { h3Config } = require('../../../../config');
 const { Mongo } = require('../../../utils');
 
 const router = Router();
 
-router.get('/', async (req, res) => {
+// Route for calculating the population within a given GeoJSON object
+router.get('/', async (req, res, next) => {
     try {
         const { geometry } = req.body;
 
         if (!geometry) {
-            const error = new MissingBodyParametersError(['geometry']);
-            console.error(`Request id: ${req.id}\n${error}`);
+            next(new Errors.MissingBodyParametersError(['geometry']));
+        } else {
+            const cellsInGeometry = H3Utils.getCellsInGeometry(geometry);
+            const cellsRegex = H3Utils.getRegexForCells(
+                cellsInGeometry,
+                undefined,
+                h3Config.POPULATION_RESOLUTION
+            );
+            const population = await Mongo.aggregateCells(cellsRegex);
 
-            return res.status(error.code).json(error);
+            res.status(200).json({
+                status: 200,
+                message: 'Fetched population in given polygon',
+                data: population
+            });
         }
-
-        const { coordinates, type } = geometry;
-
-        const matchingCells =
-            type === 'Polygon'
-                ? h3.polyfill(coordinates, h3Config.DEFAULT_RESOLUTION, true)
-                : coordinates.flatMap((c) =>
-                      h3.polyfill(c, h3Config.DEFAULT_RESOLUTION, true)
-                  );
-        const population = await Mongo.aggregateCells(matchingCells);
-
-        return res.status(200).json({
-            status: 200,
-            message: 'Fetched population in given polygon',
-            data: population
-        });
     } catch (error) {
-        console.error(`Request id: ${req.id}\n${error.stack}`);
-
-        return res.status(error.code || 400).json({ error });
+        next(error);
     }
 });
 

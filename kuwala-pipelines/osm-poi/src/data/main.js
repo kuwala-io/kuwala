@@ -2,7 +2,7 @@ require('dotenv').config({ path: `config/env/.env.${process.env.NODE_ENV}` });
 const mongoose = require('mongoose');
 const { start } = require('./processor');
 
-const connectDb = async () => {
+async function connectDb() {
     const { MONGO_HOST, MONGO_PORT, MONGO_DATABASE } = process.env;
     const options = {
         useNewUrlParser: true,
@@ -15,7 +15,7 @@ const connectDb = async () => {
         `mongodb://${MONGO_HOST}:${MONGO_PORT}/${MONGO_DATABASE}`,
         options
     );
-};
+}
 
 connectDb()
     .then(async () => {

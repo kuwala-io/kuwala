@@ -1,38 +1,42 @@
 const Router = require('express');
 const h3 = require('h3-node');
 const h3Config = require('../../../../config/h3');
+const { H3Utils } = require('../../../../../../shared/js');
 const { Mongo } = require('../../../utils');
-const { H3 } = require('../shared');
 
 const router = Router();
 
-router.get('/', async (req, res) => {
+// Get population aggregated for a single H3 cell
+router.get('/', async (req, res, next) => {
     try {
-        const { h3Index, resolution } = await H3.transformQueryParams(req);
+        const { h3Index, resolution } = await H3Utils.transformQueryParams(req);
         let matchingCells = [h3Index];
 
-        if (resolution > h3Config.DEFAULT_RESOLUTION) {
+        if (resolution > h3Config.POPULATION_RESOLUTION) {
             matchingCells = [
-                h3.h3ToParent(h3Index, h3Config.DEFAULT_RESOLUTION)
+                h3.h3ToParent(h3Index, h3Config.POPULATION_RESOLUTION)
             ];
-        } else if (resolution < h3Config.DEFAULT_RESOLUTION) {
+        } else if (resolution < h3Config.POPULATION_RESOLUTION) {
             matchingCells = h3.h3ToChildren(
                 h3Index,
-                h3Config.DEFAULT_RESOLUTION
+                h3Config.POPULATION_RESOLUTION
             );
         }
 
-        const population = await Mongo.aggregateCells(matchingCells);
+        const cellsRegex = H3Utils.getRegexForCells(
+            matchingCells,
+            resolution,
+            h3Config.POPULATION_RESOLUTION
+        );
+        const population = await Mongo.aggregateCells(cellsRegex);
 
-        return res.status(200).json({
+        res.status(200).json({
             status: 200,
             message: `Fetched population for ${h3Index}`,
             data: population
         });
     } catch (error) {
-        console.error(`Request id: ${req.id}\n${error.stack}`);
-
-        return res.status(error.code || 400).json({ error });
+        next(error);
     }
 });
 

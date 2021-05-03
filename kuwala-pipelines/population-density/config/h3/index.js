@@ -1,1 +1,1 @@
-module.exports.DEFAULT_RESOLUTION = 11;
+module.exports.POPULATION_RESOLUTION = 11;

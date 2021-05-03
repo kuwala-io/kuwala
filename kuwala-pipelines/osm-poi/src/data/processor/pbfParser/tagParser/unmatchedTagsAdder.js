@@ -5,8 +5,14 @@ const { categories } = require('../../../../../resources');
 // Store category tags that couldn't be matched under "misc"
 // Sort all category tags (necessary when new have been added)
 function addUnmatchedTags() {
+    const path = 'tmp/unmatchedTags.csv';
+
+    if (!fs.existsSync(path)) {
+        return;
+    }
+
     const unmatchedTags = Array.from(
-        new Set(fs.readFileSync('tmp/unmatchedTags.csv').toString().split('\n'))
+        new Set(fs.readFileSync(path).toString().split('\n'))
     ).filter((tag) => tag.length && tag !== 'yes');
     const updatedCategories = { ...categories };
     updatedCategories.misc.tags = [
@@ -22,7 +28,7 @@ function addUnmatchedTags() {
         'resources/categories.json',
         prettyJson(updatedCategories)
     );
-    fs.unlinkSync('tmp/unmatchedTags.csv');
+    fs.unlinkSync(path);
 }
 
 module.exports = {
