@@ -1,0 +1,30 @@
+{
+  "env": {
+    "commonjs": true,
+    "es2020": true,
+    "node": true
+  },
+  "extends": [
+    "airbnb-base",
+    "prettier"
+  ],
+  "plugins": [
+    "prettier"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 11
+  },
+  "rules": {
+    "prettier/prettier": "error",
+    "no-console": "off",
+    "no-case-declarations": "off",
+    "func-names": "off",
+    "mocha/no-setup-in-describe": "off",
+    "no-await-in-loop": "off",
+    "no-underscore-dangle": "off",
+    "no-async-promise-executor": "off",
+    "camelcase": "off",
+    "no-continue": "off",
+    "arrow-body-style": "off"
+  }
+}
