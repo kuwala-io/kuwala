@@ -1,6 +1,6 @@
 {
   "name": "population-density",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Making Facebook's \"Data for Good\" population data accessible worldwide through an API",
   "main": "src/app/app.js",
   "scripts": {
