@@ -3,13 +3,16 @@ import os
 import sys
 from dotenv import load_dotenv
 from quart import Quart
-from routes.place_id import place_id
+from routes.search import search
+from routes.popularity import popularity
+from shared.python.src.error_handler import general_error
 from utils.proxy import check_proxy_connection
-from shared.python.src.error_handler import bad_request
 
 app = Quart(__name__)
-app.register_blueprint(place_id)
-app.register_error_handler(error=400, func=bad_request)
+app.register_blueprint(search)
+app.register_blueprint(popularity)
+app.register_error_handler(error=400, func=general_error)
+app.register_error_handler(error=429, func=general_error)
 
 
 if __name__ == '__main__':

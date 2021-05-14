@@ -1,7 +1,7 @@
 from quart import jsonify
 
 
-def bad_request(error):
+def general_error(error):
     return jsonify({
         'success': False,
         'error': {
