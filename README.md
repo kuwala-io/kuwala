@@ -79,3 +79,5 @@ We currently have the following pipelines published:
   Global collection of point of interests (POIs)
 - [`population-density`](https://github.com/kuwala-io/kuwala/tree/master/kuwala-pipelines/population-density): 
   Detailed population and demographic data
+- [`google-poi`](https://github.com/kuwala-io/kuwala/tree/master/kuwala-pipelines/google-poi):
+  Scraping API to retrieve POI information from Google (incl. popularity score)
