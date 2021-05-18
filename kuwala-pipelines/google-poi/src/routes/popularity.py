@@ -20,15 +20,16 @@ async def get_popularities():
     results = list()
 
     def parse_result(r):
-        p = get_nested_value(r['data'], 6, 84, 7, 1)
-        time_zone = get_nested_value(r['data'], 31, 1, 0, 0)
-        date_time = moment.utcnow().timezone(time_zone)
+        data = r['data']
+        p = get_nested_value(data, 6, 84, 7, 1)
+        time_zone = get_nested_value(data, 31, 1, 0, 0)
+        timestamp = moment.utcnow().timezone(time_zone).replace(minutes=0, seconds=0)
 
         return dict(
             id=r['id'],
             data=dict(
                 popularity=p,
-                dateTime=str(date_time)
+                timestamp=str(timestamp)
             )
         )
 

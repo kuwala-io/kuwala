@@ -80,7 +80,7 @@ def get_by_id(pb_id):
     :param str pb_id: Id that is used to retrieve a specific place over the pb query parameter
     :return: The id with its corresponding result
     """
-    # 'https://www.google.com/maps/preview/place?authuser=0&hl=de&gl=de&pb=!1m17!1s0x47a851d0f395f8eb%3A0xb070b9b7b54dbe0a!3m12!1m3!1d1308.9711715352228!2d13.387873315807123!3d52.51106117981246!2m3!1f0!2f0!3f0!3m2!1i1440!2i414!4f13.1!4m2!3d52.510551380042145!4d13.390612676739682!12m4!2m3!1i360!2i120!4i8!13m65!2m2!1i203!2i100!3m2!2i4!5b1!6m6!1m2!1i86!2i86!1m2!1i408!2i240!7m50!1m3!1e1!2b0!3e3!1m3!1e2!2b1!3e2!1m3!1e2!2b0!3e3!1m3!1e3!2b0!3e3!1m3!1e8!2b0!3e3!1m3!1e3!2b1!3e2!1m3!1e10!2b0!3e3!1m3!1e10!2b1!3e2!1m3!1e9!2b1!3e2!1m3!1e10!2b0!3e3!1m3!1e10!2b1!3e2!1m3!1e10!2b0!3e4!2b1!4b1!9b0!14m5!1sTpKbYLDlD47FUrPBo4gL!4m1!2i5210!7e81!12e3!15m55!1m17!4e2!13m7!2b1!3b1!4b1!6i1!8b1!9b1!20b1!18m7!3b1!4b1!5b1!6b1!9b1!13b1!14b0!2b1!5m5!2b1!3b1!5b1!6b1!7b1!10m1!8e3!14m1!3b1!17b1!20m2!1e3!1e6!24b1!25b1!26b1!29b1!30m1!2b1!36b1!43b1!52b1!54m1!1b1!55b1!56m2!1b1!3b1!65m5!3m4!1m3!1m2!1i224!2i298!89b1!21m28!1m6!1m2!1i0!2i0!2m2!1i458!2i414!1m6!1m2!1i1390!2i0!2m2!1i1440!2i414!1m6!1m2!1i0!2i0!2m2!1i1440!2i20!1m6!1m2!1i0!2i394!2m2!1i1440!2i414!22m1!1e81!29m0!30m1!3b1!34m2!7b1!10b1!37i557'
+
     url = 'https://www.google.com/maps/preview/place'
     params = {
         'authuser': 0,
