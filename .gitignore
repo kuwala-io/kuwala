@@ -4,3 +4,6 @@
 node_modules
 yarn.lock
 .history
+build
+npm-debug.log
+.env
