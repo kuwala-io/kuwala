@@ -36,7 +36,7 @@ brew install node, docker-compose
 
 ## Setup
 
-Install node modules
+Install node modules *in both* the *current* folder/project and in the *shared folder* which is present in the root directory.
 
 ```zsh
 npm ci
