@@ -28,15 +28,23 @@ this purpose.
 
 ### How you can contribute
 
+#### Be part of our community
+
 The best first step to get involved is to 
 [join](https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-pXKFBjbnl7_P3nXtwca5ag) the Kuwala Community 
 on Slack. There we discuss everything related to data integration and new pipelines. Every pipeline will be open-source. 
 We entirely decide, based on you, our community, which sources to integrate. You can reach out to us on Slack or 
-[email](mailto:community@kuwala.io) to request a new pipeline or contribute yourself. If you want to contribute 
+[email](mailto:community@kuwala.io) to request a new pipeline or contribute yourself. 
+
+#### Contribute to the project
+
+If you want to contribute 
 yourself, you can use your choice's programming language and database technology. We have the only requirement that it 
 is possible to run the pipeline locally, query the data through REST-API endpoints, and use 
 [Uber's H3](https://eng.uber.com/h3/) functionality to handle geographical transformations. We will then take the 
 responsibility to maintain your pipeline.
+
+*Note: In order to submit a pull request, please feel free to fork the project and then submit a PR to the base repo.*
 
 ### Liberating the work with data
 
