@@ -21,11 +21,11 @@ we also consolidate the OSM tags into separate objects.
 
 Installed version of *node*, *npm*, *Docker* and *docker-compose*.
 
+This project has dependency on [*h3-node*](https://www.npmjs.com/package/h3-node/). This module requires you to have the
+following libraries installed on your machine: *git, gyp, make, cmake, and a C compiler (gcc or clang)*.
+
 An easy way to run docker on your machine is using [*Docker Desktop*](https://docs.docker.com/desktop/) with a GUI to 
 manage your containers.
-
-This project has dependency on [*h3-node*](https://www.npmjs.com/package/h3-node/). This module requires you to have the
-following libraries installed on your machine: *git*, *gyp*, *make*, *cmake*, and a *C compiler (gcc or clang)*.
 
 #### Hints for macOS
 
@@ -39,7 +39,7 @@ brew install node, docker-compose
 
 ## Setup
 
-Install node modules *in both* the *current* folder/project and in the *shared folder* which is present in the root directory.
+Install node modules *in both* the *current folder/project*  and in the *shared folder which is present in the root directory*.
 
 ```zsh
 npm ci
