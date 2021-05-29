@@ -6,7 +6,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const pino = require('express-pino-logger');
-const { Middlewares } = require('../../../../shared/js');
+const { Middlewares } = require('../../../shared/js');
 const { geojson, radius } = require('./routes');
 
 const app = express();
