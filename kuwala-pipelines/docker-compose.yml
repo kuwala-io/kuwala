@@ -38,7 +38,7 @@ services:
     tty: true        # docker run -t
     profiles:
       - services
-      - triggered_by_user
+      - pipeline
       
 # TODO: enhance volume mappings to local tmp drives
 volumes:
