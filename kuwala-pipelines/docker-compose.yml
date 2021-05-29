@@ -1,0 +1,45 @@
+version: '3.1'
+
+services:
+
+  mongo:
+    container_name: kuwala-pipelines_mongo_db
+    image: mongo:4
+    command: --dbpath /data/db
+    restart: always
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodb:/data/db
+    profiles:
+      - pipeline_essentials
+      - services
+
+  mongo-express:
+    image: mongo-express:latest
+    restart: always
+    depends_on: [mongo]
+    ports:
+      - '8081:8081'
+    profiles:
+      - pipeline_essentials
+      - services
+  
+  osm-poi:
+    environment: 
+      - MONGO_HOST=kuwala-pipelines_mongo_db
+    build:
+      context: .
+      dockerfile: ./osm-poi/dockerfile
+    #image: testimage/osm
+    restart: always
+    depends_on: [mongo]
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    profiles:
+      - services
+      - triggered_by_user
+      
+# TODO: enhance volume mappings to local tmp drives
+volumes:
+  mongodb: 
