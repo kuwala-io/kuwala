@@ -1,9 +1,7 @@
 .idea
 .DS_Store
 **/.DS_Store
-node_modules
-yarn.lock
 .history
-build
+node_modules
+
 npm-debug.log
-.env
