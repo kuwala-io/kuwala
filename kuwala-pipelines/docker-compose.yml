@@ -39,6 +39,21 @@ services:
     profiles:
       - services
       - pipeline
+
+  population-density:
+    environment: 
+      - MONGO_HOST=kuwala-pipelines_mongo_db
+    build:
+      context: .
+      dockerfile: ./population-density/dockerfile
+    #image: testimage/osm
+    restart: always
+    depends_on: [mongo]
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    profiles:
+      - services
+      - pipeline
       
 # TODO: enhance volume mappings to local tmp drives
 volumes:
