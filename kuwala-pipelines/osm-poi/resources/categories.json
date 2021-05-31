@@ -22,11 +22,19 @@
       "building=gate",
       "building=hangar"
     ],
-    "subcategories": {
-      "category": "gate",
-      "gate": {"tags": ["aeroway=gate"]},
-      "terminal": {"category": "terminal", "tags": ["aeroway=terminal"]}
-    }
+    "subcategories": [
+      {
+        "category": "gate",
+        "tags": [
+          "aeroway=gate"
+        ]
+      }, {
+        "category": "terminal",
+        "tags": [
+          "aeroway=terminal"
+        ]
+      }
+    ]
   },
   "apartment": {
     "category": "apartment",
