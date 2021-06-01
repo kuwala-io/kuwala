@@ -19,4 +19,5 @@ RUN npm ci
 RUN apk del .gyp
 
 WORKDIR /opt/osm-poi
-CMD ["npm","run","start-processing:local" ]
+
+ENTRYPOINT ["npm","run"]
