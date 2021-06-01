@@ -4,7 +4,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const pino = require('express-pino-logger');
-const { Middlewares } = require('../../../../shared/js');
+const { Middlewares } = require('../../../shared/js');
 const { cell, geojson, radius } = require('./routes');
 
 const app = express();
@@ -35,7 +35,7 @@ async function connectDb() {
 connectDb().then(() => {
     const { API_PORT } = process.env;
 
-    app.listen(API_PORT, () => {
+    app.listen(API_PORT, '0.0.0.0', () => {
         console.info(`REST API listening on port ${API_PORT}`);
     });
 });

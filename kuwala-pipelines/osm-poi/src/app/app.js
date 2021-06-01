@@ -35,8 +35,8 @@ async function connectDb() {
 
 connectDb().then(() => {
     const { API_PORT } = process.env;
-
-    app.listen(API_PORT, () => {
+    
+    app.listen(API_PORT, '0.0.0.0', () => {
         console.info(`REST API listening on port ${API_PORT}`);
     });
 });
