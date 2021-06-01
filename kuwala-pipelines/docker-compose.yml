@@ -25,6 +25,23 @@ services:
       - pipeline_essentials
       - services
 
+  # docker-compose run  --service-ports google-poi
+  google-poi:
+    environment: 
+      - MONGO_HOST=kuwala-pipelines_mongo_db
+    build:
+      context: .
+      dockerfile: ./google-poi/dockerfile
+    restart: always
+    depends_on: [mongo]
+    ports:
+      - '3003:3003'
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    profiles:
+      - services
+      - pipeline
+
   # docker-compose run  --service-ports osm-poi start-processing:local
   # docker-compose run  --service-ports osm-poi start-api:local
   osm-poi:
