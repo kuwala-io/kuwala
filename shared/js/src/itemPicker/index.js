@@ -2,11 +2,12 @@ const readlineSync = require('readline-sync');
 
 function pickItem(items, query) {
     try {
-        const numberOfPages = Math.ceil(items.length / 35); // 35 is the max length for readlineSync
+        const pageLength = 35; // 35 is the max length for readlineSync
+        const numberOfPages = Math.ceil(items.length / pageLength);
         const pages = [];
 
         for (let i = 0; i < numberOfPages; i += 1) {
-            pages.push(items.slice(i * 35, i * 35 + 35));
+            pages.push(items.slice(i * pageLength, (i + 1) * pageLength));
         }
 
         let option = -1;
@@ -23,7 +24,7 @@ function pickItem(items, query) {
         }
 
         if (option > -1) {
-            return option;
+            return option + currentPage * pageLength;
         }
 
         if (option === -1) {
