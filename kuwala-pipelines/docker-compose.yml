@@ -24,31 +24,37 @@ services:
     profiles:
       - pipeline_essentials
       - services
-  
+
+  # docker-compose run  --service-ports osm-poi start-processing:local
+  # docker-compose run  --service-ports osm-poi start-api:local
   osm-poi:
     environment: 
       - MONGO_HOST=kuwala-pipelines_mongo_db
     build:
       context: .
       dockerfile: ./osm-poi/dockerfile
-    #image: testimage/osm
     restart: always
     depends_on: [mongo]
+    ports:
+      - '3001:3001'
     stdin_open: true # docker run -i
     tty: true        # docker run -t
     profiles:
       - services
       - pipeline
 
+  # docker-compose run  --service-ports population-density start-processing:local
+  # docker-compose run  --service-ports population-density start-api:local
   population-density:
     environment: 
       - MONGO_HOST=kuwala-pipelines_mongo_db
     build:
       context: .
       dockerfile: ./population-density/dockerfile
-    #image: testimage/osm
     restart: always
     depends_on: [mongo]
+    ports:
+      - '3002:3002'
     stdin_open: true # docker run -i
     tty: true        # docker run -t
     profiles:
@@ -57,4 +63,4 @@ services:
       
 # TODO: enhance volume mappings to local tmp drives
 volumes:
-  mongodb: 
+  mongodb:
