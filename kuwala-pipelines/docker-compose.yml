@@ -25,10 +25,21 @@ services:
       - pipeline_essentials
       - services
 
+  torproxy:
+    container_name: kuwala-pipelines_torproxy
+    image: dperson/torproxy:latest
+    restart: always
+    ports:
+      - '9050:9050'
+    profiles:
+      - pipeline_essentials
+      - services
+      
   # docker-compose run  --service-ports google-poi
   google-poi:
     environment: 
       - MONGO_HOST=kuwala-pipelines_mongo_db
+      - PROXY_ADDRESS=socks5://kuwala-pipelines_torproxy:9050
     build:
       context: .
       dockerfile: ./google-poi/dockerfile
