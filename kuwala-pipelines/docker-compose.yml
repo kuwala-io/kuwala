@@ -10,7 +10,7 @@ services:
     ports:
       - '27017:27017'
     volumes:
-      - mongodb:/data/db
+      - /tmp/kuwala/db:/data/db
     profiles:
       - pipeline_essentials
       - services
@@ -65,6 +65,8 @@ services:
     depends_on: [mongo]
     ports:
       - '3001:3001'
+    volumes:
+      - /tmp/kuwala/osmFiles:/opt/osm-poi/tmp/osmFiles
     stdin_open: true # docker run -i
     tty: true        # docker run -t
     profiles:
@@ -83,12 +85,11 @@ services:
     depends_on: [mongo]
     ports:
       - '3002:3002'
+    volumes:
+      - /tmp/kuwala/countries:/opt/osm-poi/tmp/countries
     stdin_open: true # docker run -i
     tty: true        # docker run -t
     profiles:
       - services
       - pipeline
       
-# TODO: enhance volume mappings to local tmp drives
-volumes:
-  mongodb:
