@@ -1,54 +1,20 @@
+import h3
 import json
 import os
 # noinspection PyUnresolvedReferences
 import src.neo4j.Neo4jConnection as Neo4jConnection
-from pyspark.sql import SparkSession
-from pyspark.sql.functions import flatten
+# noinspection PyUnresolvedReferences
+import src.neo4j.PipelineImporter as PipelineImporter
+from pyspark.sql.functions import flatten, lit
 
 
-def connect_to_mongo(database, collection):
-    mongo_url = f'mongodb://127.0.0.1:27017/{database}.{collection}'
-
-    return SparkSession \
-        .builder \
-        .appName('osmPoi') \
-        .config('spark.mongodb.input.uri', mongo_url) \
-        .config('spark.jars.packages', 'org.mongodb.spark:mongo-spark-connector_2.12:3.0.1') \
-        .getOrCreate()
-
-
+#  Sets uniqueness constraint for H3 indexes, OSM POIS, and POI categories
 def add_constraints():
-    Neo4jConnection.query_graph(
-        'CREATE CONSTRAINT poiCategory IF NOT EXISTS ON (pc:PoiCategory) ASSERT pc.name IS UNIQUE')
     Neo4jConnection.query_graph('CREATE CONSTRAINT h3Index IF NOT EXISTS ON (h:H3Index) ASSERT h.h3Index IS UNIQUE')
     Neo4jConnection.query_graph(
         'CREATE CONSTRAINT poiOsm IF NOT EXISTS ON (po:PoiOSM) ASSERT (po.osmId, po.type) IS NODE KEY')
-
-
-def insert_data_to_graph(partition, query):
-    def send_query(rows):
-        Neo4jConnection.query_graph(query, parameters={'rows': rows})
-        print('Inserted batch')
-
-    Neo4jConnection.connect_to_graph(uri="bolt://localhost:7687",
-                                     user="neo4j",
-                                     password="password")
-
-    batch = list()
-    batch_size = 10000
-
-    for row in partition:
-        batch.append(row.asDict())
-
-        if len(batch) == batch_size:
-            send_query(batch)
-
-            batch = list()
-
-    if len(batch) > 0:
-        send_query(batch)
-
-    Neo4jConnection.close()
+    Neo4jConnection.query_graph(
+        'CREATE CONSTRAINT poiCategory IF NOT EXISTS ON (pc:PoiCategory) ASSERT pc.name IS UNIQUE')
 
 
 def add_poi_categories():
@@ -65,27 +31,19 @@ def add_poi_categories():
         Neo4jConnection.query_graph(query, parameters={'rows': categories})
 
 
-def add_h3_indexes(df):
-    query = '''
-        UNWIND $rows AS row
-        MERGE (:H3Index { h3Index: row.h3Index })
-    '''
-
-    df.foreachPartition(lambda partition: insert_data_to_graph(partition, query))
-
-
 def add_osm_pois(df):
     query = '''
         // Create PoiOSM nodes
         UNWIND $rows AS row
         MERGE (po:PoiOSM { osmId: row.osmId, type: row.type })
         SET po.name = row.name, po.osmTags = row.osmTags
-        
+
         // Create H3 index nodes
         WITH row, po
-        MATCH (h:H3Index {h3Index: row.h3Index})
+        MERGE (h:H3Index { h3Index: row.h3Index })
+        ON CREATE SET h.resolution = row.resolution
         MERGE (po)-[:LOCATED_AT]->(h)
-        
+
         // Create relationship to PoiCategories
         WITH row, po
         MATCH (pc:PoiCategory) 
@@ -93,7 +51,7 @@ def add_osm_pois(df):
         MERGE (po)-[:BELONGS_TO]->(pc)
     '''
 
-    df.foreachPartition(lambda partition: insert_data_to_graph(partition, query))
+    df.foreachPartition(lambda partition: Neo4jConnection.batch_insert_data(partition, query))
 
 
 def add_osm_poi_addresses(df):
@@ -124,42 +82,50 @@ def add_osm_poi_addresses(df):
 
     if 'region' in df.columns:
         df = df.select('*', 'region.*')
-        df = df.drop('region')
+        df = df.drop('region')  # Necessary to drop because batch insert can only process elementary data types
 
     if 'details' in df.columns:
         df = df.select('*', 'details.*')
-        df = df.drop('details')
+        df = df.drop('details')  # Necessary to drop because batch insert can only process elementary data types
 
-    df.foreachPartition(lambda partition: insert_data_to_graph(partition, query))
+    df.foreachPartition(lambda partition: Neo4jConnection.batch_insert_data(partition, query))
 
 
-def import_data_from_mongo(database, collection):
-    limit = 10000
+def import_pois_osm(limit=None):
     Neo4jConnection.connect_to_graph(uri="bolt://localhost:7687",
                                      user="neo4j",
                                      password="password")
-    spark = connect_to_mongo(database, collection)
+    spark = PipelineImporter.connect_to_mongo('osm-poi', 'pois')
     df = spark.read.format('com.mongodb.spark.sql.DefaultSource').load()
     # TODO: Figure out how to join elements of an array that contains arrays of string pairs
     df = df.withColumn('osmId', df['osmId'].cast('Integer')).withColumn('osmTags', flatten('osmTags'))
 
     add_constraints()
     add_poi_categories()
-    Neo4jConnection.close()  # Closing because following functions are multi-threaded and don't use this connection
+    # Closing because following functions are multi-threaded and don't use this connection
+    Neo4jConnection.close_connection()
 
-    add_h3_indexes(df.select('h3Index').limit(limit))
-    add_osm_pois(df.select(
+    # noinspection PyUnresolvedReferences
+    resolution = h3.h3_get_resolution(df.first()['h3Index'])
+    osm_pois = df.select(
         'osmId',
         'type',
         'name',
         'osmTags',
         'h3Index',
         'categories'
-    ).limit(limit))
-    add_osm_poi_addresses(df.filter(df.address.isNotNull()).select(
+    ).withColumn('resolution', lit(resolution))
+    osm_poi_address = df.filter(df.address.isNotNull()).select(
         'osmId',
         'type',
         'address.*'
-    ).limit(limit))
+    )
+
+    if limit is not None:
+        osm_pois = osm_pois.limit(limit)
+        osm_poi_address = osm_poi_address.limit(limit)
+
+    add_osm_pois(osm_pois)
+    add_osm_poi_addresses(osm_poi_address)
 
     spark.stop()

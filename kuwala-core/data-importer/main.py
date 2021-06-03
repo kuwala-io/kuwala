@@ -1,4 +1,4 @@
-from src.neo4j.Neo4jImporter import import_data_from_mongo
+from src.neo4j.PipelineImporter import import_pipelines
 
 if __name__ == '__main__':
-    import_data_from_mongo('osm-poi', 'pois')
+    import_pipelines()
