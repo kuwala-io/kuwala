@@ -23,17 +23,8 @@
       "building=hangar"
     ],
     "subcategories": [
-      {
-        "category": "gate",
-        "tags": [
-          "aeroway=gate"
-        ]
-      }, {
-        "category": "terminal",
-        "tags": [
-          "aeroway=terminal"
-        ]
-      }
+      {"category": "gate", "tags": ["aeroway=gate"]},
+      {"category": "terminal", "tags": ["aeroway=terminal"]}
     ]
   },
   "apartment": {
@@ -358,6 +349,7 @@
       "amenity=cultural_centre",
       "amenity=customs",
       "amenity=cyber_cafe",
+      "amenity=cyclist_leaning_rail",
       "amenity=dancing_school",
       "amenity=dark_kitchen",
       "amenity=dead_post_office",
@@ -752,6 +744,7 @@
       "building=educational",
       "building=electricity",
       "building=elevator",
+      "building=elevator_housing",
       "building=entrance",
       "building=escape_shaft",
       "building=exhibition_center",
@@ -833,6 +826,7 @@
       "building=portakabin",
       "building=power",
       "building=prefabricated",
+      "building=presbytery",
       "building=pub",
       "building=public",
       "building=public_building",
@@ -915,6 +909,7 @@
       "building=tunnel_mouth",
       "building=tunnel_shaft",
       "building=undefined",
+      "building=unknown",
       "building=utility",
       "building=vacant",
       "building=vent_shaft",
@@ -1050,6 +1045,7 @@
       "craft=taxidermist",
       "craft=tiler",
       "craft=tinsmith",
+      "craft=toolmaker",
       "craft=tree_surgery",
       "craft=upholsterer",
       "craft=wall_draining",
@@ -1738,6 +1734,7 @@
       "shop=concertina_maker",
       "shop=confectionary",
       "shop=confectionery",
+      "shop=confectionery+name=Aseli Fabrikverkauf",
       "shop=construction",
       "shop=convenience",
       "shop=cooking",
@@ -1820,6 +1817,7 @@
       "shop=frozen",
       "shop=frozen_food",
       "shop=fruiterer",
+      "shop=fuel",
       "shop=funeral",
       "shop=funeral_directors",
       "shop=furnace",
@@ -2232,6 +2230,7 @@
       "sport=bicycle",
       "sport=bicycling",
       "sport=boating",
+      "sport=bobbycar",
       "sport=bocci",
       "sport=boxing_club",
       "sport=bridge",
@@ -2334,6 +2333,7 @@
       "sport=rc_boat",
       "sport=rc_car",
       "sport=real_tennis",
+      "sport=roller-skating",
       "sport=roller_hockey",
       "sport=roller_skating",
       "sport=roller_skiing",

@@ -96,7 +96,7 @@ def add_osm_pois(df):
     df.foreachPartition(lambda partition: insert_data_to_graph(partition, query))
 
 
-def add_osm_poi_addresses(graph, df):
+def add_osm_poi_addresses(df):
     query = '''
         UNWIND $rows AS row
         MATCH (p:PoiOSM)
@@ -122,36 +122,23 @@ def add_osm_poi_addresses(graph, df):
             pao.unit = row.unit
     '''
 
-    df = df \
-        .withColumn('houseNr', df.address.houseNr) \
-        .withColumn('houseName', df.address.houseName) \
-        .withColumn('block', df.address.block) \
-        .withColumn('street', df.address.street) \
-        .withColumn('place', df.address.place) \
-        .withColumn('zipCode', df.address.zipCode) \
-        .withColumn('city', df.address.city) \
-        .withColumn('country', df.address.country) \
-        .withColumn('full', df.address.full) \
-        .withColumn('neighborhood', df.address.region.neighborhood) \
-        .withColumn('suburb', df.address.region.suburb) \
-        .withColumn('district', df.address.region.district) \
-        .withColumn('province', df.address.region.province) \
-        .withColumn('state', df.address.region.state) \
-        .withColumn('level', df.address.details.level) \
-        .withColumn('flats', df.address.details.flats) \
-        .withColumn('unit', df.address.details.unit) \
-        .drop('address')
+    if 'region' in df.columns:
+        df = df.select('*', 'region.*')
+        df = df.drop('region')
 
-    insert_data_to_graph(graph, query, df)
+    if 'details' in df.columns:
+        df = df.select('*', 'details.*')
+        df = df.drop('details')
+
+    df.foreachPartition(lambda partition: insert_data_to_graph(partition, query))
 
 
 def import_data_from_mongo(database, collection):
-    limit = 25
+    limit = 10000
     Neo4jConnection.connect_to_graph(uri="bolt://localhost:7687",
                                      user="neo4j",
                                      password="password")
     spark = connect_to_mongo(database, collection)
-    # Use option to map nested columns
     df = spark.read.format('com.mongodb.spark.sql.DefaultSource').load()
     # TODO: Figure out how to join elements of an array that contains arrays of string pairs
     df = df.withColumn('osmId', df['osmId'].cast('Integer')).withColumn('osmTags', flatten('osmTags'))
@@ -169,6 +156,10 @@ def import_data_from_mongo(database, collection):
         'h3Index',
         'categories'
     ).limit(limit))
-    # add_osm_poi_addresses(graph, df.filter(df.address.isNotNull()).select('osmId', 'type', 'address').limit(limit))
+    add_osm_poi_addresses(df.filter(df.address.isNotNull()).select(
+        'osmId',
+        'type',
+        'address.*'
+    ).limit(limit))
 
     spark.stop()
