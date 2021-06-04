@@ -1,23 +1,32 @@
 FROM node:alpine
 
 COPY ./shared /opt/shared
-COPY ./population-density /opt/population-density
+COPY ./population-density /opt/app
+
+# awscli is in use in our node app, we meed to install it in the docker image
+RUN apk add --no-cache \
+        python3 \
+        py3-pip \
+    && pip3 install --upgrade pip \
+    && pip3 install \
+        awscli \
+    && rm -rf /var/cache/apk/*
 
 # Setting up a virtual build env in order to keep the image small
 RUN apk add --no-cache --virtual .gyp \
-        g++ gcc libgcc libstdc++ linux-headers make python2 bash git cmake && \
-            npm install --quiet node-gyp -g
+        g++ gcc libgcc libstdc++ linux-headers make bash git cmake && \
+        npm install --quiet node-gyp -g
 
 #Setting up 
 WORKDIR /opt/shared/js
 RUN npm ci
 
-WORKDIR /opt/population-density
+WORKDIR /opt/app
 RUN npm ci
 
 # Deleting the virtual build env in order to keep the image small
 RUN apk del .gyp
 
-WORKDIR /opt/population-density
+WORKDIR /opt/app
 
 ENTRYPOINT ["npm","run"]
