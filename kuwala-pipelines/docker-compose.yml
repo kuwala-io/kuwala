@@ -46,7 +46,7 @@ services:
       context: .
       dockerfile: ./google-poi/dockerfile
     restart: always
-    depends_on: [mongo]
+    depends_on: [mongo, torproxy]
     ports:
       - '3003:3003'
     stdin_open: true # docker run -i
