@@ -28,6 +28,8 @@ services:
   torproxy:
     container_name: kuwala-pipelines_torproxy
     image: dperson/torproxy:latest
+    environment: 
+      - TOR_MaxCircuitDirtiness=10
     restart: always
     ports:
       - '9050:9050'
