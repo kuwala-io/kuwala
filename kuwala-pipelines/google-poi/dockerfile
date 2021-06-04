@@ -1,12 +1,12 @@
 FROM python:3.9.5
 
 COPY ./shared /opt/shared
-COPY ./google-poi /opt/google-poi
+COPY ./google-poi /opt/app
 
-ENV PYTHONPATH="/opt:/opt/google-poi"
+ENV PYTHONPATH="/opt:/opt/app"
 
-WORKDIR /opt/google-poi
+WORKDIR /opt/app
 RUN pip install -r requirements.txt
 
-WORKDIR /opt/google-poi/src
+WORKDIR /opt/app/src
 ENTRYPOINT [ "python", "app.py", "local" ]
