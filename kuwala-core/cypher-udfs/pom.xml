@@ -1,0 +1,98 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>io.kuwala</groupId>
+    <artifactId>cypher-udfs</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>Kuwala Cypher UDFs</name>
+    <description>A project to extend Cypher with UDFs</description>
+    <properties>
+        <java.version>11</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <neo4j.version>4.0.8</neo4j.version>
+        <neo4j-java-driver.version>4.1.1</neo4j-java-driver.version>
+        <junit-jupiter.version>5.7.0</junit-jupiter.version>
+        <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <assertj.version>3.13.2</assertj.version>
+    </properties>
+    <dependencies>
+        <dependency>
+            <!-- This gives us the Procedure API our runtime code uses.
+                       We have a `provided` scope on it, because when this is
+                       deployed in a Neo4j Instance, the API will be provided
+                       by Neo4j. If you add non-Neo4j dependencies to this
+                       project, their scope should normally be `compile` -->
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j</artifactId>
+            <version>${neo4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Test Dependencies -->
+        <dependency>
+            <!-- This is used for a utility that lets us start Neo4j with
+                       a specific Procedure, which is nice for writing tests. -->
+            <groupId>org.neo4j.test</groupId>
+            <artifactId>neo4j-harness</artifactId>
+            <version>${neo4j.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <!-- Used to send cypher statements to our procedure. -->
+            <groupId>org.neo4j.driver</groupId>
+            <artifactId>neo4j-java-driver</artifactId>
+            <version>${neo4j-java-driver.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit-jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.uber</groupId>
+            <artifactId>h3</artifactId>
+            <version>3.7.0</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <!-- This generates a jar-file with our procedure code,
+                             plus any dependencies marked as `compile` scope.
+                             This should then be deployed in the `plugins` directory
+                             of each Neo4j instance in your deployment.
+                             After a restart, the procedure is available for calling. -->
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>${maven-shade-plugin.version}</version>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
