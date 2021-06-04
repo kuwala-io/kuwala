@@ -13,9 +13,21 @@ const baseUrl = 'https://download.geofabrik.de';
 const fileSuffix = '-latest.osm.pbf';
 
 async function pickRegion(url) {
-    const regionResponse = await axios.get(url);
+    let regionResponse;
+
+    try {
+        regionResponse = await axios.get(url);
+    } catch (error) {
+        const { status, statusText } = error.response;
+
+        if (status === 404 && statusText === 'Not Found') {
+            return { url: `${url}${fileSuffix}`, all: true };
+        }
+
+        return undefined;
+    }
+
     const regionsDoc = $(regionResponse.data);
-    // TODO filter special regions because they have no subpage
     const regions = Object.values($(`a[href$='${fileSuffix}']`, regionsDoc))
         .filter((elem) => elem.href)
         .map((elem) => elem.href.split(fileSuffix)[0]);
