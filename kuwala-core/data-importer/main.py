@@ -1,4 +1,5 @@
-from src.neo4j.PipelineImporter import import_pipelines
+import src.neo4j.PipelineImporter as PipelineImporter
 
 if __name__ == '__main__':
-    import_pipelines()
+    PipelineImporter.import_pipelines()
+    PipelineImporter.connect_pipelines()

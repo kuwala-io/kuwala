@@ -29,7 +29,25 @@ def connect_pipelines():
                                      user="neo4j",
                                      password="password")
 
-    query = ''''''  # TODO: Write udf
+    query_resolutions = '''
+        MATCH (h:H3Index)
+        WITH DISTINCT h.resolution AS resolutions
+        ORDER BY resolutions DESC
+        RETURN resolutions
+    '''
+    resolutions = Neo4jConnection.query_graph(query_resolutions)
 
-    Neo4jConnection.query_graph(query)
+    # Find parents of children and connect them
+    for i, resolution in enumerate(resolutions):
+        if i < len(resolutions) - 1:
+            query_connect_to_parent = f'''
+                MATCH (h1:H3Index)
+                WHERE h1.resolution = {resolution[0]} 
+                MATCH (h2:H3Index)
+                WHERE h2.h3Index = io.kuwala.h3.h3ToParent(h1.h3Index, {resolutions[i + 1][0]})
+                MERGE (h1)-[:CHILD_OF]->(h2)
+            '''
+
+            Neo4jConnection.query_graph(query_connect_to_parent)
+
     Neo4jConnection.close_connection()
