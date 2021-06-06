@@ -23,23 +23,6 @@ For more general information check out our
 
 ---
 
-## Prerequisites
-
-Installed version of *Docker* and *docker-compose*
-
-An easy way to run docker on your machine is using [*Docker Desktop*](https://docs.docker.com/desktop/) with a GUI to 
-manage your containers.
-
-#### Hints for macOS
-
-Installation of *node + npm* and *docker-compose* via *Homebrew*:
-
-```zsh
-brew install node, docker-compose
-```
-
----
-
 ## Run
 
 Proceed only if you followed the initial steps to initialize the main components mentioned here:

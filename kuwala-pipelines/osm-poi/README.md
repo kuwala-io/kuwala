@@ -17,26 +17,6 @@ we also consolidate the OSM tags into separate objects.
 
 ---
 
-## Prerequisites
-
-Installed version of *node*, *npm*, *Docker* and *docker-compose*.
-
-This project has dependency on [*h3-node*](https://www.npmjs.com/package/h3-node/). This module requires you to have the
-following libraries installed on your machine: *git, gyp, make, cmake, and a C compiler (gcc or clang)*.
-
-An easy way to run docker on your machine is using [*Docker Desktop*](https://docs.docker.com/desktop/) with a GUI to 
-manage your containers.
-
-#### Hints for macOS
-
-Installation of *node + npm* and *docker-compose* via *Homebrew*:
-
-```zsh
-brew install node, docker-compose
-```
-
----
-
 ## Run
 
 Proceed only if you followed the initial steps to initialize the main components mentioned here:
