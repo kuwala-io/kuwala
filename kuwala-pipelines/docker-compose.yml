@@ -42,6 +42,7 @@ services:
     environment: 
       - MONGO_HOST=kuwala-pipelines_mongo_db
       - PROXY_ADDRESS=socks5://kuwala-pipelines_torproxy:9050
+      - QUART_DEBUG=False
     build:
       context: .
       dockerfile: ./google-poi/dockerfile
@@ -49,8 +50,6 @@ services:
     depends_on: [mongo, torproxy]
     ports:
       - '3003:3003'
-    stdin_open: true # docker run -i
-    tty: true        # docker run -t
     profiles:
       - services
       - pipeline

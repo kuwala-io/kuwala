@@ -4,7 +4,7 @@ import moment
 import re
 import src.utils.google as google
 from config.h3.h3_config import POI_RESOLUTION
-from multiprocessing import Pool
+import asyncio
 from quart import abort, Blueprint, jsonify, request
 from src.utils.array_utils import get_nested_value
 
@@ -130,8 +130,7 @@ async def get_poi_information():
     if len(ids) > 100:
         abort(400, description='You can send at most 100 ids at once.')
 
-    pool = Pool(processes=math.ceil(len(ids) / 3))
-    results = list()
+    loop = asyncio.get_event_loop()
 
     def parse_result(r):
         data = r['data'][6]
@@ -182,8 +181,15 @@ async def get_poi_information():
                 spendingTime=spending_time
             )
         )
+    
+    futures = []
+    for id in ids:
+        futures.append(loop.run_in_executor(None, google.get_by_id, id))
 
-    for result in pool.imap(google.get_by_id, ids):
-        results.append(parse_result(result))
+    results = loop.run_until_complete(asyncio.gather(*futures))
+    
+    parsed = []
+    for result in results:
+        parsed.append(parse_result(result))
 
-    return jsonify({'success': True, 'data': results})
+    return jsonify({'success': True, 'data': parsed})
