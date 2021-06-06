@@ -12,6 +12,7 @@ Installed version of *Docker* and *docker-compose* ([*Go here for instructions*]
 First you always need to change your working directory to `./kuwala-pipelines`
 
 Next, it would be safer to always run the below build command after pulling new code changes so that your local images have the latest code. 
+
 Docker images will only be built once when you run the `init.sh` script, so new changes in the code will not reflect on your local unless you explicitly run the build command below.
 
 ```zsh
