@@ -25,10 +25,7 @@ For more general information check out our
 
 ## Prerequisites
 
-Installed version of *node*, *npm*, *Docker* and *docker-compose*
-
-This project has dependency on [*h3-node*](https://www.npmjs.com/package/h3-node/). This module requires you to have the
-following libraries installed on your machine: *git, gyp, make, cmake, and a C compiler (gcc or clang)*.
+Installed version of *Docker* and *docker-compose*
 
 An easy way to run docker on your machine is using [*Docker Desktop*](https://docs.docker.com/desktop/) with a GUI to 
 manage your containers.
@@ -43,26 +40,12 @@ brew install node, docker-compose
 
 ---
 
-## Setup
+## Run
 
-Install node modules *in both* the *current folder/project*  and in the *shared folder which is present in the root directory*.
-
-```zsh
-npm ci
-```
-
-Make sure Docker is running on your machine.
-
-Start mongo with *docker-compose*
+If you followed the setup guide as a first step, now you can run this pipeline by simply calling:
 
 ```zsh
-docker-compose up -d
-```
-
-Load population data into database
-
-```zsh
-npm run start-processing:local
+docker-compose run  --service-ports population-density start-processing:local
 ```
 
 Follow the prompts to download, process and write data [1]
@@ -84,7 +67,7 @@ Run the app locally.
 (Data can only be returned for regions that have previously been downloaded and processed.)
 
 ```zsh
-npm run start-api:local
+docker-compose run  --service-ports population-density start-api:local
 ```
 
 ### API Calls
