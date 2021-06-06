@@ -3,18 +3,7 @@
 
 ## Prerequisites
 
-Installed version of *Docker* and *docker-compose*
-
-An easy way to run docker on your machine is using [*Docker Desktop*](https://docs.docker.com/desktop/) with a GUI to 
-manage your containers.
-
-#### Hints for macOS
-
-Installation of *docker* and *docker-compose* via *Homebrew*:
-
-```zsh
-brew install docker, docker-compose
-```
+Installed version of *Docker* and *docker-compose* ([*Go here for instructions*](https://docs.docker.com/compose/install/))
 
 ---
 
