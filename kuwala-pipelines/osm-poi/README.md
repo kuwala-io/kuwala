@@ -37,32 +37,18 @@ brew install node, docker-compose
 
 ---
 
-## Setup
+## Run
 
-Install node modules *in both* the *current folder/project*  and in the *shared folder which is present in the root directory*.
-
-```zsh
-npm ci
-```
-
-Make sure Docker is running on your machine.
-
-Start mongo with *docker-compose*
+If you followed the setup guide as a first step, now you can run this pipeline by simply calling:
 
 ```zsh
-docker-compose up -d
-```
-
-Load OSM data into database
-
-```zsh
-npm run start-processing:local
+docker-compose run  --service-ports osm-poi start-processing:local
 ```
 
 Follow the prompts to download, process and write data for a continent, country or region [2]
 
 ***Alternative***: You can also download .osm.pbf files directly from [Geofabrik](http://download.geofabrik.de)
-and place them in an arbitrary folder under `tmp/osmFiles` and follow [1] instead.
+and place them in an arbitrary folder under `./tmp/kuwala/osmFiles` and follow [1] instead.
 
 ```console
 [1] Existing download
@@ -94,7 +80,7 @@ Run the app locally.
 (Data can only be returned for regions that have previously been downloaded and processed.)
 
 ```zsh
-npm run start-api:local
+docker-compose run  --service-ports osm-poi start-api:local
 ```
 
 ### API Calls
