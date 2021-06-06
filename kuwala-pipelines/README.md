@@ -13,7 +13,7 @@ manage your containers.
 Installation of *docker* and *docker-compose* via *Homebrew*:
 
 ```zsh
-brew install node, docker-compose
+brew install docker, docker-compose
 ```
 
 ---
