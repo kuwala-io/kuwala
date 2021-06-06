@@ -10,7 +10,7 @@ services:
     ports:
       - '27017:27017'
     volumes:
-      - /tmp/kuwala/db:/data/db
+      - ./tmp/kuwala/db:/data/db
     profiles:
       - pipeline_essentials
       - services
@@ -67,7 +67,7 @@ services:
     ports:
       - '3001:3001'
     volumes:
-      - /tmp/kuwala/osmFiles:/opt/app/tmp/osmFiles
+      - ./tmp/kuwala/osmFiles:/opt/app/tmp/osmFiles
     stdin_open: true # docker run -i
     tty: true        # docker run -t
     profiles:
@@ -87,7 +87,7 @@ services:
     ports:
       - '3002:3002'
     volumes:
-      - /tmp/kuwala/countries:/opt/app/tmp/countries
+      - ./tmp/kuwala/countries:/opt/app/tmp/countries
     stdin_open: true # docker run -i
     tty: true        # docker run -t
     profiles:
