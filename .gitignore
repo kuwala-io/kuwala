@@ -1,7 +1,10 @@
 .idea
 .DS_Store
 **/.DS_Store
+.vscode
 .history
 node_modules
 
 npm-debug.log
+
+tmp

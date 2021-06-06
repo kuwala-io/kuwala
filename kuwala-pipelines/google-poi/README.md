@@ -34,31 +34,15 @@ This score can also be over 100 if the number of visitors is extraordinarily hig
 
 ---
 
-## Prerequisites
-
-Installed version of *Python3*.
-
----
-
-## Setup
-
-Install pip packages.
-
-```zsh
-pip install -r requirements.txt
-```
-
-In order to not run into rate limits we recommend using a proxy (e.g., [Tor](https://www.torproject.org/download/)).
-Specify the address of the running proxy in the `config/env/.env.local` through the `PROXY_ADDRESS` variable.
-
----
-
 ## Usage
 
-Run the app locally (convenience script available under `scripts`).
+Proceed only if you followed the initial steps to initialize the main components mentioned here:
+[`Initialize Main Components`](https://github.com/kuwala-io/kuwala/tree/master/kuwala-pipelines/)
+
+Run the app locally.
 
 ```zsh
-python app.py local
+docker-compose run  --service-ports google-poi
 ```
 
 ### API Calls
