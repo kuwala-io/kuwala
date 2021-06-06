@@ -10,7 +10,7 @@ manage your containers.
 
 #### Hints for macOS
 
-Installation of *node + npm* and *docker-compose* via *Homebrew*:
+Installation of *docker* and *docker-compose* via *Homebrew*:
 
 ```zsh
 brew install node, docker-compose
