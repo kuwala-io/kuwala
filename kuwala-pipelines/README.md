@@ -17,10 +17,11 @@ Next, it would be safer to always run the below build command after pulling new 
 docker-compose build osm-poi population-density google-poi
 ```
 
-Now simply run the below init script to spawn the essential docker components our pipelines rely on. Please note that this is a blocking script and has to run in a separate terminal. When you exit ( `ctrl + c` the script automatically clean up all docker runs related to this project). Note: The init script will create data folders under ./tmp/kuwala that will be used for db, osm & google file downlaods/operations. You can always find the downloaded files overthere.
+Now simply run the below init script to spawn the essential docker components our pipelines rely on. Please note that this is a blocking script and has to run in a separate terminal. When you exit ( `ctrl + c` the script automatically clean up all docker runs related to this project). 
+
+Please note that the init script will create data folders under ./tmp/kuwala that will be used for db, osm & google file downlaods/operations. You can always find the downloaded files overthere.
 
 ```zsh
-
 # Run chmod only the first time you setup the project
 chmod +x ./shared/scripts/init.sh
 # end of first time
@@ -28,7 +29,6 @@ chmod +x ./shared/scripts/init.sh
 # Run init.sh in it's own separate terminal session
 # make sure you run the script while having `./kuwala-pipelines` as a working directory.
 ./shared/scripts/init.sh 
-
 ```
 
 Now you can proceed to any of the pipleines Readme and follow the steps to run them
