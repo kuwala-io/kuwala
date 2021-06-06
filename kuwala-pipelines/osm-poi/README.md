@@ -39,7 +39,8 @@ brew install node, docker-compose
 
 ## Run
 
-If you followed the setup guide as a first step, now you can run this pipeline by simply calling:
+Proceed only if you followed the initial steps to initialize the main components mentioned here:
+[`Initialize Main Components`](https://github.com/kuwala-io/kuwala/tree/master/kuwala-pipelines/)
 
 ```zsh
 docker-compose run  --service-ports osm-poi start-processing:local

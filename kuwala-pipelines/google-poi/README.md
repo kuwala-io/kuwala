@@ -36,6 +36,9 @@ This score can also be over 100 if the number of visitors is extraordinarily hig
 
 ## Usage
 
+Proceed only if you followed the initial steps to initialize the main components mentioned here:
+[`Initialize Main Components`](https://github.com/kuwala-io/kuwala/tree/master/kuwala-pipelines/)
+
 Run the app locally.
 
 ```zsh
