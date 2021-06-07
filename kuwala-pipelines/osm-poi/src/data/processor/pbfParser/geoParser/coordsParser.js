@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const d3 = require('d3-polygon');
-const { Formatter } = require('../../../../../../shared/js');
+const { Formatter } = require('../../../../../../common/js_utils');
 
 // Get coordinates of refs
 async function convertToGeoJSONCoords(refs, db) {

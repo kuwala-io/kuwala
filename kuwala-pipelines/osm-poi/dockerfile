@@ -1,6 +1,6 @@
 FROM node:alpine
 
-COPY ./shared /opt/shared
+COPY ./common/js_utils /opt/common/js_utils
 COPY ./osm-poi /opt/app
 
 # Setting up a virtual build env in order to keep the image small
@@ -9,7 +9,7 @@ RUN apk add --no-cache --virtual .gyp \
             npm install --quiet node-gyp -g
 
 #Setting up 
-WORKDIR /opt/shared/js
+WORKDIR /opt/common/js_utils
 RUN npm ci
 
 WORKDIR /opt/app
