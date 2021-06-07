@@ -1,3 +1,3 @@
-const config = require('../shared/js/codeStyle/prettier.config');
+const config = require('../common/js_utils/codeStyle/prettier.config');
 
 module.exports = config;

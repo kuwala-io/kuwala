@@ -1,6 +1,6 @@
 FROM node:alpine
 
-COPY ./shared /opt/shared
+COPY ./common/js_utils /opt/common/js_utils
 COPY ./population-density /opt/app
 
 # awscli is in use in our node app, we meed to install it in the docker image
@@ -18,7 +18,7 @@ RUN apk add --no-cache --virtual .gyp \
         npm install --quiet node-gyp -g
 
 #Setting up 
-WORKDIR /opt/shared/js
+WORKDIR /opt/common/js_utils
 RUN npm ci
 
 WORKDIR /opt/app
