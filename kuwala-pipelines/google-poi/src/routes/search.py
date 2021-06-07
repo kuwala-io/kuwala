@@ -1,11 +1,9 @@
 import h3
-import math
-
-import asyncio
 import src.utils.google as google
 from config.h3.h3_config import POI_RESOLUTION
-from quart import abort, Blueprint, jsonify, request
+from quart import abort, Blueprint, request
 from src.utils.array_utils import get_nested_value
+from src.utils.futures import execute_futures
 
 search = Blueprint('search', __name__)
 
@@ -17,8 +15,6 @@ async def search_places():
 
     if len(queries) > 100:
         abort(400, description='You can send at most 100 queries at once.')
-
-    loop = asyncio.get_event_loop()
 
     def parse_result(r):
         data = r['data']
@@ -37,15 +33,4 @@ async def search_places():
             )
         )
 
-    futures = []
-    for query in queries:
-        futures.append(loop.run_in_executor(None, google.search, query))
-
-    results = loop.run_until_complete(asyncio.gather(*futures))
-    
-    parsed = []
-    for result in results:
-        parsed.append(parse_result(result))
-
-
-    return jsonify({'success': True, 'data': parsed})
+    return execute_futures(queries, google.search, parse_result)
