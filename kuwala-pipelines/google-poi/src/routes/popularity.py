@@ -1,9 +1,8 @@
-import math
 import moment
 import src.utils.google as google
-import asyncio
-from quart import abort, Blueprint, jsonify, request
+from quart import abort, Blueprint, request
 from src.utils.array_utils import get_nested_value
+from src.utils.futures import execute_futures
 
 popularity = Blueprint('popularity', __name__)
 
@@ -15,8 +14,6 @@ async def get_popularities():
 
     if len(ids) > 100:
         abort(400, description='You can send at most 100 ids at once.')
-
-    loop = asyncio.get_event_loop()
 
     def parse_result(r):
         data = r['data']
@@ -32,14 +29,4 @@ async def get_popularities():
             )
         )
 
-    futures = []
-    for id in ids:
-        futures.append(loop.run_in_executor(None, google.get_by_id, id))
-
-    results = loop.run_until_complete(asyncio.gather(*futures))
-    
-    parsed = []
-    for result in results:
-        parsed.append(parse_result(result))
-
-    return jsonify({'success': True, 'data': parsed})
+    return execute_futures(ids, google.get_by_id, parse_result)
