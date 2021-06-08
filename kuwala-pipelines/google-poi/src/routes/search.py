@@ -20,20 +20,26 @@ async def search_places():
         data = r['data']
 
         if data:
-            lat = round(get_nested_value(data, 9, 2), 7)  # 7 digits equals a precision of 1 cm
-            lng = round(get_nested_value(data, 9, 3), 7)  # 7 digits equals a precision of 1 cm
-            # noinspection PyUnresolvedReferences
-            h3_index = h3.geo_to_h3(lat, lng, POI_RESOLUTION)
-            pb_id = get_nested_value(data, 10)
+            lat = get_nested_value(data, 9, 2)
+            lng = get_nested_value(data, 9, 3)
 
-            return dict(
-                query=r['query'],
-                data=dict(
-                    location=dict(lat=lat, lng=lng),
-                    h3Index=h3_index,
-                    id=pb_id
+            if lat and lng:
+                lat = round(lat, 7)  # 7 digits equals a precision of 1 cm
+                lng = round(lng, 7)  # 7 digits equals a precision of 1 cm
+                # noinspection PyUnresolvedReferences
+                h3_index = h3.geo_to_h3(lat, lng, POI_RESOLUTION)
+                pb_id = get_nested_value(data, 10)
+                name = get_nested_value(data, 11)
+
+                return dict(
+                    query=r['query'],
+                    data=dict(
+                        location=dict(lat=lat, lng=lng),
+                        h3Index=h3_index,
+                        id=pb_id,
+                        name=name
+                    )
                 )
-            )
 
         return r
 
