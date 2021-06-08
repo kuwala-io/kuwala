@@ -1,7 +1,5 @@
 import h3
-# noinspection PyUnresolvedReferences
 import src.neo4j.Neo4jConnection as Neo4jConnection
-# noinspection PyUnresolvedReferences
 import src.neo4j.PipelineImporter as PipelineImporter
 from pyspark.sql.functions import lit
 

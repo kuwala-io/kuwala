@@ -1,9 +1,6 @@
-# noinspection PyUnresolvedReferences
 import src.neo4j.Neo4jConnection as Neo4jConnection
 from pyspark.sql import SparkSession
-# noinspection PyUnresolvedReferences
 from src.neo4j.PoiOSMImporter import import_pois_osm
-# noinspection PyUnresolvedReferences
 from src.neo4j.PopulationDensityImporter import import_population_density
 
 
