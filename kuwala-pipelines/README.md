@@ -25,12 +25,12 @@ Please note that the init script will create data folders under ./tmp/kuwala tha
 
 ```zsh
 # Run chmod only the first time you setup the project
-chmod +x ./shared/scripts/init.sh
+chmod +x ./common/scripts/init.sh
 # end of first time
 
 # Run init.sh in it's own separate terminal session
 # make sure you run the script while having `./kuwala-pipelines` as a working directory.
-./shared/scripts/init.sh 
+./common/scripts/init.sh 
 ```
 
 Now you can proceed to any of the pipleines Readme and follow the steps to run them

@@ -1,5 +1,5 @@
 const Router = require('express');
-const { Errors, H3Utils } = require('../../../../../shared/js');
+const { Errors, H3Utils } = require('../../../../../common/js_utils');
 const { h3Config } = require('../../../../config');
 const { Mongo } = require('../../../utils');
 

@@ -1,6 +1,6 @@
 const Router = require('express');
 const { h3Config } = require('../../../../config');
-const { H3Utils } = require('../../../../../shared/js');
+const { H3Utils } = require('../../../../../common/js_utils');
 const { Poi } = require('../../../models');
 
 const router = Router();

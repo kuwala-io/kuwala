@@ -7,7 +7,7 @@ const progress = require('progress-stream');
 const streamLength = require('stream-length');
 const $ = require('jquery')(new jsdom.JSDOM().window);
 const { continents } = require('../../../../resources');
-const { ItemPicker } = require('../../../../../shared/js');
+const { ItemPicker } = require('../../../../../common/js_utils');
 
 const baseUrl = 'https://download.geofabrik.de';
 const fileSuffix = '-latest.osm.pbf';

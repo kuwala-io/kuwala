@@ -1,12 +1,16 @@
 import logging
 import os
 import sys
+
+sys.path.insert(0, '../../common/')
+sys.path.insert(0, '../')
+
 from dotenv import load_dotenv
 from quart import Quart
 from routes.search import search
 from routes.poi_information import poi_information
 from routes.popularity import popularity
-from shared.python.src.error_handler import general_error
+from python_utils.src.error_handler import general_error
 from utils.proxy import check_proxy_connection
 
 app = Quart(__name__)
