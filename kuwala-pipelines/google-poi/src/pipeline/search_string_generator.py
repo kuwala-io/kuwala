@@ -21,18 +21,18 @@ def generate_search_strings():
         .filter(array_contains('categories', 'public_transportation')) \
         .withColumn('station', concat_ws(' ', col('name'), lit('station'))) \
         .withColumn(
-            'searchString',
+            'query',
             concat_ws(', ', col('station'), concat_ws(' ', col('street'), col('houseNr')), col('zipCode'), col('city'))
         ) \
-        .select('h3Index', 'searchString')
+        .select('h3Index', 'name', 'query')
     with_address = df \
         .filter(~array_contains('categories', 'public_transportation')) \
         .withColumn(
-            'searchString',
+            'query',
             concat_ws(', ', col('name'), concat_ws(' ', col('street'), col('houseNr')), col('zipCode'), col('city'))
             if 'full' not in df.columns else
             concat_ws(', ', col('name'), col('full'))
         ) \
-        .select('h3Index', 'searchString')
+        .select('h3Index', 'name', 'query')
 
     return with_public_transport.union(with_address)
