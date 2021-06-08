@@ -28,4 +28,4 @@ if __name__ == '__main__':
     if not check_proxy_connection():
         logging.warning('Could not connect to proxy.')
 
-    app.run(host='0.0.0.0',port=int(os.environ.get("API_PORT")))
+    app.run(host='0.0.0.0', port=int(os.environ.get("API_PORT")))
