@@ -16,7 +16,7 @@ def connect_to_mongo(database, collection):
 def generate_search_strings():
     spark = connect_to_mongo('osm-poi', 'pois')
     df = spark.read.format('com.mongodb.spark.sql.DefaultSource').load()
-    df = df.filter(df.address.isNotNull()).select('name', 'h3Index', 'address.*', 'categories')
+    df = df.filter(df.address.isNotNull()).select('osmId', 'type', 'name', 'h3Index', 'address.*', 'categories')
     with_public_transport = df \
         .filter(array_contains('categories', 'public_transportation')) \
         .withColumn('station', concat_ws(' ', col('name'), lit('station'))) \
@@ -24,7 +24,7 @@ def generate_search_strings():
             'query',
             concat_ws(', ', col('station'), concat_ws(' ', col('street'), col('houseNr')), col('zipCode'), col('city'))
         ) \
-        .select('h3Index', 'name', 'query')
+        .select('osmId', 'type', 'h3Index', 'name', 'query')
     with_address = df \
         .filter(~array_contains('categories', 'public_transportation')) \
         .withColumn(
@@ -33,6 +33,6 @@ def generate_search_strings():
             if 'full' not in df.columns else
             concat_ws(', ', col('name'), col('full'))
         ) \
-        .select('h3Index', 'name', 'query')
+        .select('osmId', 'type', 'h3Index', 'name', 'query')
 
     return with_public_transport.union(with_address)
