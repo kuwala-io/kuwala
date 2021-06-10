@@ -41,6 +41,6 @@ async def search_places():
                     )
                 )
 
-        return r
+        return dict(query=r['query'], data=None)
 
     return execute_futures(queries, google.search, parse_result)
