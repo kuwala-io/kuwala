@@ -1,39 +1,57 @@
 import h3
+import json
+import moment
 import requests
 from fuzzywuzzy import fuzz
+from ListAccumulator import ListAccumulator
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col, udf
 from pyspark.sql.types import DoubleType, IntegerType
+from typing import Callable
+
+max_h3_distance = 500
 
 
 class SearchScraper:
-    matched_results: list[DataFrame] = list()
-
+    """Get result for search strings"""
     @staticmethod
     def send_search_query(batch):
         result = requests.request(method='get', url='http://localhost:3003/search', json=batch)
 
         return result.json()
 
+    """Get POI information by id"""
     @staticmethod
-    @udf(returnType=IntegerType())
-    def get_h3_distance(h1, h2):
-        # noinspection PyUnresolvedReferences
-        return h3.h3_distance(h1, h2)
+    def send_poi_query(batch):
+        result = requests.request(method='get', url='http://localhost:3003/poi-information', json=batch)
 
+        return result.json()
+
+    """Get number of H3 cells in between to given cells of the same resolution"""
     @staticmethod
     @udf(returnType=IntegerType())
-    def get_name_distance(osm_name, query, google_name):
+    def get_h3_distance(h1: str, h2: str):
+        try:
+            # noinspection PyUnresolvedReferences
+            return h3.h3_distance(h1, h2)
+        except h3.H3ValueError:
+            return max_h3_distance
+
+    """Get a similarity score for the Google name compared to the OSM name"""
+    @staticmethod
+    @udf(returnType=IntegerType())
+    def get_name_distance(osm_name: str, query: str, google_name: str):
         return fuzz.token_set_ratio(osm_name, google_name) if osm_name else fuzz.token_set_ratio(query, google_name)
 
+    """Calculate the confidence of a Google result based on the name and H3 distance"""
     @staticmethod
     @udf(returnType=DoubleType())
-    def get_confidence(h3_distance, name_distance):
+    def get_confidence(h3_distance: int, name_distance: int):
         def get_h3_confidence(d):
             if d <= 25:
                 return 1
 
-            return 1 - d / 500 if d < 1000 else 0
+            return 1 - d / max_h3_distance if d < max_h3_distance else 0
 
         def get_name_confidence(d):
             return d / 100
@@ -43,15 +61,17 @@ class SearchScraper:
 
         return h3_confidence * (2 / 3) + name_confidence * (1 / 3)
 
+    """Match the queries that have been sent to the received results"""
     @staticmethod
-    def match_results(partition, results):
+    def match_search_results(df_p: DataFrame, results: list) -> DataFrame:
         spark = SparkSession.builder.appName('google-poi').getOrCreate()
-        df_p = spark.createDataFrame(data=partition, schema=['osmId', 'type', 'h3Index', 'name', 'query']).alias('df_p')
-        df_r = spark.createDataFrame(data=results, schema=['data, query'])
+        df_r = spark.sparkContext.parallelize(results).map(lambda x: json.dumps(x))
+        df_r = spark.read.option('multiLine', 'true').json(df_r)
+
         # noinspection PyTypeChecker
         return df_p \
+            .alias('df_p') \
             .join(df_r, df_p.query == df_r.query, 'inner') \
-            .withColumn('data', col('data, query')) \
             .filter(col('data.h3Index').isNotNull()) \
             .withColumn('osmName', col('df_p.name')) \
             .withColumn('googleName', col('data.name')) \
@@ -63,48 +83,80 @@ class SearchScraper:
             .withColumn('confidence', SearchScraper.get_confidence(col('h3Distance'), col('nameDistance'))) \
             .select('osmId', 'type', 'confidence', 'data.id')
 
+    """Match the POI ids that have been sent to the received results"""
     @staticmethod
-    def batch_queries(partition, query_function, match_function, result_buffer):
-        batch = list()
-        results = list()
-        batch_size = 10
+    def match_poi_results(df_p: DataFrame, results: list) -> DataFrame:
+        spark = SparkSession.builder.appName('google-poi').getOrCreate()
+        df_r = spark.sparkContext.parallelize(results).map(lambda x: json.dumps(x))
+        df_r = spark.read.option('multiLine', 'true').json(df_r)
 
-        for row in partition:
-            batch.append(row.query)
+        # noinspection PyTypeChecker
+        return df_p \
+            .alias('df_p') \
+            .join(df_r, df_p.id == df_r.id, 'inner') \
+            .filter(col('data.h3Index').isNotNull()) \
+            .select('osmId', 'type', 'confidence', col('df_p.id').alias('id'), 'data.*')
 
-            if len(batch) == batch_size:
-                result = query_function(batch)
-                batch = list()
+    """Send queries in batches for each partition of a dataframe"""
+    @staticmethod
+    def batch_queries(
+            df: DataFrame,
+            query_property: str,
+            query_function: Callable,
+            match_function: Callable
+    ) -> DataFrame:
+        def execute_queries(partition, q_property, q_function, accu):
+            batch = list()
+            batch_size = 100
+
+            for row in partition:
+                batch.append(row[q_property])
+
+                if len(batch) == batch_size:
+                    result = q_function(batch)
+                    batch = list()
+
+                    if 'data' in result:
+                        accu.add(result['data'])
+
+            if len(batch) > 0:
+                result = q_function(batch)
 
                 if 'data' in result:
-                    results.extend(result['data'])
+                    accu.add(result['data'])
 
-        if len(batch) > 0:
-            result = query_function(batch)
+        spark = SparkSession.builder.appName('google-poi').getOrCreate()
+        # An accumulator is necessary because when using parallelization only copies of passed objects would be updated
+        accumulator = spark.sparkContext.accumulator([], ListAccumulator())
 
-            if 'data' in result:
-                results.extend(result['data'])
+        df.foreachPartition(lambda p: execute_queries(p, query_property, query_function, accumulator))
 
-        matched_results = match_function(partition, results)
+        return match_function(df, accumulator.value)
 
-        result_buffer.append(matched_results)
-
-    def send_search_queries(self, partition):
-        SearchScraper.batch_queries(
-            partition,
+    """Send search strings to get Google POI ids"""
+    @staticmethod
+    def send_search_queries(df: DataFrame) -> DataFrame:
+        return SearchScraper.batch_queries(
+            df,
+            query_property='query',
             query_function=SearchScraper.send_search_query,
-            match_function=SearchScraper.match_results,
-            result_buffer=self.matched_results
+            match_function=SearchScraper.match_search_results
         )
 
-    def scrape_with_search_string(self, search_strings: DataFrame):
-        # TODO: Enable for production
-        #  search_strings.foreachPartition(lambda p: send_search_queries(p))
-        self.send_search_queries(search_strings.take(20))
+    """Send Google POI ids to retrieve all POI information"""
+    @staticmethod
+    def send_poi_queries(df: DataFrame) -> DataFrame:
+        return SearchScraper.batch_queries(
+            df,
+            query_property='id',
+            query_function=SearchScraper.send_poi_query,
+            match_function=SearchScraper.match_poi_results
+        )
 
-        df_results = self.matched_results[0]
+    """Write scraped POI information to a Parquet file"""
+    @staticmethod
+    def scrape_with_search_string(search_strings: DataFrame):
+        search_results = SearchScraper.send_search_queries(search_strings)
+        poi_results = SearchScraper.send_poi_queries(search_results)
 
-        for i in range(1, len(self.matched_results)):
-            df_results = df_results.union(self.matched_results[i])
-
-        df_results.show(truncate=False)
+        poi_results.write.parquet(f'../../../tmp/kuwala/googleFiles/google_pois_{moment.now()}.parquet')

@@ -133,10 +133,15 @@ async def get_poi_information():
         data = r['data'][6]
         name = get_nested_value(data, 11)
         place_id = get_nested_value(data, 78)
-        lat = round(get_nested_value(data, 9, 2), 7)  # 7 digits equals a precision of 1 cm
-        lng = round(get_nested_value(data, 9, 3), 7)  # 7 digits equals a precision of 1 cm
+        lat = get_nested_value(data, 9, 2)
+        lng = get_nested_value(data, 9, 3)
+
+        if lat and lng:
+            lat = round(lat, 7)  # 7 digits equals a precision of 1 cm
+            lng = round(lng, 7)  # 7 digits equals a precision of 1 cm
+
         # noinspection PyUnresolvedReferences
-        h3_index = h3.geo_to_h3(lat, lng, POI_RESOLUTION)
+        h3_index = h3.geo_to_h3(lat, lng, POI_RESOLUTION) if lat and lng else None
         address = get_nested_value(data, 2)
         timezone = get_nested_value(data, 30)
         categories = [t[0] for t in (get_nested_value(data, 76) or [])]
