@@ -17,13 +17,18 @@ services:
   
   neo4j:
     container_name: kuwala-pipelines_neo4j_db
-    image: neo4j:4.3.0-community
+    build:
+      context: .
+      dockerfile: ./core/neo4j/docker/dockerfile
     restart: always
+    environment: 
+      - NEO4J_AUTH=none
     ports:
       - '7474:7474'
       - '7687:7687'
     volumes:
-      - ./tmp/kuwala/db/neo4j:/data
+      - ./tmp/kuwala/db/neo4j/data:/data
+      - ./tmp/kuwala/db/neo4j/plugins:/plugins
     profiles:
       - core
       - network
