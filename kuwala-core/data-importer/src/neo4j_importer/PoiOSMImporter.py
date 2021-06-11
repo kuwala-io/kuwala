@@ -9,10 +9,10 @@ from pyspark.sql.functions import flatten, lit
 #  Sets uniqueness constraint for H3 indexes, OSM POIS, and POI categories
 def add_constraints():
     Neo4jConnection.query_graph('CREATE CONSTRAINT h3Index IF NOT EXISTS ON (h:H3Index) ASSERT h.h3Index IS UNIQUE')
-    Neo4jConnection.query_graph(
-        'CREATE CONSTRAINT poiOsm IF NOT EXISTS ON (po:PoiOSM) ASSERT (po.osmId, po.type) IS NODE KEY')
-    Neo4jConnection.query_graph(
-        'CREATE CONSTRAINT poiCategory IF NOT EXISTS ON (pc:PoiCategory) ASSERT pc.name IS UNIQUE')
+    Neo4jConnection.query_graph('CREATE CONSTRAINT poiOsm IF NOT EXISTS ON (po:PoiOSM) ASSERT (po.osmId, po.type) IS '
+                                'NODE KEY')
+    Neo4jConnection.query_graph('CREATE CONSTRAINT poiCategory IF NOT EXISTS ON (pc:PoiCategory) ASSERT pc.name IS '
+                                'UNIQUE')
 
 
 def add_poi_categories():
@@ -34,7 +34,26 @@ def add_osm_pois(df):
         // Create PoiOSM nodes
         UNWIND $rows AS row
         MERGE (po:PoiOSM { osmId: row.osmId, type: row.type })
-        SET po.name = row.name, po.osmTags = row.osmTags
+        SET 
+            po.name = row.name, 
+            po.osmTags = row.osmTags,
+            po.houseNr = row.houseNr,
+            po.houseName = row.houseName,
+            po.block = row.block,
+            po.street = row.street,
+            po.place = row.place,
+            po.zipCode = row.zipCode,
+            po.city = row.city,
+            po.country = row.country,
+            po.full = row.full,
+            po.neighborhood = row.neighborhood,
+            po.suburb = row.suburb,
+            po.district = row.district,
+            po.province = row.province,
+            po.state = row.state,
+            po.level = row.level,
+            po.flats = row.flats,
+            po.unit = row.unit
 
         // Create H3 index nodes
         WITH row, po
@@ -47,35 +66,6 @@ def add_osm_pois(df):
         MATCH (pc:PoiCategory) 
         WHERE pc.name IN row.categories
         MERGE (po)-[:BELONGS_TO]->(pc)
-    '''
-
-    df.foreachPartition(lambda partition: Neo4jConnection.batch_insert_data(partition, query))
-
-
-def add_osm_poi_addresses(df):
-    query = '''
-        UNWIND $rows AS row
-        MATCH (p:PoiOSM)
-        WHERE p.osmId = row.osmId AND p.type = row.type
-        MERGE (p)-[:HAS]->(pao:PoiAddressOSM)
-        SET 
-            pao.houseNr = row.houseNr,
-            pao.houseName = row.houseName,
-            pao.block = row.block,
-            pao.street = row.street,
-            pao.place = row.place,
-            pao.zipCode = row.zipCode,
-            pao.city = row.city,
-            pao.country = row.country,
-            pao.full = row.full,
-            pao.neighborhood = row.neighborhood,
-            pao.suburb = row.suburb,
-            pao.district = row.district,
-            pao.province = row.province,
-            pao.state = row.state,
-            pao.level = row.level,
-            pao.flats = row.flats,
-            pao.unit = row.unit
     '''
 
     if 'region' in df.columns:
@@ -111,19 +101,13 @@ def import_pois_osm(limit=None):
         'name',
         'osmTags',
         'h3Index',
-        'categories'
-    ).withColumn('resolution', lit(resolution))
-    osm_poi_address = df.filter(df.address.isNotNull()).select(
-        'osmId',
-        'type',
+        'categories',
         'address.*'
-    )
+    ).withColumn('resolution', lit(resolution))
 
     if limit is not None:
         osm_pois = osm_pois.limit(limit)
-        osm_poi_address = osm_poi_address.limit(limit)
 
     add_osm_pois(osm_pois)
-    add_osm_poi_addresses(osm_poi_address)
 
     spark.stop()
