@@ -7,7 +7,7 @@ def connect_to_mongo(database, collection):
 
     return SparkSession \
         .builder \
-        .appName('osmPoi') \
+        .appName('google-poi') \
         .config('spark.mongodb.input.uri', mongo_url) \
         .config('spark.jars.packages', 'org.mongodb.spark:mongo-spark-connector_2.12:3.0.1') \
         .getOrCreate()

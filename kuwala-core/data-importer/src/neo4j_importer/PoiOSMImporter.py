@@ -3,6 +3,7 @@ import json
 import os
 import src.neo4j_importer.Neo4jConnection as Neo4jConnection
 import src.neo4j_importer.PipelineImporter as PipelineImporter
+from pyspark.sql import DataFrame
 from pyspark.sql.functions import flatten, lit
 
 
@@ -29,7 +30,7 @@ def add_poi_categories():
         Neo4jConnection.query_graph(query, parameters={'rows': categories})
 
 
-def add_osm_pois(df):
+def add_osm_pois(df: DataFrame):
     query = '''
         // Create PoiOSM nodes
         UNWIND $rows AS row
@@ -76,7 +77,7 @@ def add_osm_pois(df):
         df = df.select('*', 'details.*')
         df = df.drop('details')  # Necessary to drop because batch insert can only process elementary data types
 
-    df.foreachPartition(lambda partition: Neo4jConnection.batch_insert_data(partition, query))
+    df.foreachPartition(lambda p: Neo4jConnection.batch_insert_data(p, query))
 
 
 def import_pois_osm(limit=None):

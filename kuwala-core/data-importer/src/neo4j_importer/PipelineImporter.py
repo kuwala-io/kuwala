@@ -1,5 +1,6 @@
 import src.neo4j_importer.Neo4jConnection as Neo4jConnection
 from pyspark.sql import SparkSession
+from src.neo4j_importer.PoiGoogleImporter import import_pois_google
 from src.neo4j_importer.PoiOSMImporter import import_pois_osm
 from src.neo4j_importer.PopulationDensityImporter import import_population_density
 
@@ -17,6 +18,7 @@ def connect_to_mongo(database, collection):
 
 def import_pipelines():
     import_pois_osm()
+    import_pois_google()
     import_population_density()
 
 
