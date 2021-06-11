@@ -79,13 +79,13 @@ Data we would like to integrate, but a scalable approach is still missing:
 ## Using existing pipelines
 
 To use our published pipelines clone this repository and navigate to 
-[`kuwala-pipelines`](https://github.com/kuwala-io/kuwala/tree/master/kuwala-pipelines). There is a separate README 
+[`./kuwala/pipelines`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines). There is a separate README 
 for each pipeline on how to get started with it.
 
 We currently have the following pipelines published:
-- [`osm-poi`](https://github.com/kuwala-io/kuwala/tree/master/kuwala-pipelines/osm-poi):
+- [`osm-poi`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/osm-poi):
   Global collection of point of interests (POIs)
-- [`population-density`](https://github.com/kuwala-io/kuwala/tree/master/kuwala-pipelines/population-density): 
+- [`population-density`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/population-density): 
   Detailed population and demographic data
-- [`google-poi`](https://github.com/kuwala-io/kuwala/tree/master/kuwala-pipelines/google-poi):
+- [`google-poi`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/google-poi):
   Scraping API to retrieve POI information from Google (incl. popularity score)

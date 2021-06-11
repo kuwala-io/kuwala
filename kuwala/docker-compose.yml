@@ -10,7 +10,20 @@ services:
     ports:
       - '27017:27017'
     volumes:
-      - ./tmp/kuwala/db:/data/db
+      - ./tmp/kuwala/db/mongo:/data/db
+    profiles:
+      - core
+      - network
+  
+  neo4j:
+    container_name: kuwala-pipelines_neo4j_db
+    image: neo4j:4.3.0-community
+    restart: always
+    ports:
+      - '7474:7474'
+      - '7687:7687'
+    volumes:
+      - ./tmp/kuwala/db/neo4j:/data
     profiles:
       - core
       - network

@@ -1,1 +1,0 @@
-python ../src/app.py local
