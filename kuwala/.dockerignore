@@ -1,0 +1,5 @@
+node_modules
+docker-compose.yml
+prettier.confiog.js
+tmp
+env

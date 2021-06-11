@@ -1,0 +1,91 @@
+version: '3.1'
+
+services:
+
+  mongo:
+    container_name: kuwala-pipelines_mongo_db
+    image: mongo:4
+    command: --dbpath /data/db
+    restart: always
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./tmp/kuwala/db:/data/db
+    profiles:
+      - core
+      - network
+
+  mongo-express:
+    image: mongo-express:latest
+    restart: always
+    depends_on: [mongo]
+    ports:
+      - '8081:8081'
+    profiles:
+      - network
+
+  torproxy:
+    container_name: kuwala-pipelines_torproxy
+    image: dperson/torproxy:latest
+    environment: 
+      - TOR_MaxCircuitDirtiness=10
+    restart: always
+    ports:
+      - '9050:9050'
+    profiles:
+      - core
+      - network
+      
+  # docker-compose run  --service-ports google-poi
+  google-poi:
+    environment: 
+      - MONGO_HOST=kuwala-pipelines_mongo_db
+      - PROXY_ADDRESS=socks5://kuwala-pipelines_torproxy:9050
+      - QUART_DEBUG=False
+    build:
+      context: .
+      dockerfile: ./pipelines/google-poi/dockerfile
+    restart: always
+    depends_on: [mongo, torproxy]
+    ports:
+      - '3003:3003'
+    profiles:
+      - network
+
+  # docker-compose run  --service-ports osm-poi start-processing:local
+  # docker-compose run  --service-ports osm-poi start-api:local
+  osm-poi:
+    environment: 
+      - MONGO_HOST=kuwala-pipelines_mongo_db
+    build:
+      context: .
+      dockerfile: ./pipelines/osm-poi/dockerfile
+    restart: always
+    depends_on: [mongo]
+    ports:
+      - '3001:3001'
+    volumes:
+      - ./tmp/kuwala/osmFiles:/opt/app/tmp/osmFiles
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    profiles:
+      - network
+
+  # docker-compose run  --service-ports population-density start-processing:local
+  # docker-compose run  --service-ports population-density start-api:local
+  population-density:
+    environment: 
+      - MONGO_HOST=kuwala-pipelines_mongo_db
+    build:
+      context: .
+      dockerfile: ./pipelines/population-density/dockerfile
+    restart: always
+    depends_on: [mongo]
+    ports:
+      - '3002:3002'
+    volumes:
+      - ./tmp/kuwala/countries:/opt/app/tmp/countries
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    profiles:
+      - network

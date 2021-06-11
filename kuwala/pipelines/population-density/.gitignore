@@ -1,0 +1,12 @@
+.idea
+.DS_Store
+**/.DS_Store
+.history
+node_modules
+npm-debug.log
+
+config/env/*
+!config/env/.env.local
+
+tmp/*
+!tmp/countries/.gitkeep
