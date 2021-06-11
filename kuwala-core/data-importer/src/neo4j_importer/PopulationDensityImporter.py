@@ -1,6 +1,6 @@
 import h3
-import src.neo4j.Neo4jConnection as Neo4jConnection
-import src.neo4j.PipelineImporter as PipelineImporter
+import src.neo4j_importer.Neo4jConnection as Neo4jConnection
+import src.neo4j_importer.PipelineImporter as PipelineImporter
 from pyspark.sql.functions import lit
 
 
