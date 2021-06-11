@@ -1,7 +1,7 @@
-import src.neo4j.Neo4jConnection as Neo4jConnection
+import src.neo4j_importer.Neo4jConnection as Neo4jConnection
 from pyspark.sql import SparkSession
-from src.neo4j.PoiOSMImporter import import_pois_osm
-from src.neo4j.PopulationDensityImporter import import_population_density
+from src.neo4j_importer.PoiOSMImporter import import_pois_osm
+from src.neo4j_importer.PopulationDensityImporter import import_population_density
 
 
 def connect_to_mongo(database, collection):
