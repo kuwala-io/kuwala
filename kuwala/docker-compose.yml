@@ -28,7 +28,6 @@ services:
       - '7687:7687'
     volumes:
       - ./tmp/kuwala/db/neo4j/data:/data
-      - ./tmp/kuwala/db/neo4j/plugins:/plugins
     profiles:
       - core
       - network

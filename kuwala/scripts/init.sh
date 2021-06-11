@@ -6,7 +6,6 @@ function remove {
 }
 mkdir -p ./tmp/kuwala/db/mongo
 mkdir -p ./tmp/kuwala/db/neo4j/data
-mkdir -p ./tmp/kuwala/db/neo4j/plugins
 mkdir -p ./tmp/kuwala/countries
 mkdir -p ./tmp/kuwala/osmFiles
 
