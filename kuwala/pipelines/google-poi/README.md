@@ -10,7 +10,7 @@ makes it suitable for time series analysis.
 For places with a very high number of average visitors there is also the live popularity for the current hour available.
 This score can also be over 100 if the number of visitors is extraordinarily high.
 
-![Popularity Graph](../../docs/images/google_poi_popularity_graph.png)
+![Popularity Graph](../../../docs/images/google_poi_popularity_graph.png)
 
 ### Features
 
