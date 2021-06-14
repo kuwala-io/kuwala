@@ -1,16 +1,16 @@
 import h3
-import src.neo4j_importer.Neo4jConnection as Neo4jConnection
-import src.neo4j_importer.PipelineImporter as PipelineImporter
+import Neo4jConnection as Neo4jConnection
+import PipelineImporter as PipelineImporter
 from pyspark.sql.functions import lit
 
 
 #  Sets uniqueness constraint for population values
 def add_constraints():
-    Neo4jConnection.connect_to_graph(uri="bolt://localhost:7687",
-                                     user="neo4j",
-                                     password="password")
+    Neo4jConnection.connect_to_graph()
+    
     Neo4jConnection.query_graph(
         'CREATE CONSTRAINT population IF NOT EXISTS ON (p:Population) ASSERT p.value IS UNIQUE')
+
     Neo4jConnection.close_connection()
 
 
@@ -41,6 +41,7 @@ def add_cells(df):
 def import_population_density(limit=None):
     spark = PipelineImporter.connect_to_mongo('population', 'cells')
     df = spark.read.format('com.mongodb.spark.sql.DefaultSource').load().withColumnRenamed('_id', 'h3Index')
+    
     # noinspection PyUnresolvedReferences
     resolution = h3.h3_get_resolution(df.first()['h3Index'])
     cells = df.select('h3Index', 'population.*').withColumn('resolution', lit(resolution))

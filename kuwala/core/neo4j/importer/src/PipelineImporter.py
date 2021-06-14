@@ -1,11 +1,14 @@
-import src.neo4j_importer.Neo4jConnection as Neo4jConnection
+import os
+import Neo4jConnection as Neo4jConnection
 from pyspark.sql import SparkSession
-from src.neo4j_importer.PoiOSMImporter import import_pois_osm
-from src.neo4j_importer.PopulationDensityImporter import import_population_density
+from PoiOSMImporter import import_pois_osm
+from PopulationDensityImporter import import_population_density
 
 
 def connect_to_mongo(database, collection):
-    mongo_url = f'mongodb://127.0.0.1:27017/{database}.{collection}'
+    
+    host = os.getenv('MONGO_HOST') or '127.0.0.1'
+    mongo_url = f'mongodb://{host}:27017/{database}.{collection}'
 
     return SparkSession \
         .builder \
@@ -22,9 +25,7 @@ def import_pipelines():
 
 # Create relationships from high resolution H3 indexes to lower resolution H3 indexes
 def connect_pipelines():
-    Neo4jConnection.connect_to_graph(uri="bolt://localhost:7687",
-                                     user="neo4j",
-                                     password="password")
+    Neo4jConnection.connect_to_graph()
 
     query_resolutions = '''
         MATCH (h:H3Index)

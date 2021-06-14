@@ -1,10 +1,15 @@
+import os
+
 from typing import Optional
 from neo4j import GraphDatabase, Neo4jDriver
 
 graph = None  # type: Optional[Neo4jDriver]
 
 
-def connect_to_graph(uri, user, password):
+def connect_to_graph(uri="bolt://localhost:7687", user="neo4j", password="password"):
+
+    uri = os.getenv('NEO4J_HOST') or uri
+    
     try:
         global graph
         graph = GraphDatabase.driver(uri, auth=(user, password))

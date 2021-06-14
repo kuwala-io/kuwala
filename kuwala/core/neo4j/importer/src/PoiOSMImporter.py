@@ -1,8 +1,8 @@
 import h3
 import json
 import os
-import src.neo4j_importer.Neo4jConnection as Neo4jConnection
-import src.neo4j_importer.PipelineImporter as PipelineImporter
+import Neo4jConnection as Neo4jConnection
+import PipelineImporter as PipelineImporter
 from pyspark.sql.functions import flatten, lit
 
 
@@ -17,7 +17,7 @@ def add_constraints():
 
 def add_poi_categories():
     script_dir = os.path.dirname(__file__)
-    file_path = os.path.join(script_dir, '../../resources/poiCategories.json')
+    file_path = os.path.join(script_dir, '../resources/poiCategories.json')
 
     with open(file_path, 'r') as json_file:
         categories = list(json.load(json_file).values())
@@ -78,13 +78,12 @@ def add_osm_pois(df):
 
     df.foreachPartition(lambda partition: Neo4jConnection.batch_insert_data(partition, query))
 
-
 def import_pois_osm(limit=None):
-    Neo4jConnection.connect_to_graph(uri="bolt://localhost:7687",
-                                     user="neo4j",
-                                     password="password")
+    Neo4jConnection.connect_to_graph()
+    
     spark = PipelineImporter.connect_to_mongo('osm-poi', 'pois')
     df = spark.read.format('com.mongodb.spark.sql.DefaultSource').load()
+    
     # TODO: Figure out how to join elements of an array that contains arrays of string pairs
     df = df.withColumn('osmId', df['osmId'].cast('Integer')).withColumn('osmTags', flatten('osmTags'))
 

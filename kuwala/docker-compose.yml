@@ -10,7 +10,7 @@ services:
     ports:
       - '27017:27017'
     volumes:
-      - ./tmp/kuwala/db/mongo:/data/db
+      - ./tmp/kuwala/db/mongo/data/db:/data/db
     profiles:
       - core
       - network
@@ -66,6 +66,19 @@ services:
     depends_on: [mongo, torproxy]
     ports:
       - '3003:3003'
+    profiles:
+      - network
+
+  # docker-compose run  --service-ports neo4j-importer
+  neo4j-importer:
+    environment: 
+      - NEO4J_HOST=bolt://kuwala-pipelines_neo4j_db:7687
+      - MONGO_HOST=kuwala-pipelines_mongo_db
+    build:
+      context: .
+      dockerfile: ./core/neo4j/importer/dockerfile
+    restart: always
+    depends_on: [mongo, neo4j]
     profiles:
       - network
 
