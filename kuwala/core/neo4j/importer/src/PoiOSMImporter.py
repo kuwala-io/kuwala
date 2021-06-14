@@ -9,6 +9,7 @@ from pyspark.sql.functions import flatten, lit
 #  Sets uniqueness constraint for H3 indexes, OSM POIS, and POI categories
 def add_constraints():
     Neo4jConnection.query_graph('CREATE CONSTRAINT h3Index IF NOT EXISTS ON (h:H3Index) ASSERT h.h3Index IS UNIQUE')
+    # TODO: Create alternative constraint for community version (Node key only available in Neo4j Enterprise)
     Neo4jConnection.query_graph('CREATE CONSTRAINT poiOsm IF NOT EXISTS ON (po:PoiOSM) ASSERT (po.osmId, po.type) IS '
                                 'NODE KEY')
     Neo4jConnection.query_graph('CREATE CONSTRAINT poiCategory IF NOT EXISTS ON (pc:PoiCategory) ASSERT pc.name IS '
@@ -77,6 +78,7 @@ def add_osm_pois(df):
         df = df.drop('details')  # Necessary to drop because batch insert can only process elementary data types
 
     df.foreachPartition(lambda partition: Neo4jConnection.batch_insert_data(partition, query))
+
 
 def import_pois_osm(limit=None):
     Neo4jConnection.connect_to_graph()
