@@ -59,7 +59,7 @@ chmod +x ./scripts/init.sh
 ./scripts/init.sh
 ```
 
-4. Run pipelines to download and process data
+4. Run pipelines to download and process data (in a new terminal window)
 
 ```zsh 
 # Process population data

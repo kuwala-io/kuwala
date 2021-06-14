@@ -85,7 +85,13 @@ def import_pois_osm(limit=None):
     
     spark = PipelineImporter.connect_to_mongo('osm-poi', 'pois')
     df = spark.read.format('com.mongodb.spark.sql.DefaultSource').load()
-    
+
+    if len(df.columns) < 1:
+        print('No OSM POI data available. You first need to run the osm-poi processing pipeline before loading it '
+              'into the graph')
+
+        return
+
     # TODO: Figure out how to join elements of an array that contains arrays of string pairs
     df = df.withColumn('osmId', df['osmId'].cast('Integer')).withColumn('osmTags', flatten('osmTags'))
 

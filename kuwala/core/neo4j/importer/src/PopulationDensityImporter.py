@@ -41,6 +41,12 @@ def add_cells(df):
 def import_population_density(limit=None):
     spark = PipelineImporter.connect_to_mongo('population', 'cells')
     df = spark.read.format('com.mongodb.spark.sql.DefaultSource').load().withColumnRenamed('_id', 'h3Index')
+
+    if len(df.columns) < 1:
+        print('No population data available. You first need to run the population-density processing pipeline before '
+              'loading it into the graph')
+
+        return
     
     # noinspection PyUnresolvedReferences
     resolution = h3.h3_get_resolution(df.first()['h3Index'])
