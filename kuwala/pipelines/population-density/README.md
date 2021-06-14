@@ -5,7 +5,7 @@ Facebook publishes detailed population data with demographic information under i
 It is one of the most granular data sets about the worldwide population using official census and Facebook data combined 
 with image recognition.
 
-![Population Density Overview](../../docs/images/population_density_overview.png)
+![Population Density Overview](../../../docs/images/population_density_overview.png)
 
 The raw data is aggregated in 1-arcsecond blocks (approx. 30x30 m) squares which we transform to H3 bins at 
 resolution 11.<br/>
