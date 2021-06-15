@@ -1,0 +1,23 @@
+FROM node:alpine
+
+COPY ./pipelines/common/js_utils /opt/common/js_utils
+COPY ./pipelines/osm-poi /opt/app
+
+# Setting up a virtual build env in order to keep the image small
+RUN apk add --no-cache --virtual .gyp \
+        g++ gcc libgcc libstdc++ linux-headers make python3 bash git cmake && \
+            npm install --quiet node-gyp -g
+
+#Setting up 
+WORKDIR /opt/common/js_utils
+RUN npm ci
+
+WORKDIR /opt/app
+RUN npm ci
+
+# Deleting the virtual build env in order to keep the image small
+RUN apk del .gyp
+
+WORKDIR /opt/app
+
+ENTRYPOINT ["npm","run"]
