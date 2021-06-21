@@ -22,6 +22,8 @@ def parse_opening_hours(opening_hours):
         closing_time_hours = get_nested_value(li, 6, 0, 2)
         closing_time_minutes = get_nested_value(li, 6, 0, 3)
 
+        # TODO: Consider places with breaks (e.g., closed between 13-14h)
+
         return dict(
             date=str(moment.date(date)),
             openingTime=str(moment.date(date).add(
@@ -29,7 +31,13 @@ def parse_opening_hours(opening_hours):
                 minutes=opening_time_minutes
             )) if opening_time_hours is not None else None,
             closingTime=str(moment.date(date).add(
-                days=1 if closing_time_hours < opening_time_hours else 0,  # Necessary if closing at midnight or later
+                days=1 if  # Necessary if closing at midnight or later or when place is open 24 hours (all values 0)
+                closing_time_hours < opening_time_hours | (
+                        opening_time_hours == 0 &
+                        opening_time_minutes == 0 &
+                        closing_time_hours == 0 &
+                        closing_time_minutes == 0
+                ) else 0,
                 hours=closing_time_hours,
                 minutes=closing_time_minutes
             )) if closing_time_hours is not None else None

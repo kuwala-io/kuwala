@@ -84,8 +84,8 @@ def add_osm_pois(df: DataFrame):
 def import_pois_osm(limit=None):
     Neo4jConnection.connect_to_graph()
 
-    spark = PipelineImporter.connect_to_mongo('osm-poi', 'pois')
-    df = spark.read.format('com.mongodb.spark.sql.DefaultSource').load()
+    spark = PipelineImporter.connect_to_mongo(database='osm-poi', collection='pois')
+    df = spark.read.format('mongo').load()
 
     if len(df.columns) < 1:
         print('No OSM POI data available. You first need to run the osm-poi processing pipeline before loading it '

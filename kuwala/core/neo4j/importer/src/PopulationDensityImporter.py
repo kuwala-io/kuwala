@@ -39,8 +39,8 @@ def add_cells(df):
 
 
 def import_population_density(limit=None):
-    spark = PipelineImporter.connect_to_mongo('population', 'cells')
-    df = spark.read.format('com.mongodb.spark.sql.DefaultSource').load().withColumnRenamed('_id', 'h3Index')
+    spark = PipelineImporter.connect_to_mongo(database='population', collection='cells')
+    df = spark.read.format('mongo').load().withColumnRenamed('_id', 'h3Index')
 
     if len(df.columns) < 1:
         print('No population data available. You first need to run the population-density processing pipeline before '
@@ -58,3 +58,4 @@ def import_population_density(limit=None):
     add_constraints()
     add_cells(cells)
 
+    spark.stop()

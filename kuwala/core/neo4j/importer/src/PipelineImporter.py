@@ -7,19 +7,19 @@ from PopulationDensityImporter import import_population_density
 
 
 def connect_to_mongo(database, collection):
-
     host = os.getenv('MONGO_HOST') or '127.0.0.1'
     mongo_url = f'mongodb://{host}:27017/{database}.{collection}'
 
     return SparkSession \
         .builder \
-        .appName('neo4j_importer') \
+        .appName(f'neo4j_importer_{database}') \
         .config('spark.mongodb.input.uri', mongo_url) \
-        .config('spark.jars.packages', 'org.mongodb.spark:mongo-spark-connector_2.12:3.0.1') \
         .getOrCreate()
 
 
 def import_pipelines():
+    SparkSession.builder.config('spark.jars.packages', 'org.mongodb.spark:mongo-spark-connector_2.12:3.0.1')
+
     import_pois_osm()
     import_pois_google()
     import_population_density()
@@ -38,13 +38,13 @@ def connect_pipelines():
     resolutions = Neo4jConnection.query_graph(query_resolutions)
 
     # Find parents of children and connect them
-    for i, resolution in enumerate(resolutions):
+    for i, r in enumerate(resolutions):
         if i < len(resolutions) - 1:
             query_connect_to_parent = f'''
                 MATCH (h1:H3Index)
-                WHERE h1.resolution = {resolution[0]} 
+                WHERE h1.resolution = {r[i][0]} 
                 MATCH (h2:H3Index)
-                WHERE h2.h3Index = io.kuwala.h3.h3ToParent(h1.h3Index, {resolutions[i + 1][0]})
+                WHERE h2.h3Index = io.kuwala.h3.h3ToParent(h1.h3Index, {r[i + 1][0]})
                 MERGE (h1)-[:CHILD_OF]->(h2)
             '''
 
