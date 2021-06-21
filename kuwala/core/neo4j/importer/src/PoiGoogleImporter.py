@@ -1,6 +1,6 @@
 import h3
 import os
-import src.neo4j_importer.Neo4jConnection as Neo4jConnection
+import Neo4jConnection as Neo4jConnection
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col, lit
 
@@ -38,7 +38,7 @@ def import_pois_google(limit=None):
                                      password="password")
     spark = SparkSession.builder.appName('neo4j_importer').getOrCreate()
     script_dir = os.path.dirname(__file__)
-    parquet_files = os.path.join(script_dir, '../../../../kuwala-pipelines/tmp/kuwala/googleFiles/')
+    parquet_files = os.path.join(script_dir, '../../../../tmp/kuwala/googleFiles/')
     df = spark.read.parquet(parquet_files + sorted(os.listdir(parquet_files), reverse=True)[0])
 
     add_constraints()

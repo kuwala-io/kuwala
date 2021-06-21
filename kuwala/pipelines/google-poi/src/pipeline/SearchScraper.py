@@ -159,4 +159,4 @@ class SearchScraper:
         search_results = SearchScraper.send_search_queries(search_strings)
         poi_results = SearchScraper.send_poi_queries(search_results)
 
-        poi_results.write.parquet(f'../../../tmp/kuwala/googleFiles/google_pois_{moment.now()}.parquet')
+        poi_results.write.parquet(f'../../../../tmp/kuwala/googleFiles/google_pois_{moment.now()}.parquet')

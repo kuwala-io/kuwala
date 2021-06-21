@@ -1,7 +1,7 @@
 import os
 import Neo4jConnection as Neo4jConnection
 from pyspark.sql import SparkSession
-from src.neo4j_importer.PoiGoogleImporter import import_pois_google
+from PoiGoogleImporter import import_pois_google
 from PoiOSMImporter import import_pois_osm
 from PopulationDensityImporter import import_population_density
 

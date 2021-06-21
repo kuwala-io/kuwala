@@ -13,7 +13,7 @@ def connect_to_mongo(database, collection):
         .getOrCreate()
 
 
-def generate_search_strings():
+def generate_search_strings(limit=None):
     spark = connect_to_mongo('osm-poi', 'pois')
     df = spark.read.format('com.mongodb.spark.sql.DefaultSource').load()
     df = df.filter(df.address.isNotNull()).select('osmId', 'type', 'name', 'h3Index', 'address.*', 'categories')
@@ -35,4 +35,9 @@ def generate_search_strings():
         ) \
         .select('osmId', 'type', 'h3Index', 'name', 'query')
 
-    return with_public_transport.union(with_address)
+    union = with_public_transport.union(with_address)
+
+    if limit is not None:
+        union = union.limit(limit)
+
+    return union
