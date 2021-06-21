@@ -1,0 +1,14 @@
+# Let pip figure out the version
+findspark
+neo4j
+pandas
+py4j
+h3
+numpy
+pyspark
+python-dateutil
+pytz
+six
+#
+
+

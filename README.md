@@ -21,10 +21,81 @@ moving thunderstorm, we leverage [Uber's H3](https://eng.uber.com/h3/) spatial i
 
 ![H3 Overview](./docs/images/h3_overview.png)
 
-Pipelines wrap individual data sources. Within the pipeline, raw data is cleaned and preprocessed. Based on that, the 
-pipeline exposes query functions through REST and GraphQL endpoints. Through this, you can easily combine pipelines and 
-build further applications and pipelines on top of them. We plan on releasing an open-source solution specifically for 
-this purpose.
+Pipelines wrap individual data sources. Within the pipeline, raw data is cleaned and preprocessed. Then, the 
+preprocessed data is loaded into a graph to establish connections between the different data points. Based on the graph, 
+Kuwala will create a data lake from which you can load the data to a data warehouse, for example. Alternatively, it 
+will also be possible to query the graph through a GraphQL endpoint.
+
+---
+
+### Quickstart with Docker
+
+#### Prerequisites
+
+Installed version of *Docker* and *docker-compose* ([*Go here for instructions*](https://docs.docker.com/compose/install/))
+
+
+#### Process data
+
+1. Change directory to `kuwala`
+
+```zsh 
+cd kuwala
+```
+
+2. Build images
+
+```zsh
+docker-compose build osm-poi population-density google-poi neo4j neo4j-importer
+```
+
+3. Start databases
+
+```zsh 
+chmod +x ./scripts/init.sh
+```
+
+```zsh 
+./scripts/init.sh
+```
+
+4. Run pipelines to download and process data (in a new terminal window)
+
+```zsh 
+# Process population data
+docker-compose run  --service-ports population-density start-processing:local
+```
+
+```zsh 
+# Process OSM POI data
+docker-compose run  --service-ports osm-poi start-processing:local
+```
+
+5. Load data into the graph
+
+```zsh 
+# Load data into graph database
+docker-compose run  --service-ports neo4j-importer
+``` 
+
+For a more detailed explanation follow the 
+[README under `./kuwala`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/README.md).
+
+#### Query data
+
+You can either query the graph database directly using Cypher, or you run individual REST APIs for the pipelines.
+
+1. [Cypher](https://neo4j.com/developer/cypher/) to query Neo4j
+2. REST APIs on top of pipelines
+      ```zsh 
+      # Run REST-API to query OSM POI data
+      docker-compose run  --service-ports osm-poi start-api:local
+      ```
+
+We are working on building out the core to load the combined data to a data lake directly and additionally have a 
+single GraphQL endpoint.
+
+---
 
 ### How you can contribute
 
@@ -40,11 +111,10 @@ We entirely decide, based on you, our community, which sources to integrate. You
 
 If you want to contribute 
 yourself, you can use your choice's programming language and database technology. We have the only requirement that it 
-is possible to run the pipeline locally, query the data through REST-API endpoints, and use 
-[Uber's H3](https://eng.uber.com/h3/) functionality to handle geographical transformations. We will then take the 
-responsibility to maintain your pipeline.
+is possible to run the pipeline locally and use [Uber's H3](https://eng.uber.com/h3/) functionality to handle 
+geographical transformations. We will then take the responsibility to maintain your pipeline.
 
-*Note: In order to submit a pull request, please feel free to fork the project and then submit a PR to the base repo.*
+*Note: To submit a pull request, please fork the project and then submit a PR to the base repo.*
 
 ### Liberating the work with data
 
@@ -79,13 +149,13 @@ Data we would like to integrate, but a scalable approach is still missing:
 ## Using existing pipelines
 
 To use our published pipelines clone this repository and navigate to 
-[`kuwala-pipelines`](https://github.com/kuwala-io/kuwala/tree/master/kuwala-pipelines). There is a separate README 
+[`./kuwala/pipelines`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines). There is a separate README 
 for each pipeline on how to get started with it.
 
 We currently have the following pipelines published:
-- [`osm-poi`](https://github.com/kuwala-io/kuwala/tree/master/kuwala-pipelines/osm-poi):
+- [`osm-poi`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/osm-poi):
   Global collection of point of interests (POIs)
-- [`population-density`](https://github.com/kuwala-io/kuwala/tree/master/kuwala-pipelines/population-density): 
+- [`population-density`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/population-density): 
   Detailed population and demographic data
-- [`google-poi`](https://github.com/kuwala-io/kuwala/tree/master/kuwala-pipelines/google-poi):
+- [`google-poi`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/google-poi):
   Scraping API to retrieve POI information from Google (incl. popularity score)
