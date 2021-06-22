@@ -14,6 +14,14 @@ def add_constraints():
     # TODO: Create alternative constraint for community version (Node key only available in Neo4j Enterprise)
     Neo4jConnection.query_graph('CREATE CONSTRAINT poiClosed IF NOT EXISTS ON (p:PoiClosed) ASSERT '
                                 '(p.closed, p.permanently) IS NODE KEY')
+    Neo4jConnection.query_graph('CREATE CONSTRAINT poiRating IF NOT EXISTS ON (p:PoiRating) ASSERT p.value IS UNIQUE')
+    Neo4jConnection.query_graph('CREATE CONSTRAINT poiPriceLevel IF NOT EXISTS ON (p:PoiPriceLevel) ASSERT p.value IS '
+                                'UNIQUE')
+    Neo4jConnection.query_graph('CREATE CONSTRAINT poiWaitingTime IF NOT EXISTS ON (p:PoiWaitingTime) ASSERT p.value '
+                                'IS UNIQUE')
+    # TODO: Create alternative constraint for community version (Node key only available in Neo4j Enterprise)
+    Neo4jConnection.query_graph('CREATE CONSTRAINT poiSpendingTime IF NOT EXISTS ON (p:PoiSpendingTime) ASSERT '
+                                '(p.min, p.max) IS NODE KEY')
 
 
 def add_google_pois(df: DataFrame):
@@ -72,6 +80,60 @@ def add_closed_tags(df: DataFrame):
     df.foreachPartition(lambda p: Neo4jConnection.batch_insert_data(p, query))
 
 
+def add_ratings(df: DataFrame):
+    query = '''
+        UNWIND $rows AS row
+        MATCH (pg:PoiGoogle { id: row.id })
+        MERGE (pr:PoiRating { value: row.stars })
+        MERGE (pg)-[:HAS { numberOfReviews: row.numberOfReviews, date: row.date }]->(pr)
+    '''
+
+    df.foreachPartition(lambda p: Neo4jConnection.batch_insert_data(p, query))
+
+
+def add_price_levels(df: DataFrame):
+    query = '''
+        UNWIND $rows AS row
+        MATCH (pg:PoiGoogle { id: row.id })
+        MERGE (ppl:PoiPriceLevel { value: row.priceLevel })
+        MERGE (pg)-[:HAS { date: row.date }]->(ppl)
+    '''
+
+    df.foreachPartition(lambda p: Neo4jConnection.batch_insert_data(p, query))
+
+
+def add_popularities(df: DataFrame):
+    query = '''
+        UNWIND $rows AS row
+        MATCH (pg:PoiGoogle { id: row.id })
+        MERGE (pg)-[:HAS { timestamp: row.timestamp }]->(:PoiPopularityAverage { value: row.popularity })
+    '''
+
+    df.foreachPartition(lambda p: Neo4jConnection.batch_insert_data(p, query))
+
+
+def add_waiting_times(df: DataFrame):
+    query = '''
+        UNWIND $rows AS row
+        MATCH (pg:PoiGoogle { id: row.id })
+        MERGE (pwt:PoiWaitingTime { value: row.waitingTime })
+        MERGE (pg)-[:HAS { timestamp: row.timestamp }]->(pwt)
+    '''
+
+    df.foreachPartition(lambda p: Neo4jConnection.batch_insert_data(p, query))
+
+
+def add_spending_times(df: DataFrame):
+    query = '''
+        UNWIND $rows AS row
+        MATCH (pg:PoiGoogle { id: row.id })
+        MERGE (pst:PoiSpendingTime { min: row.minSpendingTime, max: row.maxSpendingTime })
+        MERGE (pg)-[:HAS { date: row.date }]->(pst)
+    '''
+
+    df.foreachPartition(lambda p: Neo4jConnection.batch_insert_data(p, query))
+
+
 def import_pois_google(limit=None):
     Neo4jConnection.connect_to_graph(uri="bolt://localhost:7687",
                                      user="neo4j",
@@ -93,7 +155,8 @@ def import_pois_google(limit=None):
     time_zone = df.first()['timezone']
     date = moment.utcnow().timezone(time_zone).replace(hours=0, minutes=0, seconds=0)
 
-    google_pois = df.select('id', 'h3Index', 'name', 'placeID', 'address', 'timezone', 'contact.*') \
+    google_pois = df \
+        .select('id', 'h3Index', 'name', 'placeID', 'address', 'timezone', 'contact.*') \
         .withColumn('resolution', lit(resolution))
     opening_hours = df \
         .select('id', 'openingHours') \
@@ -101,9 +164,33 @@ def import_pois_google(limit=None):
         .select('id', 'openingHours.*') \
         .filter(col('closingTime').isNotNull() & col('openingTime').isNotNull())
     closed_tags = df.select('id', 'permanentlyClosed', 'temporarilyClosed').withColumn('date', lit(str(date)))
+    ratings = df.select('id', 'rating.*').filter(col('stars').isNotNull()).withColumn('date', lit(str(date)))
+    price_levels = df \
+        .select('id', 'priceLevel') \
+        .filter(col('priceLevel').isNotNull()) \
+        .withColumn('date', lit(str(date)))
+    popularities = df \
+        .select('id', 'popularity') \
+        .withColumn('popularity', explode('popularity')) \
+        .select('id', 'popularity.*')
+    waiting_times = df \
+        .select('id', 'waitingTime') \
+        .withColumn('waitingTime', explode('waitingTime')) \
+        .select('id', 'waitingTime.*')
+    spending_times = df \
+        .filter(col('spendingTime').isNotNull()) \
+        .withColumn('minSpendingTime', col('spendingTime')[0]) \
+        .withColumn('maxSpendingTime', col('spendingTime')[1]) \
+        .select('id', 'minSpendingTime', 'maxSpendingTime') \
+        .withColumn('date', lit(str(date)))
 
     add_google_pois(google_pois)
     add_opening_hours(opening_hours)
     add_closed_tags(closed_tags)
+    add_ratings(ratings)
+    add_price_levels(price_levels)
+    add_popularities(popularities)
+    add_waiting_times(waiting_times)
+    add_spending_times(spending_times)
 
     spark.stop()
