@@ -4,15 +4,14 @@ import os
 import Neo4jConnection as Neo4jConnection
 import PipelineImporter as PipelineImporter
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import flatten, lit
+from pyspark.sql.functions import concat, flatten, lit
+from pyspark.sql.types import LongType
 
 
 #  Sets uniqueness constraint for H3 indexes, OSM POIS, and POI categories
 def add_constraints():
     Neo4jConnection.query_graph('CREATE CONSTRAINT h3Index IF NOT EXISTS ON (h:H3Index) ASSERT h.h3Index IS UNIQUE')
-    # TODO: Create alternative constraint for community version (Node key only available in Neo4j Enterprise)
-    Neo4jConnection.query_graph('CREATE CONSTRAINT poiOsm IF NOT EXISTS ON (po:PoiOSM) ASSERT (po.osmId, po.type) IS '
-                                'NODE KEY')
+    Neo4jConnection.query_graph('CREATE CONSTRAINT poiOsm IF NOT EXISTS ON (p:PoiOSM) ASSERT (p.id) IS UNIQUE')
     Neo4jConnection.query_graph('CREATE CONSTRAINT poiCategory IF NOT EXISTS ON (pc:PoiCategory) ASSERT pc.name IS '
                                 'UNIQUE')
 
@@ -35,8 +34,10 @@ def add_osm_pois(df: DataFrame):
     query = '''
         // Create PoiOSM nodes
         UNWIND $rows AS row
-        MERGE (po:PoiOSM { osmId: row.osmId, type: row.type })
+        MERGE (po:PoiOSM { id: row.id })
         SET 
+            po.osmId = row.osmId,
+            po.type = row.type,
             po.name = row.name, 
             po.osmTags = row.osmTags,
             po.houseNr = row.houseNr,
@@ -84,8 +85,7 @@ def add_osm_pois(df: DataFrame):
 def import_pois_osm(limit=None):
     Neo4jConnection.connect_to_graph()
 
-    spark = PipelineImporter.connect_to_mongo(database='osm-poi', collection='pois')
-    df = spark.read.format('mongo').load()
+    df = PipelineImporter.connect_to_mongo(database='osm-poi', collection='pois')
 
     if len(df.columns) < 1:
         print('No OSM POI data available. You first need to run the osm-poi processing pipeline before loading it '
@@ -94,7 +94,10 @@ def import_pois_osm(limit=None):
         return
 
     # TODO: Figure out how to join elements of an array that contains arrays of string pairs
-    df = df.withColumn('osmId', df['osmId'].cast('Integer')).withColumn('osmTags', flatten('osmTags'))
+    df = df \
+        .withColumn('osmId', df['osmId'].cast(LongType())) \
+        .withColumn('id', concat('type', 'osmId')) \
+        .withColumn('osmTags', flatten('osmTags'))
 
     add_constraints()
     add_poi_categories()
@@ -104,6 +107,7 @@ def import_pois_osm(limit=None):
     # noinspection PyUnresolvedReferences
     resolution = h3.h3_get_resolution(df.first()['h3Index'])
     osm_pois = df.select(
+        'id',
         'osmId',
         'type',
         'name',
@@ -118,4 +122,4 @@ def import_pois_osm(limit=None):
 
     add_osm_pois(osm_pois)
 
-    spark.stop()
+    return df

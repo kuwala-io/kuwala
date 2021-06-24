@@ -1,9 +1,9 @@
 import os
-import Neo4jConnection as Neo4jConnection
-from pyspark.sql import SparkSession
+from PipelineConnector import connect_h3_indexes, connect_pois
 from PoiGoogleImporter import import_pois_google
 from PoiOSMImporter import import_pois_osm
 from PopulationDensityImporter import import_population_density
+from pyspark.sql import SparkSession
 
 
 def connect_to_mongo(database, collection):
@@ -13,41 +13,26 @@ def connect_to_mongo(database, collection):
     return SparkSession \
         .builder \
         .appName(f'neo4j_importer_{database}') \
-        .config('spark.mongodb.input.uri', mongo_url) \
-        .getOrCreate()
+        .getOrCreate() \
+        .newSession() \
+        .read \
+        .format('mongo') \
+        .option('uri', mongo_url) \
+        .load()
 
 
-def import_pipelines():
+def start():
     SparkSession.builder.config('spark.jars.packages', 'org.mongodb.spark:mongo-spark-connector_2.12:3.0.1')
 
-    import_pois_osm()
-    import_pois_google()
+    # Import data
+    df_pois_osm = import_pois_osm()
+    df_pois_google = import_pois_google()
     import_population_density()
 
+    # Connect data
+    connect_pipelines(df_pois_osm, df_pois_google)
 
-# Create relationships from high resolution H3 indexes to lower resolution H3 indexes
-def connect_pipelines():
-    Neo4jConnection.connect_to_graph()
 
-    query_resolutions = '''
-        MATCH (h:H3Index)
-        WITH DISTINCT h.resolution AS resolutions
-        ORDER BY resolutions DESC
-        RETURN resolutions
-    '''
-    resolutions = Neo4jConnection.query_graph(query_resolutions)
-
-    # Find parents of children and connect them
-    for i, r in enumerate(resolutions):
-        if i < len(resolutions) - 1:
-            query_connect_to_parent = f'''
-                MATCH (h1:H3Index)
-                WHERE h1.resolution = {r[i][0]} 
-                MATCH (h2:H3Index)
-                WHERE h2.h3Index = io.kuwala.h3.h3ToParent(h1.h3Index, {r[i + 1][0]})
-                MERGE (h1)-[:CHILD_OF]->(h2)
-            '''
-
-            Neo4jConnection.query_graph(query_connect_to_parent)
-
-    Neo4jConnection.close_connection()
+def connect_pipelines(df_pois_osm, df_pois_google):
+    connect_pois(df_pois_osm, df_pois_google)
+    connect_h3_indexes()

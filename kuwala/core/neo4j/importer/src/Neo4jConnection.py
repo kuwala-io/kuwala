@@ -57,7 +57,6 @@ def batch_insert_data(partition, query):
             response, retry = query_graph(query, parameters={'rows': rows})
 
             if not retry:
-                print('Inserted batch')
                 break
             elif sleep_time < 60:
                 sleep(sleep_time)
