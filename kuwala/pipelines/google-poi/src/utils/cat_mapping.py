@@ -16,7 +16,7 @@ def word_contains_x(x:str, word:str)->str:
     if x in word:
         return word
 
-def get_category(tag:str, cat_data:dict):
+def get_category(tag:str, cat_data:dict)->List[str]:
     return [cat for cat in cat_data.keys() if any(word_contains_x(tag, word=x) for x in cat_data[cat]['tags'])]
 
 def complete_categories(poi_cat: List[str], kuwala_to_poi:dict) -> dict:
