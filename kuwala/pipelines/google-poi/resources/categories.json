@@ -1,0 +1,260 @@
+{
+    "administration": {
+        "category": "administration",
+        "tags": [
+            "association_or_organization",
+            "city_hall",
+            "immigration_and_naturalization_service"
+        ]
+    },
+    "airport": {
+        "category": "airport",
+        "tags": [
+            "international_airport",
+            "airport"
+        ]
+    },
+    "artCulture": {
+        "category": "artCulture",
+        "tags": [
+            "art_gallery",
+            "art_museum",
+            "ballet_theater",
+            "concert_hall",
+            "conference_center",
+            "convention_center",
+            "cultural_center",
+            "historical_landmark",
+            "modern_art_museum",
+            "museum",
+            "opera_house",
+            "performing_arts_theater"
+        ]
+    },
+    "automobile": {
+        "category": "automobile",
+        "tags": [
+            "gas_station",
+            "park",
+            "school"
+        ]
+    },
+    "beauty": {
+        "category": "beauty",
+        "tags": [
+            "hair_salon"
+        ]
+    },
+    "cafe": {
+        "category": "cafe",
+        "tags": [
+            "cafe",
+            "coffee_shop"
+        ]
+    },
+    "drinks": {
+        "category": "drinks",
+        "tags": [
+            "bar",
+            "pub"
+        ]
+    },
+    "education": {
+        "category": "education",
+        "tags": [
+            "library",
+            "school"
+        ]
+    },
+    "entertainment": {
+        "category": "entertainment",
+        "tags": [
+            "banquet_hall",
+            "casino",
+            "concert_hall",
+            "golf_club",
+            "golf_course",
+            "hotel",
+            "live_music_venue",
+            "night_club",
+            "school",
+            "stadium"
+        ]
+    },
+    "food": {
+        "category": "food",
+        "tags": [
+            "banquet_hall",
+            "lunch_restaurant",
+            "restaurant"
+        ]
+    },
+    "groceries": {
+        "category": "groceries",
+        "tags": [
+            "grocery_store",
+            "supermarket"
+        ]
+    },
+    "medical": {
+        "category": "medical",
+        "tags": [
+            "hospital",
+            "medical_center"
+        ]
+    },
+    "misc": {
+        "category": "misc",
+        "tags": [
+            "attraction",
+            "bar",
+            "cafe",
+            "casino",
+            "church",
+            "concert_hall",
+            "conference_center",
+            "convenience_store",
+            "convention_center",
+            "cultural_center",
+            "dome",
+            "event_venue",
+            "farm",
+            "flooring_store",
+            "garden_center",
+            "golf_course",
+            "government_office",
+            "hardware_store",
+            "hospital",
+            "immigration_and_naturalization_service",
+            "library",
+            "machines",
+            "museum",
+            "outdoor_furniture_store",
+            "paint_store",
+            "park",
+            "plant_nursery",
+            "plumbing_supply_store",
+            "police_department",
+            "police_station",
+            "produce_market",
+            "pub",
+            "public_library",
+            "restaurant",
+            "school",
+            "stadium",
+            "store",
+            "trailer_rental_service",
+            "train_station",
+            "variety_store",
+            "wedding_venue",
+            "woods"
+        ]
+    },
+    "office": {
+        "category": "office",
+        "tags": [
+            "business_center",
+            "corporate_office",
+            "government_office",
+            "police_department"
+        ]
+    },
+    "publicService": {
+        "category": "publicService",
+        "tags": [
+            "association_or_organization",
+            "city_hall",
+            "immigration_and_naturalization_service"
+        ]
+    },
+    "publicTransportation": {
+        "category": "publicTransportation",
+        "tags": [
+            "pub",
+            "train_station"
+        ]
+    },
+    "recreation": {
+        "category": "recreation",
+        "tags": [
+            "botanical_garden",
+            "golf_club",
+            "horse_boarding_stable",
+            "park",
+            "woods"
+        ]
+    },
+    "religiousBuilding": {
+        "category": "religiousBuilding",
+        "tags": [
+            "cathedral",
+            "church",
+            "mosque"
+        ]
+    },
+    "service": {
+        "category": "service",
+        "tags": [
+            "city_hall",
+            "government_office",
+            "immigration_and_naturalization_service",
+            "police_department",
+            "public_library",
+            "trailer_rental_service"
+        ]
+    },
+    "shopping": {
+        "category": "shopping",
+        "tags": [
+            "department_store",
+            "clothing_store"
+        ]
+    },
+    "socialService": {
+        "category": "socialService",
+        "tags": [
+            "city_hall",
+            "government_office",
+            "immigration_and_naturalization_service",
+            "police_department",
+            "public_library"
+        ]
+    },
+    "sport": {
+        "category": "sport",
+        "tags": [
+            "school",
+            "sports_complex"
+        ]
+    },
+    "tourism": {
+        "category": "tourism",
+        "tags": [
+            "attraction",
+            "historical_landmark",
+            "hotel",
+            "modern_art_museum",
+            "museum",
+            "tourist_attraction"
+        ]
+    },
+    "wholesaler": {
+        "category": "wholesaler",
+        "tags": [
+            "building_materials_store",
+            "dollar_store",
+            "electrical_supply_store",
+            "farm",
+            "flooring_store",
+            "garden_center",
+            "home_goods_store",
+            "lighting_store",
+            "outdoor_furniture_store",
+            "paint_store",
+            "plumbing_supply_store",
+            "produce_market",
+            "rug_store",
+            "wholesaler"
+        ]
+    }
+}
