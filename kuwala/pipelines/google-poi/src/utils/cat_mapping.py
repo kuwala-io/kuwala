@@ -21,7 +21,10 @@ def get_category(tag:str, cat_data:dict)->List[str]:
 
 def complete_categories(poi_cat: List[str], kuwala_to_poi:dict) -> dict:
     categories = {'google': poi_cat}
-    kuwala_tags = [get_category(tag, cat_data=kuwala_to_poi) for tag in poi_cat]
-    categories['kuwala'] = sorted(set(itertools.chain(*kuwala_tags)))
+    if poi_cat==[]:
+        categories['kuwala']=[]
+    else:
+        kuwala_tags = [get_category(tag, cat_data=kuwala_to_poi) for tag in poi_cat]
+        categories['kuwala'] = sorted(set(itertools.chain(*kuwala_tags)))
     return categories
 
