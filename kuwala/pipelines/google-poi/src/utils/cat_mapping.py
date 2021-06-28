@@ -12,7 +12,7 @@ CAT_PATH = os.path.join(POI_PATH, 'resources', 'categories.json')
 with open(CAT_PATH, 'r') as j:
     kuwala_to_poi = json.load(j)
 
-def get_category(tag, cat_data):
+def get_category(tag:str, cat_data:dict)->List[str]:
     return [cat for cat in cat_data.keys() if any(tag == x for x in cat_data[cat]['tags'])]
 
 def complete_categories(poi_cat: List[str], kuwala_to_poi:dict) -> dict:
