@@ -12,12 +12,8 @@ CAT_PATH = os.path.join(POI_PATH, 'resources', 'categories.json')
 with open(CAT_PATH, 'r') as j:
     kuwala_to_poi = json.load(j)
 
-def word_contains_x(x:str, word:str)->str:
-    if x in word:
-        return word
-
-def get_category(tag:str, cat_data:dict)->List[str]:
-    return [cat for cat in cat_data.keys() if any(word_contains_x(tag, word=x) for x in cat_data[cat]['tags'])]
+def get_category(tag, cat_data):
+    return [cat for cat in cat_data.keys() if any(tag == x for x in cat_data[cat]['tags'])]
 
 def complete_categories(poi_cat: List[str], kuwala_to_poi:dict) -> dict:
     categories = {'google': poi_cat}
@@ -25,6 +21,9 @@ def complete_categories(poi_cat: List[str], kuwala_to_poi:dict) -> dict:
         categories['kuwala']=[]
     else:
         kuwala_tags = [get_category(tag, cat_data=kuwala_to_poi) for tag in poi_cat]
-        categories['kuwala'] = sorted(set(itertools.chain(*kuwala_tags)))
+        if any(kuwala_tags):
+            categories['kuwala'] = sorted(set(itertools.chain(*kuwala_tags)))
+        else:
+            categories['kuwala']=['misc']
     return categories
 
