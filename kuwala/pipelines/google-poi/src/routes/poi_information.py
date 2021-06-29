@@ -8,7 +8,7 @@ import asyncio
 from quart import abort, Blueprint, jsonify, request
 from src.utils.array_utils import get_nested_value
 
-from src.utils.cat_mapping import kuwala_to_poi, complete_categories
+from src.utils.cat_mapping import complete_categories
 
 poi_information = Blueprint('poi-information', __name__)
 
@@ -171,7 +171,7 @@ async def get_poi_information():
                 address=address,
                 timezone=timezone,
                 # categories=categories,
-                categories=complete_categories(categories, kuwala_to_poi=kuwala_to_poi),
+                categories=complete_categories(categories),
                 temporarilyClosed=temporarily_closed,
                 permanentlyClosed=permanently_closed,
                 insideOf=inside_of,
