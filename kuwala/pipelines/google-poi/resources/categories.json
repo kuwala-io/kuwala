@@ -19,7 +19,7 @@
             "furnished_apartment_building"
         ]
     },
-    "art_culture": {
+    "artCulture": {
         "category": "art_culture",
         "tags": [
             "art_gallery",
@@ -120,7 +120,7 @@
             "corporate_office"
         ]
     },
-    "public_service": {
+    "publicService": {
         "category": "public_service",
         "tags": [
             "government_office",
@@ -129,7 +129,7 @@
             "police_station"
         ]
     },
-    "public_transportation": {
+    "publicTransportation": {
         "category": "public_transportation",
         "tags": [
             "train_station"
@@ -144,7 +144,7 @@
             "woods"
         ]
     },
-    "religious_building": {
+    "religiousBuilding": {
         "category": "religious_building",
         "tags": [
             "cathedral",
@@ -165,6 +165,13 @@
             "dollar_store",
             "variety_store",
             "clothing_store"
+        ]
+    },
+    "socialService": {
+        "category": "social_service",
+        "tags": [
+            "homeless_service",
+            "ngo"
         ]
     },
     "sport": {
