@@ -8,6 +8,8 @@ import asyncio
 from quart import abort, Blueprint, jsonify, request
 from src.utils.array_utils import get_nested_value
 
+from src.utils.cat_mapping import complete_categories
+
 poi_information = Blueprint('poi-information', __name__)
 
 
@@ -168,7 +170,8 @@ async def get_poi_information():
                 h3Index=h3_index,
                 address=address,
                 timezone=timezone,
-                categories=categories,
+                # categories=categories,
+                categories=complete_categories(categories),
                 temporarilyClosed=temporarily_closed,
                 permanentlyClosed=permanently_closed,
                 insideOf=inside_of,
