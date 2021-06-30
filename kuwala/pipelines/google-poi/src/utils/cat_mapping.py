@@ -5,7 +5,7 @@ from typing import List
 
 
 def get_category(tag:str, cat_data:dict)->List[str]:
-    kuwala_cats = [cat for cat in cat_data.keys() if any(tag == x for x in cat_data[cat]['tags'])]
+    kuwala_cats = [cat_data[cat]['category'] for cat in cat_data.keys() if any(tag == x for x in cat_data[cat]['tags'])]
     if kuwala_cats == []:
         return 'misc'
     else:
