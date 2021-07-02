@@ -27,6 +27,7 @@ def start():
     # Import data
     df_pois_osm = import_pois_osm()
     df_pois_google = import_pois_google()
+
     import_population_density()
 
     # Connect data

@@ -16,16 +16,30 @@ class SearchScraper:
     """Get result for search strings"""
     @staticmethod
     def send_search_query(batch):
-        result = requests.request(method='get', url='http://localhost:3003/search', json=batch)
+        # noinspection PyBroadException
+        try:
+            result = requests.request(method='get', url='http://localhost:3003/search', json=batch)
 
-        return result.json()
+            return result.json() if result else None
+        except Exception as e:
+            print('Search query failed: ', e)
+            print('Continuing without batch.')
+
+            return None
 
     """Get POI information by id"""
     @staticmethod
     def send_poi_query(batch):
-        result = requests.request(method='get', url='http://localhost:3003/poi-information', json=batch)
+        # noinspection PyBroadException
+        try:
+            result = requests.request(method='get', url='http://localhost:3003/poi-information', json=batch)
 
-        return result.json()
+            return result.json() if result else None
+        except Exception as e:
+            print('POI query failed: ', e)
+            print('Continuing without batch.')
+
+            return None
 
     """Get number of H3 cells in between to given cells of the same resolution"""
     @staticmethod
@@ -113,16 +127,17 @@ class SearchScraper:
                 batch.append(row[q_property])
 
                 if len(batch) == batch_size:
+                    # TODO: Implement retry if result is None
                     result = q_function(batch)
                     batch = list()
 
-                    if 'data' in result:
+                    if result and ('data' in result):
                         accu.add(result['data'])
 
             if len(batch) > 0:
                 result = q_function(batch)
 
-                if 'data' in result:
+                if result and ('data' in result):
                     accu.add(result['data'])
 
         spark = SparkSession.builder.appName('google-poi').getOrCreate()

@@ -2,6 +2,7 @@ import json
 import os
 import requests
 from quart import abort
+from requests.exceptions import ConnectionError
 from src.utils.array_utils import get_nested_value
 from time import sleep
 
@@ -18,15 +19,22 @@ def fetch_data(url, params):
     sleep_time = 1
 
     while True:
-        response = requests.get(url, params=params, proxies=proxies if proxy else None, headers=headers)
+        try:
+            response = requests.get(url, params=params, proxies=proxies if proxy else None, headers=headers)
 
-        if response.ok:
-            break
-        elif sleep_time < 60:
-            sleep(sleep_time)
-            sleep_time *= 2
-        else:
-            abort(429, 'Too many request. Please check the proxy on the server')
+            if response.ok:
+                break
+            elif sleep_time < 60:
+                sleep(sleep_time)
+                sleep_time *= 2
+            else:
+                abort(429, 'Too many request. Please check the proxy on the server')
+        except ConnectionError:
+            if sleep_time < 60:
+                sleep(sleep_time)
+                sleep_time *= 2
+            else:
+                abort(429, 'Too many request. Please check the proxy on the server')
 
     return response
 

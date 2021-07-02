@@ -15,15 +15,16 @@ def connect_h3_indexes():
         RETURN resolutions
     '''
     resolutions = Neo4jConnection.query_graph(query_resolutions)
+    resolutions = resolutions[0]  # Query returns a tuple with the results at the first index
 
     # Find parents of children and connect them
     for i, r in enumerate(resolutions):
         if i < len(resolutions) - 1:
             query_connect_to_parent = f'''
                 MATCH (h1:H3Index)
-                WHERE h1.resolution = {r[i][0]} 
+                WHERE h1.resolution = {r[0]} 
                 MATCH (h2:H3Index)
-                WHERE h2.h3Index = io.kuwala.h3.h3ToParent(h1.h3Index, {r[i + 1][0]})
+                WHERE h2.h3Index = io.kuwala.h3.h3ToParent(h1.h3Index, {resolutions[i + 1][0]})
                 MERGE (h1)-[:CHILD_OF]->(h2)
             '''
 
