@@ -1,0 +1,212 @@
+{
+    "administration": {
+        "category": "administration",
+        "tags": [
+            "association_or_organization",
+            "city_hall"
+        ]
+    },
+    "airport": {
+        "category": "airport",
+        "tags": [
+            "international_airport",
+            "airport"
+        ]
+    },
+    "apartment": {
+        "category": "apartment",
+        "tags": [
+            "furnished_apartment_building"
+        ]
+    },
+    "artCulture": {
+        "category": "art_culture",
+        "tags": [
+            "art_gallery",
+            "art_museum",
+            "ballet_theater",
+            "concert_hall",
+            "conference_center",
+            "convention_center",
+            "cultural_center",
+            "event_venue",
+            "historical_landmark",
+            "modern_art_museum",
+            "museum",
+            "opera_house",
+            "performing_arts_theater"
+        ]
+    },
+    "automobile": {
+        "category": "automobile",
+        "tags": [
+            "gas_station"
+        ]
+    },
+    "beauty": {
+        "category": "beauty",
+        "tags": [
+            "hair_salon"
+        ]
+    },
+    "cafe": {
+        "category": "cafe",
+        "tags": [
+            "cafe",
+            "coffee_shop"
+        ]
+    },
+    "drinks": {
+        "category": "drinks",
+        "tags": [
+            "bar",
+            "pub"
+        ]
+    },
+    "education": {
+        "category": "education",
+        "tags": [
+            "library",
+            "public_library",
+            "school"
+        ]
+    },
+    "entertainment": {
+        "category": "entertainment",
+        "tags": [
+            "banquet_hall",
+            "casino",
+            "live_music_venue",
+            "night_club",
+            "stadium"
+        ]
+    },
+    "food": {
+        "category": "food",
+        "tags": [
+            "lunch_restaurant",
+            "restaurant"
+        ]
+    },
+    "groceries": {
+        "category": "groceries",
+        "tags": [
+            "convenience_store",
+            "grocery_store",
+            "supermarket"
+        ]
+    },
+    "medical": {
+        "category": "medical",
+        "tags": [
+            "hospital",
+            "medical_center"
+        ]
+    },
+    "misc": {
+        "category": "misc",
+        "tags": [
+            "dome",
+            "machines",
+            "plant_nursery",
+            "store",
+            "wedding_venue"
+        ]
+    },
+    "office": {
+        "category": "office",
+        "tags": [
+            "business_center",
+            "corporate_office"
+        ]
+    },
+    "publicService": {
+        "category": "public_service",
+        "tags": [
+            "government_office",
+            "immigration_and_naturalization_service",
+            "police_department",
+            "police_station"
+        ]
+    },
+    "publicTransportation": {
+        "category": "public_transportation",
+        "tags": [
+            "train_station"
+        ]
+    },
+    "recreation": {
+        "category": "recreation",
+        "tags": [
+            "botanical_garden",
+            "horse_boarding_stable",
+            "park",
+            "woods"
+        ]
+    },
+    "religiousBuilding": {
+        "category": "religious_building",
+        "tags": [
+            "cathedral",
+            "church",
+            "mosque"
+        ]
+    },
+    "service": {
+        "category": "service",
+        "tags": [
+            "trailer_rental_service"
+        ]
+    },
+    "shopping": {
+        "category": "shopping",
+        "tags": [
+            "department_store",
+            "dollar_store",
+            "variety_store",
+            "clothing_store"
+        ]
+    },
+    "socialService": {
+        "category": "social_service",
+        "tags": [
+            "homeless_service",
+            "ngo"
+        ]
+    },
+    "sport": {
+        "category": "sport",
+        "tags": [
+            "golf_club",
+            "golf_course",
+            "sports_complex"
+        ]
+    },
+    "tourism": {
+        "category": "tourism",
+        "tags": [
+            "attraction",
+            "hotel",
+            "tourist_attraction"
+        ]
+    },
+    "wholesaler": {
+        "category": "wholesaler",
+        "tags": [
+            "building_materials_store",
+            "electrical_supply_store",
+            "farm",
+            "flooring_store",
+            "garden_center",
+            "hardware_store",
+            "home_goods_store",
+            "lighting_store",
+            "outdoor_furniture_store",
+            "paint_store",
+            "plumbing_supply_store",
+            "produce_market",
+            "rug_store",
+            "wholesaler"
+        ]
+    }
+}
