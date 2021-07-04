@@ -140,7 +140,7 @@ def import_pois_google(limit=None):
                                      password="password")
     spark = SparkSession.builder.appName('neo4j_importer_google-poi').getOrCreate().newSession()
     script_dir = os.path.dirname(__file__)
-    parquet_files = os.path.join(script_dir, '../../../../tmp/kuwala/googleFiles/')
+    parquet_files = os.path.join(script_dir, '../tmp/kuwala/googleFiles/')
     df = spark.read.parquet(parquet_files + sorted(os.listdir(parquet_files), reverse=True)[0])
 
     if limit is not None:

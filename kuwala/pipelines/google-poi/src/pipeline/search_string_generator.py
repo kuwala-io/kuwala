@@ -1,9 +1,11 @@
+import os
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import array_contains, col, concat_ws, lit
 
 
 def connect_to_mongo(database, collection):
-    mongo_url = f'mongodb://127.0.0.1:27017/{database}.{collection}'
+    host = os.getenv('MONGO_HOST') or '127.0.0.1'
+    mongo_url = f'mongodb://{host}:27017/{database}.{collection}'
 
     return SparkSession \
         .builder \

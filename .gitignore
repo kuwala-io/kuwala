@@ -9,4 +9,5 @@ npm-debug.log
 
 tmp
 env
+!.env.local
 __pycache__

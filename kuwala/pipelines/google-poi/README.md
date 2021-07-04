@@ -39,10 +39,16 @@ This score can also be over 100 if the number of visitors is extraordinarily hig
 Proceed only if you followed the initial steps to initialize the main components mentioned here:
 [`Initialize Main Components`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/)
 
-Run the app locally.
+1. Start the scraping api
 
 ```zsh
-docker-compose run  --service-ports google-poi
+docker-compose --profile google-poi-scraper up
+```
+
+2. OPTIONAL: To scrape the Google data for all OSM POIs that are in the database after running the OSM pipeline execute:
+
+```zsh
+docker-compose run google-poi-pipeline
 ```
 
 ### API Calls

@@ -1,0 +1,9 @@
+FROM rappdw/docker-java-python
+
+COPY ./pipelines/google-poi /opt/pipeline
+
+WORKDIR /opt/pipeline
+RUN pip install -r requirements.txt
+
+WORKDIR /opt/pipeline/src/pipeline
+ENTRYPOINT [ "python", "main.py" ]

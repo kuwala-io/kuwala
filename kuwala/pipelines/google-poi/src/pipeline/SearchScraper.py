@@ -1,6 +1,7 @@
 import h3
 import json
 import moment
+import os
 import requests
 from fuzzywuzzy import fuzz
 from ListAccumulator import ListAccumulator
@@ -15,28 +16,19 @@ max_h3_distance = 500
 class SearchScraper:
     """Get result for search strings"""
     @staticmethod
-    def send_search_query(batch):
+    def send_query(batch, query_type):
         # noinspection PyBroadException
         try:
-            result = requests.request(method='get', url='http://localhost:3003/search', json=batch)
+            host = os.getenv('GOOGLE_POI_API_HOST') or '127.0.0.1'
+            # noinspection HttpUrlsUsage
+            result = requests.request(
+                method='get',
+                url=f'http://{host}:3003/{"search" if query_type == "search" else "poi-information"}',
+                json=batch)
 
             return result.json() if result else None
         except Exception as e:
             print('Search query failed: ', e)
-            print('Continuing without batch.')
-
-            return None
-
-    """Get POI information by id"""
-    @staticmethod
-    def send_poi_query(batch):
-        # noinspection PyBroadException
-        try:
-            result = requests.request(method='get', url='http://localhost:3003/poi-information', json=batch)
-
-            return result.json() if result else None
-        except Exception as e:
-            print('POI query failed: ', e)
             print('Continuing without batch.')
 
             return None
@@ -116,10 +108,10 @@ class SearchScraper:
     def batch_queries(
             df: DataFrame,
             query_property: str,
-            query_function: Callable,
-            match_function: Callable
+            match_function: Callable,
+            query_type: str
     ) -> DataFrame:
-        def execute_queries(partition, q_property, q_function, accu):
+        def execute_queries(partition, q_property, accu):
             batch = list()
             batch_size = 100
 
@@ -128,14 +120,14 @@ class SearchScraper:
 
                 if len(batch) == batch_size:
                     # TODO: Implement retry if result is None
-                    result = q_function(batch)
+                    result = SearchScraper.send_query(batch, query_type)
                     batch = list()
 
                     if result and ('data' in result):
                         accu.add(result['data'])
 
             if len(batch) > 0:
-                result = q_function(batch)
+                result = SearchScraper.send_query(batch, query_type)
 
                 if result and ('data' in result):
                     accu.add(result['data'])
@@ -144,7 +136,7 @@ class SearchScraper:
         # An accumulator is necessary because when using parallelization only copies of passed objects would be updated
         accumulator = spark.sparkContext.accumulator([], ListAccumulator())
 
-        df.foreachPartition(lambda p: execute_queries(p, query_property, query_function, accumulator))
+        df.foreachPartition(lambda p: execute_queries(p, query_property, accumulator))
 
         return match_function(df, accumulator.value)
 
@@ -154,8 +146,8 @@ class SearchScraper:
         return SearchScraper.batch_queries(
             df,
             query_property='query',
-            query_function=SearchScraper.send_search_query,
-            match_function=SearchScraper.match_search_results
+            match_function=SearchScraper.match_search_results,
+            query_type='search'
         )
 
     """Send Google POI ids to retrieve all POI information"""
@@ -164,8 +156,8 @@ class SearchScraper:
         return SearchScraper.batch_queries(
             df,
             query_property='id',
-            query_function=SearchScraper.send_poi_query,
-            match_function=SearchScraper.match_poi_results
+            match_function=SearchScraper.match_poi_results,
+            query_type='poi'
         )
 
     """Write scraped POI information to a Parquet file"""
@@ -174,4 +166,4 @@ class SearchScraper:
         search_results = SearchScraper.send_search_queries(search_strings)
         poi_results = SearchScraper.send_poi_queries(search_results)
 
-        poi_results.write.parquet(f'../../../../tmp/kuwala/googleFiles/google_pois_{moment.now()}.parquet')
+        poi_results.write.parquet(f'../../tmp/googleFiles/google_pois_{moment.now()}.parquet')
