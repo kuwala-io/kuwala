@@ -3,25 +3,20 @@ import moment
 import os
 import Neo4jConnection as Neo4jConnection
 from pyspark.sql import DataFrame, SparkSession
-from pyspark.sql.functions import col, explode, lit
+from pyspark.sql.functions import col, concat_ws, explode, lit
 
 
 def add_constraints():
     Neo4jConnection.query_graph('CREATE CONSTRAINT poiGoogle IF NOT EXISTS ON (p:PoiGoogle) ASSERT p.id IS UNIQUE')
-    # TODO: Create alternative constraint for community version (Node key only available in Neo4j Enterprise)
-    Neo4jConnection.query_graph('CREATE CONSTRAINT poiOpeningHours IF NOT EXISTS ON (p:PoiOpeningHours) ASSERT '
-                                '(p.openingTime, p.closingTime) IS NODE KEY')
-    # TODO: Create alternative constraint for community version (Node key only available in Neo4j Enterprise)
-    Neo4jConnection.query_graph('CREATE CONSTRAINT poiClosed IF NOT EXISTS ON (p:PoiClosed) ASSERT '
-                                '(p.closed, p.permanently) IS NODE KEY')
+    Neo4jConnection.query_graph('CREATE CONSTRAINT poiOpeningHours IF NOT EXISTS ON (p:PoiOpeningHours) ASSERT (p.id) '
+                                'IS UNIQUE')
     Neo4jConnection.query_graph('CREATE CONSTRAINT poiRating IF NOT EXISTS ON (p:PoiRating) ASSERT p.value IS UNIQUE')
     Neo4jConnection.query_graph('CREATE CONSTRAINT poiPriceLevel IF NOT EXISTS ON (p:PoiPriceLevel) ASSERT p.value IS '
                                 'UNIQUE')
     Neo4jConnection.query_graph('CREATE CONSTRAINT poiWaitingTime IF NOT EXISTS ON (p:PoiWaitingTime) ASSERT p.value '
                                 'IS UNIQUE')
-    # TODO: Create alternative constraint for community version (Node key only available in Neo4j Enterprise)
-    Neo4jConnection.query_graph('CREATE CONSTRAINT poiSpendingTime IF NOT EXISTS ON (p:PoiSpendingTime) ASSERT '
-                                '(p.min, p.max) IS NODE KEY')
+    Neo4jConnection.query_graph('CREATE CONSTRAINT poiSpendingTime IF NOT EXISTS ON (p:PoiSpendingTime) ASSERT p.id '
+                                'IS UNIQUE')
 
 
 def add_google_pois(df: DataFrame):
@@ -53,9 +48,8 @@ def add_opening_hours(df: DataFrame):
         UNWIND $rows AS row
         MATCH (pg:PoiGoogle { id: row.id })
         WITH pg, row
-        MERGE (poh:PoiOpeningHours { 
-            openingTime: row.openingTime, closingTime: row.closingTime
-        })
+        MERGE (poh:PoiOpeningHours { id: row.oh_id })
+        ON CREATE SET poh.openingTime = row.openingTime, poh.closingTime = row.closingTime
         MERGE (pg)-[:HAS { date: row.date }]->(poh)
     '''
 
@@ -127,7 +121,8 @@ def add_spending_times(df: DataFrame):
     query = '''
         UNWIND $rows AS row
         MATCH (pg:PoiGoogle { id: row.id })
-        MERGE (pst:PoiSpendingTime { min: row.minSpendingTime, max: row.maxSpendingTime })
+        MERGE (pst:PoiSpendingTime { id: row.st_id })
+        ON CREATE SET pst.min = row.minSpendingTime, pst.max = row.maxSpendingTime
         MERGE (pg)-[:HAS { date: row.date }]->(pst)
     '''
 
@@ -162,7 +157,8 @@ def import_pois_google(limit=None):
         .select('id', 'openingHours') \
         .withColumn('openingHours', explode('openingHours')) \
         .select('id', 'openingHours.*') \
-        .filter(col('closingTime').isNotNull() & col('openingTime').isNotNull())
+        .filter(col('openingTime').isNotNull() & col('closingTime').isNotNull()) \
+        .withColumn('oh_id', concat_ws('_', 'openingTime', 'closingTime'))
     closed_tags = df.select('id', 'permanentlyClosed', 'temporarilyClosed').withColumn('date', lit(str(date)))
     ratings = df.select('id', 'rating.*').filter(col('stars').isNotNull()).withColumn('date', lit(str(date)))
     price_levels = df \
@@ -182,7 +178,8 @@ def import_pois_google(limit=None):
         .withColumn('minSpendingTime', col('spendingTime')[0]) \
         .withColumn('maxSpendingTime', col('spendingTime')[1]) \
         .select('id', 'minSpendingTime', 'maxSpendingTime') \
-        .withColumn('date', lit(str(date)))
+        .withColumn('date', lit(str(date))) \
+        .withColumn('st_id', concat_ws('_', 'minSpendingTime', 'maxSpendingTime'))
 
     add_google_pois(google_pois)
     add_opening_hours(opening_hours)
