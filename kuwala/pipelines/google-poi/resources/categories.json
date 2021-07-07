@@ -110,7 +110,12 @@
             "machines",
             "plant_nursery",
             "store",
-            "wedding_venue"
+            "wedding_venue",
+            "catering_service",
+            "chicken_restaurant",
+            "family_restaurant",
+            "southern_us_restaurant",
+            "american_restaurant"
         ]
     },
     "office": {
