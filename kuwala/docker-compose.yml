@@ -5,7 +5,7 @@ services:
   mongo:
     container_name: kuwala-pipelines_mongo_db
     image: mongo:4
-    command: --dbpath /data/db
+    command: --dbpath /data/db --setParameter cursorTimeoutMillis=10,800,000
     restart: always
     ports:
       - '27017:27017'

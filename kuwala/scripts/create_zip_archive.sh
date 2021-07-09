@@ -1,1 +1,2 @@
-git archive --format=zip HEAD -o ../../kuwala.zip
+cd ../..
+git archive --format=zip HEAD -o kuwala.zip
