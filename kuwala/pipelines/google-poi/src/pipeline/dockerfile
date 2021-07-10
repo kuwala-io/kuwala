@@ -1,5 +1,6 @@
 FROM rappdw/docker-java-python
 
+COPY ./pipelines/common/python_utils /opt/common/python_utils
 COPY ./pipelines/google-poi /opt/pipeline
 
 WORKDIR /opt/pipeline

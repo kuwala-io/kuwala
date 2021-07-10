@@ -6,6 +6,7 @@ chardet==4.0.0
 click==7.1.2
 dateparser==1.0.0
 fuzzywuzzy==0.18.0
+geojson==2.5.0
 h11==0.12.0
 h2==4.0.0
 h3==3.7.2
