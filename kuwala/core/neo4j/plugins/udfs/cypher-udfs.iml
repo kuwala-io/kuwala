@@ -185,5 +185,6 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-api:5.7.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.assertj:assertj-core:3.13.2" level="project" />
     <orderEntry type="library" name="Maven: com.uber:h3:3.7.0" level="project" />
+    <orderEntry type="library" name="Maven: joda-time:joda-time:2.10.10" level="project" />
   </component>
 </module>
