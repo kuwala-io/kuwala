@@ -221,7 +221,9 @@
             "dj",
             "plaza",
             "bus_stop",
-            "transit_station"
+            "transit_station",
+            "construction_company",
+            "korean_grocery_store"
         ]
     },
     "office": {

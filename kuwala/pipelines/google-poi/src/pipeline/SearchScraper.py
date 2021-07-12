@@ -71,8 +71,12 @@ class SearchScraper:
     """Match the queries that have been sent to the received results"""
     @staticmethod
     def match_search_results(df_p: DataFrame, results: list) -> DataFrame:
+        # Optimal partition size is 128GB (https://gist.github.com/dusenberrymw/30cebf98263fae206ea0ffd2cb155813)
+        # We assume roughly 10 KB per result.
+        number_of_partitions = math.ceil(len(results) / 12800)
         spark = SparkSession.builder.appName('google-poi').getOrCreate()
         df_r = spark.sparkContext.parallelize(results).map(lambda x: json.dumps(x))
+        df_r = df_r.repartition(number_of_partitions)
         df_r = spark.read.option('multiLine', 'true').json(df_r)
 
         # noinspection PyTypeChecker
@@ -93,8 +97,12 @@ class SearchScraper:
     """Match the POI ids that have been sent to the received results"""
     @staticmethod
     def match_poi_results(df_p: DataFrame, results: list) -> DataFrame:
-        spark = SparkSession.builder.appName('google-poi').getOrCreate()
+        # Optimal partition size is 128GB (https://gist.github.com/dusenberrymw/30cebf98263fae206ea0ffd2cb155813)
+        # We assume roughly 10 KB per result.
+        number_of_partitions = math.ceil(len(results) / 12800)
+        spark = SparkSession.builder.appName('google-poi').config('spark.driver.memory', '16g').getOrCreate()
         df_r = spark.sparkContext.parallelize(results).map(lambda x: json.dumps(x))
+        df_r = df_r.repartition(number_of_partitions)
         df_r = spark.read.option('multiLine', 'true').json(df_r)
         # noinspection PyTypeChecker
         df_p = df_p \
@@ -103,9 +111,7 @@ class SearchScraper:
             .filter(col('data.h3Index').isNotNull()) \
             .select('osmId', 'type', 'confidence', col('df_p.id').alias('id'), 'data.*')
 
-        # Optimal partition size is 128GB (https://gist.github.com/dusenberrymw/30cebf98263fae206ea0ffd2cb155813)
-        # We assume roughly 10 KB per result.
-        return df_p.repartition(math.ceil(len(results) / 12800), 'h3Index')
+        return df_p.repartition(number_of_partitions, 'h3Index')
 
     """Send queries in batches for each partition of a dataframe"""
     @staticmethod
