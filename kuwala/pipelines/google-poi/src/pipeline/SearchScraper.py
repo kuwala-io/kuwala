@@ -1,5 +1,6 @@
 import h3
 import json
+import math
 import moment
 import os
 import requests
@@ -95,13 +96,16 @@ class SearchScraper:
         spark = SparkSession.builder.appName('google-poi').getOrCreate()
         df_r = spark.sparkContext.parallelize(results).map(lambda x: json.dumps(x))
         df_r = spark.read.option('multiLine', 'true').json(df_r)
-
         # noinspection PyTypeChecker
-        return df_p \
+        df_p = df_p \
             .alias('df_p') \
             .join(df_r, df_p.id == df_r.id, 'inner') \
             .filter(col('data.h3Index').isNotNull()) \
             .select('osmId', 'type', 'confidence', col('df_p.id').alias('id'), 'data.*')
+
+        # Optimal partition size is 128GB (https://gist.github.com/dusenberrymw/30cebf98263fae206ea0ffd2cb155813)
+        # We assume roughly 10 KB per result.
+        return df_p.repartition(math.ceil(len(results) / 12800), 'h3Index')
 
     """Send queries in batches for each partition of a dataframe"""
     @staticmethod

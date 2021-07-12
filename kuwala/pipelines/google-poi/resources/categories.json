@@ -34,7 +34,13 @@
             "modern_art_museum",
             "museum",
             "opera_house",
-            "performing_arts_theater"
+            "performing_arts_theater",
+            "arts_organization",
+            "art_center",
+            "drama_theater",
+            "artist",
+            "art_school",
+            "art_dealer"
         ]
     },
     "automobile": {
@@ -53,14 +59,22 @@
         "category": "cafe",
         "tags": [
             "cafe",
-            "coffee_shop"
+            "coffee_shop",
+            "bakery",
+            "dessert_shop",
+            "coffee_store",
+            "chocolate_cafe",
+            "ice_cream_shop"
         ]
     },
     "drinks": {
         "category": "drinks",
         "tags": [
             "bar",
-            "pub"
+            "pub",
+            "gastropub",
+            "beer_garden",
+            "wine_bar"
         ]
     },
     "education": {
@@ -78,14 +92,36 @@
             "casino",
             "live_music_venue",
             "night_club",
-            "stadium"
+            "stadium",
+            "movie_theater"
         ]
     },
     "food": {
         "category": "food",
         "tags": [
             "lunch_restaurant",
-            "restaurant"
+            "restaurant",
+            "lebanese_restaurant",
+            "meal_takeaway",
+            "fast_food_restaurant",
+            "maltese_restaurant",
+            "tapas_bar",
+            "pizza_restaurant",
+            "kebab_shop",
+            "middle_eastern_restaurant",
+            "fine_dining_restaurant",
+            "new_us_american_restaurant",
+            "italian_restaurant",
+            "deli",
+            "pizzatakeaway",
+            "mexican_restaurant",
+            "mediterranean_restaurant",
+            "asian_fusion_restaurant",
+            "vegan_restaurant",
+            "sandwich_shop",
+            "cafeteria",
+            "tuscan_restaurant",
+            "thai_restaurant"
         ]
     },
     "groceries": {
@@ -93,24 +129,99 @@
         "tags": [
             "convenience_store",
             "grocery_store",
-            "supermarket"
+            "supermarket",
+            "discount_supermarket",
+            "frozen_food_store"
         ]
     },
     "medical": {
         "category": "medical",
         "tags": [
             "hospital",
-            "medical_center"
+            "medical_center",
+            "medical_clinic",
+            "pharmacy"
         ]
     },
     "misc": {
         "category": "misc",
         "tags": [
-            "dome",
             "machines",
             "plant_nursery",
             "store",
-            "wedding_venue"
+            "wedding_venue",
+            "embassy",
+            "digital_printer",
+            "sign_shop",
+            "print_shop",
+            "lodging",
+            "barber_shop",
+            "shipping_service",
+            "costume_jewelry_shop",
+            "book_store",
+            "property_management_company",
+            "financial_consultant",
+            "accountant",
+            "department_of_transportation",
+            "federal_government_office",
+            "commercial_printer",
+            "graphic_designer",
+            "tobacco_shop",
+            "wine_store",
+            "cigar_shop",
+            "alcoholic_beverage_wholesaler",
+            "sewing_shop",
+            "solar_energy_equipment_supplier",
+            "appliance_store",
+            "car_dealer",
+            "kitchen_furniture_store",
+            "chocolate_shop",
+            "tea_store",
+            "insurance_company",
+            "lawyer",
+            "record_store",
+            "marina",
+            "spa",
+            "auto_broker",
+            "council",
+            "food_products_supplier",
+            "tax_department",
+            "state_government_office",
+            "computer_repair_service",
+            "cell_phone_store",
+            "electronics_store",
+            "computer_store",
+            "mobile_phone_repair_shop",
+            "finance_broker",
+            "insurance_broker",
+            "finance",
+            "mattress_store",
+            "gift_shop",
+            "kitchen_supply_store",
+            "bedding_store",
+            "fire_alarm_supplier",
+            "safety_equipment_supplier",
+            "fire_protection_system_supplier",
+            "closed_circuit_television",
+            "security_system_supplier",
+            "security_system_installer",
+            "central_bank",
+            "monument_maker",
+            "real_estate_agency",
+            "catering_service",
+            "real_estate_agents",
+            "souvenir_store",
+            "southern_us_restaurant",
+            "chicken_restaurant",
+            "family_restaurant",
+            "american_restaurant",
+            "garden",
+            "bubble_tea_store",
+            "shopping_center",
+            "dj",
+            "plaza",
+            "bus_stop",
+            "transit_station"
         ]
     },
     "office": {
@@ -141,7 +252,8 @@
             "botanical_garden",
             "horse_boarding_stable",
             "park",
-            "woods"
+            "woods",
+            "playground"
         ]
     },
     "religiousBuilding": {
@@ -149,13 +261,18 @@
         "tags": [
             "cathedral",
             "church",
-            "mosque"
+            "mosque",
+            "dome"
         ]
     },
     "service": {
         "category": "service",
         "tags": [
-            "trailer_rental_service"
+            "savings_bank",
+            "atm",
+            "trailer_rental_service",
+            "legal_services",
+            "bank"
         ]
     },
     "shopping": {
@@ -187,7 +304,8 @@
         "tags": [
             "attraction",
             "hotel",
-            "tourist_attraction"
+            "tourist_attraction",
+            "vacation_appartment"
         ]
     },
     "wholesaler": {
