@@ -51,6 +51,14 @@ docker-compose --profile google-poi-scraper up
 docker-compose run google-poi-pipeline
 ```
 
+To run the scraper just for a subregion of the processed OSM data, you can provide the optional parameter 
+`polygon_coords`, which passes the coordinates according to the GeoJSON format for Polygons. Additionally, the H3
+resolution for the polyfill can be provided through the `polygon_resolution` parameter (default: 9).
+
+```zsh
+docker-compose run google-poi-pipeline --polygon_coords "[[[14.490726008861989,35.88842705928255],[14.490726008861989,35.90641346655704],[14.51292661409779,35.90641346655704],[14.51292661409779,35.88842705928255],[14.490726008861989,35.88842705928255]]]"
+```
+
 ### API Calls
 
 For performance reasons the amount of queries or ids that can be sent with one query is limited to 100.
