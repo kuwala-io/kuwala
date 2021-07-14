@@ -180,7 +180,6 @@ async def get_poi_information():
                 h3Index=h3_index,
                 address=address,
                 timezone=timezone,
-                # categories=categories,
                 categories=complete_categories(categories),
                 temporarilyClosed=temporarily_closed,
                 permanentlyClosed=permanently_closed,

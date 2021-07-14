@@ -1,6 +1,7 @@
 import argparse
 import h3
 import json
+import moment
 import os
 import sys
 
@@ -41,7 +42,7 @@ def generate_search_strings(limit=None):
         polygon_resolution = 9
 
         if args.polygon_resolution:
-            polygon_resolution = args.polygon_resolution
+            polygon_resolution = int(args.polygon_resolution)
 
         polygon_cells = polyfill_polygon(polygon, resolution=polygon_resolution)
 
@@ -79,4 +80,5 @@ def generate_search_strings(limit=None):
     if limit is not None:
         union = union.limit(limit)
 
-    return union
+    union.write.parquet(f'../../tmp/googleFiles/searchStrings/google_search_strings'
+                        f'_{moment.now().format("YYYY-MM-DDTHH-mm-ss")}.parquet')

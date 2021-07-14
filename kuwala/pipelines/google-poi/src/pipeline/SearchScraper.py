@@ -1,15 +1,15 @@
 import h3
-import json
-import math
-import moment
 import os
+import pandas
+import pyarrow as pa
+import pyarrow.parquet as pq
 import requests
 from fuzzywuzzy import fuzz
-from ListAccumulator import ListAccumulator
-from pyspark.sql import DataFrame, SparkSession
+from pandas import DataFrame
+from pathlib import Path
+from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, udf
 from pyspark.sql.types import DoubleType, IntegerType
-from typing import Callable
 
 max_h3_distance = 500
 
@@ -70,110 +70,183 @@ class SearchScraper:
 
     """Match the queries that have been sent to the received results"""
     @staticmethod
-    def match_search_results(df_p: DataFrame, results: list) -> DataFrame:
-        # Optimal partition size is 128GB (https://gist.github.com/dusenberrymw/30cebf98263fae206ea0ffd2cb155813)
-        # We assume roughly 10 KB per result.
-        number_of_partitions = math.ceil(len(results) / 12800)
-        spark = SparkSession.builder.appName('google-poi').getOrCreate()
-        df_r = spark.sparkContext.parallelize(results).map(lambda x: json.dumps(x))
-        df_r = df_r.repartition(number_of_partitions)
-        df_r = spark.read.option('multiLine', 'true').json(df_r)
-
+    def match_search_results(directory: str, file_name: str):
+        spark = SparkSession.builder.appName('google-poi').config('spark.driver.memory', '16g').getOrCreate()
+        df_str = spark.read.parquet(directory + file_name)
+        path_results = directory.replace('Strings', 'Results') + file_name.replace('strings', 'results')
+        df_res = spark.read.parquet(path_results)
         # noinspection PyTypeChecker
-        return df_p \
-            .alias('df_p') \
-            .join(df_r, df_p.query == df_r.query, 'inner') \
+        df_res = df_str \
+            .alias('df_str') \
+            .join(df_res, df_str.query == df_res.query, 'inner') \
             .filter(col('data.h3Index').isNotNull()) \
-            .withColumn('osmName', col('df_p.name')) \
+            .withColumn('osmName', col('df_str.name')) \
             .withColumn('googleName', col('data.name')) \
             .withColumn(
                 'nameDistance',
-                SearchScraper.get_name_distance(col('osmName'), col('df_p.query'), col('googleName'))
+                SearchScraper.get_name_distance(col('osmName'), col('df_str.query'), col('googleName'))
             ) \
             .withColumn('h3Distance', SearchScraper.get_h3_distance(col('h3Index'), col('data.h3Index'))) \
             .withColumn('confidence', SearchScraper.get_confidence(col('h3Distance'), col('nameDistance'))) \
             .select('osmId', 'type', 'confidence', 'data.id')
 
+        df_res.write.parquet(path_results.replace('results', 'results_matched'))
+
     """Match the POI ids that have been sent to the received results"""
     @staticmethod
-    def match_poi_results(df_p: DataFrame, results: list) -> DataFrame:
-        # Optimal partition size is 128GB (https://gist.github.com/dusenberrymw/30cebf98263fae206ea0ffd2cb155813)
-        # We assume roughly 10 KB per result.
-        number_of_partitions = math.ceil(len(results) / 12800)
+    def match_poi_results(directory: str, file_name: str):
         spark = SparkSession.builder.appName('google-poi').config('spark.driver.memory', '16g').getOrCreate()
-        df_r = spark.sparkContext.parallelize(results).map(lambda x: json.dumps(x))
-        df_r = df_r.repartition(number_of_partitions)
-        df_r = spark.read.option('multiLine', 'true').json(df_r)
-        # noinspection PyTypeChecker
-        df_p = df_p \
-            .alias('df_p') \
-            .join(df_r, df_p.id == df_r.id, 'inner') \
-            .filter(col('data.h3Index').isNotNull()) \
-            .select('osmId', 'type', 'confidence', col('df_p.id').alias('id'), 'data.*')
+        df_res = spark.read.parquet(
+            directory.replace('Strings', 'Results') + file_name.replace('strings', 'results_matched')
+        )
+        path_poi_data = directory.replace('searchStrings', 'poiData') + file_name.replace('search_strings', 'poi_data')
+        df_pd = spark.read.parquet(path_poi_data)
 
-        return df_p.repartition(number_of_partitions, 'h3Index')
+        # noinspection PyTypeChecker
+        df_pd = df_res \
+            .alias('df_res') \
+            .join(df_pd, df_res.id == df_pd.id, 'inner') \
+            .filter(col('data.h3Index').isNotNull()) \
+            .select('osmId', 'type', 'confidence', col('df_res.id').alias('id'), 'data.*')
+
+        df_pd.write.parquet(path_poi_data.replace('poi_data', 'poi_data_matched'))
 
     """Send queries in batches for each partition of a dataframe"""
     @staticmethod
     def batch_queries(
-            df: DataFrame,
-            query_property: str,
-            match_function: Callable,
-            query_type: str
-    ) -> DataFrame:
-        def execute_queries(partition, q_property, accu):
-            batch = list()
-            batch_size = 100
+        df: DataFrame,
+        output_dir: str,
+        file_name: str,
+        query_property: str,
+        query_type: str,
+        schema=None
+    ):
+        batch = list()
+        batch_size = 100
+        writer = None
 
-            for row in partition:
-                batch.append(row[q_property])
+        for index, row in df.iterrows():
+            batch.append(row[query_property])
 
-                if len(batch) == batch_size:
-                    # TODO: Implement retry if result is None
-                    result = SearchScraper.send_query(batch, query_type)
-                    batch = list()
-
-                    if result and ('data' in result):
-                        accu.add(result['data'])
-
-            if len(batch) > 0:
+            if len(batch) == batch_size:
+                # TODO: Implement retry if result is None
                 result = SearchScraper.send_query(batch, query_type)
+                batch = list()
 
                 if result and ('data' in result):
-                    accu.add(result['data'])
+                    data = pandas.DataFrame(result['data'])
+                    # noinspection PyArgumentList
+                    table = pa.Table.from_pandas(df=data, schema=schema)
 
-        spark = SparkSession.builder.appName('google-poi').getOrCreate()
-        # An accumulator is necessary because when using parallelization only copies of passed objects would be updated
-        accumulator = spark.sparkContext.accumulator([], ListAccumulator())
+                    if not writer:
+                        script_dir = os.path.dirname(__file__)
+                        output_dir = os.path.join(script_dir, output_dir)
+                        output_file = os.path.join(output_dir, file_name)
 
-        df.foreachPartition(lambda p: execute_queries(p, query_property, accumulator))
+                        Path(output_dir).mkdir(parents=True, exist_ok=True)
 
-        return match_function(df, accumulator.value)
+                        writer = pq.ParquetWriter(
+                            output_file,
+                            schema=schema if schema else table.schema,
+                            flavor='spark'
+                        )
 
-    """Send search strings to get Google POI ids"""
-    @staticmethod
-    def send_search_queries(df: DataFrame) -> DataFrame:
-        return SearchScraper.batch_queries(
-            df,
-            query_property='query',
-            match_function=SearchScraper.match_search_results,
-            query_type='search'
-        )
+                    writer.write_table(table)
+
+        if len(batch) > 0:
+            result = SearchScraper.send_query(batch, query_type)
+
+            if result and ('data' in result):
+                data = pandas.DataFrame(result['data'])
+                # noinspection PyArgumentList
+                table = pa.Table.from_pandas(df=data, schema=schema)
+
+                writer.write_table(table)
+
+        if writer:
+            writer.close()
 
     """Send Google POI ids to retrieve all POI information"""
     @staticmethod
-    def send_poi_queries(df: DataFrame) -> DataFrame:
+    def send_poi_queries(directory: str, file_name: str):
+        pois = pq \
+            .read_table(directory.replace('Strings', 'Results') + file_name.replace('strings', 'results_matched')) \
+            .to_pandas()
+        schema = pa.schema([
+            pa.field('id', pa.string()),
+            pa.field('data', pa.struct([
+                pa.field('name', pa.string()),
+                pa.field('placeID', pa.string()),
+                pa.field('location', pa.struct([
+                    pa.field('lat', pa.float64()),
+                    pa.field('lng', pa.float64())
+                ])),
+                pa.field('h3Index', pa.string()),
+                pa.field('address', pa.list_(pa.string())),
+                pa.field('timezone', pa.string()),
+                pa.field('categories', pa.struct([
+                    pa.field('google', pa.list_(pa.string())),
+                    pa.field('kuwala', pa.list_(pa.string()))
+                ])),
+                pa.field('temporarilyClosed', pa.bool_()),
+                pa.field('permanentlyClosed', pa.bool_()),
+                pa.field('insideOf', pa.string()),
+                pa.field('contact', pa.struct([
+                    pa.field('phone', pa.string()),
+                    pa.field('website', pa.string())
+                ])),
+                pa.field('openingHours', pa.list_(pa.struct([
+                    pa.field('closingTime', pa.string()),
+                    pa.field('openingTime', pa.string()),
+                    pa.field('date', pa.string())
+                ]))),
+                pa.field('rating', pa.struct([
+                    pa.field('numberOfReviews', pa.int64()),
+                    pa.field('stars', pa.float64())
+                ])),
+                pa.field('priceLevel', pa.int64()),
+                pa.field('popularity', pa.list_(pa.struct([
+                    pa.field('popularity', pa.int64()),
+                    pa.field('timestamp', pa.string())
+                ]))),
+                pa.field('waitingTime', pa.list_(pa.struct([
+                    pa.field('waitingTime', pa.int64()),
+                    pa.field('timestamp', pa.string())
+                ]))),
+                pa.field('spendingTime', pa.list_(pa.int64()))
+            ]))
+        ])
+
         return SearchScraper.batch_queries(
-            df,
+            df=pois,
+            output_dir=f'../../tmp/googleFiles/poiData/',
+            file_name=file_name.replace('search_strings', 'poi_data'),
             query_property='id',
-            match_function=SearchScraper.match_poi_results,
-            query_type='poi'
+            query_type='poi',
+            schema=schema
+        )
+
+    """Send search strings to get Google POI ids"""
+    @staticmethod
+    def send_search_queries(directory: str, file_name: str):
+        search_strings = pq.read_table(directory + file_name).to_pandas()
+
+        return SearchScraper.batch_queries(
+            df=search_strings,
+            output_dir=f'../../tmp/googleFiles/searchResults/',
+            file_name=file_name.replace('strings', 'results'),
+            query_property='query',
+            query_type='search'
         )
 
     """Write scraped POI information to a Parquet file"""
     @staticmethod
-    def scrape_with_search_string(search_strings: DataFrame):
-        search_results = SearchScraper.send_search_queries(search_strings)
-        poi_results = SearchScraper.send_poi_queries(search_results)
+    def scrape_with_search_string():
+        script_dir = os.path.dirname(__file__)
+        parquet_files = os.path.join(script_dir, '../../tmp/googleFiles/searchStrings/')
+        file_name = sorted(os.listdir(parquet_files), reverse=True)[0]
 
-        poi_results.write.parquet(f'../../tmp/googleFiles/google_pois_{moment.now()}.parquet')
+        SearchScraper.send_search_queries(parquet_files, file_name)
+        SearchScraper.match_search_results(parquet_files, file_name)
+        SearchScraper.send_poi_queries(parquet_files, file_name)
+        SearchScraper.match_poi_results(parquet_files, file_name)
