@@ -4,12 +4,14 @@ import pandas
 import pyarrow as pa
 import pyarrow.parquet as pq
 import requests
+from func_timeout import func_set_timeout, FunctionTimedOut
 from fuzzywuzzy import fuzz
 from pandas import DataFrame
 from pathlib import Path
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, udf
 from pyspark.sql.types import DoubleType, IntegerType
+from time import sleep
 
 max_h3_distance = 500
 
@@ -17,6 +19,7 @@ max_h3_distance = 500
 class SearchScraper:
     """Get result for search strings"""
     @staticmethod
+    @func_set_timeout(180)
     def send_query(batch, query_type):
         # noinspection PyBroadException
         try:
@@ -123,45 +126,53 @@ class SearchScraper:
     ):
         batch = list()
         batch_size = 100
+        max_sleep_time = 120
         writer = None
 
         for index, row in df.iterrows():
             batch.append(row[query_property])
 
-            if len(batch) == batch_size:
-                # TODO: Implement retry if result is None
-                result = SearchScraper.send_query(batch, query_type)
+            # noinspection PyTypeChecker
+            if len(batch) == batch_size or (index + 1) == len(df.index):
+                successful = False
+                sleep_time = 1
+
+                while not successful and sleep_time < max_sleep_time:
+                    try:
+                        result = SearchScraper.send_query(batch, query_type)
+
+                        if result and ('data' in result):
+                            data = pandas.DataFrame(result['data'])
+                            # noinspection PyArgumentList
+                            table = pa.Table.from_pandas(df=data, schema=schema)
+
+                            if not writer:
+                                script_dir = os.path.dirname(__file__)
+                                output_dir = os.path.join(script_dir, output_dir)
+                                output_file = os.path.join(output_dir, file_name)
+
+                                Path(output_dir).mkdir(parents=True, exist_ok=True)
+
+                                writer = pq.ParquetWriter(
+                                    output_file,
+                                    schema=schema if schema else table.schema,
+                                    flavor='spark'
+                                )
+
+                            writer.write_table(table)
+
+                            successful = True
+                        else:
+                            sleep(sleep_time)
+                            sleep_time *= 2
+                    except FunctionTimedOut:
+                        sleep(sleep_time)
+                        sleep_time *= 2
+
+                        if sleep_time >= max_sleep_time:
+                            print('Request timed out too many times. Skipping batch')
+
                 batch = list()
-
-                if result and ('data' in result):
-                    data = pandas.DataFrame(result['data'])
-                    # noinspection PyArgumentList
-                    table = pa.Table.from_pandas(df=data, schema=schema)
-
-                    if not writer:
-                        script_dir = os.path.dirname(__file__)
-                        output_dir = os.path.join(script_dir, output_dir)
-                        output_file = os.path.join(output_dir, file_name)
-
-                        Path(output_dir).mkdir(parents=True, exist_ok=True)
-
-                        writer = pq.ParquetWriter(
-                            output_file,
-                            schema=schema if schema else table.schema,
-                            flavor='spark'
-                        )
-
-                    writer.write_table(table)
-
-        if len(batch) > 0:
-            result = SearchScraper.send_query(batch, query_type)
-
-            if result and ('data' in result):
-                data = pandas.DataFrame(result['data'])
-                # noinspection PyArgumentList
-                table = pa.Table.from_pandas(df=data, schema=schema)
-
-                writer.write_table(table)
 
         if writer:
             writer.close()
@@ -230,13 +241,26 @@ class SearchScraper:
     @staticmethod
     def send_search_queries(directory: str, file_name: str):
         search_strings = pq.read_table(directory + file_name).to_pandas()
+        schema = pa.schema([
+            pa.field('query', pa.string()),
+            pa.field('data', pa.struct([
+                pa.field('h3Index', pa.string()),
+                pa.field('id', pa.string()),
+                pa.field('location', pa.struct([
+                    pa.field('lat', pa.float64()),
+                    pa.field('lng', pa.float64())
+                ])),
+                pa.field('name', pa.string())
+            ]))
+        ])
 
         return SearchScraper.batch_queries(
             df=search_strings,
             output_dir=f'../../tmp/googleFiles/searchResults/',
             file_name=file_name.replace('strings', 'results'),
             query_property='query',
-            query_type='search'
+            query_type='search',
+            schema=schema
         )
 
     """Write scraped POI information to a Parquet file"""
