@@ -1,35 +1,27 @@
-import rasterio
-import concurrent.futures
+import questionary
+from hdx.hdx_configuration import Configuration
+from hdx.data.organization import Organization
 
 
-def process_geotiff():
-    raster = rasterio.open('../tmp/cog_globallat_-10_lon_-90_general-v1.5.1.tif')
-    transform = raster.transform
-    windows = [window for ij, window in raster.block_windows()]
-    population_df = []
+def select_dataset():
+    Configuration.create(hdx_site='prod', user_agent='Kuwala', hdx_read_only=True)
+    datasets = Organization.read_from_hdx(identifier='74ad0574-923d-430b-8d52-ad80256c4461').get_datasets(
+        query='Population')
+    datasets = sorted(
+        filter(
+            lambda d: 'population' in d['title'].lower() and 'csv' in d['file_types'],
+            map(
+                lambda d: dict(id=d.get('id'), title=d.get('title'), location=d.get_location_names(),
+                               file_types=d.get_filetypes()),
+                datasets
+            )
+        ), key=lambda d: d['location'][0])
+    countries = list(map(lambda d: d['location'][0], datasets))
+    country = questionary.select('For which country do you want to download the population data?', choices=countries) \
+        .ask()
 
-    def process_pixels(pixels):
-        population = []
-
-        for x in range(pixels.shape[0]):
-            for y in range(pixels.shape[1]):
-                if pixels[x, y] > 0:
-                    coords = (x, y) * transform
-
-                    population.append({'lat': coords[1], 'lng': coords[0], 'value': pixels[x, y]})
-
-        return population
-
-    def process_window(window):
-        pixels = raster.read(1, window=window)
-        result = process_pixels(pixels)
-
-        if len(result) > 0:
-            population_df.append(result)
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-        executor.map(process_window, windows)
+    return datasets[countries.index(country)]['id']
 
 
 if __name__ == '__main__':
-    process_geotiff()
+    dataset = select_dataset()
