@@ -1,4 +1,5 @@
 import h3
+import moment
 import os
 import pandas
 import pyarrow as pa
@@ -32,8 +33,8 @@ class SearchScraper:
 
             return result.json() if result else None
         except Exception as e:
-            print('Search query failed: ', e)
-            print('Continuing without batch.')
+            print(f'[{moment.now().format("YYYY-MM-DDTHH-mm-ss")}]: Search query failed: ', e)
+            print(f'[{moment.now().format("YYYY-MM-DDTHH-mm-ss")}]: Continuing without batch.')
 
             return None
 
@@ -133,11 +134,11 @@ class SearchScraper:
             batch.append(row[query_property])
 
             # noinspection PyTypeChecker
-            if len(batch) == batch_size or (index + 1) == len(df.index):
+            if (len(batch) == batch_size) or ((index + 1) == len(df.index)):
                 successful = False
                 sleep_time = 1
 
-                while not successful and sleep_time < max_sleep_time:
+                while not successful and (sleep_time < max_sleep_time):
                     try:
                         result = SearchScraper.send_query(batch, query_type)
 
@@ -170,7 +171,8 @@ class SearchScraper:
                         sleep_time *= 2
 
                         if sleep_time >= max_sleep_time:
-                            print('Request timed out too many times. Skipping batch')
+                            print(f'[{moment.now().format("YYYY-MM-DDTHH-mm-ss")}]: Request timed out too many times. '
+                                  f'Skipping batch')
 
                 batch = list()
 
@@ -228,7 +230,7 @@ class SearchScraper:
             ]))
         ])
 
-        return SearchScraper.batch_queries(
+        SearchScraper.batch_queries(
             df=pois,
             output_dir=f'../../tmp/googleFiles/poiData/',
             file_name=file_name.replace('search_strings', 'poi_data'),
@@ -254,7 +256,7 @@ class SearchScraper:
             ]))
         ])
 
-        return SearchScraper.batch_queries(
+        SearchScraper.batch_queries(
             df=search_strings,
             output_dir=f'../../tmp/googleFiles/searchResults/',
             file_name=file_name.replace('strings', 'results'),
