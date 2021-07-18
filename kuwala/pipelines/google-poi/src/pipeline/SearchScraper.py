@@ -185,6 +185,7 @@ class SearchScraper:
         pois = pq \
             .read_table(directory.replace('Strings', 'Results') + file_name.replace('strings', 'results_matched')) \
             .to_pandas()
+        pois = pois[['id']].drop_duplicates()
         schema = pa.schema([
             pa.field('id', pa.string()),
             pa.field('data', pa.struct([
