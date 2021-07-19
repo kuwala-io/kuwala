@@ -24,7 +24,7 @@ def add_google_pois(df: DataFrame):
         // Create PoiGoogle nodes
         UNWIND $rows AS row
         MERGE (pg:PoiGoogle { id: row.id })
-        SET 
+        ON CREATE SET 
             pg.placeId = row.placeID,
             pg.name = row.name,
             pg.address = row.address,
