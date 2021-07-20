@@ -5,7 +5,7 @@ services:
   mongo:
     container_name: kuwala-pipelines_mongo_db
     image: mongo:4
-    command: --dbpath /data/db
+    command: --dbpath /data/db --setParameter cursorTimeoutMillis=10800000
     restart: always
     ports:
       - '27017:27017'
@@ -23,6 +23,7 @@ services:
     restart: always
     environment: 
       - NEO4J_AUTH=none
+      - NEO4JLABS_PLUGINS=["apoc"]
     ports:
       - '7474:7474'
       - '7687:7687'
@@ -50,26 +51,43 @@ services:
     ports:
       - '9050:9050'
     profiles:
-      - core
       - network
-      
-  # docker-compose run  --service-ports google-poi
-  google-poi:
-    environment: 
-      - MONGO_HOST=kuwala-pipelines_mongo_db
+      - google-poi-scraper
+
+  # docker-compose --profile google-poi-scraper up
+  google-poi-api:
+    container_name: google-poi-api
+    environment:
       - PROXY_ADDRESS=socks5://kuwala-pipelines_torproxy:9050
       - QUART_DEBUG=False
     build:
       context: .
       dockerfile: ./pipelines/google-poi/dockerfile
     restart: always
-    depends_on: [mongo, torproxy]
+    depends_on: [torproxy]
     ports:
       - '3003:3003'
     profiles:
       - network
+      - google-poi-scraper
 
-  # docker-compose run  --service-ports neo4j-importer
+  # docker-compose run google-poi-pipeline
+  google-poi-pipeline:
+    container_name: google-poi-pipeline
+    environment:
+      - MONGO_HOST=kuwala-pipelines_mongo_db
+      - GOOGLE_POI_API_HOST=google-poi-api
+    build:
+      context: .
+      dockerfile: ./pipelines/google-poi/src/pipeline/dockerfile
+    volumes:
+      - ./tmp/kuwala/googleFiles:/opt/pipeline/tmp/googleFiles
+    restart: always
+    depends_on: [mongo]
+    profiles:
+      - network
+
+  # docker-compose run neo4j-importer
   neo4j-importer:
     environment: 
       - NEO4J_HOST=bolt://kuwala-pipelines_neo4j_db:7687
@@ -77,6 +95,8 @@ services:
     build:
       context: .
       dockerfile: ./core/neo4j/importer/dockerfile
+    volumes:
+      - ./tmp/kuwala:/opt/app/tmp/kuwala
     restart: always
     depends_on: [mongo, neo4j]
     profiles:

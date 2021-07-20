@@ -1,7 +1,8 @@
 import os
 
+from neo4j import exceptions, GraphDatabase, Neo4jDriver
+from time import sleep
 from typing import Optional
-from neo4j import GraphDatabase, Neo4jDriver
 
 graph = None  # type: Optional[Neo4jDriver]
 
@@ -27,25 +28,41 @@ def query_graph(q, parameters=None, db=None):
 
     session = None
     response = None
+    retry = False
 
     try:
         session = graph.session(database=db) if db is not None else graph.session()
         response = list(session.run(q, parameters))
+    # Deadlocks might occur due to concurrent writes
+    except exceptions.TransientError:
+        print('Retry')
+
+        retry = True
     except Exception as e:
         print("Query failed:", e)
     finally:
         if session is not None:
             session.close()
 
-    return response
+    return response, retry
 
 
 # Method used inside Pyspark
 # Establish new database connection for each invocation due to multi-threaded environment
 def batch_insert_data(partition, query):
     def send_query(rows):
-        query_graph(query, parameters={'rows': rows})
-        print('Inserted batch')
+        sleep_time = 1
+
+        while True:
+            response, retry = query_graph(query, parameters={'rows': rows})
+
+            if not retry:
+                break
+            elif sleep_time < 60:
+                sleep(sleep_time)
+                sleep_time *= 2
+            else:
+                return response
 
     connect_to_graph(uri="bolt://localhost:7687",
                      user="neo4j",

@@ -39,10 +39,24 @@ This score can also be over 100 if the number of visitors is extraordinarily hig
 Proceed only if you followed the initial steps to initialize the main components mentioned here:
 [`Initialize Main Components`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/)
 
-Run the app locally.
+1. Start the scraping api
 
 ```zsh
-docker-compose run  --service-ports google-poi
+docker-compose --profile google-poi-scraper up
+```
+
+2. OPTIONAL: To scrape the Google data for all OSM POIs that are in the database after running the OSM pipeline execute:
+
+```zsh
+docker-compose run google-poi-pipeline
+```
+
+To run the scraper just for a subregion of the processed OSM data, you can provide the optional parameter 
+`polygon_coords`, which passes the coordinates according to the GeoJSON format for Polygons. Additionally, the H3
+resolution for the polyfill can be provided through the `polygon_resolution` parameter (default: 9).
+
+```zsh
+docker-compose run google-poi-pipeline --polygon_coords "[[[14.490726008861989,35.88842705928255],[14.490726008861989,35.90641346655704],[14.51292661409779,35.90641346655704],[14.51292661409779,35.88842705928255],[14.490726008861989,35.88842705928255]]]"
 ```
 
 ### API Calls

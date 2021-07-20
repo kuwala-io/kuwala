@@ -5,8 +5,12 @@
 .history
 node_modules
 
+kuwala.zip
+venv/
+
 npm-debug.log
 
 tmp
 env
+!.env.local
 __pycache__

@@ -66,6 +66,11 @@
             <artifactId>h3</artifactId>
             <version>3.7.0</version>
         </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.10.10</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

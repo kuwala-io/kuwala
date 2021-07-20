@@ -46,7 +46,7 @@ cd kuwala
 2. Build images
 
 ```zsh
-docker-compose build osm-poi population-density google-poi neo4j neo4j-importer
+docker-compose build osm-poi population-density google-poi-api google-poi-pipeline neo4j neo4j-importer
 ```
 
 3. Start databases

@@ -1,12 +1,11 @@
 import h3
-import math
 import moment
 import re
 import src.utils.google as google
 from config.h3.h3_config import POI_RESOLUTION
-import asyncio
-from quart import abort, Blueprint, jsonify, request
+from quart import abort, Blueprint, request
 from src.utils.array_utils import get_nested_value
+from src.utils.futures import execute_futures
 
 from src.utils.cat_mapping import complete_categories
 
@@ -25,6 +24,8 @@ def parse_opening_hours(opening_hours):
         closing_time_hours = get_nested_value(li, 6, 0, 2)
         closing_time_minutes = get_nested_value(li, 6, 0, 3)
 
+        # TODO: Consider places with breaks (e.g., closed between 13-14h)
+
         return dict(
             date=str(moment.date(date)),
             openingTime=str(moment.date(date).add(
@@ -32,7 +33,13 @@ def parse_opening_hours(opening_hours):
                 minutes=opening_time_minutes
             )) if opening_time_hours is not None else None,
             closingTime=str(moment.date(date).add(
-                days=1 if closing_time_hours < opening_time_hours else 0,  # Necessary if closing at midnight or later
+                days=1 if  # Necessary if closing at midnight or later or when place is open 24 hours (all values 0)
+                closing_time_hours < opening_time_hours | (
+                        opening_time_hours == 0 &
+                        opening_time_minutes == 0 &
+                        closing_time_hours == 0 &
+                        closing_time_minutes == 0
+                ) else 0,
                 hours=closing_time_hours,
                 minutes=closing_time_minutes
             )) if closing_time_hours is not None else None
@@ -132,16 +139,19 @@ async def get_poi_information():
     if len(ids) > 100:
         abort(400, description='You can send at most 100 ids at once.')
 
-    loop = asyncio.get_event_loop()
-
     def parse_result(r):
         data = r['data'][6]
         name = get_nested_value(data, 11)
         place_id = get_nested_value(data, 78)
-        lat = round(get_nested_value(data, 9, 2), 7)  # 7 digits equals a precision of 1 cm
-        lng = round(get_nested_value(data, 9, 3), 7)  # 7 digits equals a precision of 1 cm
+        lat = get_nested_value(data, 9, 2)
+        lng = get_nested_value(data, 9, 3)
+
+        if lat and lng:
+            lat = round(lat, 7)  # 7 digits equals a precision of 1 cm
+            lng = round(lng, 7)  # 7 digits equals a precision of 1 cm
+
         # noinspection PyUnresolvedReferences
-        h3_index = h3.geo_to_h3(lat, lng, POI_RESOLUTION)
+        h3_index = h3.geo_to_h3(lat, lng, POI_RESOLUTION) if lat and lng else None
         address = get_nested_value(data, 2)
         timezone = get_nested_value(data, 30)
         categories = [t[0] for t in (get_nested_value(data, 76) or [])]
@@ -170,7 +180,6 @@ async def get_poi_information():
                 h3Index=h3_index,
                 address=address,
                 timezone=timezone,
-                # categories=categories,
                 categories=complete_categories(categories),
                 temporarilyClosed=temporarily_closed,
                 permanentlyClosed=permanently_closed,
@@ -184,15 +193,5 @@ async def get_poi_information():
                 spendingTime=spending_time
             )
         )
-    
-    futures = []
-    for id in ids:
-        futures.append(loop.run_in_executor(None, google.get_by_id, id))
 
-    results = loop.run_until_complete(asyncio.gather(*futures))
-    
-    parsed = []
-    for result in results:
-        parsed.append(parse_result(result))
-
-    return jsonify({'success': True, 'data': parsed})
+    return execute_futures(ids, google.get_by_id, parse_result)
