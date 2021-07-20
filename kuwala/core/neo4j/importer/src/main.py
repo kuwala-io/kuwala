@@ -1,5 +1,3 @@
-import sys
-
 import PipelineImporter as PipelineImporter
 
 if __name__ == '__main__':
