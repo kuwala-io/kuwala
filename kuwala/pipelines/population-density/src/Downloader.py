@@ -1,5 +1,6 @@
 import os
 import questionary
+import time
 import zipfile
 from hdx.data.dataset import Dataset
 from hdx.data.organization import Organization
@@ -95,6 +96,8 @@ class Downloader:
             file_paths.append(dict(path=dir_path_type, type=r['type']))
 
             if not os.path.exists(dir_path_type):
+                start_time = time.time()
+
                 Path(dir_path_type).mkdir(parents=True, exist_ok=True)
 
                 url, file_path = r_hdx.download(dir_path_type)
@@ -106,5 +109,9 @@ class Downloader:
                     zip_ref.extractall(dir_path_type)
 
                 os.remove(file_path_without_ext)
+
+                end_time = time.time()
+
+                print(f'Downloaded data for {r["type"]} in {round(end_time - start_time)} s')
 
         return file_paths, dir_path
