@@ -1,4 +1,4 @@
-import io.kuwala.h3.H3;
+import io.kuwala.time.Time;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.*;
 import org.neo4j.driver.*;
@@ -8,7 +8,7 @@ import org.neo4j.harness.Neo4jBuilders;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class H3Test {
+public class TimeTest {
     private static final Config driverConfig = Config.builder().withoutEncryption().build();
     private static Driver driver;
     private Neo4j embeddedDatabaseServer;
@@ -17,7 +17,7 @@ public class H3Test {
     void initializeNeo4j() {
         this.embeddedDatabaseServer = Neo4jBuilders.newInProcessBuilder()
                 .withDisabledServer()
-                .withFunction(H3.class)
+                .withFunction(Time.class)
                 .build();
 
         driver = GraphDatabase.driver(embeddedDatabaseServer.boltURI(), driverConfig);
@@ -38,9 +38,21 @@ public class H3Test {
 
     @Test
     public void shouldReturnParentIndex() {
-            Session session = driver.session();
-            String result = session.run( "RETURN io.kuwala.h3.h3ToParent('8f3f3040004caca', 11) AS result").single().get("result").asString();
+        Session session = driver.session();
+        double result = session.run(
+        "RETURN io.kuwala.time.durationHours('2021-07-05T08:00:00-00.00', '2021-07-05T16:00:00-00.00') AS result"
+        ).single().get("result").asDouble();
 
-            MatcherAssert.assertThat( result, equalTo("8b3f3040004cfff") );
+        MatcherAssert.assertThat( result, equalTo(8.0) );
+    }
+
+    @Test
+    public void shouldReturnHour() {
+        Session session = driver.session();
+        double result = session.run(
+                "RETURN io.kuwala.time.getHour('2021-07-05T08:00:00-00.00') AS result"
+        ).single().get("result").asDouble();
+
+        MatcherAssert.assertThat( result, equalTo(8.0) );
     }
 }
