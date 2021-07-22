@@ -121,21 +121,13 @@ services:
     profiles:
       - network
 
-  # docker-compose run  --service-ports population-density start-processing:local
-  # docker-compose run  --service-ports population-density start-api:local
+  # docker-compose run  population-density
   population-density:
-    environment: 
-      - MONGO_HOST=kuwala-pipelines_mongo_db
     build:
       context: .
       dockerfile: ./pipelines/population-density/dockerfile
     restart: always
-    depends_on: [mongo]
-    ports:
-      - '3002:3002'
     volumes:
-      - ./tmp/kuwala/countries:/opt/app/tmp/countries
-    stdin_open: true # docker run -i
-    tty: true        # docker run -t
+      - ./tmp/kuwala/populationFiles:/opt/app/tmp/populationFiles
     profiles:
       - network

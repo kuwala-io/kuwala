@@ -85,7 +85,7 @@ class Downloader:
         selected_resources = list(filter(lambda resource: resource['type'] in selected_resources, resources))
         country_code = d.get_location_iso3s()[0]
         script_dir = os.path.dirname(__file__)
-        dir_path = f'../tmp/{country_code}/'
+        dir_path = f'../tmp/populationFiles/{country_code}/'
         dir_path = os.path.join(script_dir, dir_path)
         file_paths = list()
 
