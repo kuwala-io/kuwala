@@ -52,7 +52,7 @@ def add_population(df: DataFrame):
 def import_population_density(limit=None):
     script_dir = os.path.dirname(__file__)
     country_dir = os.path.join(script_dir, '../tmp/kuwala/populationFiles/')
-    countries = os.listdir(country_dir)
+    countries = os.listdir(country_dir) if os.path.exists(country_dir) else []
 
     if len(countries) < 1:
         print('No population data available. You first need to run the population-density processing pipeline before '
