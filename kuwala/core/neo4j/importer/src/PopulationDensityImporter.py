@@ -11,15 +11,20 @@ def add_population(df: DataFrame):
     query = '''
         MERGE (h:H3Index { h3Index: event.h3Index }) 
         WITH h, event
-        MERGE (:Population { 
-            total: event.total,
-            women: event.women,
-            men: event.men,
-            children_under_five: event.children_under_five,
-            youth_15_24: event.youth_15_24,
-            elderly_60_plus: event.elderly_60_plus,
-            women_of_reproductive_age_15_49: event.women_of_reproductive_age_15_49
-        })-[:POPULATION_AT]->(h)
+        MERGE (p:Population)-[:POPULATION_AT]->(h)
+        WITH p, event
+        SET
+            p.total = CASE WHEN event.total IS NOT NULL THEN event.total ELSE 'null' END,
+            p.women = CASE WHEN event.women IS NOT NULL THEN event.women ELSE 'null' END,
+            p.men = CASE WHEN event.men IS NOT NULL THEN event.men ELSE 'null' END,
+            p.children_under_five = 
+                CASE WHEN event.children_under_five IS NOT NULL 
+                THEN event.children_under_five ELSE 'null' END,
+            p.youth_15_24 = CASE WHEN event.youth_15_24 IS NOT NULL THEN event.youth_15_24 ELSE 'null' END,
+            p.elderly_60_plus = CASE WHEN event.elderly_60_plus IS NOT NULL THEN event.elderly_60_plus ELSE 'null' END,
+            p.women_of_reproductive_age_15_49 = 
+                CASE WHEN event.women_of_reproductive_age_15_49 IS NOT NULL 
+                THEN event.women_of_reproductive_age_15_49 ELSE 'null' END
     '''
     url = os.getenv('NEO4J_HOST') or 'bolt://localhost:7687'
 
