@@ -1,19 +1,6 @@
 version: '3.1'
 
 services:
-
-  mongo:
-    container_name: kuwala-pipelines_mongo_db
-    image: mongo:4
-    command: --dbpath /data/db --setParameter cursorTimeoutMillis=10800000
-    restart: always
-    ports:
-      - '27017:27017'
-    volumes:
-      - ./tmp/kuwala/db/mongo/data/db:/data/db
-    profiles:
-      - core
-      - network
   
   neo4j:
     container_name: kuwala-pipelines_neo4j_db
@@ -31,15 +18,6 @@ services:
       - ./tmp/kuwala/db/neo4j/data:/data
     profiles:
       - core
-      - network
-
-  mongo-express:
-    image: mongo-express:latest
-    restart: always
-    depends_on: [mongo]
-    ports:
-      - '8081:8081'
-    profiles:
       - network
 
   torproxy:
@@ -102,22 +80,14 @@ services:
     profiles:
       - network
 
-  # docker-compose run  --service-ports osm-poi start-processing:local
-  # docker-compose run  --service-ports osm-poi start-api:local
-  osm-poi:
-    environment: 
-      - MONGO_HOST=kuwala-pipelines_mongo_db
+  # docker-compose run osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar <pbf-path> <parquet-path>
+  osm-parquetizer:
     build:
       context: .
-      dockerfile: ./pipelines/osm-poi/dockerfile
+      dockerfile: ./pipelines/osm-poi/osm-parquetizer/dockerfile
     restart: always
-    depends_on: [mongo]
-    ports:
-      - '3001:3001'
     volumes:
       - ./tmp/kuwala/osmFiles:/opt/app/tmp/osmFiles
-    stdin_open: true # docker run -i
-    tty: true        # docker run -t
     profiles:
       - network
 
