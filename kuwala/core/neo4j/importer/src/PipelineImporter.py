@@ -23,7 +23,11 @@ def connect_to_mongo(database, collection):
 
 
 def start():
-    SparkSession.builder.config('spark.jars.packages', 'org.mongodb.spark:mongo-spark-connector_2.12:3.0.1')
+    SparkSession.builder \
+        .config('spark.driver.memory', '16g') \
+        .config('spark.jars.packages', 'org.mongodb.spark:mongo-spark-connector_2.12:3.0.1,'
+                                       'neo4j-contrib:neo4j-connector-apache-spark_2.12:4.0.1_for_spark_3') \
+        .getOrCreate()
 
     # Create general H3 constraint
     Neo4jConnection.connect_to_graph()

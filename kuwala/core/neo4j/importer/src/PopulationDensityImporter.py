@@ -9,7 +9,7 @@ from pyspark.sql.functions import lit
 
 def add_population(df: DataFrame):
     query = '''
-        MERGE (h:H3Index { h3Index: event.h3Index }) 
+        MERGE (h:H3Index { h3Index: event.h3Index, resolution: event.resolution }) 
         WITH h, event
         MERGE (p:Population)-[:POPULATION_AT]->(h)
         WITH p, event
@@ -67,8 +67,6 @@ def import_population_density(limit=None):
     start_time = time.time()
     spark = SparkSession.builder \
         .appName('neo4j_importer_population-density') \
-        .config('spark.driver.memory', '16g') \
-        .config('spark.jars.packages', 'neo4j-contrib:neo4j-connector-apache-spark_2.12:4.0.1_for_spark_3') \
         .getOrCreate() \
         .newSession()
     df = spark.read.parquet(f'{country_dir}{countries[country_names.index(country)]}/result.parquet')
