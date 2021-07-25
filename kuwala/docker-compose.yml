@@ -16,7 +16,7 @@ services:
       - network
   
   neo4j:
-    container_name: kuwala-pipelines_neo4j_db
+    container_name: neo4j
     build:
       context: .
       dockerfile: ./core/neo4j/docker/dockerfile
@@ -90,7 +90,7 @@ services:
   # docker-compose run neo4j-importer
   neo4j-importer:
     environment: 
-      - NEO4J_HOST=bolt://kuwala-pipelines_neo4j_db:7687
+      - NEO4J_HOST=bolt://neo4j:7687
       - MONGO_HOST=kuwala-pipelines_mongo_db
     build:
       context: .
