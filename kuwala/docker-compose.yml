@@ -1,6 +1,19 @@
 version: '3.1'
 
 services:
+
+  mongo:
+    container_name: kuwala-pipelines_mongo_db
+    image: mongo:4
+    command: --dbpath /data/db --setParameter cursorTimeoutMillis=10800000
+    restart: always
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./tmp/kuwala/db/mongo/data/db:/data/db
+    profiles:
+      - core
+      - network
   
   neo4j:
     container_name: kuwala-pipelines_neo4j_db
