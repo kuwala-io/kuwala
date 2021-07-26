@@ -21,7 +21,7 @@ public class H3 {
     }
 
     @UserFunction
-    @Description("io.kuwala.h3.getNeighborsInRadius(h3Index, resolution, radius) - The neighb at a given resolution.")
+    @Description("io.kuwala.h3.getNeighborsInRadius(h3Index, resolution, radius) - Returns the neighboring H3 indexes within a certain radius based on a given resolution.")
     public List<String> getNeighborsInRadius(
             @Name("h3Index") String h3Index,
             @Name("resolution") Long resolution,
