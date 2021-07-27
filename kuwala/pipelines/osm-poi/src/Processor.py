@@ -3,7 +3,7 @@ import json
 import os
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col, udf
-from pyspark.sql.types import ArrayType, BooleanType, StringType
+from pyspark.sql.types import ArrayType, BooleanType, StringType, StructField, StructType
 
 
 class Processor:
@@ -77,6 +77,73 @@ class Processor:
         return df.withColumn(column, parse_tags(col('tags')))
 
     @staticmethod
+    def parse_address(df: DataFrame) -> DataFrame:
+        relevant_address_tags = Processor.load_resource('relevantAddressTags.json')
+
+        @udf(returnType=StructType([
+            StructField('house_nr', StringType()),
+            StructField('street', StringType()),
+            StructField('zip_code', StringType()),
+            StructField('city', StringType()),
+            StructField('country', StringType()),
+            StructField('full', StringType()),
+            StructField('region', StructType([
+                StructField('neighborhood', StringType()),  # Area within a suburb or quarter
+                StructField('suburb', StringType()),  # An area within commuting distance of a city
+                StructField('district', StringType()),  # Administrative division
+                StructField('province', StringType()),  # Administrative division
+                StructField('state', StringType())  # Administrative division
+            ])),
+            StructField('house_name', StringType()),  # Sometimes additionally to or instead of house number
+            StructField('place', StringType()),  # Territorial zone (e.g., island, square) instead of street
+            StructField('block', StringType()),  # In some countries used instead of house number
+            StructField('details', StructType([
+                StructField('level', StringType()),
+                StructField('flats', StringType()),
+                StructField('unit', StringType())
+            ]))
+        ]))
+        def parse_tags(tags):
+            address = dict(region=None, details=None)
+
+            for tag in tags:
+                if tag.key in relevant_address_tags:
+                    switcher = {
+                        'housenumber': ['house_nr'],
+                        'street': ['street'],
+                        'postcode': ['zip_code'],
+                        'city': ['city'],
+                        'country': ['country'],
+                        'full': ['full'],
+                        'neighbourhood': ['region', 'neighborhood'],
+                        'suburb': ['region', 'suburb'],
+                        'district': ['region', 'district'],
+                        'province': ['region', 'province'],
+                        'state': ['region', 'state'],
+                        'housename': ['house_name'],
+                        'place': ['place'],
+                        'block': ['block'],
+                        'floor': ['details', 'level'],
+                        'level': ['details', 'level'],
+                        'flats': ['details', 'flats'],
+                        'unit': ['details', 'unit']
+                    }
+
+                    keys = switcher.get(tag.key.split(':')[1])
+
+                    if keys:
+                        if len(keys) < 2:
+                            address[keys[0]] = tag.value
+                        else:
+                            address[keys[0]][keys[1]] = tag.value
+                    else:
+                        print(f'Invalid address key: {tag.key}')
+
+            return address
+
+        return df.withColumn('address', parse_tags(col('tags')))
+
+    @staticmethod
     def start():
         script_dir = os.path.dirname(__file__)
         parquet_files = os.path.join(script_dir, '../tmp/osmFiles/parquet/')
@@ -88,6 +155,7 @@ class Processor:
         df = spark.read.parquet(parquet_files + 'europe/malta-latest/malta-latest.osm.pbf.node.parquet')
         df = Processor.filter_tags(df)
         df = Processor.parse_categories(df)
+        df = Processor.parse_address(df)
         df = Processor.parse_single_tag(df, 'name', ['name'])
         df = Processor.parse_single_tag(df, 'phone', ['phone'])
         df = Processor.parse_single_tag(df, 'email', ['email'])
