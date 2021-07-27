@@ -3,26 +3,28 @@ import json
 from typing import List
 
 
-
-def get_category(tag:str, cat_data:dict)->List[str]:
+def get_category(tag: str, cat_data: dict) -> str:
     kuwala_cats = [cat_data[cat]['category'] for cat in cat_data.keys() if any(tag == x for x in cat_data[cat]['tags'])]
-    if kuwala_cats == []:
+
+    if not kuwala_cats:
         return 'misc'
-    else:
-        return kuwala_cats[0]
+
+    return kuwala_cats[0]
+
 
 def complete_categories(poi_cat: List[str]) -> dict:
     # load category data
     CURDIR = os.path.abspath(os.path.curdir)
     idx = CURDIR.split(os.sep).index('src')
-    POI_PATH = (os.sep).join(CURDIR.split(os.sep)[:idx])
+    POI_PATH = os.sep.join(CURDIR.split(os.sep)[:idx])
     CAT_PATH = os.path.join(POI_PATH, 'resources', 'categories.json')
     with open(CAT_PATH, 'r') as j:
         kuwala_to_poi = json.load(j)
 
     # update categories
     categories = {'google': poi_cat}
-    if poi_cat == []:
+
+    if not poi_cat:
         categories['kuwala'] = []
     else:
         kuwala_tags_raw = [get_category(tag, cat_data=kuwala_to_poi) for tag in poi_cat]

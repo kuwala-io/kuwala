@@ -10,7 +10,17 @@ class Processor:
     @staticmethod
     def load_resource(file_name: str):
         with open(f'../resources/{file_name}') as f:
-            return json.load(f)
+            resource = json.load(f)
+
+            f.close()
+
+            return resource
+
+    @staticmethod
+    def update_resource(file_name: str, data):
+        with open(f'../resources/{file_name}', 'w') as f:
+            json.dump(dict(sorted(data.items())), f, indent=4)
+            f.close()
 
     @staticmethod
     def filter_tags(df: DataFrame) -> DataFrame:
@@ -28,26 +38,42 @@ class Processor:
     @staticmethod
     def parse_categories(df: DataFrame) -> DataFrame:
         categories = Processor.load_resource('categories.json')
+        relevant_category_tags = Processor.load_resource('relevantCategoryTags.json')
 
         @udf(returnType=ArrayType(StringType()))
         def parse_tags(tags):
-            def match_tags(tag):
+            result = []
+
+            for tag in tags:
                 matched_categories = []
 
-                for c in categories.keys():
-                    if f'{tag.key}={tag.value}' in categories[c]['tags']:
-                        matched_categories.append(categories[c]['category'])
+                if tag.key in relevant_category_tags:
+                    for c in categories.keys():
+                        osm_tag = f'{tag.key}={tag.value}'
 
-                # TODO: Add unmatched tags
+                        if osm_tag in categories[c]['tags']:
+                            matched_categories.append(categories[c]['category'])
 
-                return matched_categories
+                        # TODO: add osm_tag to misc using a Spark accumulator
 
-            result = list(map(lambda t: match_tags(t), tags))
-            results_flat = list(itertools.chain(*result))
+                    result.append(matched_categories)
 
-            return list(dict.fromkeys(results_flat))  # Return with removed duplicates
+            if result:
+                results_flat = list(itertools.chain(*result))
+
+                return list(dict.fromkeys(results_flat))  # Return with removed duplicates
 
         return df.withColumn('categories', parse_tags(col('tags')))
+
+    @staticmethod
+    def parse_name(df: DataFrame) -> DataFrame:
+        @udf(returnType=StringType())
+        def parse_tags(tags):
+            name_tag = next((tag for tag in tags if tag.key == 'name'), None)
+            if name_tag:
+                return name_tag.value
+
+        return df.withColumn('name', parse_tags(col('tags')))
 
     @staticmethod
     def start():
@@ -61,5 +87,6 @@ class Processor:
         df = spark.read.parquet(parquet_files + 'europe/malta-latest/malta-latest.osm.pbf.node.parquet')
         df = Processor.filter_tags(df)
         df = Processor.parse_categories(df)
+        df = Processor.parse_name(df)
 
         df.show(n=200, truncate=False)
