@@ -66,14 +66,15 @@ class Processor:
         return df.withColumn('categories', parse_tags(col('tags')))
 
     @staticmethod
-    def parse_name(df: DataFrame) -> DataFrame:
+    def parse_single_tag(df: DataFrame, column: str, tag_keys: [str]) -> DataFrame:
         @udf(returnType=StringType())
         def parse_tags(tags):
-            name_tag = next((tag for tag in tags if tag.key == 'name'), None)
-            if name_tag:
-                return name_tag.value
+            match = next((t for t in tags if t.key in tag_keys), None)
 
-        return df.withColumn('name', parse_tags(col('tags')))
+            if match:
+                return match.value
+
+        return df.withColumn(column, parse_tags(col('tags')))
 
     @staticmethod
     def start():
@@ -87,6 +88,9 @@ class Processor:
         df = spark.read.parquet(parquet_files + 'europe/malta-latest/malta-latest.osm.pbf.node.parquet')
         df = Processor.filter_tags(df)
         df = Processor.parse_categories(df)
-        df = Processor.parse_name(df)
+        df = Processor.parse_single_tag(df, 'name', ['name'])
+        df = Processor.parse_single_tag(df, 'phone', ['phone'])
+        df = Processor.parse_single_tag(df, 'email', ['email'])
+        df = Processor.parse_single_tag(df, 'website', ['website', 'url'])
 
         df.show(n=200, truncate=False)
