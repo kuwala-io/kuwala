@@ -56,7 +56,8 @@ class Processor:
 
                         # TODO: add osm_tag to misc using a Spark accumulator
 
-                    result.append(matched_categories)
+                    if matched_categories:
+                        result.append(matched_categories)
 
             if result:
                 results_flat = list(itertools.chain(*result))
@@ -152,7 +153,7 @@ class Processor:
             .config('spark.sql.parquet.binaryAsString', 'true') \
             .getOrCreate() \
             .newSession()
-        df = spark.read.parquet(parquet_files + 'europe/malta-latest/malta-latest.osm.pbf.node.parquet')
+        df = spark.read.parquet(parquet_files + 'europe/malta-latest/malta-latest.osm.pbf.way.parquet')
         df = Processor.filter_tags(df)
         df = Processor.parse_categories(df)
         df = Processor.parse_address(df)
@@ -160,5 +161,10 @@ class Processor:
         df = Processor.parse_single_tag(df, 'phone', ['phone'])
         df = Processor.parse_single_tag(df, 'email', ['email'])
         df = Processor.parse_single_tag(df, 'website', ['website', 'url'])
+        df = Processor.parse_single_tag(df, 'brand', ['brand'])
+        df = Processor.parse_single_tag(df, 'operator', ['operator'])
+        df = Processor.parse_single_tag(df, 'boundary', ['boundary'])
+        df = Processor.parse_single_tag(df, 'admin_level', ['admin_level'])
+        df = Processor.parse_single_tag(df, 'type', ['type'])
 
-        df.show(n=200, truncate=False)
+        df.where(col('admin_level').isNotNull()).show(n=20, truncate=True)

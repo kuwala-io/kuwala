@@ -5028,6 +5028,12 @@
       "tourism=zoo"
     ]
   },
+  "nature": {
+    "category": "nature",
+    "tags": [
+      "natural=coastline"
+    ]
+  },
   "office": {
     "category": "office",
     "tags": [

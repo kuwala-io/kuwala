@@ -5,8 +5,10 @@
     "addr:city",
     "addr:country",
     "addr:full",
+    "admin_level",
     "aeroway",
     "amenity",
+    "boundary",
     "brand",
     "building",
     "craft",
@@ -22,5 +24,6 @@
     "shop",
     "sport",
     "station",
-    "tourism"
+    "tourism",
+    "type"
 ]
