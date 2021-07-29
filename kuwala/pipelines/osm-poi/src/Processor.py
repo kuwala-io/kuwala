@@ -3,7 +3,7 @@ import json
 import os
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col, udf
-from pyspark.sql.types import ArrayType, BooleanType, StringType, StructField, StructType
+from pyspark.sql.types import ArrayType, BooleanType, FloatType, StringType, StructField, StructType
 
 
 class Processor:
@@ -23,17 +23,17 @@ class Processor:
             f.close()
 
     @staticmethod
-    def filter_tags(df: DataFrame) -> DataFrame:
+    def is_poi(df: DataFrame) -> DataFrame:
         included_tags = Processor.load_resource('includedTags.json')
         excluded_tags = Processor.load_resource('excludedTags.json')
 
         @udf(returnType=BooleanType())
-        def filter_by_tags(tags):
+        def has_poi_tag(tags):
             return \
                 len(list(filter((lambda t: t.key in included_tags), tags))) > 0 and \
                 len(list(filter((lambda t: t.key in excluded_tags), tags))) < 1
 
-        return df.filter(filter_by_tags(col('tags')))
+        return df.withColumn('is_poi', has_poi_tag(col('tags')))
 
     @staticmethod
     def parse_categories(df: DataFrame) -> DataFrame:
@@ -41,7 +41,10 @@ class Processor:
         relevant_category_tags = Processor.load_resource('relevantCategoryTags.json')
 
         @udf(returnType=ArrayType(StringType()))
-        def parse_tags(tags):
+        def parse_tags(is_poi, tags):
+            if not is_poi:
+                return
+
             result = []
 
             for tag in tags:
@@ -64,18 +67,21 @@ class Processor:
 
                 return list(dict.fromkeys(results_flat))  # Return with removed duplicates
 
-        return df.withColumn('categories', parse_tags(col('tags')))
+        return df.withColumn('categories', parse_tags(col('is_poi'), col('tags')))
 
     @staticmethod
     def parse_single_tag(df: DataFrame, column: str, tag_keys: [str]) -> DataFrame:
         @udf(returnType=StringType())
-        def parse_tags(tags):
+        def parse_tags(is_poi, tags):
+            if not is_poi:
+                return
+
             match = next((t for t in tags if t.key in tag_keys), None)
 
             if match:
                 return match.value
 
-        return df.withColumn(column, parse_tags(col('tags')))
+        return df.withColumn(column, parse_tags(col('is_poi'), col('tags')))
 
     @staticmethod
     def parse_address(df: DataFrame) -> DataFrame:
@@ -104,8 +110,11 @@ class Processor:
                 StructField('unit', StringType())
             ]))
         ]))
-        def parse_tags(tags):
-            address = dict(region=None, details=None)
+        def parse_tags(is_poi, tags):
+            if not is_poi:
+                return
+
+            address = dict(region=dict(), details=dict())
 
             for tag in tags:
                 if tag.key in relevant_address_tags:
@@ -142,19 +151,12 @@ class Processor:
 
             return address
 
-        return df.withColumn('address', parse_tags(col('tags')))
+        return df.withColumn('address', parse_tags(col('is_poi'), col('tags')))
 
     @staticmethod
-    def start():
-        script_dir = os.path.dirname(__file__)
-        parquet_files = os.path.join(script_dir, '../tmp/osmFiles/parquet/')
-        spark = SparkSession.builder \
-            .appName('osm-poi') \
-            .config('spark.sql.parquet.binaryAsString', 'true') \
-            .getOrCreate() \
-            .newSession()
-        df = spark.read.parquet(parquet_files + 'europe/malta-latest/malta-latest.osm.pbf.way.parquet')
-        df = Processor.filter_tags(df)
+    def df_parse_tags(parquet_files, spark, osm_type) -> DataFrame:
+        df = spark.read.parquet(f'{parquet_files}europe/malta-latest/malta-latest.osm.pbf.{osm_type}.parquet')
+        df = Processor.is_poi(df)
         df = Processor.parse_categories(df)
         df = Processor.parse_address(df)
         df = Processor.parse_single_tag(df, 'name', ['name'])
@@ -167,4 +169,48 @@ class Processor:
         df = Processor.parse_single_tag(df, 'admin_level', ['admin_level'])
         df = Processor.parse_single_tag(df, 'type', ['type'])
 
-        df.where(col('admin_level').isNotNull()).show(n=20, truncate=True)
+        return df
+
+    @staticmethod
+    def df_parse_way_coordinates(spark, df_node, df_way) -> DataFrame:
+        df_node_broadcast = spark.sparkContext.broadcast(
+            df_node.filter(col('is_poi') == False).select('id', 'latitude', 'longitude').toPandas()
+        )
+
+        @udf(returnType=ArrayType(ArrayType(FloatType())))
+        def get_coordinates(nodes):
+            coordinates = []
+
+            for node in nodes:
+                node_pd = df_node_broadcast.value.loc[df_node_broadcast.value['id'] == node['nodeId']]
+
+                if not node_pd.empty:
+                    node_pd = node_pd.iloc[0]
+                    lat = float(node_pd['latitude'])
+                    lng = float(node_pd['longitude'])
+
+                    if lat and lng:
+                        coordinates.append([lng, lat])
+
+            if coordinates:
+                return coordinates
+
+        return df_way.withColumn('coordinates', get_coordinates(col('nodes')))
+
+    @staticmethod
+    def start():
+        script_dir = os.path.dirname(__file__)
+        parquet_files = os.path.join(script_dir, '../tmp/osmFiles/parquet/')
+        spark = SparkSession.builder \
+            .appName('osm-poi') \
+            .config('spark.sql.parquet.binaryAsString', 'true') \
+            .getOrCreate() \
+            .newSession()
+        df_node = Processor.df_parse_tags(parquet_files, spark, 'node')
+        df_way = Processor.df_parse_tags(parquet_files, spark, 'way')
+        df_relation = Processor.df_parse_tags(parquet_files, spark, 'relation')
+        df_way = Processor.df_parse_way_coordinates(spark, df_node, df_way)
+
+        df_node.show()
+        df_way.show()
+        df_relation.show()
