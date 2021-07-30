@@ -29,63 +29,40 @@ Proceed only if you followed the initial steps to initialize the main components
 [`Initialize Main Components`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/)
 
 ```zsh
-docker-compose run  --service-ports population-density start-processing:local
+docker-compose run  population-density
 ```
 
-Follow the prompts to download, process and write data [1]
+Follow the prompts to download, process and save data [1]
 
 ```console
-[1] Data - Process population data
-[2] Map - Generate file for Kepler
-[0] CANCEL
-
-What do you want to do? [1, 2, 0]: 
+? For which country do you want to download the population data? (Use arrow keys)
+ » Albania
+   Algeria
+   American Samoa
+   Andorra
+   Angola
+   Anguilla
+   Antigua And Barbuda
+   …
+   
+? Which demographic groups do you want to include? (Use arrow keys to move, <space> to select, <a> to toggle, <i> to invert)
+ » ○ children_under_five
+   ○ elderly_60_plus
+   ○ total
+   ○ men
+   ○ women
+   ○ women_of_reproductive_age_15_49
+   ○ youth_15_24
 ```
 
 ---
 
 ## Usage
 
-Run the app locally.
-
-(Data can only be returned for regions that have previously been downloaded and processed.)
-
-```zsh
-docker-compose run  --service-ports population-density start-api:local
-```
-
-### API Calls
-
-#### Get Population in a Cell
-Request Method: <span style="color:green">**GET**</span><br/>
-URL: `/cell`<br/>
-Query Params (**required**): `h3_index` ***OR*** `lat, lng`
-
-*Example*: `localhost:3002/cell?h3_index=8b3f304f16c9fff`
-
-#### Get Population within Radius
-Request Method: <span style="color:green">**GET**</span><br/>
-URL: `/radius/:radius`<br/>
-Query Params (**required**): `h3_index` ***OR*** `lat, lng`
-
-*Example*: `localhost:3002/radius/100?h3_index=8b3f304f16c9fff`
-
-#### Get Population within Polygon
-Request Method: <span style="color:green">**GET**</span><br/>
-URL: `/geojson`<br/>
-Request Body (**required**): `GeoJSON` format <br/>
-
-*Example*: `localhost:3002/geojson`<br>
-Request Body:
-
-```json 
-    {
-        "geometry": {
-            "type": "Polygon",
-            "coordinates": […]
-        }
-    }
-```
+At the moment you can query the data directly using Cypher on top of Neo4j, or you can process the transformed results 
+in Parquet format. We are working on a Jupyter notebook environment where you visualize the data directly and use 
+functions to transform the data to your desired aggregation and ultimately send it to your destination. You can follow 
+the progress on our [GitHub milestones](https://github.com/kuwala-io/kuwala/milestones) page.
 
 ---
 ### License

@@ -1,59 +1,86 @@
 import h3
-import Neo4jConnection as Neo4jConnection
-import PipelineImporter as PipelineImporter
+import os
+import pycountry
+import questionary
+import time
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import lit
 
 
-#  Sets uniqueness constraint for population values
-def add_constraints():
-    Neo4jConnection.connect_to_graph()
-    
-    Neo4jConnection.query_graph(
-        'CREATE CONSTRAINT population IF NOT EXISTS ON (p:Population) ASSERT p.value IS UNIQUE')
-
-    Neo4jConnection.close_connection()
-
-
-def add_cells(df):
+def add_population(df: DataFrame):
     query = '''
-        UNWIND $rows AS row 
-        MERGE (h:H3Index { h3Index: row.h3Index })
-        ON CREATE SET h.resolution = row.resolution
-        MERGE (pt:Population { value: row.total_population })
-        MERGE (pw:Population { value: row.women })
-        MERGE (pm:Population { value: row.men })
-        MERGE (pc:Population { value: row.children_under_five })
-        MERGE (py:Population { value: row.youth_15_24} )
-        MERGE (pe:Population { value: row.elderly_60_plus })
-        MERGE (pwr:Population { value: row.women_of_reproductive_age_15_49 })
-        MERGE (pt)-[:POPULATION_AT { type: "total_population" }]->(h)
-        MERGE (pw)-[:POPULATION_AT { type: "women" }]->(h)
-        MERGE (pm)-[:POPULATION_AT { type: "men" }]->(h)
-        MERGE (pc)-[:POPULATION_AT { type: "children_under_five" }]->(h)
-        MERGE (py)-[:POPULATION_AT { type: "youth_15_24" }]->(h)
-        MERGE (pe)-[:POPULATION_AT { type: "elderly_60_plus" }]->(h)
-        MERGE (pwr)-[:POPULATION_AT { type: "women_of_reproductive_age_15_49" }]->(h)
+        MERGE (h:H3Index { h3Index: event.h3Index, resolution: event.resolution }) 
+        WITH h, event
+        MERGE (p:Population)-[:POPULATION_AT]->(h)
+        WITH p, event
+        SET
+            p.total = CASE WHEN event.total IS NOT NULL THEN event.total ELSE 'null' END,
+            p.women = CASE WHEN event.women IS NOT NULL THEN event.women ELSE 'null' END,
+            p.men = CASE WHEN event.men IS NOT NULL THEN event.men ELSE 'null' END,
+            p.children_under_five = 
+                CASE WHEN event.children_under_five IS NOT NULL 
+                THEN event.children_under_five ELSE 'null' END,
+            p.youth_15_24 = CASE WHEN event.youth_15_24 IS NOT NULL THEN event.youth_15_24 ELSE 'null' END,
+            p.elderly_60_plus = CASE WHEN event.elderly_60_plus IS NOT NULL THEN event.elderly_60_plus ELSE 'null' END,
+            p.women_of_reproductive_age_15_49 = 
+                CASE WHEN event.women_of_reproductive_age_15_49 IS NOT NULL 
+                THEN event.women_of_reproductive_age_15_49 ELSE 'null' END
     '''
+    url = os.getenv('NEO4J_HOST') or 'bolt://localhost:7687'
 
-    df.foreachPartition(lambda partition: Neo4jConnection.batch_insert_data(partition, query))
+    # The following error will be printed:
+    #
+    #   ERROR SchemaService: Query not compiled because of the following exception:
+    #   org.neo4j.driver.exceptions.ClientException: Variable `event` not defined (line 2, column 29 (offset: 71))
+    #   "MATCH (h:H3Index { h3Index: event.h3Index })"
+    #
+    # The error can be ignored and everything runs correctly as discussed here:
+    # https://github.com/neo4j-contrib/neo4j-spark-connector/issues/357
+    # The issue is fixed but not available for the PySpark packages yet:
+    # https://spark-packages.org/package/neo4j-contrib/neo4j-connector-apache-spark_2.12
+    df.write \
+        .format('org.neo4j.spark.DataSource') \
+        .mode('Overwrite') \
+        .option('url', url) \
+        .option('authentication.type', 'basic') \
+        .option('authentication.basic.username', 'neo4j') \
+        .option('authentication.basic.password', 'password') \
+        .option('query', query) \
+        .save()
 
 
 def import_population_density(limit=None):
-    df = PipelineImporter.connect_to_mongo(database='population', collection='cells')
-    df = df.withColumnRenamed('_id', 'h3Index')
+    script_dir = os.path.dirname(__file__)
+    country_dir = os.path.join(script_dir, '../tmp/kuwala/populationFiles/')
+    countries = os.listdir(country_dir) if os.path.exists(country_dir) else []
 
-    if len(df.columns) < 1:
+    if len(countries) < 1:
         print('No population data available. You first need to run the population-density processing pipeline before '
               'loading it into the graph')
 
         return
-    
+
+    country_names = list(map(lambda c: pycountry.countries.get(alpha_3=c).name, countries))
+    country = questionary \
+        .select('For which country do you want to ingest the population data?', choices=country_names) \
+        .ask()
+    start_time = time.time()
+    spark = SparkSession.builder \
+        .appName('neo4j_importer_population-density') \
+        .getOrCreate() \
+        .newSession()
+    df = spark.read.parquet(f'{country_dir}{countries[country_names.index(country)]}/result.parquet')
+
     # noinspection PyUnresolvedReferences
     resolution = h3.h3_get_resolution(df.first()['h3Index'])
-    cells = df.select('h3Index', 'population.*').withColumn('resolution', lit(resolution))
+    df = df.withColumn('resolution', lit(resolution))
+    df = df.fillna(0)
 
     if limit is not None:
-        cells = cells.limit(limit)
+        df = df.limit(limit)
 
-    add_constraints()
-    add_cells(cells)
+    add_population(df)
+
+    end_time = time.time()
+
+    print(f'Imported population data in {round(end_time - start_time)} s')

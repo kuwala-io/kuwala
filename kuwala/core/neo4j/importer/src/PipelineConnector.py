@@ -16,6 +16,7 @@ def connect_h3_indexes():
     '''
     resolutions = Neo4jConnection.query_graph(query_resolutions)
     resolutions = resolutions[0]  # Query returns a tuple with the results at the first index
+    resolutions = [i for i in resolutions if i[0] is not None]
 
     # Find parents of children and connect them
     for i, r in enumerate(resolutions):

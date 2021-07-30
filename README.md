@@ -63,7 +63,7 @@ chmod +x ./scripts/init.sh
 
 ```zsh 
 # Process population data
-docker-compose run  --service-ports population-density start-processing:local
+docker-compose run  population-density
 ```
 
 ```zsh 

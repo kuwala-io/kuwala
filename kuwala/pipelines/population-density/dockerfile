@@ -1,32 +1,9 @@
-FROM node:alpine
+FROM rappdw/docker-java-python
 
-COPY ./pipelines/common/js_utils /opt/common/js_utils
 COPY ./pipelines/population-density /opt/app
 
-# awscli is in use in our node app, we meed to install it in the docker image
-RUN apk add --no-cache \
-        python3 \
-        py3-pip \
-    && pip3 install --upgrade pip \
-    && pip3 install \
-        awscli \
-    && rm -rf /var/cache/apk/*
-
-# Setting up a virtual build env in order to keep the image small
-RUN apk add --no-cache --virtual .gyp \
-        g++ gcc libgcc libstdc++ linux-headers make bash git cmake && \
-        npm install --quiet node-gyp -g
-
-#Setting up 
-WORKDIR /opt/common/js_utils
-RUN npm ci
-
 WORKDIR /opt/app
-RUN npm ci
+RUN pip install -r requirements.txt
 
-# Deleting the virtual build env in order to keep the image small
-RUN apk del .gyp
-
-WORKDIR /opt/app
-
-ENTRYPOINT ["npm","run"]
+WORKDIR /opt/app/src
+ENTRYPOINT [ "python", "main.py" ]

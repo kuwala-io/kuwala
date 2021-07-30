@@ -16,7 +16,7 @@ services:
       - network
   
   neo4j:
-    container_name: kuwala-pipelines_neo4j_db
+    container_name: neo4j
     build:
       context: .
       dockerfile: ./core/neo4j/docker/dockerfile
@@ -90,7 +90,7 @@ services:
   # docker-compose run neo4j-importer
   neo4j-importer:
     environment: 
-      - NEO4J_HOST=bolt://kuwala-pipelines_neo4j_db:7687
+      - NEO4J_HOST=bolt://neo4j:7687
       - MONGO_HOST=kuwala-pipelines_mongo_db
     build:
       context: .
@@ -121,21 +121,13 @@ services:
     profiles:
       - network
 
-  # docker-compose run  --service-ports population-density start-processing:local
-  # docker-compose run  --service-ports population-density start-api:local
+  # docker-compose run  population-density
   population-density:
-    environment: 
-      - MONGO_HOST=kuwala-pipelines_mongo_db
     build:
       context: .
       dockerfile: ./pipelines/population-density/dockerfile
     restart: always
-    depends_on: [mongo]
-    ports:
-      - '3002:3002'
     volumes:
-      - ./tmp/kuwala/countries:/opt/app/tmp/countries
-    stdin_open: true # docker run -i
-    tty: true        # docker run -t
+      - ./tmp/kuwala/populationFiles:/opt/app/tmp/populationFiles
     profiles:
       - network

@@ -10,7 +10,6 @@ from pyspark.sql.types import LongType
 
 #  Sets uniqueness constraint for H3 indexes, OSM POIS, and POI categories
 def add_constraints():
-    Neo4jConnection.query_graph('CREATE CONSTRAINT h3Index IF NOT EXISTS ON (h:H3Index) ASSERT h.h3Index IS UNIQUE')
     Neo4jConnection.query_graph('CREATE CONSTRAINT poiOsm IF NOT EXISTS ON (p:PoiOSM) ASSERT (p.id) IS UNIQUE')
     Neo4jConnection.query_graph('CREATE CONSTRAINT poiCategory IF NOT EXISTS ON (pc:PoiCategory) ASSERT pc.name IS '
                                 'UNIQUE')

@@ -8,7 +8,6 @@ graph = None  # type: Optional[Neo4jDriver]
 
 
 def connect_to_graph(uri="bolt://localhost:7687", user="neo4j", password="password"):
-
     uri = os.getenv('NEO4J_HOST') or uri
     
     try:
