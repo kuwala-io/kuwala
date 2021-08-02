@@ -4,5 +4,6 @@
     "disused:bridge",
     "disused:highway",
     "abandoned:barrier",
-    "gauge"
+    "gauge",
+    "entrance"
 ]
