@@ -1,3 +1,4 @@
+import com.uber.h3core.util.GeoCoord;
 import io.kuwala.h3.H3;
 import org.apache.commons.lang.StringUtils;
 import org.hamcrest.MatcherAssert;
@@ -36,6 +37,18 @@ public class H3Test {
         try(Session session = driver.session()) {
             session.run("MATCH (n) DETACH DELETE n");
         }
+    }
+
+    @Test
+    public void shouldReturnCentroid() {
+        Session session = driver.session();
+        List<Double> result = session.run( "RETURN io.kuwala.h3.h3ToGeo('8f3f3040004caca') AS result")
+                .single()
+                .get("result")
+                .asList(Value::asDouble);
+
+        MatcherAssert.assertThat( result.get(0), equalTo(14.349714762386316) );
+        MatcherAssert.assertThat( result.get(1), equalTo(35.96938114263836) );
     }
 
     @Test

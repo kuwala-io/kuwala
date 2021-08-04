@@ -18,11 +18,12 @@ class Processor:
 
     @staticmethod
     def start(files: [dict], output_dir: str):
+        memory = os.getenv('SPARK_MEMORY') or '16g'
         start_time = time.time()
         dfs = list()
         spark = SparkSession.builder \
             .appName('population-density') \
-            .config('spark.driver.memory', '16g') \
+            .config('spark.driver.memory', memory) \
             .getOrCreate() \
             .newSession()
 

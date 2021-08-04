@@ -364,12 +364,13 @@ class Processor:
 
     @staticmethod
     def start():
+        memory = os.getenv('SPARK_MEMORY') or '16g'
         start_time = time.time()
         script_dir = os.path.dirname(__file__)
         parquet_files = os.path.join(script_dir, '../tmp/osmFiles/parquet/')
         spark = SparkSession.builder \
             .appName('osm-poi') \
-            .config('spark.driver.memory', '16g') \
+            .config('spark.driver.memory', memory) \
             .config('spark.sql.parquet.binaryAsString', 'true') \
             .getOrCreate() \
             .newSession()

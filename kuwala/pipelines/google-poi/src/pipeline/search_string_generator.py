@@ -18,11 +18,12 @@ from pyspark.sql.types import StringType
 def connect_to_mongo(database, collection):
     host = os.getenv('MONGO_HOST') or '127.0.0.1'
     mongo_url = f'mongodb://{host}:27017/{database}.{collection}'
+    memory = os.getenv('SPARK_MEMORY') or '16g'
 
     return SparkSession \
         .builder \
         .appName('google-poi') \
-        .config('spark.driver.memory', '16g') \
+        .config('spark.driver.memory', memory) \
         .config('spark.mongodb.input.uri', mongo_url) \
         .config('spark.jars.packages', 'org.mongodb.spark:mongo-spark-connector_2.12:3.0.1') \
         .getOrCreate()

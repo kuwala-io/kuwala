@@ -23,8 +23,9 @@ def connect_to_mongo(database, collection):
 
 
 def start():
+    memory = os.getenv('SPARK_MEMORY') or '16g'
     SparkSession.builder \
-        .config('spark.driver.memory', '16g') \
+        .config('spark.driver.memory', memory) \
         .config('spark.jars.packages', 'org.mongodb.spark:mongo-spark-connector_2.12:3.0.1,'
                                        'neo4j-contrib:neo4j-connector-apache-spark_2.12:4.0.1_for_spark_3') \
         .getOrCreate()

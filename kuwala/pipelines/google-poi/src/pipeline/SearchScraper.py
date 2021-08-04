@@ -75,7 +75,8 @@ class SearchScraper:
     """Match the queries that have been sent to the received results"""
     @staticmethod
     def match_search_results(directory: str, file_name: str):
-        spark = SparkSession.builder.appName('google-poi').config('spark.driver.memory', '16g').getOrCreate()
+        memory = os.getenv('SPARK_MEMORY') or '16g'
+        spark = SparkSession.builder.appName('google-poi').config('spark.driver.memory', memory).getOrCreate()
         df_str = spark.read.parquet(directory + file_name)
         path_results = directory.replace('Strings', 'Results') + file_name.replace('strings', 'results')
         df_res = spark.read.parquet(path_results)
@@ -99,7 +100,8 @@ class SearchScraper:
     """Match the POI ids that have been sent to the received results"""
     @staticmethod
     def match_poi_results(directory: str, file_name: str):
-        spark = SparkSession.builder.appName('google-poi').config('spark.driver.memory', '16g').getOrCreate()
+        memory = os.getenv('SPARK_MEMORY') or '16g'
+        spark = SparkSession.builder.appName('google-poi').config('spark.driver.memory', memory).getOrCreate()
         df_res = spark.read.parquet(
             directory.replace('Strings', 'Results') + file_name.replace('strings', 'results_matched')
         )

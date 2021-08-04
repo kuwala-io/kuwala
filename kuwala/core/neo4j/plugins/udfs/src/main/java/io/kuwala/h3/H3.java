@@ -1,14 +1,25 @@
 package io.kuwala.h3;
 
 import com.uber.h3core.*;
+import com.uber.h3core.util.GeoCoord;
 import org.neo4j.procedure.Description;
 import org.neo4j.procedure.Name;
 import org.neo4j.procedure.UserFunction;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 public class H3 {
+    @UserFunction
+    @Description("io.kuwala.h3.h3ToGeo(h3Index) - Returns the centroid's coordinates of a given index.")
+    public List<Double> h3ToGeo(@Name("h3Index") String h3Index) throws IOException {
+        H3Core h3 = H3Core.newInstance();
+        GeoCoord centroid = h3.h3ToGeo(h3Index);
+
+        return Arrays.asList(centroid.lng, centroid.lat);
+    }
+
     @UserFunction
     @Description("io.kuwala.h3.h3ToParent(h3Index, resolution) - Returns the parent index at a given resolution.")
     public String h3ToParent(

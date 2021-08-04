@@ -5028,12 +5028,6 @@
       "tourism=zoo"
     ]
   },
-  "nature": {
-    "category": "nature",
-    "tags": [
-      "natural=coastline"
-    ]
-  },
   "office": {
     "category": "office",
     "tags": [
@@ -5089,7 +5083,8 @@
       "leisure=dog_park",
       "leisure=garden",
       "leisure=park",
-      "leisure=playground"
+      "leisure=playground",
+      "natural=coastline"
     ]
   },
   "religiousBuilding": {

@@ -37,6 +37,12 @@ def add_google_pois(df: DataFrame):
         MERGE (h:H3Index { h3Index: row.h3Index })
         ON CREATE SET h.resolution = row.resolution
         MERGE (pg)-[:LOCATED_AT]->(h)
+        
+        // Create relationship to PoiCategories
+        WITH row, pg
+        MATCH (pc:PoiCategory) 
+        WHERE pc.name IN row.categories
+        MERGE (pg)-[:BELONGS_TO]->(pc)
     '''
 
     df.foreachPartition(lambda p: Neo4jConnection.batch_insert_data(p, query))
@@ -153,8 +159,9 @@ def import_pois_google(limit=None):
     date = moment.utcnow().timezone(time_zone).replace(hours=0, minutes=0, seconds=0)
 
     google_pois = df \
-        .select('id', 'h3Index', 'name', 'placeID', 'address', 'timezone', 'contact.*') \
-        .withColumn('resolution', lit(resolution))
+        .select('id', 'h3Index', 'name', 'placeID', 'categories', 'address', 'timezone', 'contact.*') \
+        .withColumn('resolution', lit(resolution)) \
+        .withColumn('categories', col('categories.kuwala'))
     opening_hours = df \
         .select('id', 'openingHours') \
         .withColumn('openingHours', explode('openingHours')) \
