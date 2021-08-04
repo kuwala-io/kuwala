@@ -84,6 +84,7 @@
         "category": "beauty",
         "tags": [
             "beauty_salon",
+            "cosmetics_store",
             "beauty_supply_store",
             "spa",
             "barber_shop",
@@ -429,7 +430,6 @@
         "category": "recreation",
         "tags": [
             "garden",
-            "dance_school",
             "ballet_school",
             "swimming_pool",
             "botanical_garden",
@@ -589,7 +589,6 @@
             "fashion_accessories_store",
             "gift_basket_store",
             "jewelry_store",
-            "cosmetics_store",
             "craft_store",
             "used_clothing_store",
             "womens_clothing_store",
@@ -626,6 +625,7 @@
         "tags": [
             "golf",
             "golf_club",
+            "dance_school",
             "golf_course",
             "sports_complex"
         ]
