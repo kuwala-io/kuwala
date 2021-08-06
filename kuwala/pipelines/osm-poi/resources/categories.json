@@ -2816,7 +2816,8 @@
       "leisure=water_reserve",
       "leisure=water_slide",
       "leisure=park",
-      "leisure=playground"
+      "leisure=playground",
+      "natural=coastline"
     ]
   },
   "religiousBuilding": {
