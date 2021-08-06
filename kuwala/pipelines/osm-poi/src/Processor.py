@@ -2,6 +2,7 @@ import h3
 import itertools
 import json
 import os
+import questionary
 import time
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col, explode, lit, udf
@@ -13,6 +14,26 @@ DEFAULT_RESOLUTION = 15
 
 
 class Processor:
+    @staticmethod
+    def select_file():
+        script_dir = os.path.dirname(__file__)
+        parquet_dir = os.path.join(script_dir, '../tmp/osmFiles/parquet')
+        continents = os.listdir(parquet_dir)
+        continent = questionary.select('Which continent are you interested in?', choices=continents).ask()
+        continent_path = f'{parquet_dir}/{continent}'
+        countries = os.listdir(continent_path)
+        country = questionary.select('Which country are you interested in?', choices=countries).ask()
+        country_path = f'{continent_path}/{country}'
+
+        if 'latest' in country:
+            return country_path
+
+        regions = os.listdir(country_path)
+        region = questionary.select('Which region are you interested in?', choices=regions).ask()
+
+        if region:
+            return f'{country_path}/{region}'
+
     @staticmethod
     def load_resource(file_name: str):
         with open(f'../resources/{file_name}') as f:
@@ -160,8 +181,10 @@ class Processor:
         return df.withColumn('address', parse_tags(col('is_poi'), col('tags')))
 
     @staticmethod
-    def df_parse_tags(parquet_files, spark, osm_type) -> DataFrame:
-        df = spark.read.parquet(f'{parquet_files}europe/malta-latest/malta-latest.osm.pbf.{osm_type}.parquet')
+    def df_parse_tags(file_path, spark, osm_type) -> DataFrame:
+        files = os.listdir(file_path + '/osm-parquetizer')
+        file = list(filter(lambda f: (osm_type in f) and ('crc' not in f), files))[0]
+        df = spark.read.parquet(f'{file_path}/osm-parquetizer/{file}')
         df = Processor.is_poi(df)
         df = Processor.parse_categories(df)
         df = Processor.parse_address(df)
@@ -364,6 +387,7 @@ class Processor:
 
     @staticmethod
     def start():
+        file_path = Processor.select_file()
         memory = os.getenv('SPARK_MEMORY') or '16g'
         start_time = time.time()
         script_dir = os.path.dirname(__file__)
@@ -375,9 +399,9 @@ class Processor:
             .getOrCreate() \
             .newSession()
         # Parse OSM tags
-        df_node = Processor.df_parse_tags(parquet_files, spark, 'node')
-        df_way = Processor.df_parse_tags(parquet_files, spark, 'way')
-        df_relation = Processor.df_parse_tags(parquet_files, spark, 'relation')
+        df_node = Processor.df_parse_tags(file_path, spark, 'node')
+        df_way = Processor.df_parse_tags(file_path, spark, 'way')
+        df_relation = Processor.df_parse_tags(file_path, spark, 'relation')
         # Create GeoJSONs
         df_node, df_way = Processor.df_mark_relation_members(spark, df_node, df_way, df_relation)
         df_way = Processor.df_parse_way_coordinates(spark, df_node, df_way)
