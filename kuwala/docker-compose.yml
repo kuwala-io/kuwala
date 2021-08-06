@@ -106,6 +106,18 @@ services:
     profiles:
       - network
 
+  # docker-compose run osm-poi
+  osm-poi:
+    build:
+      context: .
+      dockerfile: ./pipelines/osm-poi/dockerfile
+    restart: always
+    volumes:
+      - ./tmp/kuwala/osmFiles:/opt/app/tmp/osmFiles
+    profiles:
+      - network
+
+
   # docker-compose run  population-density
   population-density:
     build:

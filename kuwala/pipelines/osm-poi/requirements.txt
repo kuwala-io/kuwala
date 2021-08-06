@@ -17,5 +17,6 @@ questionary==1.10.0
 requests==2.26.0
 Shapely==1.7.1
 six==1.16.0
+tqdm==4.62.0
 urllib3==1.26.6
 wcwidth==0.2.5
