@@ -203,51 +203,31 @@ class Processor:
         return df
 
     @staticmethod
-    def df_parse_way_coordinates(spark, df_node, df_way) -> DataFrame:
-        pd_coordinates = df_node.filter(col('is_poi') == False).select('id', 'latitude', 'longitude').sort(
-            'id').toPandas()
-        dict_coordinates = pd_coordinates.set_index('id').T.to_dict('list')
-        dict_coordinates = spark.sparkContext.broadcast(dict_coordinates)
-
-        del pd_coordinates
-
+    def df_parse_way_coordinates(df_way) -> DataFrame:
         @udf(returnType=ArrayType(ArrayType(FloatType())))
-        def get_coordinates(is_poi, is_relation_member, nodes):
-            if not (is_poi or is_relation_member):
-                return
-
+        def get_coordinates(nodes):
             coordinates = []
 
             for node in nodes:
-                # node_pd = df_node_broadcast.value.loc[df_node_broadcast.value['id'] == node['nodeId']]
-                try:
-                    coords = dict_coordinates.value[node['nodeId']]
-                except KeyError:
-                    continue
-
-                if coords:
-                    coordinates.append([coords[1], coords[0]])
+                coordinates.append([node['longitude'], node['latitude']])
 
             if coordinates and len(coordinates) > 1:
                 return coordinates
 
-        return df_way.withColumn('coordinates', get_coordinates(col('is_poi'), col('is_relation_member'), col('nodes')))
+        return df_way.withColumn('coordinates', get_coordinates(col('nodes')))
 
     @staticmethod
-    def df_mark_relation_members(spark, df_node, df_way, df_relation) -> [DataFrame, DataFrame]:
+    def df_mark_relation_members(spark, df_way, df_relation) -> DataFrame:
         df_members = df_relation.withColumn('members', explode('members')).select('members.*').select('id', 'type') \
             .sort('id')
-        dict_node_members = df_members.filter(col('type') == 'Node').select('id').toPandas().set_index('id').T \
-            .to_dict('list')
-        dict_node_members = spark.sparkContext.broadcast(dict_node_members)
-        dict_way_members = df_members.filter(col('type') == 'Way').select('id').toPandas().set_index('id').T \
-            .to_dict('list')
+        dict_way_members = df_members.filter(col('type') == 'Way').select('id').distinct().toPandas() \
+            .set_index('id').T.to_dict('list')
         dict_way_members = spark.sparkContext.broadcast(dict_way_members)
 
         del df_members
 
         @udf(returnType=BooleanType())
-        def is_relation_member(osm_type, osm_id):
+        def is_relation_member(osm_id):
             def is_in_df(broadcast, oid):
                 try:
                     # noinspection PyComparisonWithNone
@@ -255,18 +235,17 @@ class Processor:
                 except KeyError:
                     return False
 
-            return is_in_df(dict_node_members if osm_type == 'node' else dict_way_members, osm_id)
+            return is_in_df(dict_way_members, osm_id)
 
-        df_node = df_node.withColumn('is_relation_member', is_relation_member(lit('node'), col('id')))
-        df_way = df_way.withColumn('is_relation_member', is_relation_member(lit('way'), col('id')))
+        df_way = df_way.withColumn('is_relation_member', is_relation_member(col('id')))
 
-        return df_node, df_way
+        return df_way
 
     @staticmethod
     def df_way_create_geo_json(df_way) -> DataFrame:
         @udf(returnType=StringType())
-        def create_geo_json(is_relation_member, coordinates):
-            if is_relation_member or not coordinates:
+        def create_geo_json(coordinates):
+            if not coordinates or len(coordinates) < 1:
                 return
 
             last_index = len(coordinates) - 1
@@ -279,7 +258,7 @@ class Processor:
 
             return json.dumps(dict(type=geo_json_type, coordinates=geo_json_coordinates))
 
-        return df_way.withColumn('geo_json', create_geo_json(col('is_relation_member'), col('coordinates')))
+        return df_way.withColumn('geo_json', create_geo_json(col('coordinates')))
 
     @staticmethod
     def get_geo_json_center(df) -> DataFrame:
@@ -295,6 +274,8 @@ class Processor:
 
                     return dict(latitude=centroid.y, longitude=centroid.x)
                 except ValueError:
+                    return
+                except IndexError:
                     return
 
         return df \
@@ -390,8 +371,6 @@ class Processor:
         file_path = Processor.select_file()
         memory = os.getenv('SPARK_MEMORY') or '16g'
         start_time = time.time()
-        script_dir = os.path.dirname(__file__)
-        parquet_files = os.path.join(script_dir, '../tmp/osmFiles/parquet/')
         spark = SparkSession.builder \
             .appName('osm-poi') \
             .config('spark.driver.memory', memory) \
@@ -403,8 +382,8 @@ class Processor:
         df_way = Processor.df_parse_tags(file_path, spark, 'way')
         df_relation = Processor.df_parse_tags(file_path, spark, 'relation')
         # Create GeoJSONs
-        df_node, df_way = Processor.df_mark_relation_members(spark, df_node, df_way, df_relation)
-        df_way = Processor.df_parse_way_coordinates(spark, df_node, df_way)
+        df_way = Processor.df_mark_relation_members(spark, df_way, df_relation)
+        df_way = Processor.df_parse_way_coordinates(df_way)
         df_way = Processor.df_way_create_geo_json(df_way)
         df_relation = Processor.df_relation_create_geo_json(spark, df_relation, df_way)
         df_way = Processor.get_geo_json_center(df_way)
@@ -415,8 +394,9 @@ class Processor:
         df_relation = Processor.df_add_h3_index(df_relation)
         # Combine all data frames
         df_pois = Processor.combine_pois(df_node, df_way, df_relation)
-        end_time = time.time()
 
-        df_pois.write.mode('overwrite').parquet(f'{parquet_files}europe/malta-latest/kuwala.parquet')
+        df_pois.write.mode('overwrite').parquet(file_path + '/kuwala-2.parquet')
+
+        end_time = time.time()
 
         print(f'Processed OSM files in {round(end_time - start_time)} s')

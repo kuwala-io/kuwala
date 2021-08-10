@@ -1,5 +1,6 @@
 import json
 import os
+import urllib.error
 import questionary
 import sys
 
@@ -17,7 +18,12 @@ FILE_SUFFIX = '-latest.osm.pbf'
 class Downloader:
     @staticmethod
     def pick_region(url: str):
-        d = PyQuery(url=url)
+        try:
+            d = PyQuery(url=url)
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                return dict(url=f'{url}{FILE_SUFFIX}', all=True)
+
         regions = d.find(f"a[href$='{FILE_SUFFIX}']")
         regions = list(map(lambda rf: rf.text.split(FILE_SUFFIX)[0], filter(lambda r: r.text, regions)))
 
