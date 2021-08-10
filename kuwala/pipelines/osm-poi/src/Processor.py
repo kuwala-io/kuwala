@@ -395,7 +395,7 @@ class Processor:
         # Combine all data frames
         df_pois = Processor.combine_pois(df_node, df_way, df_relation)
 
-        df_pois.write.mode('overwrite').parquet(file_path + '/kuwala-2.parquet')
+        df_pois.write.mode('overwrite').parquet(file_path + '/kuwala.parquet')
 
         end_time = time.time()
 
