@@ -1,18 +1,26 @@
 import h3
 import json
 import os
+import time
 import Neo4jConnection as Neo4jConnection
-import PipelineImporter as PipelineImporter
-from pyspark.sql import DataFrame
-from pyspark.sql.functions import concat, flatten, lit
-from pyspark.sql.types import LongType
+import sys
+
+sys.path.insert(0, '../../../../pipelines/common/')
+sys.path.insert(0, '../')
+
+from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql.functions import col, concat, lit, udf
+from pyspark.sql.types import ArrayType, StringType
+from python_utils.src.FileSelector import select_osm_file
 
 
 #  Sets uniqueness constraint for H3 indexes, OSM POIS, and POI categories
 def add_constraints():
     Neo4jConnection.query_graph('CREATE CONSTRAINT poiOsm IF NOT EXISTS ON (p:PoiOSM) ASSERT (p.id) IS UNIQUE')
-    Neo4jConnection.query_graph('CREATE CONSTRAINT poiCategory IF NOT EXISTS ON (pc:PoiCategory) ASSERT pc.name IS '
+    Neo4jConnection.query_graph('CREATE CONSTRAINT poiCategory IF NOT EXISTS ON (p:PoiCategory) ASSERT p.name IS '
                                 'UNIQUE')
+    Neo4jConnection.query_graph('CREATE CONSTRAINT poiBuildingFootprintOsm IF NOT EXISTS ON '
+                                '(p:PoiBuildingFootprintOSM) ASSERT (p.id) IS UNIQUE')
 
 
 def add_poi_categories():
@@ -32,41 +40,40 @@ def add_poi_categories():
 def add_osm_pois(df: DataFrame):
     query = '''
         // Create PoiOSM nodes
-        UNWIND $rows AS row
-        MERGE (po:PoiOSM { id: row.id })
+        MERGE (po:PoiOSM { id: event.id })
         SET 
-            po.osmId = row.osmId,
-            po.type = row.type,
-            po.name = row.name, 
-            po.osmTags = row.osmTags,
-            po.houseNr = row.houseNr,
-            po.houseName = row.houseName,
-            po.block = row.block,
-            po.street = row.street,
-            po.place = row.place,
-            po.zipCode = row.zipCode,
-            po.city = row.city,
-            po.country = row.country,
-            po.full = row.full,
-            po.neighborhood = row.neighborhood,
-            po.suburb = row.suburb,
-            po.district = row.district,
-            po.province = row.province,
-            po.state = row.state,
-            po.level = row.level,
-            po.flats = row.flats,
-            po.unit = row.unit
+            po.osmId = event.osmId,
+            po.type = event.type,
+            po.name = event.name, 
+            po.osmTags = event.osm_tags,
+            po.houseNr = event.houseNr,
+            po.houseName = event.houseName,
+            po.block = event.block,
+            po.street = event.street,
+            po.place = event.place,
+            po.zipCode = event.zipCode,
+            po.city = event.city,
+            po.country = event.country,
+            po.full = event.full,
+            po.neighborhood = event.neighborhood,
+            po.suburb = event.suburb,
+            po.district = event.district,
+            po.province = event.province,
+            po.state = event.state,
+            po.level = event.level,
+            po.flats = event.flats,
+            po.unit = event.unit
 
         // Create H3 index nodes
-        WITH row, po
-        MERGE (h:H3Index { h3Index: row.h3Index })
-        ON CREATE SET h.resolution = row.resolution
+        WITH event, po
+        MERGE (h:H3Index { h3Index: event.h3_index })
+        ON CREATE SET h.resolution = event.resolution
         MERGE (po)-[:LOCATED_AT]->(h)
 
         // Create relationship to PoiCategories
-        WITH row, po
+        WITH event, po
         MATCH (pc:PoiCategory) 
-        WHERE pc.name IN row.categories
+        WHERE pc.name IN event.categories
         MERGE (po)-[:BELONGS_TO]->(pc)
     '''
 
@@ -78,47 +85,79 @@ def add_osm_pois(df: DataFrame):
         df = df.select('*', 'details.*')
         df = df.drop('details')  # Necessary to drop because batch insert can only process elementary data types
 
-    df.foreachPartition(lambda p: Neo4jConnection.batch_insert_data(p, query))
+    Neo4jConnection.spark_send_query(df, query)
+
+
+def add_osm_building_footprints(df: DataFrame):
+    query = '''
+        MATCH (po:PoiOSM { id: event.id })
+        WITH po, event
+        MERGE (pbf:PoiBuildingFootprintOSM { id: event.id })
+        ON CREATE SET pbf.geoJson = event.geo_json
+        WITH po, pbf
+        MERGE (po)-[:HAS]->(pbf)
+    '''
+
+    Neo4jConnection.spark_send_query(df, query)
 
 
 def import_pois_osm(limit=None):
-    Neo4jConnection.connect_to_graph()
+    script_dir = os.path.dirname(__file__)
+    directory = os.path.join(script_dir, '../tmp/kuwala/osmFiles/parquet')
+    file_path = select_osm_file(directory)
 
-    df = PipelineImporter.connect_to_mongo(database='osm-poi', collection='pois')
-
-    if len(df.columns) < 1:
+    if not file_path:
         print('No OSM POI data available. You first need to run the osm-poi processing pipeline before loading it '
               'into the graph')
 
         return
 
-    # TODO: Figure out how to join elements of an array that contains arrays of string pairs
-    df = df \
-        .withColumn('osmId', df['osmId'].cast(LongType())) \
-        .withColumn('id', concat('type', 'osmId')) \
-        .withColumn('osmTags', flatten('osmTags'))
+    start_time = time.time()
 
+    Neo4jConnection.connect_to_graph()
     add_constraints()
     add_poi_categories()
-    # Closing because following functions are multi-threaded and don't use this connection
     Neo4jConnection.close_connection()
 
-    # noinspection PyUnresolvedReferences
-    resolution = h3.h3_get_resolution(df.first()['h3Index'])
-    osm_pois = df.select(
-        'id',
-        'osmId',
-        'type',
-        'name',
-        'osmTags',
-        'h3Index',
-        'categories',
-        'address.*'
-    ).withColumn('resolution', lit(resolution))
+    spark = SparkSession.builder.appName('neo4j_importer_osm-poi').getOrCreate().newSession()
+    df = spark.read.parquet(f'{file_path}/kuwala.parquet')
 
     if limit is not None:
-        osm_pois = osm_pois.limit(limit)
+        df = df.limit(limit)
+
+    @udf(returnType=ArrayType(elementType=StringType()))
+    def concat_osm_tags(tags):
+        return list(map(lambda t: f'{t["key"]}={t["value"]}', tags))
+
+    df = df \
+        .withColumn('osm_id', col('id')) \
+        .withColumn('id', concat('osm_type', 'osm_id')) \
+        .withColumn('osm_tags', concat_osm_tags(col('tags')))
+
+    # noinspection PyUnresolvedReferences
+    resolution = h3.h3_get_resolution(df.first()['h3_index'])
+    osm_pois = df.select(
+        'id',
+        'osm_id',
+        'type',
+        'name',
+        'osm_tags',
+        'h3_index',
+        'categories',
+        'address.*',
+        'website',
+        'email',
+        'phone'
+    ).withColumn('resolution', lit(resolution))
 
     add_osm_pois(osm_pois)
+
+    osm_pois_with_geo_json = df.select('id', 'geo_json').filter(col('geo_json').isNotNull())
+
+    add_osm_building_footprints(osm_pois_with_geo_json)
+
+    end_time = time.time()
+
+    print(f'Imported OSM data in {round(end_time - start_time)} s')
 
     return df

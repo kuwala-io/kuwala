@@ -2,38 +2,18 @@ import h3
 import itertools
 import json
 import os
-import questionary
 import time
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col, explode, lit, udf
 from pyspark.sql.types import \
     ArrayType, BooleanType, FloatType, IntegerType, NullType, StringType, StructField, StructType
+from python_utils.src.FileSelector import select_osm_file
 from shapely.geometry import shape
 
 DEFAULT_RESOLUTION = 15
 
 
 class Processor:
-    @staticmethod
-    def select_file():
-        script_dir = os.path.dirname(__file__)
-        parquet_dir = os.path.join(script_dir, '../tmp/osmFiles/parquet')
-        continents = os.listdir(parquet_dir)
-        continent = questionary.select('Which continent are you interested in?', choices=continents).ask()
-        continent_path = f'{parquet_dir}/{continent}'
-        countries = os.listdir(continent_path)
-        country = questionary.select('Which country are you interested in?', choices=countries).ask()
-        country_path = f'{continent_path}/{country}'
-
-        if 'latest' in country:
-            return country_path
-
-        regions = os.listdir(country_path)
-        region = questionary.select('Which region are you interested in?', choices=regions).ask()
-
-        if region:
-            return f'{country_path}/{region}'
-
     @staticmethod
     def load_resource(file_name: str):
         with open(f'../resources/{file_name}') as f:
@@ -333,6 +313,7 @@ class Processor:
         @udf(returnType=StringType())
         def get_h3_index(latitude, longitude):
             if latitude and longitude:
+                # noinspection PyUnresolvedReferences
                 return h3.geo_to_h3(latitude, longitude, DEFAULT_RESOLUTION)
 
         return df.withColumn('h3_index', get_h3_index(col('latitude'), col('longitude')))
@@ -368,7 +349,9 @@ class Processor:
 
     @staticmethod
     def start():
-        file_path = Processor.select_file()
+        script_dir = os.path.dirname(__file__)
+        directory = os.path.join(script_dir, '../tmp/osmFiles/parquet')
+        file_path = select_osm_file(directory)
         memory = os.getenv('SPARK_MEMORY') or '16g'
         start_time = time.time()
         spark = SparkSession.builder \

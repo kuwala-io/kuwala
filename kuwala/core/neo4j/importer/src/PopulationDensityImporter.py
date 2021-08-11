@@ -1,4 +1,5 @@
 import h3
+import Neo4jConnection as Neo4jConnection
 import os
 import pycountry
 import questionary
@@ -26,27 +27,8 @@ def add_population(df: DataFrame):
                 CASE WHEN event.women_of_reproductive_age_15_49 IS NOT NULL 
                 THEN event.women_of_reproductive_age_15_49 ELSE 'null' END
     '''
-    url = os.getenv('NEO4J_HOST') or 'bolt://localhost:7687'
 
-    # The following error will be printed:
-    #
-    #   ERROR SchemaService: Query not compiled because of the following exception:
-    #   org.neo4j.driver.exceptions.ClientException: Variable `event` not defined (line 2, column 29 (offset: 71))
-    #   "MATCH (h:H3Index { h3Index: event.h3Index })"
-    #
-    # The error can be ignored and everything runs correctly as discussed here:
-    # https://github.com/neo4j-contrib/neo4j-spark-connector/issues/357
-    # The issue is fixed but not available for the PySpark packages yet:
-    # https://spark-packages.org/package/neo4j-contrib/neo4j-connector-apache-spark_2.12
-    df.write \
-        .format('org.neo4j.spark.DataSource') \
-        .mode('Overwrite') \
-        .option('url', url) \
-        .option('authentication.type', 'basic') \
-        .option('authentication.basic.username', 'neo4j') \
-        .option('authentication.basic.password', 'password') \
-        .option('query', query) \
-        .save()
+    Neo4jConnection.spark_send_query(df, query)
 
 
 def import_population_density(limit=None):

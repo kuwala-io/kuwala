@@ -1,7 +1,5 @@
 import os
-
 from neo4j import exceptions, GraphDatabase, Neo4jDriver
-from time import sleep
 from typing import Optional
 
 graph = None  # type: Optional[Neo4jDriver]
@@ -46,39 +44,26 @@ def query_graph(q, parameters=None, db=None):
     return response, retry
 
 
-# Method used inside Pyspark
-# Establish new database connection for each invocation due to multi-threaded environment
-def batch_insert_data(partition, query):
-    def send_query(rows):
-        sleep_time = 1
+def spark_send_query(df, query):
+    url = os.getenv('NEO4J_HOST') or 'bolt://localhost:7687'
 
-        while True:
-            response, retry = query_graph(query, parameters={'rows': rows})
+    # An error like this will be printed:
+    #
+    #   ERROR SchemaService: Query not compiled because of the following exception:
+    #   org.neo4j.driver.exceptions.ClientException: Variable `event` not defined (line 3, column 32 (offset: 97))
+    #   "MERGE (po:PoiOSM { id: event.id })"
+    #
+    # The error can be ignored and everything runs correctly as discussed here:
+    # https://github.com/neo4j-contrib/neo4j-spark-connector/issues/357
+    # The issue is fixed but not available for the PySpark packages yet:
+    # https://spark-packages.org/package/neo4j-contrib/neo4j-connector-apache-spark_2.12
 
-            if not retry:
-                break
-            elif sleep_time < 60:
-                sleep(sleep_time)
-                sleep_time *= 2
-            else:
-                return response
-
-    connect_to_graph(uri="bolt://localhost:7687",
-                     user="neo4j",
-                     password="password")
-
-    batch = list()
-    batch_size = 10000
-
-    for row in partition:
-        batch.append(row.asDict())
-
-        if len(batch) == batch_size:
-            send_query(batch)
-
-            batch = list()
-
-    if len(batch) > 0:
-        send_query(batch)
-
-    close_connection()
+    df.write \
+        .format('org.neo4j.spark.DataSource') \
+        .mode('Overwrite') \
+        .option('url', url) \
+        .option('authentication.type', 'basic') \
+        .option('authentication.basic.username', 'neo4j') \
+        .option('authentication.basic.password', 'password') \
+        .option('query', query) \
+        .save()

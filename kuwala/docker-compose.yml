@@ -2,19 +2,6 @@ version: '3.1'
 
 services:
 
-  mongo:
-    container_name: kuwala-pipelines_mongo_db
-    image: mongo:4
-    command: --dbpath /data/db --setParameter cursorTimeoutMillis=10800000
-    restart: always
-    ports:
-      - '27017:27017'
-    volumes:
-      - ./tmp/kuwala/db/mongo/data/db:/data/db
-    profiles:
-      - core
-      - network
-  
   neo4j:
     container_name: neo4j
     build:
@@ -25,7 +12,7 @@ services:
       - NEO4J_AUTH=none
       - NEO4JLABS_PLUGINS=["apoc"]
       - NEO4J_dbms_memory_heap_initial__size=512m
-      - NEO4J_dbms_memory_heap_max__size=4G
+      - NEO4J_dbms_memory_heap_max__size=3G
     ports:
       - '7474:7474'
       - '7687:7687'
@@ -76,7 +63,6 @@ services:
     volumes:
       - ./tmp/kuwala/googleFiles:/opt/pipeline/tmp/googleFiles
     restart: always
-    depends_on: [mongo]
     profiles:
       - network
 
@@ -91,7 +77,7 @@ services:
     volumes:
       - ./tmp/kuwala:/opt/app/tmp/kuwala
     restart: always
-    depends_on: [mongo, neo4j]
+    depends_on: [neo4j]
     profiles:
       - network
 

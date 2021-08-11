@@ -2,11 +2,13 @@ import h3
 import moment
 import os
 import Neo4jConnection as Neo4jConnection
+import time
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col, concat_ws, explode, lit
 
 
 def add_constraints():
+    Neo4jConnection.connect_to_graph()
     Neo4jConnection.query_graph('CREATE CONSTRAINT poiGoogle IF NOT EXISTS ON (p:PoiGoogle) ASSERT p.id IS UNIQUE')
     Neo4jConnection.query_graph('CREATE CONSTRAINT poiOpeningHours IF NOT EXISTS ON (p:PoiOpeningHours) ASSERT (p.id) '
                                 'IS UNIQUE')
@@ -17,49 +19,48 @@ def add_constraints():
                                 'IS UNIQUE')
     Neo4jConnection.query_graph('CREATE CONSTRAINT poiSpendingTime IF NOT EXISTS ON (p:PoiSpendingTime) ASSERT p.id '
                                 'IS UNIQUE')
+    Neo4jConnection.close_connection()
 
 
 def add_google_pois(df: DataFrame):
     query = '''
         // Create PoiGoogle nodes
-        UNWIND $rows AS row
-        MERGE (pg:PoiGoogle { id: row.id })
+        MERGE (pg:PoiGoogle { id: event.id })
         ON CREATE SET 
-            pg.placeId = row.placeID,
-            pg.name = row.name,
-            pg.address = row.address,
-            pg.phone = row.phone,
-            pg.website = row.website,
-            pg.timezone = row.timezone
+            pg.placeId = event.placeID,
+            pg.name = event.name,
+            pg.address = event.address,
+            pg.phone = event.phone,
+            pg.website = event.website,
+            pg.timezone = event.timezone
 
         // Create H3 index nodes
-        WITH row, pg
-        MERGE (h:H3Index { h3Index: row.h3Index })
-        ON CREATE SET h.resolution = row.resolution
+        WITH event, pg
+        MERGE (h:H3Index { h3Index: event.h3Index })
+        ON CREATE SET h.resolution = event.resolution
         MERGE (pg)-[:LOCATED_AT]->(h)
         
         // Create relationship to PoiCategories
-        WITH row, pg
+        WITH event, pg
         MATCH (pc:PoiCategory) 
-        WHERE pc.name IN row.categories
+        WHERE pc.name IN event.categories
         MERGE (pg)-[:BELONGS_TO]->(pc)
     '''
 
-    df.foreachPartition(lambda p: Neo4jConnection.batch_insert_data(p, query))
+    Neo4jConnection.spark_send_query(df, query)
 
 
 def add_opening_hours(df: DataFrame):
     query = '''
         // Create opening hours and relate them to PoiGoogle nodes
-        UNWIND $rows AS row
-        MATCH (pg:PoiGoogle { id: row.id })
-        WITH pg, row
-        MERGE (poh:PoiOpeningHours { id: row.oh_id })
-        ON CREATE SET poh.openingTime = row.openingTime, poh.closingTime = row.closingTime
-        MERGE (pg)-[:HAS { date: row.date }]->(poh)
+        MATCH (pg:PoiGoogle { id: event.id })
+        WITH pg, event
+        MERGE (poh:PoiOpeningHours { id: event.oh_id })
+        ON CREATE SET poh.openingTime = event.openingTime, poh.closingTime = event.closingTime
+        MERGE (pg)-[:HAS { date: event.date }]->(poh)
     '''
 
-    df.foreachPartition(lambda p: Neo4jConnection.batch_insert_data(p, query))
+    Neo4jConnection.spark_send_query(df, query)
 
 
 def add_closed_tags(df: DataFrame):
@@ -70,88 +71,88 @@ def add_closed_tags(df: DataFrame):
     ''')
 
     query = '''
-        UNWIND $rows AS row
-        MATCH (pg:PoiGoogle { id: row.id })
+        MATCH (pg:PoiGoogle { id: event.id })
         MATCH (pc:PoiClosed)
-        WHERE pc.closed = (row.permanentlyClosed OR row.temporarilyClosed) AND pc.permanently = row.permanentlyClosed
-        MERGE (pg)-[:IS { date: row.date }]->(pc)
+        WHERE pc.closed = 
+            (event.permanentlyClosed OR event.temporarilyClosed) AND 
+            pc.permanently = event.permanentlyClosed
+        MERGE (pg)-[:IS { date: event.date }]->(pc)
     '''
 
-    df.foreachPartition(lambda p: Neo4jConnection.batch_insert_data(p, query))
+    Neo4jConnection.spark_send_query(df, query)
 
 
 def add_ratings(df: DataFrame):
     query = '''
-        UNWIND $rows AS row
-        MATCH (pg:PoiGoogle { id: row.id })
-        MERGE (pr:PoiRating { value: row.stars })
-        MERGE (pg)-[:HAS { numberOfReviews: row.numberOfReviews, date: row.date }]->(pr)
+        MATCH (pg:PoiGoogle { id: event.id })
+        MERGE (pr:PoiRating { value: event.stars })
+        MERGE (pg)-[:HAS { numberOfReviews: event.numberOfReviews, date: event.date }]->(pr)
     '''
 
-    df.foreachPartition(lambda p: Neo4jConnection.batch_insert_data(p, query))
+    Neo4jConnection.spark_send_query(df, query)
 
 
 def add_price_levels(df: DataFrame):
     query = '''
-        UNWIND $rows AS row
-        MATCH (pg:PoiGoogle { id: row.id })
-        MERGE (ppl:PoiPriceLevel { value: row.priceLevel })
-        MERGE (pg)-[:HAS { date: row.date }]->(ppl)
+        MATCH (pg:PoiGoogle { id: event.id })
+        MERGE (ppl:PoiPriceLevel { value: event.priceLevel })
+        MERGE (pg)-[:HAS { date: event.date }]->(ppl)
     '''
 
-    df.foreachPartition(lambda p: Neo4jConnection.batch_insert_data(p, query))
+    Neo4jConnection.spark_send_query(df, query)
 
 
 def add_popularities(df: DataFrame):
     query = '''
-        UNWIND $rows AS row
-        MATCH (pg:PoiGoogle { id: row.id })
-        MERGE (pg)-[:HAS { timestamp: row.timestamp }]->(:PoiPopularityAverage { value: row.popularity })
+        MATCH (pg:PoiGoogle { id: event.id })
+        MERGE (pg)-[:HAS { timestamp: event.timestamp }]->(:PoiPopularityAverage { value: event.popularity })
     '''
 
-    df.foreachPartition(lambda p: Neo4jConnection.batch_insert_data(p, query))
+    Neo4jConnection.spark_send_query(df, query)
 
 
 def add_waiting_times(df: DataFrame):
     query = '''
-        UNWIND $rows AS row
-        MATCH (pg:PoiGoogle { id: row.id })
-        MERGE (pwt:PoiWaitingTime { value: row.waitingTime })
-        MERGE (pg)-[:HAS { timestamp: row.timestamp }]->(pwt)
+        MATCH (pg:PoiGoogle { id: event.id })
+        MERGE (pwt:PoiWaitingTime { value: event.waitingTime })
+        MERGE (pg)-[:HAS { timestamp: event.timestamp }]->(pwt)
     '''
 
-    df.foreachPartition(lambda p: Neo4jConnection.batch_insert_data(p, query))
+    Neo4jConnection.spark_send_query(df, query)
 
 
 def add_spending_times(df: DataFrame):
     query = '''
-        UNWIND $rows AS row
-        MATCH (pg:PoiGoogle { id: row.id })
-        MERGE (pst:PoiSpendingTime { id: row.st_id })
-        ON CREATE SET pst.min = row.minSpendingTime, pst.max = row.maxSpendingTime
-        MERGE (pg)-[:HAS { date: row.date }]->(pst)
+        MATCH (pg:PoiGoogle { id: event.id })
+        MERGE (pst:PoiSpendingTime { id: event.st_id })
+        ON CREATE SET pst.min = event.minSpendingTime, pst.max = event.maxSpendingTime
+        MERGE (pg)-[:HAS { date: event.date }]->(pst)
     '''
 
-    df.foreachPartition(lambda p: Neo4jConnection.batch_insert_data(p, query))
+    Neo4jConnection.spark_send_query(df, query)
 
 
 def import_pois_google(limit=None):
-    Neo4jConnection.connect_to_graph(uri="bolt://localhost:7687",
-                                     user="neo4j",
-                                     password="password")
-    spark = SparkSession.builder.appName('neo4j_importer_google-poi').getOrCreate().newSession()
     script_dir = os.path.dirname(__file__)
-    parquet_files = os.path.join(script_dir, '../tmp/kuwala/googleFiles/poiData/')
-    df = spark.read.parquet(
-        parquet_files + sorted(list(filter(lambda f: 'matched' in f, os.listdir(parquet_files))), reverse=True)[0]
-    )
+    directory = os.path.join(script_dir, '../tmp/kuwala/googleFiles/poiData/')
+    parquet_files = sorted(list(filter(lambda f: 'matched' in f, os.listdir(directory))), reverse=True)
+
+    if len(parquet_files) < 1:
+        print('No Google POI data available. You first need to run the google-poi processing pipeline before loading '
+              'it into the graph')
+
+        return
+
+    file_path = directory + parquet_files[0]
+    start_time = time.time()
+
+    add_constraints()
+
+    spark = SparkSession.builder.appName('neo4j_importer_google-poi').getOrCreate().newSession()
+    df = spark.read.parquet(file_path)
 
     if limit is not None:
         df = df.limit(limit)
-
-    add_constraints()
-    # Closing because following functions are multi-threaded and don't use this connection
-    Neo4jConnection.close_connection()
 
     # noinspection PyUnresolvedReferences
     resolution = h3.h3_get_resolution(df.first()['h3Index'])
@@ -198,5 +199,9 @@ def import_pois_google(limit=None):
     add_popularities(popularities)
     add_waiting_times(waiting_times)
     add_spending_times(spending_times)
+
+    end_time = time.time()
+
+    print(f'Imported Google data in {round(end_time - start_time)} s')
 
     return df
