@@ -1,16 +1,41 @@
+import math
 import os
 import questionary
+import urllib.error
+import pycountry
+import pycountry_convert as pcc
+import requests.exceptions
+from fuzzywuzzy import fuzz
+from pyquery import PyQuery
+from hdx.data.organization import Organization
+from hdx.hdx_configuration import Configuration
+from time import sleep
+
+CONTINENTS = [
+    {'code': 'af', 'name': 'Africa', 'geofabrik': 'africa'},
+    {'code': 'an', 'name': 'Antarctica', 'geofabrik': 'antarctica'},
+    {'code': 'as', 'name': 'Asia', 'geofabrik': 'asia'},
+    {'code': 'na', 'name': 'Central America', 'geofabrik': 'central-america'},
+    {'code': 'eu', 'name': 'Europe', 'geofabrik': 'europe'},
+    {'code': 'na', 'name': 'North America', 'geofabrik': 'north-america'},
+    {'code': 'oc', 'name': 'Oceania', 'geofabrik': 'australia-oceania'},
+    {'code': 'sa', 'name': 'South America', 'geofabrik': 'south-america'}
+]
 
 
-def select_osm_file(directory):
+def select_local_osm_file(directory):
     continents = os.listdir(directory)
-    continent = questionary.select('Which continent are you interested in?', choices=continents).ask()
+    continent_names = list(map(lambda c: pcc.convert_continent_code_to_continent_name(c.upper()), continents))
+    continent = questionary.select('Which continent are you interested in?', choices=continent_names).ask()
+    continent = continents[continent_names.index(continent)]
     continent_path = f'{directory}/{continent}'
     countries = os.listdir(continent_path)
-    country = questionary.select('Which country are you interested in?', choices=countries).ask()
+    country_names = list(map(lambda c: pcc.map_country_alpha3_to_country_name()[c.upper()] or c, countries))
+    country = questionary.select('Which country are you interested in?', choices=country_names).ask()
+    country = countries[country_names.index(country)]
     country_path = f'{continent_path}/{country}'
 
-    if 'latest' in country:
+    if os.path.isdir(country_path + '/osm-parquetizer'):
         return country_path
 
     regions = os.listdir(country_path)
@@ -18,3 +43,125 @@ def select_osm_file(directory):
 
     if region:
         return f'{country_path}/{region}'
+
+
+def select_osm_file():
+    base_url = 'https://download.geofabrik.de'
+    file_suffix = '-latest.osm.pbf'
+
+    def pick_region(url: str):
+        d = None
+        sleep_time = 1
+        max_sleep_time = math.pow(2, 4)
+
+        while not d:
+            try:
+                d = PyQuery(url=url)
+            except urllib.error.HTTPError as e:
+                if e.code == 404:
+                    return dict(url=f'{url}{file_suffix}', all=True)
+            except urllib.error.URLError as e:
+                if sleep_time <= max_sleep_time:
+                    sleep(sleep_time)
+
+                    sleep_time *= 2
+                else:
+                    raise ConnectionRefusedError()
+            except requests.exceptions.SSLError as e:
+                if sleep_time <= max_sleep_time:
+                    sleep(sleep_time)
+
+                    sleep_time *= 2
+                else:
+                    raise ConnectionRefusedError()
+
+        regions = d.find(f"a[href$='{file_suffix}']")
+        regions = list(map(lambda rf: rf.text.split(file_suffix)[0], filter(lambda r: r.text, regions)))
+
+        regions.insert(0, 'all')
+
+        selected_region = questionary.select('Which region are you interested in?', choices=regions).ask()
+
+        if selected_region == 'all':
+            return dict(url=f'{url}{file_suffix}', all=True)
+
+        return dict(url=f'{url}/{selected_region}', all=False)
+
+    continent_names = list(map((lambda c: c['name']), CONTINENTS))
+    continent = questionary.select('Which continent are you interested in?', choices=continent_names).ask()
+    continent = CONTINENTS[continent_names.index(continent)]
+    continent_geofabrik = continent['geofabrik']
+    continent = continent['code']
+    country = pick_region(f'{base_url}/{continent_geofabrik}')
+    file = dict(url=None, continent=continent, country=None, country_region=None)
+
+    if country:
+        country_parts = country['url'].split(continent_geofabrik + '/')
+
+        # Entire continent selected
+        if len(country_parts) < 2:
+            file['url'] = country['url']
+
+            return file
+
+        region = pick_region(country['url'])
+
+        try:
+            file['country'] = pycountry.countries.search_fuzzy(country_parts[1])[0].alpha_3.lower()
+        except LookupError:
+            countries = pycountry.countries.objects
+            countries = list(map(
+                lambda c: dict(
+                    code=c.alpha_3.lower(),
+                    distance=fuzz.token_set_ratio(c.name.lower(), country_parts[1]))
+                , countries))
+            country = max(countries, key=lambda c: c['distance'])
+
+            if country['distance'] > 80:
+                # TODO: Consider exceptions like 'malaysia-singapore-brunei'
+                file['country'] = country['code']
+            else:
+                file['country'] = country_parts[1]
+
+        if region['all']:
+            file['url'] = region['url']
+
+            return file
+
+        file['url'] = region['url'] + file_suffix
+        file['country_region'] = region['url'].split(country_parts[1] + '/')[1].lower()
+
+        return file
+
+    return None
+
+
+def select_population_file():
+    Configuration.create(hdx_site='prod', user_agent='Kuwala', hdx_read_only=True)
+    # The identifier is for Facebook. This shouldn't change from HDX's side in the future since it's an id.
+    datasets = Organization.read_from_hdx(identifier='74ad0574-923d-430b-8d52-ad80256c4461').get_datasets(
+        query='Population')
+    datasets = sorted(
+        filter(
+            lambda d: 'population' in d['title'].lower() and 'csv' in d['file_types'],
+            map(
+                lambda d: dict(id=d.get('id'), title=d.get('title'), location=d.get_location_names(),
+                               country_code=d.get_location_iso3s(), file_types=d.get_filetypes()),
+                datasets
+            )
+        ), key=lambda d: d['location'][0])
+    countries = list(map(lambda d: d['location'][0], datasets))
+    country = questionary \
+        .select('For which country do you want to download the population data?', choices=countries) \
+        .ask()
+
+    dataset = datasets[countries.index(country)]
+    country = dataset['country_code'][0].upper()
+    country_alpha_2 = pcc.country_alpha3_to_country_alpha2(country)
+    continent = pcc.country_alpha2_to_continent_code(country_alpha_2)
+    dataset['country'] = country.lower()
+    dataset['continent'] = continent.lower()
+
+    del dataset['country_code']
+
+    return dataset

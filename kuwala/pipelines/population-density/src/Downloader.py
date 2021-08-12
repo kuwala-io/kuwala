@@ -2,46 +2,28 @@ import os
 import questionary
 import time
 import zipfile
+import sys
+
+sys.path.insert(0, '../../common/')
+sys.path.insert(0, '../')
+
 from hdx.data.dataset import Dataset
-from hdx.data.organization import Organization
 from hdx.data.resource import Resource
-from hdx.hdx_configuration import Configuration
 from pathlib import Path
+from python_utils.src.FileSelector import select_population_file
 
 
 class Downloader:
     @staticmethod
     def start() -> [dict]:
-        dataset = Downloader.select_dataset()
+        dataset = select_population_file()
         files, output_dir = Downloader.download_files(dataset)
 
         return files, output_dir
 
     @staticmethod
-    def select_dataset() -> dict:
-        Configuration.create(hdx_site='prod', user_agent='Kuwala', hdx_read_only=True)
-        # The identifier is for Facebook. This shouldn't change from HDX's side in the future since it's an id.
-        datasets = Organization.read_from_hdx(identifier='74ad0574-923d-430b-8d52-ad80256c4461').get_datasets(
-            query='Population')
-        datasets = sorted(
-            filter(
-                lambda d: 'population' in d['title'].lower() and 'csv' in d['file_types'],
-                map(
-                    lambda d: dict(id=d.get('id'), title=d.get('title'), location=d.get_location_names(),
-                                   country_code=d.get_location_iso3s(), file_types=d.get_filetypes()),
-                    datasets
-                )
-            ), key=lambda d: d['location'][0])
-        countries = list(map(lambda d: d['location'][0], datasets))
-        country = questionary \
-            .select('For which country do you want to download the population data?', choices=countries) \
-            .ask()
-
-        return datasets[countries.index(country)]
-
-    @staticmethod
-    def download_files(d: dict) -> [str]:
-        d = Dataset.read_from_hdx(d['id'])
+    def download_files(dataset: dict) -> [str]:
+        d = Dataset.read_from_hdx(dataset['id'])
         resources = d.get_resources()
 
         def get_type(name: str):
@@ -83,9 +65,8 @@ class Downloader:
             .checkbox('Which demographic groups do you want to include?', choices=resource_names) \
             .ask()
         selected_resources = list(filter(lambda resource: resource['type'] in selected_resources, resources))
-        country_code = d.get_location_iso3s()[0]
         script_dir = os.path.dirname(__file__)
-        dir_path = f'../tmp/populationFiles/{country_code}/'
+        dir_path = f'../tmp/populationFiles/{dataset["continent"]}/{dataset["country"]}/'
         dir_path = os.path.join(script_dir, dir_path)
         file_paths = list()
 

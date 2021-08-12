@@ -7,7 +7,7 @@ from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col, explode, lit, udf
 from pyspark.sql.types import \
     ArrayType, BooleanType, FloatType, IntegerType, NullType, StringType, StructField, StructType
-from python_utils.src.FileSelector import select_osm_file
+from python_utils.src.FileSelector import select_local_osm_file
 from shapely.geometry import shape
 
 DEFAULT_RESOLUTION = 15
@@ -351,7 +351,7 @@ class Processor:
     def start():
         script_dir = os.path.dirname(__file__)
         directory = os.path.join(script_dir, '../tmp/osmFiles/parquet')
-        file_path = select_osm_file(directory)
+        file_path = select_local_osm_file(directory)
         memory = os.getenv('SPARK_MEMORY') or '16g'
         start_time = time.time()
         spark = SparkSession.builder \

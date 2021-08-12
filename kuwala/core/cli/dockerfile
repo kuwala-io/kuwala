@@ -1,0 +1,10 @@
+FROM python:3.9.5
+
+COPY ./pipelines/common/python_utils /opt/app/pipelines/common/python_utils
+COPY ./core/cli /opt/app/core/cli
+
+WORKDIR /opt/app/core/cli
+RUN pip install -r requirements.txt
+
+WORKDIR /opt/app/core/cli/src
+ENTRYPOINT [ "python", "main.py" ]

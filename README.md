@@ -60,7 +60,7 @@ docker-compose run  population-density
 # Download OSM POI data
 docker-compose run osm-poi
 # Transform PBF to Parquet
-# Example: docker-compose run osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar tmp/osmFiles/pbf/europe/malta-latest.osm.pbf tmp/osmFiles/parquet/europe/malta-latest/osm-parquetizer
+# Example: docker-compose run osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar tmp/osmFiles/pbf/eu/mlt.osm.pbf tmp/osmFiles/parquet/eu/mlt/osm-parquetizer
 docker-compose run osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar <pbf-path> <parquet-path>
 # Process Parquet files
 docker-compose run osm-poi

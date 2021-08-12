@@ -11,7 +11,7 @@ sys.path.insert(0, '../')
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col, concat, lit, udf
 from pyspark.sql.types import ArrayType, StringType
-from python_utils.src.FileSelector import select_osm_file
+from python_utils.src.FileSelector import select_local_osm_file
 
 
 #  Sets uniqueness constraint for H3 indexes, OSM POIS, and POI categories
@@ -104,7 +104,7 @@ def add_osm_building_footprints(df: DataFrame):
 def import_pois_osm(limit=None):
     script_dir = os.path.dirname(__file__)
     directory = os.path.join(script_dir, '../tmp/kuwala/osmFiles/parquet')
-    file_path = select_osm_file(directory)
+    file_path = select_local_osm_file(directory)
 
     if not file_path:
         print('No OSM POI data available. You first need to run the osm-poi processing pipeline before loading it '

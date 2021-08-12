@@ -1,5 +1,6 @@
 FROM rappdw/docker-java-python
 
+COPY ./pipelines/common/python_utils /opt/common/python_utils
 COPY ./pipelines/population-density /opt/app
 
 WORKDIR /opt/app

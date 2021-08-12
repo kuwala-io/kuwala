@@ -2,6 +2,17 @@ version: '3.1'
 
 services:
 
+  cli:
+    container_name: cli
+    build:
+      context: .
+      dockerfile: ./core/cli/dockerfile
+    restart: always
+    volumes:
+      - ./tmp/kuwala:/opt/app/tmp/kuwala
+    profiles:
+      - network
+
   neo4j:
     container_name: neo4j
     build:
