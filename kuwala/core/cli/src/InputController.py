@@ -6,7 +6,8 @@ import sys
 sys.path.insert(0, '../../../pipelines/common/')
 sys.path.insert(0, '../')
 
-from python_utils.src.FileSelector import select_osm_file, select_population_file
+import python_utils.src.FileSelector as FileSelector
+from hdx.data.dataset import Dataset
 
 
 def load_pipelines():
@@ -38,18 +39,28 @@ def select_region(pipelines: [str]) -> [str, str]:
     continent = None
     country = None
     country_region = None
+    population_density_id = None
 
     if 'osm-poi' in pipelines or 'google-poi' in pipelines:
-        file = select_osm_file()
+        file = FileSelector.select_osm_file()
         continent = file['continent']
         country = file['country']
         country_region = file['country_region']
     elif 'population-density' in pipelines:
-        file = select_population_file()
+        file = FileSelector.select_population_file()
         continent = file['continent']
         country = file['country']
+        population_density_id = file['id']
 
     # TODO if both osm-poi and population density are selected, check if population data is available for the selected
     #   country
 
-    return continent, country, country_region
+    return continent, country, country_region, population_density_id
+
+
+def select_demographic_groups(d):
+    d = Dataset.read_from_hdx(d)
+    selected = FileSelector.select_demographic_groups(d)
+
+    # Apply json.dumps() twice to escape double quotes
+    return json.dumps(json.dumps(selected))

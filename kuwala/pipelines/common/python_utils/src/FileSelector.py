@@ -7,6 +7,7 @@ import pycountry_convert as pcc
 import requests.exceptions
 from fuzzywuzzy import fuzz
 from pyquery import PyQuery
+from hdx.data.dataset import Dataset
 from hdx.data.organization import Organization
 from hdx.hdx_configuration import Configuration
 from time import sleep
@@ -136,7 +137,7 @@ def select_osm_file():
     return None
 
 
-def select_population_file():
+def get_countries_with_population_data(return_country_code=False):
     Configuration.create(hdx_site='prod', user_agent='Kuwala', hdx_read_only=True)
     # The identifier is for Facebook. This shouldn't change from HDX's side in the future since it's an id.
     datasets = Organization.read_from_hdx(identifier='74ad0574-923d-430b-8d52-ad80256c4461').get_datasets(
@@ -150,11 +151,16 @@ def select_population_file():
                 datasets
             )
         ), key=lambda d: d['location'][0])
-    countries = list(map(lambda d: d['location'][0], datasets))
+    countries = list(map(lambda d: d['location'][0] if not return_country_code else d['country_code'][0], datasets))
+
+    return datasets, countries
+
+
+def select_population_file():
+    datasets, countries = get_countries_with_population_data()
     country = questionary \
         .select('For which country do you want to download the population data?', choices=countries) \
         .ask()
-
     dataset = datasets[countries.index(country)]
     country = dataset['country_code'][0].upper()
     country_alpha_2 = pcc.country_alpha3_to_country_alpha2(country)
@@ -165,3 +171,49 @@ def select_population_file():
     del dataset['country_code']
 
     return dataset
+
+
+def select_demographic_groups(d: Dataset):
+    resources = d.get_resources()
+
+    def get_type(name: str):
+        name = name.lower()
+
+        if ('women' in name) and ('reproductive' not in name):
+            return 'women'
+
+        if ('men' in name) and ('women' not in name):
+            return 'men'
+
+        if 'children' in name:
+            return 'children_under_five'
+
+        if 'youth' in name:
+            return 'youth_15_24'
+
+        if 'elderly' in name:
+            return 'elderly_60_plus'
+
+        if 'reproductive' in name:
+            return 'women_of_reproductive_age_15_49'
+
+        return 'total'
+
+    resources = list(filter(
+        lambda resource: resource['format'].lower() == 'csv',
+        map(
+            lambda resource: dict(
+                id=resource.get('id'),
+                format=resource.get('format'),
+                type=get_type(resource.get('name'))
+            ),
+            resources
+        )
+    ))
+    resources = list(map(lambda r: dict(id=r['id'], type=r['type']), resources))
+    resource_names = list(map(lambda r: r['type'], resources))
+    selected_resources = questionary \
+        .checkbox('Which demographic groups do you want to include?', choices=resource_names) \
+        .ask()
+
+    return list(filter(lambda resource: resource['type'] in selected_resources, resources))
