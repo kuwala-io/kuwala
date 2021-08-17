@@ -11,7 +11,8 @@ def add_constraints():
     Neo4jConnection.close_connection()
 
 
-# Create relationships from high resolution H3 indexes to lower resolution H3 indexes
+# Create relationships from high resolution
+# H3 indexes to lower resolution H3 indexes
 def connect_h3_indexes():
     start_time = time.time()
 

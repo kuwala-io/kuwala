@@ -66,13 +66,13 @@ services:
   google-poi-pipeline:
     container_name: google-poi-pipeline
     environment:
-      - MONGO_HOST=kuwala-pipelines_mongo_db
       - GOOGLE_POI_API_HOST=google-poi-api
     build:
       context: .
       dockerfile: ./pipelines/google-poi/src/pipeline/dockerfile
     volumes:
       - ./tmp/kuwala/googleFiles:/opt/pipeline/tmp/googleFiles
+      - ./tmp/kuwala/osmFiles:/opt/pipeline/tmp/osmFiles
     restart: always
     profiles:
       - network

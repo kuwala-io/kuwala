@@ -2,7 +2,7 @@ import logging
 import subprocess
 
 
-def run_command(command: [str]):
+def run_command(command: [str], exit_keyword=None):
     process = subprocess.Popen(command, stdout=subprocess.PIPE, universal_newlines=True, shell=True)
 
     while True:
@@ -10,6 +10,9 @@ def run_command(command: [str]):
 
         if len(line.strip()) > 0:
             print(line if 'Stage' not in line and '%' not in line else line.strip(), end='\r')
+
+        if exit_keyword is not None and exit_keyword in line:
+            return process
 
         return_code = process.poll()
 
@@ -39,7 +42,12 @@ def run_osm_poi_pipeline(url, continent, country, country_region):
 
 
 def run_google_poi_pipeline(continent, country, country_region):
-    logging.info('Running Google POI')
+    continent_arg = f'--continent={continent}' if continent else ''
+    country_arg = f'--country={country}' if country else ''
+    country_region_arg = f'--country_region={country_region}' if country_region else ''
+    scraping_api_process = run_command(f'docker-compose --profile google-poi-scraper up', exit_keyword='Running')
+    run_command([f'docker-compose run google-poi-pipeline {continent_arg} {country_arg} {country_region_arg}'])
+    scraping_api_process.terminate()
 
 
 def run_population_density_pipeline(continent, country, demographic_groups):
