@@ -12,9 +12,10 @@ if __name__ == '__main__':
     logging.info(f'Kuwala CLI is ready to rumble')
 
     pipelines = select_pipelines()
-    continent, country, country_region, population_density_id = select_region(pipelines)
-    demographic_groups = select_demographic_groups(population_density_id) if population_density_id is not None else None
+    selected_region = select_region(pipelines)
+    demographic_groups = select_demographic_groups(selected_region['population_density_id']) \
+        if selected_region['population_density_id'] is not None else None
 
     logging.info(f'Starting {str(", ").join(pipelines)} {"pipelines" if len(pipelines) > 1 else "pipeline"}')
 
-    run_pipelines(pipelines, continent, country, country_region, demographic_groups)
+    run_pipelines(pipelines, selected_region)

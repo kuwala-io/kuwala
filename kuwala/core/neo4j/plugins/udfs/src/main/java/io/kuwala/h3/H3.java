@@ -6,6 +6,7 @@ import org.neo4j.procedure.Description;
 import org.neo4j.procedure.Name;
 import org.neo4j.procedure.UserFunction;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -37,30 +38,48 @@ public class H3 {
             @Name("h3Index") String h3Index,
             @Name("resolution") Long resolution,
             @Name("radius") Long radius
-    ) throws IOException {
-        H3Core h3 = H3Core.newInstance();
-        String centerCell = transformIndexToResolution(h3Index, Math.toIntExact(resolution));
-        List<String> edges = h3.getH3UnidirectionalEdgesFromHexagon(centerCell);
-        Optional<Double> totalEdgeLength = edges.stream()
-                .map(edge -> h3.exactEdgeLength(edge, LengthUnit.m))
-                .reduce(Double::sum);
+    ) {
+        H3Core h3 = null;
+        String centerCell = null;
 
-        if (totalEdgeLength.isPresent()) {
-            double centerCellRadius = totalEdgeLength.get() / edges.size();
+        try {
+            h3 = H3Core.newInstance();
+            centerCell = transformIndexToResolution(h3Index, Math.toIntExact(resolution));
+        } catch (IOException | NumberFormatException e) {
+            e.printStackTrace();
 
-            if (centerCellRadius > radius) {
-                throw new IllegalArgumentException();
-            }
-
-            int ringSize = Math.toIntExact((long) Math.ceil(Math.floor(radius / centerCellRadius) / 2));
-
-            return h3.kRing(centerCell, ringSize);
+            return new ArrayList<>();
         }
 
-        throw new NullPointerException();
+        try {
+            List<String> edges = h3.getH3UnidirectionalEdgesFromHexagon(centerCell);
+            H3Core finalH = h3;
+
+            Optional<Double> totalEdgeLength = edges.stream()
+                    .map(edge -> finalH.exactEdgeLength(edge, LengthUnit.m))
+                    .reduce(Double::sum);
+
+            if (totalEdgeLength.isPresent()) {
+                double centerCellRadius = totalEdgeLength.get() / edges.size();
+
+                if (centerCellRadius > radius) {
+                    throw new IllegalArgumentException();
+                }
+
+                int ringSize = Math.toIntExact((long) Math.ceil(Math.floor(radius / centerCellRadius) / 2));
+
+                return h3.kRing(centerCell, ringSize);
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+
+            return new ArrayList<>();
+        }
+
+        return new ArrayList<>();
     }
 
-    private String transformIndexToResolution(String h3Index, int resolution) throws IOException {
+    private String transformIndexToResolution(String h3Index, int resolution) throws IOException, NumberFormatException {
         H3Core h3 = H3Core.newInstance();
         int indexResolution = h3.h3GetResolution(h3Index);
 

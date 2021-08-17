@@ -10,17 +10,21 @@ from python_utils.src.FileSelector import select_osm_file
 
 class Downloader:
     @staticmethod
-    def start():
-        file = select_osm_file()
+    def start(args):
+        file = None
+
+        if args.url is None:
+            file = select_osm_file()
+
         script_dir = os.path.dirname(__file__)
-        file_path = os.path.join(script_dir, f'../tmp/osmFiles/pbf/{file["continent"]}')
+        file_path = os.path.join(script_dir, f'../tmp/osmFiles/pbf/{args.continent or file["continent"]}')
 
-        if file['country']:
-            file_path += f'/{file["country"]}'
+        if args.country or (file and file['country']):
+            file_path += f'/{args.country or file["country"]}'
 
-        if file['country_region']:
-            file_path += f'/{file["country_region"]}'
+        if args.country_region or (file and file['country_region']):
+            file_path += f'/{args.country_region or file["country_region"]}'
 
         file_path += '.osm.pbf'
 
-        download_file(url=file['url'], path=file_path)
+        download_file(url=args.url or file['url'], path=file_path)

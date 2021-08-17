@@ -1,5 +1,4 @@
 import argparse
-
 from Downloader import Downloader
 from Processor import Processor
 
