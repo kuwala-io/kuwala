@@ -1,10 +1,10 @@
 FROM rappdw/docker-java-python
 
-COPY ./pipelines/common/python_utils /opt/common/python_utils
-COPY ./pipelines/google-poi /opt/pipeline
+COPY ./common/python_utils /opt/common/python_utils
+COPY ./pipelines/google-poi /opt/pipelines/app
 
-WORKDIR /opt/pipeline
+WORKDIR /opt/pipelines/app
 RUN pip install -r requirements.txt
 
-WORKDIR /opt/pipeline/src/pipeline
+WORKDIR /opt/pipelines/app/src/pipeline
 ENTRYPOINT [ "python", "main.py" ]

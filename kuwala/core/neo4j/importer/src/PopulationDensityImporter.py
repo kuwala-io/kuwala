@@ -28,7 +28,7 @@ def add_population(df: DataFrame):
                 THEN event.women_of_reproductive_age_15_49 ELSE 'null' END
     '''
 
-    Neo4jConnection.spark_send_query(df, query)
+    Neo4jConnection.write_df_to_neo4j_with_override(df, query)
 
 
 def import_population_density(limit=None):

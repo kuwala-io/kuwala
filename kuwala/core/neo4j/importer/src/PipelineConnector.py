@@ -1,8 +1,9 @@
 import Neo4jConnection as Neo4jConnection
 import time
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import col, concat, udf, when
-from pyspark.sql.types import LongType, StringType
+from pyspark.sql.functions import col, concat, when
+from pyspark.sql.types import LongType
+from python_utils.src.spark_udfs import build_poi_id_based_on_confidence
 
 
 def add_constraints():
@@ -55,7 +56,7 @@ def add_pois(df):
         MERGE (p)-[:LOCATED_AT]->(h)
     '''
 
-    Neo4jConnection.spark_send_query(df, query)
+    Neo4jConnection.write_df_to_neo4j_with_override(df, query)
 
 
 def connect_osm_pois(df):
@@ -66,7 +67,7 @@ def connect_osm_pois(df):
         MERGE (po)-[:BELONGS_TO]->(p)
     '''
 
-    Neo4jConnection.spark_send_query(df, query)
+    Neo4jConnection.write_df_to_neo4j_with_override(df, query)
 
 
 def connect_google_pois(df):
@@ -77,7 +78,7 @@ def connect_google_pois(df):
         MERGE (pg)-[:BELONGS_TO { confidence: event.confidence }]->(p)
     '''
 
-    Neo4jConnection.spark_send_query(df, query)
+    Neo4jConnection.write_df_to_neo4j_with_override(df, query)
 
 
 # Create one single POI node combining OSM and Google
@@ -93,15 +94,11 @@ def connect_pois(df_osm: DataFrame, df_google: DataFrame):
         .withColumnRenamed('id', 'googleId') \
         .withColumnRenamed('h3Index', 'h3IndexGoogle')
 
-    @udf(returnType=StringType())
-    def get_poi_id(confidence, h3_index_google, h3_index_osm, osm_id):
-        if confidence and confidence >= 0.9:
-            return f'{h3_index_google}_{osm_id}'
-
-        return f'{h3_index_osm}_{osm_id}'
-
     df_pois = df_osm.join(df_google, on=['osmId'], how='left') \
-        .withColumn('id', get_poi_id(col('confidence'), col('h3IndexGoogle'), col('h3IndexOsm'), col('osmId'))) \
+        .withColumn(
+            'id',
+            build_poi_id_based_on_confidence(col('confidence'), col('h3IndexGoogle'), col('h3IndexOsm'), col('osmId'))
+        ) \
         .withColumn('h3Index', when(col('confidence') >= 0.9, col('h3IndexGoogle')).otherwise(col('h3IndexOsm')))
     pois = df_pois.select('id', 'h3Index').distinct()
     osm_pois = df_pois.select('id', 'osmId')

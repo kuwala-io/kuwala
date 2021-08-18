@@ -1,18 +1,12 @@
 import argparse
-import h3
 import json
 import moment
 import os
-import sys
-
-sys.path.insert(0, '../../../common/')
-sys.path.insert(0, '../../')
-
 from geojson import Polygon
 from python_utils.src.h3_utils import polyfill_polygon
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import array_contains, col, concat_ws, lit, udf
-from pyspark.sql.types import StringType
+from pyspark.sql.functions import array_contains, col, concat_ws, lit
+from python_utils.src.spark_udfs import h3_to_parent
 
 
 def connect_to_mongo(database, collection):
@@ -46,15 +40,7 @@ def generate_search_strings(limit=None):
             polygon_resolution = int(args.polygon_resolution)
 
         polygon_cells = polyfill_polygon(polygon, resolution=polygon_resolution)
-
-        @udf(returnType=StringType())
-        def to_polygon_resolution(h3_index: str):
-            if polygon_resolution == 15:
-                return h3_index
-
-            return h3.h3_to_parent(h3_index, polygon_resolution)
-
-        df = df.withColumn('h3Polygon', to_polygon_resolution(col('h3Index')))
+        df = df.withColumn('h3Polygon', h3_to_parent(col('h3Index'), lit(polygon_resolution)))
         df = df.filter(df.h3Polygon.isin(polygon_cells))
 
     df = df.filter(df.address.isNotNull()).select('osmId', 'type', 'name', 'h3Index', 'address.*', 'categories')

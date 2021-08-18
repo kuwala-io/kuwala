@@ -1,11 +1,10 @@
-### 1. Get Linux
 FROM rappdw/docker-java-python
 
-COPY ./pipelines/common/python_utils /opt/pipelines/common/python_utils
-COPY ./core /opt/app
+COPY ./common/python_utils /opt/common/python_utils
+COPY ./core/neo4j /opt/core/app
 
-WORKDIR /opt/app/neo4j/importer
+WORKDIR /opt/core/app/importer
 RUN pip install -r requirements.txt
 
-WORKDIR /opt/app/neo4j/importer/src
+WORKDIR /opt/core/app/importer/src
 ENTRYPOINT [ "python", "-u", "main.py" ]

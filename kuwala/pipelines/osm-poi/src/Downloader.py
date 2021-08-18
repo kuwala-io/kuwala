@@ -2,11 +2,6 @@ import json
 import os
 import urllib.error
 import questionary
-import sys
-
-sys.path.insert(0, '../../common/')
-sys.path.insert(0, '../')
-
 from pyquery import PyQuery
 from python_utils.src.FileDownloader import download_file
 

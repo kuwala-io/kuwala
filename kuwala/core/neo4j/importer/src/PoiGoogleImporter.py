@@ -47,7 +47,7 @@ def add_google_pois(df: DataFrame):
         MERGE (pg)-[:BELONGS_TO]->(pc)
     '''
 
-    Neo4jConnection.spark_send_query(df, query)
+    Neo4jConnection.write_df_to_neo4j_with_override(df, query)
 
 
 def add_opening_hours(df: DataFrame):
@@ -60,7 +60,7 @@ def add_opening_hours(df: DataFrame):
         MERGE (pg)-[:HAS { date: event.date }]->(poh)
     '''
 
-    Neo4jConnection.spark_send_query(df, query)
+    Neo4jConnection.write_df_to_neo4j_with_override(df, query)
 
 
 def add_closed_tags(df: DataFrame):
@@ -79,7 +79,7 @@ def add_closed_tags(df: DataFrame):
         MERGE (pg)-[:IS { date: event.date }]->(pc)
     '''
 
-    Neo4jConnection.spark_send_query(df, query)
+    Neo4jConnection.write_df_to_neo4j_with_override(df, query)
 
 
 def add_ratings(df: DataFrame):
@@ -89,7 +89,7 @@ def add_ratings(df: DataFrame):
         MERGE (pg)-[:HAS { numberOfReviews: event.numberOfReviews, date: event.date }]->(pr)
     '''
 
-    Neo4jConnection.spark_send_query(df, query)
+    Neo4jConnection.write_df_to_neo4j_with_override(df, query)
 
 
 def add_price_levels(df: DataFrame):
@@ -99,7 +99,7 @@ def add_price_levels(df: DataFrame):
         MERGE (pg)-[:HAS { date: event.date }]->(ppl)
     '''
 
-    Neo4jConnection.spark_send_query(df, query)
+    Neo4jConnection.write_df_to_neo4j_with_override(df, query)
 
 
 def add_popularities(df: DataFrame):
@@ -108,7 +108,7 @@ def add_popularities(df: DataFrame):
         MERGE (pg)-[:HAS { timestamp: event.timestamp }]->(:PoiPopularityAverage { value: event.popularity })
     '''
 
-    Neo4jConnection.spark_send_query(df, query)
+    Neo4jConnection.write_df_to_neo4j_with_override(df, query)
 
 
 def add_waiting_times(df: DataFrame):
@@ -118,7 +118,7 @@ def add_waiting_times(df: DataFrame):
         MERGE (pg)-[:HAS { timestamp: event.timestamp }]->(pwt)
     '''
 
-    Neo4jConnection.spark_send_query(df, query)
+    Neo4jConnection.write_df_to_neo4j_with_override(df, query)
 
 
 def add_spending_times(df: DataFrame):
@@ -129,7 +129,7 @@ def add_spending_times(df: DataFrame):
         MERGE (pg)-[:HAS { date: event.date }]->(pst)
     '''
 
-    Neo4jConnection.spark_send_query(df, query)
+    Neo4jConnection.write_df_to_neo4j_with_override(df, query)
 
 
 def import_pois_google(limit=None):
