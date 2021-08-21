@@ -1,0 +1,3 @@
+[submodule "kuwala/pipelines/osm-poi/osm-parquetizer"]
+	path = kuwala/pipelines/osm-poi/osm-parquetizer
+	url = https://github.com/kuwala-io/osm-parquetizer.git

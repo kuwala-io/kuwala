@@ -2,19 +2,6 @@ version: '3.1'
 
 services:
 
-  mongo:
-    container_name: kuwala-pipelines_mongo_db
-    image: mongo:4
-    command: --dbpath /data/db --setParameter cursorTimeoutMillis=10800000
-    restart: always
-    ports:
-      - '27017:27017'
-    volumes:
-      - ./tmp/kuwala/db/mongo/data/db:/data/db
-    profiles:
-      - core
-      - network
-  
   neo4j:
     container_name: neo4j
     build:
@@ -24,6 +11,8 @@ services:
     environment: 
       - NEO4J_AUTH=none
       - NEO4JLABS_PLUGINS=["apoc"]
+      - NEO4J_dbms_memory_heap_initial__size=512m
+      - NEO4J_dbms_memory_heap_max__size=3G
     ports:
       - '7474:7474'
       - '7687:7687'
@@ -31,15 +20,6 @@ services:
       - ./tmp/kuwala/db/neo4j/data:/data
     profiles:
       - core
-      - network
-
-  mongo-express:
-    image: mongo-express:latest
-    restart: always
-    depends_on: [mongo]
-    ports:
-      - '8081:8081'
-    profiles:
       - network
 
   torproxy:
@@ -83,7 +63,6 @@ services:
     volumes:
       - ./tmp/kuwala/googleFiles:/opt/pipeline/tmp/googleFiles
     restart: always
-    depends_on: [mongo]
     profiles:
       - network
 
@@ -98,28 +77,32 @@ services:
     volumes:
       - ./tmp/kuwala:/opt/app/tmp/kuwala
     restart: always
-    depends_on: [mongo, neo4j]
+    depends_on: [neo4j]
     profiles:
       - network
 
-  # docker-compose run  --service-ports osm-poi start-processing:local
-  # docker-compose run  --service-ports osm-poi start-api:local
+  # docker-compose run osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar <pbf-path> <parquet-path>
+  osm-parquetizer:
+    build:
+      context: .
+      dockerfile: ./pipelines/osm-poi/osm-parquetizer/dockerfile
+    restart: always
+    volumes:
+      - ./tmp/kuwala/osmFiles:/opt/app/tmp/osmFiles
+    profiles:
+      - network
+
+  # docker-compose run osm-poi
   osm-poi:
-    environment: 
-      - MONGO_HOST=kuwala-pipelines_mongo_db
     build:
       context: .
       dockerfile: ./pipelines/osm-poi/dockerfile
     restart: always
-    depends_on: [mongo]
-    ports:
-      - '3001:3001'
     volumes:
       - ./tmp/kuwala/osmFiles:/opt/app/tmp/osmFiles
-    stdin_open: true # docker run -i
-    tty: true        # docker run -t
     profiles:
       - network
+
 
   # docker-compose run  population-density
   population-density:

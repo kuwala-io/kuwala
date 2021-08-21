@@ -1,11 +1,21 @@
 import Neo4jConnection as Neo4jConnection
+import time
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import concat
+from pyspark.sql.functions import col, concat, when
 from pyspark.sql.types import LongType
+from python_utils.src.spark_udfs import build_poi_id_based_on_confidence
+
+
+def add_constraints():
+    Neo4jConnection.connect_to_graph()
+    Neo4jConnection.query_graph('CREATE CONSTRAINT poi IF NOT EXISTS ON (p:Poi) ASSERT p.id IS UNIQUE')
+    Neo4jConnection.close_connection()
 
 
 # Create relationships from high resolution H3 indexes to lower resolution H3 indexes
 def connect_h3_indexes():
+    start_time = time.time()
+
     Neo4jConnection.connect_to_graph()
 
     query_resolutions = '''
@@ -33,40 +43,72 @@ def connect_h3_indexes():
 
     Neo4jConnection.close_connection()
 
+    end_time = time.time()
+
+    print(f'Connected H3 indexes in {round(end_time - start_time)} s')
+
+
+def add_pois(df):
+    query = '''
+        MERGE (p:Poi { id: event.id })
+        WITH event, p
+        MATCH (h:H3Index { h3Index: event.h3Index })
+        MERGE (p)-[:LOCATED_AT]->(h)
+    '''
+
+    Neo4jConnection.write_df_to_neo4j_with_override(df, query)
+
+
+def connect_osm_pois(df):
+    query = '''
+        MATCH (p:Poi { id: event.id })
+        WITH event, p
+        MATCH (po:PoiOSM { id: event.osmId })
+        MERGE (po)-[:BELONGS_TO]->(p)
+    '''
+
+    Neo4jConnection.write_df_to_neo4j_with_override(df, query)
+
+
+def connect_google_pois(df):
+    query = '''
+        MATCH (p:Poi { id: event.id })
+        WITH event, p
+        MATCH (pg:PoiGoogle { id: event.googleId })
+        MERGE (pg)-[:BELONGS_TO { confidence: event.confidence }]->(p)
+    '''
+
+    Neo4jConnection.write_df_to_neo4j_with_override(df, query)
+
 
 # Create one single POI node combining OSM and Google
 def connect_pois(df_osm: DataFrame, df_google: DataFrame):
-    df_osm = df_osm.select('id', 'h3Index').withColumnRenamed('h3Index', 'h3IndexOsm').withColumnRenamed('id', 'osmId')
+    start_time = time.time()
+    df_osm = df_osm.select('id', 'h3_index') \
+        .withColumnRenamed('h3_index', 'h3IndexOsm') \
+        .withColumnRenamed('id', 'osmId')
     df_google = df_google \
         .withColumn('osmId', df_google['osmId'].cast(LongType())) \
         .withColumn('osmId', concat('type', 'osmId')) \
         .select('id', 'osmId', 'confidence', 'h3Index') \
         .withColumnRenamed('id', 'googleId') \
         .withColumnRenamed('h3Index', 'h3IndexGoogle')
-    df_pois = df_osm.join(df_google, on=['osmId'], how='left')
 
-    Neo4jConnection.connect_to_graph()
-    Neo4jConnection.query_graph('CREATE CONSTRAINT poi IF NOT EXISTS ON (p:Poi) ASSERT p.id IS UNIQUE')
+    df_pois = df_osm.join(df_google, on=['osmId'], how='left') \
+        .withColumn(
+            'id',
+            build_poi_id_based_on_confidence(col('confidence'), col('h3IndexGoogle'), col('h3IndexOsm'), col('osmId'))
+        ) \
+        .withColumn('h3Index', when(col('confidence') >= 0.9, col('h3IndexGoogle')).otherwise(col('h3IndexOsm')))
+    pois = df_pois.select('id', 'h3Index').distinct()
+    osm_pois = df_pois.select('id', 'osmId')
+    google_pois = df_pois.filter(col('confidence').isNotNull()).select('id', 'confidence', 'googleId')
 
-    query = '''
-        // Create Poi nodes
-        UNWIND $rows AS row
-        WITH 
-            CASE WHEN row.confidence >= 0.9 
-                THEN row.h3IndexGoogle + '_' + row.osmId 
-                ELSE row.h3IndexOsm + '_' + row.osmId 
-                END AS id,
-            row
-        MERGE (p:Poi { id: id })
-        WITH p, row
-        MATCH (po:PoiOSM { id: row.osmId })
-        MERGE (po)-[:BELONGS_TO]->(p)
-        WITH CASE WHEN row.confidence >= 0.9 THEN row.h3IndexGoogle ELSE row.h3IndexOsm END as h3Index, p, row
-        MATCH (h:H3Index { h3Index: h3Index })
-        MERGE (p)-[:LOCATED_AT]->(h)
-        WITH p, row
-        MATCH (pg:PoiGoogle { id: row.googleId })
-        MERGE (pg)-[:BELONGS_TO { confidence: row.confidence }]->(p)
-    '''
+    add_constraints()
+    add_pois(pois)
+    connect_osm_pois(osm_pois)
+    connect_google_pois(google_pois)
 
-    df_pois.foreachPartition(lambda p: Neo4jConnection.batch_insert_data(p, query))
+    end_time = time.time()
+
+    print(f'Connected POIs in {round(end_time - start_time)} s')

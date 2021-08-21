@@ -19,7 +19,7 @@ Docker images will only be built once when you run the `init.sh` script, so new 
 your local unless you explicitly run the build command below.
 
 ```zsh
-docker-compose build osm-poi population-density google-poi-api google-poi-pipeline neo4j-importer
+docker-compose build osm-poi osm-parquetizer population-density google-poi-api google-poi-pipeline neo4j-importer
 ```
 
 Now simply run the below init script to spawn the essential docker components our pipelines rely on. Please note that 

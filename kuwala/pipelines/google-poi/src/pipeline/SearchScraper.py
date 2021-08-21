@@ -1,4 +1,3 @@
-import h3
 import moment
 import os
 import pandas
@@ -6,15 +5,14 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import requests
 from func_timeout import func_set_timeout, FunctionTimedOut
-from fuzzywuzzy import fuzz
 from pandas import DataFrame
 from pathlib import Path
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, udf
-from pyspark.sql.types import DoubleType, IntegerType
+from pyspark.sql.functions import col, lit
+from python_utils.src.spark_udfs import get_confidence_based_h3_and_name_distance, get_h3_distance, get_string_distance
 from time import sleep
 
-max_h3_distance = 500
+MAX_H3_DISTANCE = 500
 
 
 class SearchScraper:
@@ -38,44 +36,11 @@ class SearchScraper:
 
             return None
 
-    """Get number of H3 cells in between to given cells of the same resolution"""
-    @staticmethod
-    @udf(returnType=IntegerType())
-    def get_h3_distance(h1: str, h2: str):
-        try:
-            # noinspection PyUnresolvedReferences
-            return h3.h3_distance(h1, h2)
-        except h3.H3ValueError:
-            return max_h3_distance
-
-    """Get a similarity score for the Google name compared to the OSM name"""
-    @staticmethod
-    @udf(returnType=IntegerType())
-    def get_name_distance(osm_name: str, query: str, google_name: str):
-        return fuzz.token_set_ratio(osm_name, google_name) if osm_name else fuzz.token_set_ratio(query, google_name)
-
-    """Calculate the confidence of a Google result based on the name and H3 distance"""
-    @staticmethod
-    @udf(returnType=DoubleType())
-    def get_confidence(h3_distance: int, name_distance: int):
-        def get_h3_confidence(d):
-            if d <= 25:
-                return 1
-
-            return 1 - d / max_h3_distance if d < max_h3_distance else 0
-
-        def get_name_confidence(d):
-            return d / 100
-
-        h3_confidence = get_h3_confidence(h3_distance)
-        name_confidence = get_name_confidence(name_distance)
-
-        return h3_confidence * (2 / 3) + name_confidence * (1 / 3)
-
     """Match the queries that have been sent to the received results"""
     @staticmethod
     def match_search_results(directory: str, file_name: str):
-        spark = SparkSession.builder.appName('google-poi').config('spark.driver.memory', '16g').getOrCreate()
+        memory = os.getenv('SPARK_MEMORY') or '16g'
+        spark = SparkSession.builder.appName('google-poi').config('spark.driver.memory', memory).getOrCreate()
         df_str = spark.read.parquet(directory + file_name)
         path_results = directory.replace('Strings', 'Results') + file_name.replace('strings', 'results')
         df_res = spark.read.parquet(path_results)
@@ -88,10 +53,13 @@ class SearchScraper:
             .withColumn('googleName', col('data.name')) \
             .withColumn(
                 'nameDistance',
-                SearchScraper.get_name_distance(col('osmName'), col('df_str.query'), col('googleName'))
+                get_string_distance(col('osmName') | col('df_str.query'), col('googleName'))
             ) \
-            .withColumn('h3Distance', SearchScraper.get_h3_distance(col('h3Index'), col('data.h3Index'))) \
-            .withColumn('confidence', SearchScraper.get_confidence(col('h3Distance'), col('nameDistance'))) \
+            .withColumn('h3Distance', get_h3_distance(col('h3Index'), col('data.h3Index'), lit(MAX_H3_DISTANCE))) \
+            .withColumn(
+                'confidence',
+                get_confidence_based_h3_and_name_distance(col('h3Distance'), col('nameDistance'), lit(MAX_H3_DISTANCE))
+            ) \
             .select('osmId', 'type', 'confidence', 'data.id')
 
         df_res.write.parquet(path_results.replace('results', 'results_matched'))
@@ -99,7 +67,8 @@ class SearchScraper:
     """Match the POI ids that have been sent to the received results"""
     @staticmethod
     def match_poi_results(directory: str, file_name: str):
-        spark = SparkSession.builder.appName('google-poi').config('spark.driver.memory', '16g').getOrCreate()
+        memory = os.getenv('SPARK_MEMORY') or '16g'
+        spark = SparkSession.builder.appName('google-poi').config('spark.driver.memory', memory).getOrCreate()
         df_res = spark.read.parquet(
             directory.replace('Strings', 'Results') + file_name.replace('strings', 'results_matched')
         )

@@ -6,7 +6,6 @@ import org.joda.time.format.DateTimeFormatter;
 import org.neo4j.procedure.Description;
 import org.neo4j.procedure.Name;
 import org.neo4j.procedure.UserFunction;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -18,20 +17,13 @@ public class Time {
     public double durationHours(
             @Name("start") String start,
             @Name("end") String end
-    ) {
-        double duration = 0.0;
+    ) throws ParseException {
+        SimpleDateFormat inFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
+        Date startDate = inFormat.parse(start);
+        Date endDate = inFormat.parse(end);
+        Duration d = Duration.between(startDate.toInstant(), endDate.toInstant());
 
-        try {
-            SimpleDateFormat inFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
-            Date startDate = inFormat.parse(start);
-            Date endDate = inFormat.parse(end);
-            Duration d = Duration.between(startDate.toInstant(), endDate.toInstant());
-            duration = d.toHours();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        return duration;
+        return d.toHours();
     }
 
     @UserFunction

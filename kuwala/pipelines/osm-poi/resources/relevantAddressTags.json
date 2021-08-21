@@ -1,0 +1,20 @@
+[
+  "addr:housenumber",
+  "addr:street",
+  "addr:postcode",
+  "addr:city",
+  "addr:country",
+  "addr:full",
+  "addr:neighbourhood",
+  "addr:suburb",
+  "addr:district",
+  "addr:province",
+  "addr:state",
+  "addr:housename",
+  "addr:place",
+  "addr:block",
+  "addr:floor",
+  "addr:level",
+  "addr:flats",
+  "addr:unit"
+]

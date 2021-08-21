@@ -19,75 +19,42 @@ we also consolidate the OSM tags into separate objects.
 
 ## Run
 
-Proceed only if you followed the initial steps to initialize the main components mentioned here:
-[`Initialize Main Components`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/)
+### Download PBF files
 
 ```zsh
-docker-compose run  --service-ports osm-poi start-processing:local
+docker-compose run osm-poi
+Creating network "kuwala_default" with the default driver
+Creating kuwala_osm-poi_run ... done
+? What do you want to do? Download
+? Which continent are you interested in? europe
+? Which region are you interested in? malta
 ```
 
-Follow the prompts to download, process and write data for a continent, country or region [2]
-
-***Alternative***: You can also download .osm.pbf files directly from [Geofabrik](http://download.geofabrik.de)
-and place them in an arbitrary folder under `./tmp/kuwala/osmFiles` and follow [1] instead.
-
-```console
-[1] Existing download
-[2] New download
-[0] Cancel
-
-Do you want to make a new download? [1, 2, 0]: 2
-
-[1] africa
-[2] antarctica
-[3] asia
-[4] australia-oceania
-[5] central-america
-[6] europe
-[7] north-america
-[8] south-america
-[0] Cancel
-
-Which continent are you interested in? [1...8 / 0]: 
-
-```
-
----
-
-## Usage
-
-Run the app locally.
-
-(Data can only be returned for regions that have previously been downloaded and processed.)
+### Parse PBF files to Parquet
 
 ```zsh
-docker-compose run  --service-ports osm-poi start-api:local
+docker-compose run osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar <pbf-path> <parquet-path>
 ```
 
-### API Calls
+The `pbf-path` starts with `tmp/osmFiles/pbf` and is followed by the path for the region to the `.osm.pbf` file.
 
-#### Get POIs within Radius
-Request Method: <span style="color:green">**GET**</span><br/>
-URL: `/radius/:radius`<br/>
-Query Params (**required**): `h3_index` ***OR*** `lat, lng`
+The `parquet-path` starts with `tmp/osmFiles/parquet`, is followed by the path for the region without the `.osm.pbf`
+extension and ends with `/osm-parquetizer`.
 
-*Example*: `localhost:3001/radius/50?lat=52.5291472&lng=13.4015439`
+For example:
 
-#### Get POIs within Polygon
-Request Method: <span style="color:green">**GET**</span><br/>
-URL: `/geojson`<br/>
-Request Body (**required**): `GeoJSON` format <br/>
+```zsh
+docker-compose run osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar tmp/osmFiles/pbf/europe/malta-latest.osm.pbf tmp/osmFiles/parquet/europe/malta-latest/osm-parquetizer
+```
 
-*Example*: `localhost:3001/geojson`<br>
-Request Body:
+### Process Parquet files
 
-```json 
-    {
-        "geometry": {
-            "type": "Polygon",
-            "coordinates": […]
-        }
-    }
+```zsh
+docker-compose run osm-poi
+Creating kuwala_osm-poi_run ... done
+? What do you want to do? Process
+? Which continent are you interested in? europe
+? Which country are you interested in? malta-latest
 ```
 
 ---

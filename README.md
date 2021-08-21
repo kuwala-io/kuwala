@@ -28,7 +28,7 @@ will also be possible to query the graph through a GraphQL endpoint.
 
 ---
 
-### Quickstart with Docker
+### Quickstart with Docker (OSM and population data)
 
 #### Prerequisites
 
@@ -46,20 +46,10 @@ cd kuwala
 2. Build images
 
 ```zsh
-docker-compose build osm-poi population-density google-poi-api google-poi-pipeline neo4j neo4j-importer
+docker-compose build osm-poi osm-parquetizer population-density google-poi-api google-poi-pipeline neo4j neo4j-importer
 ```
 
-3. Start databases
-
-```zsh 
-chmod +x ./scripts/init.sh
-```
-
-```zsh 
-./scripts/init.sh
-```
-
-4. Run pipelines to download and process data (in a new terminal window)
+3. Run pipelines to download and process data (in a new terminal window)
 
 ```zsh 
 # Process population data
@@ -67,11 +57,23 @@ docker-compose run  population-density
 ```
 
 ```zsh 
-# Process OSM POI data
-docker-compose run  --service-ports osm-poi start-processing:local
+# Download OSM POI data
+docker-compose run osm-poi
+# Transform PBF to Parquet
+# Example: docker-compose run osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar tmp/osmFiles/pbf/europe/malta-latest.osm.pbf tmp/osmFiles/parquet/europe/malta-latest/osm-parquetizer
+docker-compose run osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar <pbf-path> <parquet-path>
+# Process Parquet files
+docker-compose run osm-poi
 ```
 
-5. Load data into the graph
+4. Start Neo4j
+
+```zsh 
+# Start Neo4j
+docker-compose --profile core up
+``` 
+
+5. Load data into the graph (in separate terminal window)
 
 ```zsh 
 # Load data into graph database

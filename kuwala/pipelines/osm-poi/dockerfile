@@ -1,23 +1,10 @@
-FROM node:alpine
+FROM rappdw/docker-java-python
 
-COPY ./pipelines/common/js_utils /opt/common/js_utils
-COPY ./pipelines/osm-poi /opt/app
+COPY ./common/python_utils /opt/common/python_utils
+COPY ./pipelines/osm-poi /opt/pipelines/app
 
-# Setting up a virtual build env in order to keep the image small
-RUN apk add --no-cache --virtual .gyp \
-        g++ gcc libgcc libstdc++ linux-headers make python3 bash git cmake && \
-            npm install --quiet node-gyp -g
+WORKDIR /opt/pipelines/app
+RUN pip install -r requirements.txt
 
-#Setting up 
-WORKDIR /opt/common/js_utils
-RUN npm ci
-
-WORKDIR /opt/app
-RUN npm ci
-
-# Deleting the virtual build env in order to keep the image small
-RUN apk del .gyp
-
-WORKDIR /opt/app
-
-ENTRYPOINT ["npm","run"]
+WORKDIR /opt/pipelines/app/src
+ENTRYPOINT [ "python", "main.py" ]
