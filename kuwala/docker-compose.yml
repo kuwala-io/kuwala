@@ -22,6 +22,20 @@ services:
       - core
       - network
 
+  jupyter:
+    container_name: jupyter
+    build:
+      context: .
+      dockerfile: ./core/jupyter/docker/dockerfile
+    restart: always
+    environment: 
+      - NEO4J_HOST=bolt://neo4j:7687
+    ports:
+      - '8888:8888'
+    profiles:
+      - core
+      - network
+
   torproxy:
     container_name: kuwala-pipelines_torproxy
     image: dperson/torproxy:latest
