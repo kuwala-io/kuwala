@@ -14,7 +14,7 @@ def add_constraints():
     Neo4jConnection.close_connection()
 
 
-def start():
+def start(args):
     memory = os.getenv('SPARK_MEMORY') or '16g'
     SparkSession.builder \
         .config('spark.driver.memory', memory) \
@@ -22,9 +22,9 @@ def start():
         .getOrCreate()
 
     add_constraints()
-    import_population_density()
+    import_population_density(args)
 
-    df_pois_osm = import_pois_osm()
+    df_pois_osm = import_pois_osm(args)
     df_pois_google = import_pois_google()
 
     connect_pipelines(df_pois_osm, df_pois_google)

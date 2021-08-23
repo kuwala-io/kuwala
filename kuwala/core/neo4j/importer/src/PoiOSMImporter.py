@@ -38,10 +38,9 @@ def add_poi_categories():
 
 
 def add_osm_pois(df: DataFrame):
-    query = '''
-        // Create PoiOSM nodes
+    query_poi_osm = '''
         MERGE (po:PoiOSM { id: event.id })
-        SET 
+        ON CREATE SET 
             po.osmId = event.osmId,
             po.type = event.type,
             po.name = event.name, 
@@ -63,14 +62,16 @@ def add_osm_pois(df: DataFrame):
             po.level = event.level,
             po.flats = event.flats,
             po.unit = event.unit
-
-        // Create H3 index nodes
+    '''
+    query_h3_indexes = 'MERGE (h:H3Index { h3Index: event.h3_index, resolution: event.resolution })'
+    query_located_at = '''
+        MATCH (po:PoiOSM { id: event.id })
         WITH event, po
-        MERGE (h:H3Index { h3Index: event.h3_index })
-        ON CREATE SET h.resolution = event.resolution
+        MATCH (h:H3Index { h3Index: event.h3_index })
         MERGE (po)-[:LOCATED_AT]->(h)
-
-        // Create relationship to PoiCategories
+    '''
+    query_belongs_to = '''
+        MATCH (po:PoiOSM { id: event.id })
         WITH event, po
         MATCH (pc:PoiCategory) 
         WHERE pc.name IN event.categories
@@ -85,32 +86,44 @@ def add_osm_pois(df: DataFrame):
         df = df.select('*', 'details.*')
         df = df.drop('details')  # Necessary to drop because batch insert can only process elementary data types
 
-    Neo4jConnection.spark_send_query(df, query)
+    Neo4jConnection.spark_send_query(df, query_poi_osm)
+    Neo4jConnection.spark_send_query(df.filter(col('h3_index').isNotNull()).sort('h3_index'), query_h3_indexes)
+    Neo4jConnection.spark_send_query(df.filter(col('h3_index').isNotNull()).sort('h3_index'), query_located_at)
+    Neo4jConnection.spark_send_query(df.repartition(1), query_belongs_to)
 
 
 def add_osm_building_footprints(df: DataFrame):
-    query = '''
-        MATCH (po:PoiOSM { id: event.id })
-        WITH po, event
+    query_building_footprint = '''
         MERGE (pbf:PoiBuildingFootprintOSM { id: event.id })
         ON CREATE SET pbf.geoJson = event.geo_json
+    '''
+    query_relationships = '''
+        MATCH (po:PoiOSM { id: event.id })
+        WITH po, event
+        MATCH (pbf:PoiBuildingFootprintOSM { id: event.id })
         WITH po, pbf
         MERGE (po)-[:HAS]->(pbf)
     '''
 
-    Neo4jConnection.spark_send_query(df, query)
+    Neo4jConnection.spark_send_query(df, query_building_footprint)
+    Neo4jConnection.spark_send_query(df, query_relationships)
 
 
-def import_pois_osm(limit=None):
+def import_pois_osm(args, limit=None):
     script_dir = os.path.dirname(__file__)
     directory = os.path.join(script_dir, '../tmp/kuwala/osmFiles/parquet')
-    file_path = select_local_osm_file(directory)
+    continent = args.continent
 
-    if not file_path:
-        print('No OSM POI data available. You first need to run the osm-poi processing pipeline before loading it '
-              'into the graph')
+    if continent is None:
+        file_path = select_local_osm_file(directory)
+    else:
+        file_path = f'{directory}/{continent}'
 
-        return
+        if args.country:
+            file_path += f'/{args.country}'
+
+        if args.country_region:
+            file_path += f'/{args.country_region}'
 
     start_time = time.time()
 
@@ -120,7 +133,7 @@ def import_pois_osm(limit=None):
     Neo4jConnection.close_connection()
 
     spark = SparkSession.builder.appName('neo4j_importer_osm-poi').getOrCreate().newSession()
-    df = spark.read.parquet(f'{file_path}/kuwala.parquet')
+    df = spark.read.parquet(f'{file_path}/kuwala.parquet').sort('id')
 
     if limit is not None:
         df = df.limit(limit)

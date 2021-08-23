@@ -1,11 +1,10 @@
 import h3
 import Neo4jConnection as Neo4jConnection
 import os
-import pycountry
-import questionary
 import time
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import lit
+from python_utils.src.FileSelector import select_local_country
 
 
 def add_population(df: DataFrame):
@@ -28,30 +27,27 @@ def add_population(df: DataFrame):
                 THEN event.women_of_reproductive_age_15_49 ELSE 'null' END
     '''
 
-    Neo4jConnection.spark_send_query(df, query)
+    Neo4jConnection.spark_send_query(df.sort('h3Index'), query)
 
 
-def import_population_density(limit=None):
+def import_population_density(args, limit=None):
     script_dir = os.path.dirname(__file__)
-    country_dir = os.path.join(script_dir, '../tmp/kuwala/populationFiles/')
-    countries = os.listdir(country_dir) if os.path.exists(country_dir) else []
+    file_path = os.path.join(script_dir, '../tmp/kuwala/populationFiles/')
+    continent = args.continent
+    country = args.country
 
-    if len(countries) < 1:
-        print('No population data available. You first need to run the population-density processing pipeline before '
-              'loading it into the graph')
+    if continent is None or country is None:
+        file_path = select_local_country(file_path)
+        file_path += '/result.parquet'
+    else:
+        file_path += f'{continent}/{country}/result.parquet'
 
-        return
-
-    country_names = list(map(lambda c: pycountry.countries.get(alpha_3=c).name, countries))
-    country = questionary \
-        .select('For which country do you want to ingest the population data?', choices=country_names) \
-        .ask()
     start_time = time.time()
     spark = SparkSession.builder \
         .appName('neo4j_importer_population-density') \
         .getOrCreate() \
         .newSession()
-    df = spark.read.parquet(f'{country_dir}{countries[country_names.index(country)]}/result.parquet')
+    df = spark.read.parquet(file_path)
 
     # noinspection PyUnresolvedReferences
     resolution = h3.h3_get_resolution(df.first()['h3Index'])

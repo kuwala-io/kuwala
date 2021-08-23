@@ -44,7 +44,7 @@ def query_graph(q, parameters=None, db=None):
     return response, retry
 
 
-def spark_send_query(df, query):
+def spark_send_query(df, query, batch_size=5000):
     url = os.getenv('NEO4J_HOST') or 'bolt://localhost:7687'
 
     # An error like this will be printed:
@@ -65,5 +65,8 @@ def spark_send_query(df, query):
         .option('authentication.type', 'basic') \
         .option('authentication.basic.username', 'neo4j') \
         .option('authentication.basic.password', 'password') \
+        .option('batch.size', batch_size) \
+        .option('transaction.retries', 100) \
+        .option('transaction.retry.timeout', 100) \
         .option('query', query) \
         .save()

@@ -24,7 +24,7 @@ CONTINENTS = [
 ]
 
 
-def select_local_osm_file(directory):
+def select_local_country(directory):
     continents = os.listdir(directory)
     continent_names = list(map(lambda c: pcc.convert_continent_code_to_continent_name(c.upper()), continents))
     continent = questionary.select('Which continent are you interested in?', choices=continent_names).ask()
@@ -34,7 +34,12 @@ def select_local_osm_file(directory):
     country_names = list(map(lambda c: pcc.map_country_alpha3_to_country_name()[c.upper()] or c, countries))
     country = questionary.select('Which country are you interested in?', choices=country_names).ask()
     country = countries[country_names.index(country)]
-    country_path = f'{continent_path}/{country}'
+
+    return f'{continent_path}/{country}'
+
+
+def select_local_osm_file(directory):
+    country_path = select_local_country(directory)
 
     if os.path.isdir(country_path + '/osm-parquetizer'):
         return country_path

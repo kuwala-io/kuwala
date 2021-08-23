@@ -39,7 +39,7 @@ def generate_search_strings(limit=None):
         file_path += f'/{args.country_region}'
 
     file_path += '/kuwala.parquet'
-    df = spark.read.parquet(file_path)
+    df = spark.read.parquet(file_path).withColumnRenamed('h3_index', 'h3Index')
 
     if args.polygon_coords:
         polygon_coords = json.loads(args.polygon_coords)
@@ -70,7 +70,6 @@ def generate_search_strings(limit=None):
             df.address.full.isNotNull()
         ) \
         .withColumnRenamed('id', 'osmId') \
-        .withColumnRenamed('h3_index', 'h3Index') \
         .drop('type') \
         .withColumnRenamed('osm_type', 'type') \
         .select('osmId', 'type', 'name', 'h3Index', 'address.*', 'categories') \

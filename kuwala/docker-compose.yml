@@ -86,7 +86,7 @@ services:
       context: .
       dockerfile: ./core/neo4j/importer/dockerfile
     volumes:
-      - ./tmp/kuwala:/opt/app/tmp/kuwala
+      - ./tmp/kuwala:/opt/app/neo4j/importer/tmp/kuwala
     restart: always
     depends_on: [neo4j]
     profiles:

@@ -56,7 +56,7 @@ def add_pois(df):
         MERGE (p)-[:LOCATED_AT]->(h)
     '''
 
-    Neo4jConnection.spark_send_query(df, query)
+    Neo4jConnection.spark_send_query(df.repartition(1), query)
 
 
 def connect_osm_pois(df):
@@ -67,18 +67,25 @@ def connect_osm_pois(df):
         MERGE (po)-[:BELONGS_TO]->(p)
     '''
 
-    Neo4jConnection.spark_send_query(df, query)
+    Neo4jConnection.spark_send_query(df.repartition(1), query)
 
 
 def connect_google_pois(df):
-    query = '''
+    query_belongs_to = '''
         MATCH (p:Poi { id: event.id })
         WITH event, p
         MATCH (pg:PoiGoogle { id: event.googleId })
         MERGE (pg)-[:BELONGS_TO { confidence: event.confidence }]->(p)
     '''
+    query_inside_of = '''
+        MATCH (p:Poi)<-[:BELONGS_TO]-(:PoiGoogle { id: event.insideOf })
+        WITH event, p
+        MATCH (pg:PoiGoogle { id: event.googleId })
+        MERGE (pg)-[:INSIDE_OF]->(p)
+    '''
 
-    Neo4jConnection.spark_send_query(df, query)
+    Neo4jConnection.spark_send_query(df.repartition(1), query_belongs_to)
+    Neo4jConnection.spark_send_query(df.filter(col('insideOf').isNotNull()).repartition(1), query_inside_of)
 
 
 # Create one single POI node combining OSM and Google
@@ -90,7 +97,7 @@ def connect_pois(df_osm: DataFrame, df_google: DataFrame):
     df_google = df_google \
         .withColumn('osmId', df_google['osmId'].cast(LongType())) \
         .withColumn('osmId', concat('type', 'osmId')) \
-        .select('id', 'osmId', 'confidence', 'h3Index') \
+        .select('id', 'osmId', 'confidence', 'h3Index', 'insideOf') \
         .withColumnRenamed('id', 'googleId') \
         .withColumnRenamed('h3Index', 'h3IndexGoogle')
 
@@ -106,7 +113,7 @@ def connect_pois(df_osm: DataFrame, df_google: DataFrame):
         .withColumn('h3Index', when(col('confidence') >= 0.9, col('h3IndexGoogle')).otherwise(col('h3IndexOsm')))
     pois = df_pois.select('id', 'h3Index').distinct()
     osm_pois = df_pois.select('id', 'osmId')
-    google_pois = df_pois.filter(col('confidence').isNotNull()).select('id', 'confidence', 'googleId')
+    google_pois = df_pois.filter(col('confidence').isNotNull()).select('id', 'confidence', 'googleId', 'insideOf')
 
     add_constraints()
     add_pois(pois)
