@@ -1,10 +1,10 @@
 FROM python:3.9.5
 
-COPY ./pipelines/common/python_utils /opt/common/python_utils
-COPY ./pipelines/google-poi /opt/app
+COPY ./common/python_utils /opt/common/python_utils
+COPY ./pipelines/google-poi /opt/pipelines/app
 
-WORKDIR /opt/app
+WORKDIR /opt/pipelines/app
 RUN pip install -r requirements.txt
 
-WORKDIR /opt/app/src
+WORKDIR /opt/pipelines/app/src
 ENTRYPOINT [ "python", "-u", "app.py", "local" ]

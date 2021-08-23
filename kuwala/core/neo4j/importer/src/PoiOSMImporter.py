@@ -3,15 +3,10 @@ import json
 import os
 import time
 import Neo4jConnection as Neo4jConnection
-import sys
-
-sys.path.insert(0, '../../../../pipelines/common/')
-sys.path.insert(0, '../')
-
 from pyspark.sql import DataFrame, SparkSession
-from pyspark.sql.functions import col, concat, lit, udf
-from pyspark.sql.types import ArrayType, StringType
+from pyspark.sql.functions import col, concat, lit
 from python_utils.src.FileSelector import select_local_osm_file
+from python_utils.src.spark_udfs import concat_list_of_key_value_pairs
 
 
 #  Sets uniqueness constraint for H3 indexes, OSM POIS, and POI categories
@@ -86,10 +81,10 @@ def add_osm_pois(df: DataFrame):
         df = df.select('*', 'details.*')
         df = df.drop('details')  # Necessary to drop because batch insert can only process elementary data types
 
-    Neo4jConnection.spark_send_query(df, query_poi_osm)
-    Neo4jConnection.spark_send_query(df.filter(col('h3_index').isNotNull()).sort('h3_index'), query_h3_indexes)
-    Neo4jConnection.spark_send_query(df.filter(col('h3_index').isNotNull()).sort('h3_index'), query_located_at)
-    Neo4jConnection.spark_send_query(df.repartition(1), query_belongs_to)
+    Neo4jConnection.write_df_to_neo4j_with_override(df, query_poi_osm)
+    Neo4jConnection.write_df_to_neo4j_with_override(df.filter(col('h3_index').isNotNull()).sort('h3_index'), query_h3_indexes)
+    Neo4jConnection.write_df_to_neo4j_with_override(df.filter(col('h3_index').isNotNull()).sort('h3_index'), query_located_at)
+    Neo4jConnection.write_df_to_neo4j_with_override(df.repartition(1), query_belongs_to)
 
 
 def add_osm_building_footprints(df: DataFrame):
@@ -105,8 +100,8 @@ def add_osm_building_footprints(df: DataFrame):
         MERGE (po)-[:HAS]->(pbf)
     '''
 
-    Neo4jConnection.spark_send_query(df, query_building_footprint)
-    Neo4jConnection.spark_send_query(df, query_relationships)
+    Neo4jConnection.write_df_to_neo4j_with_override(df, query_building_footprint)
+    Neo4jConnection.write_df_to_neo4j_with_override(df, query_relationships)
 
 
 def import_pois_osm(args, limit=None):
@@ -138,14 +133,10 @@ def import_pois_osm(args, limit=None):
     if limit is not None:
         df = df.limit(limit)
 
-    @udf(returnType=ArrayType(elementType=StringType()))
-    def concat_osm_tags(tags):
-        return list(map(lambda t: f'{t["key"]}={t["value"]}', tags))
-
     df = df \
         .withColumn('osm_id', col('id')) \
         .withColumn('id', concat('osm_type', 'osm_id')) \
-        .withColumn('osm_tags', concat_osm_tags(col('tags')))
+        .withColumn('osm_tags', concat_list_of_key_value_pairs(col('tags')))
 
     # noinspection PyUnresolvedReferences
     resolution = h3.h3_get_resolution(df.first()['h3_index'])

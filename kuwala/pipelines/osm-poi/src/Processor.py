@@ -1,4 +1,3 @@
-import h3
 import itertools
 import json
 import os
@@ -8,7 +7,7 @@ from pyspark.sql.functions import col, explode, lit, udf
 from pyspark.sql.types import \
     ArrayType, BooleanType, FloatType, IntegerType, NullType, StringType, StructField, StructType
 from python_utils.src.FileSelector import select_local_osm_file
-from shapely.geometry import shape
+from python_utils.src.spark_udfs import create_geo_json_based_on_coordinates, get_centroid_of_geo_json, get_h3_index
 
 DEFAULT_RESOLUTION = 15
 
@@ -223,43 +222,12 @@ class Processor:
 
     @staticmethod
     def df_way_create_geo_json(df_way) -> DataFrame:
-        @udf(returnType=StringType())
-        def create_geo_json(coordinates):
-            if not coordinates or len(coordinates) < 1:
-                return
-
-            last_index = len(coordinates) - 1
-            geo_json_type = 'Polygon'
-
-            if (coordinates[0][0] != coordinates[last_index][0]) or (coordinates[0][1] != coordinates[last_index][1]):
-                geo_json_type = 'LineString'
-
-            geo_json_coordinates = [coordinates] if geo_json_type == 'Polygon' else coordinates
-
-            return json.dumps(dict(type=geo_json_type, coordinates=geo_json_coordinates))
-
-        return df_way.withColumn('geo_json', create_geo_json(col('coordinates')))
+        return df_way.withColumn('geo_json', create_geo_json_based_on_coordinates(col('coordinates')))
 
     @staticmethod
     def get_geo_json_center(df) -> DataFrame:
-        @udf(returnType=StructType([
-            StructField(name='latitude', dataType=FloatType()), StructField(name='longitude', dataType=FloatType())
-        ]))
-        def get_centroid(geo_json):
-            if geo_json:
-                geo_json = json.loads(geo_json)
-
-                try:
-                    centroid = shape(geo_json).centroid
-
-                    return dict(latitude=centroid.y, longitude=centroid.x)
-                except ValueError:
-                    return
-                except IndexError:
-                    return
-
         return df \
-            .withColumn('centroid', get_centroid(col('geo_json'))) \
+            .withColumn('centroid', get_centroid_of_geo_json(col('geo_json'))) \
             .withColumn('latitude', col('centroid.latitude')) \
             .withColumn('longitude', col('centroid.longitude'))
 
@@ -310,12 +278,6 @@ class Processor:
 
     @staticmethod
     def df_add_h3_index(df) -> DataFrame:
-        @udf(returnType=StringType())
-        def get_h3_index(latitude, longitude):
-            if latitude and longitude:
-                # noinspection PyUnresolvedReferences
-                return h3.geo_to_h3(latitude, longitude, DEFAULT_RESOLUTION)
-
         return df.withColumn('h3_index', get_h3_index(col('latitude'), col('longitude')))
 
     @staticmethod

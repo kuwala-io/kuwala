@@ -44,7 +44,7 @@ def query_graph(q, parameters=None, db=None):
     return response, retry
 
 
-def spark_send_query(df, query, batch_size=5000):
+def write_df_to_neo4j_with_override(df, query, batch_size=5000):
     url = os.getenv('NEO4J_HOST') or 'bolt://localhost:7687'
 
     # An error like this will be printed:

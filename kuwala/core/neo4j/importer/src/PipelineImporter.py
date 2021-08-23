@@ -1,5 +1,10 @@
 import os
 import Neo4jConnection as Neo4jConnection
+import sys
+
+sys.path.insert(0, '../../../../common/')
+sys.path.insert(0, '../')
+
 from PipelineConnector import connect_h3_indexes, connect_pois
 from PoiGoogleImporter import import_pois_google
 from PoiOSMImporter import import_pois_osm
