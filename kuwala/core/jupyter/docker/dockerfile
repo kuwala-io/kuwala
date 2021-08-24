@@ -1,17 +1,6 @@
 FROM jupyter/pyspark-notebook
 
-
-# Install Jupyter Notebook, Lab, and Hub
-# Generate a notebook server config
-# Cleanup temporary files
-# Correct permissions
-# Do all this in a single RUN command to avoid duplicating all of the
-# files across image layers when the permissions change
-RUN conda install --quiet --yes \
-    'geojson' \
-    'h3-py' \
-    'neo4j-python-driver' && \
-    conda clean --all -f -y
+RUN pip install unfolded.map-sdk unfolded.data-sdk sidecar geojson h3 neo4j
 
 # Setup work directory for backward-compatibility
 RUN mkdir "/home/${NB_USER}/kuwala" && \

@@ -30,6 +30,7 @@ services:
     restart: always
     environment: 
       - NEO4J_HOST=bolt://neo4j:7687
+      - JUPYTER_ENABLE_LAB=yes
     ports:
       - '8888:8888'
     profiles:
