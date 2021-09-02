@@ -72,8 +72,11 @@ def get_centroid_of_geo_json(geo_json: str):
 
 # Get a similarity score for two strings
 @udf(returnType=IntegerType())
-def get_string_distance(s1: str, s2: str):
-    return fuzz.token_set_ratio(s1, s2)
+def get_string_distance(compare_str: str, base_str: str, alternative_base_str: str):
+    if base_str:
+        return fuzz.token_set_ratio(base_str, compare_str)
+
+    return fuzz.token_set_ratio(alternative_base_str, compare_str)
 
 
 # Map a list of key-value-pairs to a list of strings

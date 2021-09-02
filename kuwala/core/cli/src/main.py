@@ -1,5 +1,4 @@
 import logging
-
 from InputController import select_demographic_groups, select_pipelines, select_region
 from PipelineOrchestrator import run_pipelines
 
@@ -13,8 +12,7 @@ if __name__ == '__main__':
 
     pipelines = select_pipelines()
     selected_region = select_region(pipelines)
-    demographic_groups = select_demographic_groups(selected_region['population_density_id']) \
-        if selected_region['population_density_id'] is not None else None
+    selected_region['demographic_groups'] = select_demographic_groups(pipelines, selected_region)
 
     logging.info(f'Starting {str(", ").join(pipelines)} {"pipelines" if len(pipelines) > 1 else "pipeline"}')
 

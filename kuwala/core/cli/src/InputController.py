@@ -3,7 +3,7 @@ import logging
 import questionary
 import sys
 
-sys.path.insert(0, '../../../pipelines/common/')
+sys.path.insert(0, '../../../common/')
 sys.path.insert(0, '../')
 
 import python_utils.src.FileSelector as FileSelector
@@ -66,8 +66,18 @@ def select_region(pipelines: [str]) -> [str, str]:
     )
 
 
-def select_demographic_groups(d):
-    d = Dataset.read_from_hdx(d)
+def select_demographic_groups(pipelines, selected_region):
+    d = selected_region['population_density_id']
+
+    if not d and 'population-density' not in pipelines:
+        return None
+
+    if d:
+        d = Dataset.read_from_hdx(d)
+    else:
+        d = FileSelector.select_population_file(selected_region['country'])
+        d = Dataset.read_from_hdx(d['id'])
+
     selected = FileSelector.select_demographic_groups(d)
 
     # Apply json.dumps() twice to escape double quotes

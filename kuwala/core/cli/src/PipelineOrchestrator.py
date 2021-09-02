@@ -1,44 +1,62 @@
-import logging
 import subprocess
+from threading import Thread
 
 
 def run_command(command: [str], exit_keyword=None):
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, universal_newlines=True, shell=True)
+    process = subprocess.Popen(
+        command,
+        bufsize=1,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        universal_newlines=True,
+        shell=True
+    )
+    thread_result = dict(hit_exit_keyword=False)
 
-    while True:
-        line = process.stdout.readline()
+    def print_std(std, result):
+        while True:
+            line = std.readline()
 
-        if len(line.strip()) > 0:
-            print(line if 'Stage' not in line and '%' not in line else line.strip(), end='\r')
+            if len(line.strip()) > 0:
+                print(line if 'Stage' not in line and '%' not in line else line.strip(), end='\r')
 
-        if exit_keyword is not None and exit_keyword in line:
-            return process
+            if exit_keyword is not None and exit_keyword in line:
+                result['hit_exit_keyword'] = True
 
-        return_code = process.poll()
+                break
 
-        if return_code is not None:
-            if return_code != 0:
-                for output in process.stderr.readlines():
-                    logging.error(output)
+            return_code = process.poll()
 
-                return RuntimeError()
+            if return_code is not None:
+                if return_code != 0:
+                    return RuntimeError()
 
-            # Process has finished, read rest of the output
-            for output in process.stdout.readlines():
-                print(output.strip())
+                break
 
-            break
+    stdout_thread = Thread(target=print_std, args=(process.stdout, thread_result,), daemon=True)
+    stderr_thread = Thread(target=print_std, args=(process.stderr, thread_result,), daemon=True)
+
+    stdout_thread.start()
+    stderr_thread.start()
+
+    while stdout_thread.is_alive() and stderr_thread.is_alive():
+        pass
+
+    if thread_result['hit_exit_keyword']:
+        return process
 
 
 def run_osm_poi_pipeline(url, continent, country, country_region):
     continent_arg = f'--continent={continent}' if continent else ''
     country_arg = f'--country={country}' if country else ''
     country_region_arg = f'--country_region={country_region}' if country_region else ''
-    run_command([f'docker-compose run osm-poi --action=download --url={url} {continent_arg} {country_arg} '
+
+    run_command([f'docker-compose run --rm osm-poi --action=download --url={url} {continent_arg} {country_arg} '
                  f'{country_region_arg}'])
-    run_command([f'docker-compose run osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar '
+    run_command([f'docker-compose run --rm osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar '
                  f'{continent_arg} {country_arg} {country_region_arg}'])
-    run_command([f'docker-compose run osm-poi --action=process {continent_arg} {country_arg} {country_region_arg}'])
+    run_command([f'docker-compose run --rm osm-poi --action=process {continent_arg} {country_arg} '
+                 f'{country_region_arg}'])
 
 
 def run_google_poi_pipeline(continent, country, country_region):
@@ -46,13 +64,27 @@ def run_google_poi_pipeline(continent, country, country_region):
     country_arg = f'--country={country}' if country else ''
     country_region_arg = f'--country_region={country_region}' if country_region else ''
     scraping_api_process = run_command(f'docker-compose --profile google-poi-scraper up', exit_keyword='Running')
-    run_command([f'docker-compose run google-poi-pipeline {continent_arg} {country_arg} {country_region_arg}'])
+
+    run_command([f'docker-compose run --rm google-poi-pipeline {continent_arg} {country_arg} {country_region_arg}'])
     scraping_api_process.terminate()
 
 
 def run_population_density_pipeline(continent, country, demographic_groups):
-    run_command([f'docker-compose run population-density --continent={continent} --country={country} '
-                 f'--demographic_groups={demographic_groups}'])
+    continent_arg = f'--continent={continent}' if continent else ''
+    country_arg = f'--country={country}' if country else ''
+    demographic_groups_arg = f'--demographic_groups={demographic_groups}' if demographic_groups else ''
+
+    run_command([f'docker-compose run --rm population-density {continent_arg} {country_arg} {demographic_groups_arg}'])
+
+
+def run_neo4j_importer(continent, country, country_region):
+    continent_arg = f'--continent={continent}' if continent else ''
+    country_arg = f'--country={country}' if country else ''
+    country_region_arg = f'--country_region={country_region}' if country_region else ''
+    neo4j_process = run_command(f'docker-compose --profile core up', exit_keyword='Started.')
+
+    run_command([f'docker-compose run --rm neo4j-importer {continent_arg} {country_arg} {country_region_arg}'])
+    neo4j_process.terminate()
 
 
 def run_pipelines(pipelines: [str], selected_region: dict):
@@ -68,3 +100,6 @@ def run_pipelines(pipelines: [str], selected_region: dict):
 
     if 'population-density' in pipelines:
         run_population_density_pipeline(continent, country, selected_region['demographic_groups'])
+
+    run_neo4j_importer(continent, country, country_region)
+    run_command(['docker-compose down --remove-orphans'])

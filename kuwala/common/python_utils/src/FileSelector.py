@@ -161,12 +161,17 @@ def get_countries_with_population_data(return_country_code=False):
     return datasets, countries
 
 
-def select_population_file():
+def select_population_file(country_code=None):
     datasets, countries = get_countries_with_population_data()
-    country = questionary \
-        .select('For which country do you want to download the population data?', choices=countries) \
-        .ask()
-    dataset = datasets[countries.index(country)]
+
+    if not country_code:
+        country = questionary \
+            .select('For which country do you want to download the population data?', choices=countries) \
+            .ask()
+        dataset = datasets[countries.index(country)]
+    else:
+        dataset = next((d for d in datasets if d['country_code'][0].lower() == country_code), None)
+
     country = dataset['country_code'][0].upper()
     country_alpha_2 = pcc.country_alpha3_to_country_alpha2(country)
     continent = pcc.country_alpha2_to_continent_code(country_alpha_2)

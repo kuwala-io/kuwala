@@ -77,7 +77,7 @@
         "category": "automobile",
         "tags": [
             "used_car_dealer",
-            "auto_machine_shop",   
+            "auto_machine_shop",
             "trailer_rental_service",
             "car_rental_agency",
             "car_repair",
@@ -101,7 +101,7 @@
         "category": "beauty",
         "tags": [
             "beauty_salon",
-            "cosmetics_store",           
+            "cosmetics_store",
             "wellness_center",
             "beauty_supply_store",
             "spa",
@@ -349,7 +349,10 @@
             "solar_photovoltaic_power_plant",
             "boat_ramp",
             "volunteer_organization",
-            "youth_organization"
+            "youth_organization",
+            "tool_store",
+            "wallpaper_store",
+            "level"
         ]
     },
     "office": {
@@ -381,7 +384,7 @@
             "bus_stop",
             "train_station"
         ]
-    }, 
+    },
     "recreation": {
         "category": "recreation",
         "tags": [
@@ -542,8 +545,8 @@
             "sewing_shop",
             "chocolate_shop",
             "gift_shop",
-            "shopping_center", 
-            "dive_shop",   
+            "shopping_center",
+            "dive_shop",
             "dress_shop",
             "hat_shop",
             "bag_shop",
@@ -574,7 +577,7 @@
             "bedroom_furniture_store",
             "sofa_store",
             "office_furniture_store",
-            "christmas_store",          
+            "christmas_store",
             "stereo_store",
             "luggage_store",
             "fishing_store",

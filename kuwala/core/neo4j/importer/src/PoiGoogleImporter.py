@@ -139,13 +139,18 @@ def add_spending_times(df: DataFrame):
 def import_pois_google(limit=None):
     script_dir = os.path.dirname(__file__)
     directory = os.path.join(script_dir, '../tmp/kuwala/googleFiles/poiData/')
+
+    if not os.path.exists(directory):
+        print('No Google data available for import')
+
+        return None
+
     parquet_files = sorted(list(filter(lambda f: 'matched' in f, os.listdir(directory))), reverse=True)
 
     if len(parquet_files) < 1:
-        print('No Google POI data available. You first need to run the google-poi processing pipeline before loading '
-              'it into the graph')
+        print('No Google data available for import')
 
-        return
+        return None
 
     file_path = directory + parquet_files[0]
     start_time = time.time()

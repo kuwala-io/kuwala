@@ -128,7 +128,14 @@ def import_pois_osm(args, limit=None):
     Neo4jConnection.close_connection()
 
     spark = SparkSession.builder.appName('neo4j_importer_osm-poi').getOrCreate().newSession()
-    df = spark.read.parquet(f'{file_path}/kuwala.parquet').sort('id')
+    file_path = f'{file_path}/kuwala.parquet'
+
+    if not os.path.exists(file_path):
+        print('No OSM data available for import')
+
+        return None
+
+    df = spark.read.parquet(file_path).sort('id')
 
     if limit is not None:
         df = df.limit(limit)

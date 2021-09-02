@@ -23,7 +23,7 @@ services:
       - NEO4J_AUTH=none
       - NEO4JLABS_PLUGINS=["apoc"]
       - NEO4J_dbms_memory_heap_initial__size=512m
-      - NEO4J_dbms_memory_heap_max__size=3G
+      - NEO4J_dbms_memory_heap_max__size=4G
     ports:
       - '7474:7474'
       - '7687:7687'
@@ -71,8 +71,8 @@ services:
       context: .
       dockerfile: ./pipelines/google-poi/src/pipeline/dockerfile
     volumes:
-      - ./tmp/kuwala/googleFiles:/opt/pipeline/tmp/googleFiles
-      - ./tmp/kuwala/osmFiles:/opt/pipeline/tmp/osmFiles
+      - ./tmp/kuwala/googleFiles:/opt/pipelines/app/tmp/googleFiles
+      - ./tmp/kuwala/osmFiles:/opt/pipelines/app/tmp/osmFiles
     restart: always
     profiles:
       - network
@@ -86,7 +86,7 @@ services:
       context: .
       dockerfile: ./core/neo4j/importer/dockerfile
     volumes:
-      - ./tmp/kuwala:/opt/app/neo4j/importer/tmp/kuwala
+      - ./tmp/kuwala:/opt/core/app/importer/tmp/kuwala
     restart: always
     depends_on: [neo4j]
     profiles:
@@ -110,7 +110,7 @@ services:
       dockerfile: ./pipelines/osm-poi/dockerfile
     restart: always
     volumes:
-      - ./tmp/kuwala/osmFiles:/opt/app/tmp/osmFiles
+      - ./tmp/kuwala/osmFiles:/opt/pipelines/app/tmp/osmFiles
     profiles:
       - network
 
@@ -122,6 +122,6 @@ services:
       dockerfile: ./pipelines/population-density/dockerfile
     restart: always
     volumes:
-      - ./tmp/kuwala/populationFiles:/opt/app/tmp/populationFiles
+      - ./tmp/kuwala/populationFiles:/opt/pipelines/app/tmp/populationFiles
     profiles:
       - network

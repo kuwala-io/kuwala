@@ -53,7 +53,7 @@ class SearchScraper:
             .withColumn('googleName', col('data.name')) \
             .withColumn(
                 'nameDistance',
-                get_string_distance(col('osmName') | col('df_str.query'), col('googleName'))
+                get_string_distance(col('googleName'), col('osmName'), col('df_str.query'))
             ) \
             .withColumn('h3Distance', get_h3_distance(col('h3Index'), col('data.h3Index'), lit(MAX_H3_DISTANCE))) \
             .withColumn(

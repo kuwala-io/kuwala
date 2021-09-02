@@ -42,6 +42,11 @@ def import_population_density(args, limit=None):
     else:
         file_path += f'{continent}/{country}/result.parquet'
 
+    if not os.path.exists(file_path):
+        print('No population data available for import')
+
+        return
+
     start_time = time.time()
     spark = SparkSession.builder \
         .appName('neo4j_importer_population-density') \
