@@ -6,8 +6,8 @@ from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col, explode, lit, udf
 from pyspark.sql.types import \
     ArrayType, BooleanType, FloatType, IntegerType, NullType, StringType, StructField, StructType
-from python_utils.src.FileSelector import select_local_osm_file
-from python_utils.src.spark_udfs import create_geo_json_based_on_coordinates, get_centroid_of_geo_json, get_h3_index
+from kuwala.common.python_utils.src.FileSelector import select_local_osm_file
+from kuwala.common.python_utils.src.spark_udfs import create_geo_json_based_on_coordinates, get_centroid_of_geo_json, get_h3_index
 
 DEFAULT_RESOLUTION = 15
 

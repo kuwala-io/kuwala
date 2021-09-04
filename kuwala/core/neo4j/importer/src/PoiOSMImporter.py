@@ -5,8 +5,8 @@ import time
 import Neo4jConnection as Neo4jConnection
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col, concat, lit
-from python_utils.src.FileSelector import select_local_osm_file
-from python_utils.src.spark_udfs import concat_list_of_key_value_pairs
+from kuwala.common.python_utils.src.FileSelector import select_local_osm_file
+from kuwala.common.python_utils.src.spark_udfs import concat_list_of_key_value_pairs
 
 
 #  Sets uniqueness constraint for H3 indexes, OSM POIS, and POI categories

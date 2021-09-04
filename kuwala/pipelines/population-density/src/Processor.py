@@ -5,7 +5,7 @@ from functools import reduce
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, sum
 from pyspark.sql.types import DoubleType
-from python_utils.src.spark_udfs import get_h3_index
+from kuwala.common.python_utils.src.spark_udfs import get_h3_index
 
 
 class Processor:

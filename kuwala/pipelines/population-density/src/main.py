@@ -1,8 +1,3 @@
-import sys
-
-sys.path.insert(0, '../../../common/')
-sys.path.insert(0, '../')
-
 import argparse
 from Downloader import Downloader
 from Processor import Processor

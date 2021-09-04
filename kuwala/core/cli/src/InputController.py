@@ -1,17 +1,16 @@
 import json
 import logging
+import os
 import questionary
-import sys
-
-sys.path.insert(0, '../../../common/')
-sys.path.insert(0, '../')
-
-import python_utils.src.FileSelector as FileSelector
+import kuwala.common.python_utils.src.FileSelector as FileSelector
 from hdx.data.dataset import Dataset
 
 
 def load_pipelines():
-    with open(f'../resources/pipelines.json') as f:
+    script_dir = os.path.dirname(__file__)
+    file_path = os.path.join(script_dir, '../resources/pipelines.json')
+
+    with open(file_path) as f:
         pipelines = json.load(f)
 
         f.close()

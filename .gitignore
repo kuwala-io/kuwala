@@ -5,6 +5,7 @@
 .history
 node_modules
 
+kuwala.egg-info/
 kuwala.zip
 venv/
 

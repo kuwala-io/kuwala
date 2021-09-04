@@ -9,7 +9,7 @@ from pandas import DataFrame
 from pathlib import Path
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, lit
-from python_utils.src.spark_udfs import get_confidence_based_h3_and_name_distance, get_h3_distance, get_string_distance
+from kuwala.common.python_utils.src.spark_udfs import get_confidence_based_h3_and_name_distance, get_h3_distance, get_string_distance
 from time import sleep
 
 MAX_H3_DISTANCE = 500

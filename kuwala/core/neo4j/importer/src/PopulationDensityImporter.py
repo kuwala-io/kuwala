@@ -4,7 +4,7 @@ import os
 import time
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import lit
-from python_utils.src.FileSelector import select_local_country
+from kuwala.common.python_utils.src.FileSelector import select_local_country
 
 
 def add_population(df: DataFrame):

@@ -3,7 +3,7 @@ import time
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col, concat, when
 from pyspark.sql.types import LongType
-from python_utils.src.spark_udfs import build_poi_id_based_on_confidence
+from kuwala.common.python_utils.src.spark_udfs import build_poi_id_based_on_confidence
 
 
 def add_constraints():
