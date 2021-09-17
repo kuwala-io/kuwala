@@ -14,6 +14,7 @@ if __name__ == '__main__':
     selected_region = select_region(pipelines)
     selected_region['demographic_groups'] = select_demographic_groups(pipelines, selected_region)
 
+    logging.info('You can lean back now and wait for the pipelines to do their magic.')
     logging.info(f'Starting {str(", ").join(pipelines)} {"pipelines" if len(pipelines) > 1 else "pipeline"}')
 
     run_pipelines(pipelines, selected_region)
