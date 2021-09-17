@@ -1,4 +1,8 @@
 import argparse
+import sys
+
+sys.path.insert(0, '../../../../common/')
+
 import PipelineImporter as PipelineImporter
 
 if __name__ == '__main__':

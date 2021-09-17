@@ -6,7 +6,7 @@ from hdx.data.dataset import Dataset
 from hdx.data.resource import Resource
 from hdx.hdx_configuration import Configuration
 from pathlib import Path
-from kuwala.common.python_utils.src.FileSelector import \
+from python_utils.src.FileSelector import \
     get_countries_with_population_data, \
     select_demographic_groups, \
     select_population_file

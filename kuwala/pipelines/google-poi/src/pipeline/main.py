@@ -1,3 +1,7 @@
+import sys
+
+sys.path.insert(0, '../../../../common/')
+
 from SearchScraper import SearchScraper
 from search_string_generator import generate_search_strings
 

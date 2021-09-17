@@ -3,13 +3,10 @@
 **/.DS_Store
 .vscode
 .history
-node_modules
 
 kuwala.egg-info/
 kuwala.zip
 venv/
-
-npm-debug.log
 
 tmp
 env

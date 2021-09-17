@@ -35,7 +35,7 @@ will also be possible to query the graph through a GraphQL endpoint.
 Installed version of *Python3*, *Docker* and 
 *docker-compose* ([*Go here for instructions*](https://docs.docker.com/compose/install/))
 
-***Note***: We recommend giving Docker at least 8 GB of RAM
+***Note***: We recommend giving Docker at least 8 GB of RAM (On Docker Desktop you can go under settings -> resources)
 
 
 #### Process data
@@ -46,7 +46,7 @@ Installed version of *Python3*, *Docker* and
 cd kuwala/scripts
 ```
 
-2. Build CLI and Docker images
+2. Build CLI and Docker images (this may take several minutes)
 
 ```zsh
 sh initialize_components.sh
@@ -54,8 +54,20 @@ sh initialize_components.sh
 
 3. Run CLI to download and process data
 
+WARNING: If you decide to run the google-poi pipeline the scraper may run for several minutes up to several hours 
+depending on the country. You can always see the requests made by the scraper in the logs of the `google-poi-api`
+container in Docker Desktop.
+
 ```zsh 
 sh run_cli.sh
+```
+
+Errors of the following type can be ignored. This is a known bug in the neo4j-pyspark package. The queries are
+compiled and executed correctly.
+
+```
+ERROR SchemaService: Query not compiled because of the following exception:
+org.neo4j.driver.exceptions.ClientException: Variable `event` not defined
 ```
 
 #### Query data

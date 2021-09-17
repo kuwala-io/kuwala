@@ -1,5 +1,9 @@
 import argparse
 import questionary
+import sys
+
+sys.path.insert(0, '../../../common/')
+
 from Downloader import Downloader
 from Processor import Processor
 

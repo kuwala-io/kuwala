@@ -3,10 +3,10 @@ import json
 import moment
 import os
 from geojson import Polygon
-from kuwala.common.python_utils.src.h3_utils import polyfill_polygon
+from python_utils.src.h3_utils import polyfill_polygon
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import array_contains, col, concat_ws, lit
-from kuwala.common.python_utils.src.spark_udfs import h3_to_parent
+from python_utils.src.spark_udfs import h3_to_parent
 
 
 def generate_search_strings(limit=None):

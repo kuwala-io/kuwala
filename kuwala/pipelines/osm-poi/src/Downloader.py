@@ -1,6 +1,6 @@
 import os
-from kuwala.common.python_utils.src.FileDownloader import download_file
-from kuwala.common.python_utils.src.FileSelector import select_osm_file
+from python_utils.src.FileDownloader import download_file
+from python_utils.src.FileSelector import select_osm_file
 
 
 class Downloader:
