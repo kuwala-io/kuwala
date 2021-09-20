@@ -34,7 +34,6 @@ services:
     ports:
       - '8888:8888'
     profiles:
-      - core
       - network
 
   torproxy:

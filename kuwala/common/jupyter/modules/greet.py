@@ -1,1 +1,0 @@
-def hi(lst): [print('hi', x) for x in lst]

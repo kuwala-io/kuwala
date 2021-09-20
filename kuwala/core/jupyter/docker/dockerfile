@@ -1,6 +1,7 @@
 FROM jupyter/pyspark-notebook
 
-RUN pip install unfolded.map-sdk unfolded.data-sdk sidecar geojson h3 neo4j
+COPY ./common/jupyter/requirements.txt /opt/requirements.txt
+RUN pip install -r /opt/requirements.txt
 
 # Setup work directory for backward-compatibility
 RUN mkdir "/home/${NB_USER}/kuwala" && \
