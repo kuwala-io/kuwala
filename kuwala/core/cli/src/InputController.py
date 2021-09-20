@@ -6,6 +6,16 @@ import kuwala.common.python_utils.src.FileSelector as FileSelector
 from hdx.data.dataset import Dataset
 
 
+def select_demo():
+    choices = ['Run Pipelines myself', 'Use demo data for Portugal']
+    choice = questionary.select('Do you want to run and select the pipelines yourself or do you want to use a '
+                                'preprocessed demo with data for Portugal?',
+                                choices=choices) \
+        .ask()
+
+    return choices.index(choice) == 1
+
+
 def load_pipelines():
     script_dir = os.path.dirname(__file__)
     file_path = os.path.join(script_dir, '../resources/pipelines.json')

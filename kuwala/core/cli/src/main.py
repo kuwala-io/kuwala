@@ -1,6 +1,7 @@
 import logging
-from InputController import select_demographic_groups, select_pipelines, select_region
-from PipelineOrchestrator import run_pipelines
+import sys
+from InputController import select_demo, select_demographic_groups, select_pipelines, select_region
+from PipelineOrchestrator import download_demo, run_pipelines
 
 if __name__ == '__main__':
     logging.basicConfig(
@@ -9,6 +10,12 @@ if __name__ == '__main__':
         datefmt='%m/%d/%Y %I:%M:%S %p'
     )
     logging.info(f'Kuwala CLI is ready to rumble')
+
+    demo = select_demo()
+
+    if demo:
+        download_demo()
+        sys.exit(0)
 
     pipelines = select_pipelines()
     selected_region = select_region(pipelines)
