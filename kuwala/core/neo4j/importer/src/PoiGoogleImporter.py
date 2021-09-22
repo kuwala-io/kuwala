@@ -23,8 +23,7 @@ def add_constraints():
 
 
 def add_google_pois(df: DataFrame):
-    query = '''
-        // Create PoiGoogle nodes
+    query_google_pois = '''
         MERGE (pg:PoiGoogle { id: event.id })
         ON CREATE SET 
             pg.placeId = event.placeID,
@@ -33,21 +32,26 @@ def add_google_pois(df: DataFrame):
             pg.phone = event.phone,
             pg.website = event.website,
             pg.timezone = event.timezone
-
-        // Create H3 index nodes
-        WITH event, pg
-        MERGE (h:H3Index { h3Index: event.h3Index })
-        ON CREATE SET h.resolution = event.resolution
+    '''
+    query_h3_indexes = 'MERGE (h:H3Index { h3Index: event.h3Index, resolution: event.resolution })'
+    query_located_at = '''
+        MATCH (pg:PoiGoogle { id: event.id })
+        WITH event, pg     
+        MATCH (h:H3Index { h3Index: event.h3Index })
         MERGE (pg)-[:LOCATED_AT]->(h)
-        
-        // Create relationship to PoiCategories
+    '''
+    query_belongs_to = '''
+        MATCH (pg:PoiGoogle { id: event.id })
         WITH event, pg
-        MATCH (pc:PoiCategory) 
+        MATCH (pc:PoiCategory)
         WHERE pc.name IN event.categories
         MERGE (pg)-[:BELONGS_TO]->(pc)
     '''
 
-    Neo4jConnection.write_df_to_neo4j_with_override(df, query)
+    Neo4jConnection.write_df_to_neo4j_with_override(df, query_google_pois)
+    Neo4jConnection.write_df_to_neo4j_with_override(df.filter(col('h3Index').isNotNull()).sort('h3Index'), query_h3_indexes)
+    Neo4jConnection.write_df_to_neo4j_with_override(df.filter(col('h3Index').isNotNull()).sort('h3Index'), query_located_at)
+    Neo4jConnection.write_df_to_neo4j_with_override(df.repartition(1), query_belongs_to)
 
 
 def add_opening_hours(df: DataFrame):
@@ -60,7 +64,7 @@ def add_opening_hours(df: DataFrame):
         MERGE (pg)-[:HAS { date: event.date }]->(poh)
     '''
 
-    Neo4jConnection.write_df_to_neo4j_with_override(df, query)
+    Neo4jConnection.write_df_to_neo4j_with_override(df.repartition(1), query)
 
 
 def add_closed_tags(df: DataFrame):
@@ -79,7 +83,7 @@ def add_closed_tags(df: DataFrame):
         MERGE (pg)-[:IS { date: event.date }]->(pc)
     '''
 
-    Neo4jConnection.write_df_to_neo4j_with_override(df, query)
+    Neo4jConnection.write_df_to_neo4j_with_override(df.repartition(1), query)
 
 
 def add_ratings(df: DataFrame):
@@ -89,7 +93,7 @@ def add_ratings(df: DataFrame):
         MERGE (pg)-[:HAS { numberOfReviews: event.numberOfReviews, date: event.date }]->(pr)
     '''
 
-    Neo4jConnection.write_df_to_neo4j_with_override(df, query)
+    Neo4jConnection.write_df_to_neo4j_with_override(df.repartition(1), query)
 
 
 def add_price_levels(df: DataFrame):
@@ -99,7 +103,7 @@ def add_price_levels(df: DataFrame):
         MERGE (pg)-[:HAS { date: event.date }]->(ppl)
     '''
 
-    Neo4jConnection.write_df_to_neo4j_with_override(df, query)
+    Neo4jConnection.write_df_to_neo4j_with_override(df.repartition(1), query)
 
 
 def add_popularities(df: DataFrame):
@@ -129,19 +133,24 @@ def add_spending_times(df: DataFrame):
         MERGE (pg)-[:HAS { date: event.date }]->(pst)
     '''
 
-    Neo4jConnection.write_df_to_neo4j_with_override(df, query)
+    Neo4jConnection.write_df_to_neo4j_with_override(df.repartition(1), query)
 
 
 def import_pois_google(limit=None):
     script_dir = os.path.dirname(__file__)
     directory = os.path.join(script_dir, '../tmp/kuwala/googleFiles/poiData/')
+
+    if not os.path.exists(directory):
+        print('No Google data available for import')
+
+        return None
+
     parquet_files = sorted(list(filter(lambda f: 'matched' in f, os.listdir(directory))), reverse=True)
 
     if len(parquet_files) < 1:
-        print('No Google POI data available. You first need to run the google-poi processing pipeline before loading '
-              'it into the graph')
+        print('No Google data available for import')
 
-        return
+        return None
 
     file_path = directory + parquet_files[0]
     start_time = time.time()
@@ -149,7 +158,7 @@ def import_pois_google(limit=None):
     add_constraints()
 
     spark = SparkSession.builder.appName('neo4j_importer_google-poi').getOrCreate().newSession()
-    df = spark.read.parquet(file_path)
+    df = spark.read.parquet(file_path).sort('id')
 
     if limit is not None:
         df = df.limit(limit)

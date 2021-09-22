@@ -10,33 +10,19 @@ Installed version of *Docker* and *docker-compose*
 
 ## Setup
 
-First you always need to change your working directory to `./kuwala`
+First you always need to change your working directory to `./kuwala/scripts`
 
 Next, it would be safer to always run the below build command after pulling new code changes so that your local images 
 have the latest code. 
 
-Docker images will only be built once when you run the `init.sh` script, so new changes in the code will not reflect on 
-your local unless you explicitly run the build command below.
+Docker images will only be built once when you run the `initialize_components.sh` script, so new changes in the code 
+will not reflect on your local unless you explicitly run the build command below.
 
 ```zsh
-docker-compose build osm-poi osm-parquetizer population-density google-poi-api google-poi-pipeline neo4j-importer
+sh build_all_containers.sh
 ```
 
-Now simply run the below init script to spawn the essential docker components our pipelines rely on. Please note that 
-this is a blocking script and has to run in a separate terminal. When you exit ( `ctrl + c` the script automatically 
-cleans up all docker runs related to this project). 
+Please note that the docker runs will create data folders under `./kuwala/tmp/kuwala` that will be used for db, file 
+downloads, and processing results. You can always find the downloaded files over there.
 
-Please note that the init script will create data folders under ./tmp/kuwala that will be used for db, osm & google file 
-downloads/operations. You can always find the downloaded files over there.
-
-```zsh
-# Run chmod only the first time you setup the project
-chmod +x ./scripts/init.sh
-# end of first time
-
-# Run init.sh in it's own separate terminal session
-# make sure you run the script while having `./kuwala` as a working directory.
-./scripts/init.sh 
-```
-
-Now you can proceed to any of the pipelines' Readme and follow the steps to run them.
+Now you can proceed to any of the pipelines' Readme and follow the steps to run them individually.

@@ -6,6 +6,7 @@ import org.neo4j.procedure.Description;
 import org.neo4j.procedure.Name;
 import org.neo4j.procedure.UserFunction;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -37,12 +38,24 @@ public class H3 {
             @Name("h3Index") String h3Index,
             @Name("resolution") Long resolution,
             @Name("radius") Long radius
-    ) throws IOException {
-        H3Core h3 = H3Core.newInstance();
-        String centerCell = transformIndexToResolution(h3Index, Math.toIntExact(resolution));
+    ) {
+        H3Core h3 = null;
+        String centerCell = null;
+
+        try {
+            h3 = H3Core.newInstance();
+            centerCell = transformIndexToResolution(h3Index, Math.toIntExact(resolution));
+        } catch (IOException | NumberFormatException e) {
+            e.printStackTrace();
+
+            return new ArrayList<>();
+        }
+
         List<String> edges = h3.getH3UnidirectionalEdgesFromHexagon(centerCell);
+        H3Core finalH = h3;
+
         Optional<Double> totalEdgeLength = edges.stream()
-                .map(edge -> h3.exactEdgeLength(edge, LengthUnit.m))
+                .map(edge -> finalH.exactEdgeLength(edge, LengthUnit.m))
                 .reduce(Double::sum);
 
         if (totalEdgeLength.isPresent()) {
@@ -57,7 +70,7 @@ public class H3 {
             return h3.kRing(centerCell, ringSize);
         }
 
-        throw new NullPointerException();
+        return new ArrayList<>();
     }
 
     private String transformIndexToResolution(String h3Index, int resolution) throws IOException {

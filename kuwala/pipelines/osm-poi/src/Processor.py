@@ -6,7 +6,7 @@ from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col, explode, lit, udf
 from pyspark.sql.types import \
     ArrayType, BooleanType, FloatType, IntegerType, NullType, StringType, StructField, StructType
-from python_utils.src.FileSelector import select_osm_file
+from python_utils.src.FileSelector import select_local_osm_file
 from python_utils.src.spark_udfs import create_geo_json_based_on_coordinates, get_centroid_of_geo_json, get_h3_index
 
 DEFAULT_RESOLUTION = 15
@@ -310,10 +310,21 @@ class Processor:
         return df_node.union(df_way).union(df_relation)
 
     @staticmethod
-    def start():
+    def start(args):
         script_dir = os.path.dirname(__file__)
         directory = os.path.join(script_dir, '../tmp/osmFiles/parquet')
-        file_path = select_osm_file(directory)
+
+        if not args.continent:
+            file_path = select_local_osm_file(directory)
+        else:
+            file_path = f'{directory}/{args.continent}'
+
+            if args.country:
+                file_path += f'/{args.country}'
+
+            if args.country_region:
+                file_path += f'/{args.country_region}'
+
         memory = os.getenv('SPARK_MEMORY') or '16g'
         start_time = time.time()
         spark = SparkSession.builder \
