@@ -1,5 +1,7 @@
 FROM jupyter/pyspark-notebook
 
+RUN pip install pandas-profiling[notebook]
+
 COPY ./common/jupyter/requirements.txt /opt/requirements.txt
 RUN pip install -r /opt/requirements.txt
 

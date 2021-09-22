@@ -4,6 +4,7 @@ from geojson import Polygon
 from kuwala.modules.common import polyfill_polygon
 
 
+# Get the aggregated total population per H3 index at a given resolution
 def get_population_in_h3(sp, resolution, polygon_coords):
     polygon_cells = None
 

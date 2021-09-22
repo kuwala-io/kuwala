@@ -4,6 +4,7 @@ from geojson import Polygon
 from kuwala.modules.common import polyfill_polygon
 
 
+# Get the aggregated number of a specific POI category per H3 index at a given resolution
 def get_pois_by_category_in_h3(sp, category, resolution, polygon_coords):
     polygon_cells = None
 
@@ -16,19 +17,22 @@ def get_pois_by_category_in_h3(sp, category, resolution, polygon_coords):
     query = '''
         CALL {
             MATCH (pc:PoiCategory)<-[:BELONGS_TO]-(po:PoiOSM)-[:BELONGS_TO]->(p:Poi)-[:LOCATED_AT]->(h:H3Index)
-        ''' + f'''WHERE {f'h.h3_index IN {polygon_cells} AND' if polygon_cells else ''} pc.name = '{category}'
+        ''' + f'''
+            WITH p, pc, io.kuwala.h3.h3ToParent(h.h3Index, {resolution}) AS h3_index
+            WHERE {f'h3_index IN {polygon_cells} AND' if polygon_cells else ''} pc.name = '{category}'
             RETURN p
             UNION
             MATCH (pc:PoiCategory)<-[:BELONGS_TO]-(pg:PoiGoogle)-[b:BELONGS_TO]->(p:Poi)-[:LOCATED_AT]->(h:H3Index)
+            WITH p, pc, io.kuwala.h3.h3ToParent(h.h3Index, {resolution}) AS h3_index
             WHERE 
-                {f'h.h3_index IN {polygon_cells} AND' if polygon_cells else ''} 
+                {f'h3_index IN {polygon_cells} AND' if polygon_cells else ''} 
                 b.confidence >= 0.8 AND 
                 pc.name = '{category}'
             RETURN p
-        ''' + '''}
+    ''' + '''}
         WITH p
         MATCH (p)-[:LOCATED_AT]->(h:H3Index)
-        ''' + f'''WITH p, io.kuwala.h3.h3ToParent(h.h3Index, {resolution}) AS h3_index
+    ''' + f'''WITH p, io.kuwala.h3.h3ToParent(h.h3Index, {resolution}) AS h3_index
         RETURN h3_index, COUNT(p) AS number_of_{category}
     '''
 
