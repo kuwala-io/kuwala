@@ -1,10 +1,5 @@
 import os
 import Neo4jConnection as Neo4jConnection
-import sys
-
-sys.path.insert(0, '../../../../common/')
-sys.path.insert(0, '../')
-
 from PipelineConnector import connect_h3_indexes, connect_pois
 from PoiGoogleImporter import import_pois_google
 from PoiOSMImporter import import_pois_osm
@@ -19,7 +14,7 @@ def add_constraints():
     Neo4jConnection.close_connection()
 
 
-def start():
+def start(args):
     memory = os.getenv('SPARK_MEMORY') or '16g'
     SparkSession.builder \
         .config('spark.driver.memory', memory) \
@@ -27,9 +22,9 @@ def start():
         .getOrCreate()
 
     add_constraints()
-    import_population_density()
+    import_population_density(args)
 
-    df_pois_osm = import_pois_osm()
+    df_pois_osm = import_pois_osm(args)
     df_pois_google = import_pois_google()
 
     connect_pipelines(df_pois_osm, df_pois_google)

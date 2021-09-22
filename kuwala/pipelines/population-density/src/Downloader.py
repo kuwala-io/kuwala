@@ -1,101 +1,58 @@
+import json
 import os
-import questionary
 import time
 import zipfile
 from hdx.data.dataset import Dataset
-from hdx.data.organization import Organization
 from hdx.data.resource import Resource
 from hdx.hdx_configuration import Configuration
 from pathlib import Path
+from python_utils.src.FileSelector import \
+    get_countries_with_population_data, \
+    select_demographic_groups, \
+    select_population_file
 
 
 class Downloader:
     @staticmethod
-    def start() -> [dict]:
-        dataset = Downloader.select_dataset()
-        files, output_dir = Downloader.download_files(dataset)
+    def start(args) -> [dict]:
+        if args.continent is not None and args.country is not None:
+            dataset = dict(continent=args.continent, country=args.country)
+        else:
+            dataset = select_population_file()
+
+        files, output_dir = Downloader.download_files(dataset, args)
 
         return files, output_dir
 
     @staticmethod
-    def select_dataset() -> dict:
-        Configuration.create(hdx_site='prod', user_agent='Kuwala', hdx_read_only=True)
-        # The identifier is for Facebook. This shouldn't change from HDX's side in the future since it's an id.
-        datasets = Organization.read_from_hdx(identifier='74ad0574-923d-430b-8d52-ad80256c4461').get_datasets(
-            query='Population')
-        datasets = sorted(
-            filter(
-                lambda d: 'population' in d['title'].lower() and 'csv' in d['file_types'],
-                map(
-                    lambda d: dict(id=d.get('id'), title=d.get('title'), location=d.get_location_names(),
-                                   country_code=d.get_location_iso3s(), file_types=d.get_filetypes()),
-                    datasets
-                )
-            ), key=lambda d: d['location'][0])
-        countries = list(map(lambda d: d['location'][0], datasets))
-        country = questionary \
-            .select('For which country do you want to download the population data?', choices=countries) \
-            .ask()
+    def download_files(dataset: dict, args) -> [str]:
+        if args.continent is not None and args.country is not None:
+            if args.demographic_groups is not None:
+                Configuration.create(hdx_site='prod', user_agent='Kuwala', hdx_read_only=True)
+                selected_resources = json.loads(args.demographic_groups)
+            else:
+                datasets, countries = get_countries_with_population_data(return_country_code=True)
+                dataset = datasets[countries.index(args.country)]
+                dataset['continent'] = args.continent
+                dataset['country'] = args.country
+                d = Dataset.read_from_hdx(dataset['id'])
+                selected_resources = select_demographic_groups(d)
+        else:
+            d = Dataset.read_from_hdx(dataset['id'])
+            selected_resources = select_demographic_groups(d)
 
-        return datasets[countries.index(country)]
-
-    @staticmethod
-    def download_files(d: dict) -> [str]:
-        d = Dataset.read_from_hdx(d['id'])
-        resources = d.get_resources()
-
-        def get_type(name: str):
-            name = name.lower()
-
-            if ('women' in name) and ('reproductive' not in name):
-                return 'women'
-
-            if ('men' in name) and ('women' not in name):
-                return 'men'
-
-            if 'children' in name:
-                return 'children_under_five'
-
-            if 'youth' in name:
-                return 'youth_15_24'
-
-            if 'elderly' in name:
-                return 'elderly_60_plus'
-
-            if 'reproductive' in name:
-                return 'women_of_reproductive_age_15_49'
-
-            return 'total'
-
-        resources = list(filter(
-            lambda resource: resource['format'].lower() == 'csv',
-            map(
-                lambda resource: dict(
-                    id=resource.get('id'),
-                    format=resource.get('format'),
-                    type=get_type(resource.get('name'))
-                ),
-                resources
-            )
-        ))
-        resource_names = list(map(lambda resource: resource['type'], resources))
-        selected_resources = questionary \
-            .checkbox('Which demographic groups do you want to include?', choices=resource_names) \
-            .ask()
-        selected_resources = list(filter(lambda resource: resource['type'] in selected_resources, resources))
-        country_code = d.get_location_iso3s()[0]
         script_dir = os.path.dirname(__file__)
-        dir_path = f'../tmp/populationFiles/{country_code}/'
+        dir_path = f'../tmp/populationFiles/{dataset["continent"]}/{dataset["country"]}/'
         dir_path = os.path.join(script_dir, dir_path)
         file_paths = list()
 
         for r in selected_resources:
-            r_hdx = Resource().read_from_hdx(identifier=r['id'])
             dir_path_type = f'{dir_path}{r["type"]}/'
 
             file_paths.append(dict(path=dir_path_type, type=r['type']))
 
             if not os.path.exists(dir_path_type):
+                r_hdx = Resource().read_from_hdx(identifier=r['id'])
                 start_time = time.time()
 
                 Path(dir_path_type).mkdir(parents=True, exist_ok=True)

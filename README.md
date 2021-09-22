@@ -32,70 +32,72 @@ will also be possible to query the graph through a GraphQL endpoint.
 
 #### Prerequisites
 
-Installed version of *Docker* and *docker-compose* ([*Go here for instructions*](https://docs.docker.com/compose/install/))
+Installed version of *Python3*, *Docker* and 
+*docker-compose* ([*Go here for instructions*](https://docs.docker.com/compose/install/))
 
+***Note***: We recommend giving Docker at least 8 GB of RAM (On Docker Desktop you can go under settings -> resources)
+
+You can either **[A]** use a preprocessed demo with data for Portugal, or **[B]** build and run the pipelines yourself for
+which ever country you like.
 
 #### Process data
 
-1. Change directory to `kuwala`
+1. From inside the root directory, change directory to `kuwala/scripts`
 
 ```zsh 
-cd kuwala
+cd kuwala/scripts
 ```
 
-2. Build images
+2. Build CLI and Docker images (this may take several minutes)
+
+For [A], the demo:
 
 ```zsh
-docker-compose build osm-poi osm-parquetizer population-density google-poi-api google-poi-pipeline neo4j neo4j-importer
+sh build_cli.sh
 ```
 
-3. Run pipelines to download and process data (in a new terminal window)
+For [B], the individual pipelines:
 
-```zsh 
-# Process population data
-docker-compose run  population-density
+```zsh
+sh initialize_components.sh
 ```
 
+3. Run CLI to download and process data
+
 ```zsh 
-# Download OSM POI data
-docker-compose run osm-poi
-# Transform PBF to Parquet
-# Example: docker-compose run osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar tmp/osmFiles/pbf/europe/malta-latest.osm.pbf tmp/osmFiles/parquet/europe/malta-latest/osm-parquetizer
-docker-compose run osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar <pbf-path> <parquet-path>
-# Process Parquet files
-docker-compose run osm-poi
+sh run_cli.sh
 ```
 
-4. Start Neo4j
+WARNING: If you decide to run the google-poi pipeline the scraper may run for several minutes up to several hours 
+depending on the country. You can always see the requests made by the scraper in the logs of the `google-poi-api`
+container in Docker Desktop.
 
-```zsh 
-# Start Neo4j
-docker-compose --profile core up
-``` 
+Errors of the following type can be ignored. This is a known bug in the neo4j-pyspark package. The queries are
+compiled and executed correctly.
 
-5. Load data into the graph (in separate terminal window)
-
-```zsh 
-# Load data into graph database
-docker-compose run  --service-ports neo4j-importer
-``` 
-
-For a more detailed explanation follow the 
-[README under `./kuwala`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/README.md).
+```
+ERROR SchemaService: Query not compiled because of the following exception:
+org.neo4j.driver.exceptions.ClientException: Variable `event` not defined
+```
 
 #### Query data
 
-You can either query the graph database directly using Cypher, or you run individual REST APIs for the pipelines.
+Currently, you can query the graph database directly using Cypher. To launch the Neo4j instance run the following:
 
-1. [Cypher](https://neo4j.com/developer/cypher/) to query Neo4j
-2. REST APIs on top of pipelines
-      ```zsh 
-      # Run REST-API to query OSM POI data
-      docker-compose run  --service-ports osm-poi start-api:local
-      ```
+1. From inside the root directory, change directory to `kuwala/`
 
-We are working on building out the core to load the combined data to a data lake directly and additionally have a 
-single GraphQL endpoint.
+```zsh 
+cd kuwala/
+```
+
+2. Launch Neo4j
+
+```zsh
+docker-compose --profile core up
+```
+
+There already is a PR ([#55](https://github.com/kuwala-io/kuwala/pull/55)) open for a Jupyter Notebook environment with convenience functions to query and visualize the 
+data.
 
 ---
 
