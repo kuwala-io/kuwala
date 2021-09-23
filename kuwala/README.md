@@ -10,6 +10,10 @@ Installed version of *Docker* and *docker-compose*
 
 ## Setup
 
+All docker services are listed
+
+### Pipelines
+
 First you always need to change your working directory to `./kuwala/scripts`
 
 Next, it would be safer to always run the below build command after pulling new code changes so that your local images 
@@ -26,3 +30,11 @@ Please note that the docker runs will create data folders under `./kuwala/tmp/ku
 downloads, and processing results. You can always find the downloaded files over there.
 
 Now you can proceed to any of the pipelines' Readme and follow the steps to run them individually.
+
+### Core
+
+To initialize the CLI and Jupyter notebook run within the `./kuwala/scripts` directory:
+
+```zsh
+sh initialize_core_components.sh
+```

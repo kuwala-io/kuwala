@@ -42,6 +42,10 @@ services:
     environment: 
       - NEO4J_HOST=bolt://neo4j:7687
       - JUPYTER_ENABLE_LAB=yes
+    volumes:
+      - ./common/jupyter/modules:/home/jovyan/kuwala/modules
+      - ./common/jupyter/notebooks:/home/jovyan/kuwala/notebooks
+      - ./common/jupyter/resources:/home/jovyan/kuwala/resources
     ports:
       - '8888:8888'
     profiles:

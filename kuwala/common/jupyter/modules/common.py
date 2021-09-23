@@ -4,8 +4,8 @@ from pyspark.ml.feature import MinMaxScaler
 from pyspark.ml.feature import VectorAssembler
 from pyspark.ml import Pipeline
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import udf
-from pyspark.sql.types import DoubleType
+from pyspark.sql.functions import col, lit, udf
+from pyspark.sql.types import DoubleType, StringType
 
 
 # Create a Spark session that is use to query and transform data from the database
@@ -26,6 +26,19 @@ def polyfill_polygon(polygon: geojson.Polygon, resolution):
                              geo_json_conformant=True)
 
     return h3_indexes
+
+
+def add_h3_index_column(df, lat_column, lng_column, resolution):
+    # Get H3 index for coordinates pair
+    @udf(returnType=StringType())
+    def get_h3_index(lat: str, lng: str, res):
+        try:
+            # noinspection PyUnresolvedReferences
+            return h3.geo_to_h3(float(lat), float(lng), res)
+        except TypeError:
+            return None
+
+    return df.withColumn('h3_index', get_h3_index(col(lat_column), col(lng_column), lit(resolution)))
 
 
 # Normalize one or multiple columns using a min-max scaler

@@ -6,13 +6,12 @@ COPY ./common/jupyter/requirements.txt /opt/requirements.txt
 RUN pip install -r /opt/requirements.txt
 
 # Setup work directory for backward-compatibility
-RUN mkdir "/home/${NB_USER}/kuwala" && \
-    mkdir "/home/${NB_USER}/kuwala/modules" && \
-    mkdir "/home/${NB_USER}/kuwala/notebooks" && \
-    touch "/home/${NB_USER}/kuwala/__init__.py" && \
-    fix-permissions "/home/${NB_USER}"
+RUN rmdir "/home/jovyan/work" && \
+    mkdir "/home/jovyan/kuwala" && \
+    mkdir "/home/jovyan/kuwala/modules" && \
+    mkdir "/home/jovyan/kuwala/notebooks" && \
+    mkdir "/home/jovyan/kuwala/resources" && \
+    touch "/home/jovyan/kuwala/__init__.py" && \
+    fix-permissions "/home/jovyan"
 
-COPY ./common/jupyter/modules "/home/${NB_USER}/kuwala/modules" 
-COPY ./common/jupyter/notebooks "/home/${NB_USER}/kuwala/notebooks" 
-
-ENV PYTHONPATH="/home/${NB_USER}/"
+ENV PYTHONPATH="/home/jovyan/"
