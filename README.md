@@ -12,7 +12,7 @@ Unfortunately, many promising data projects fail, however. That's because too ma
 gathering and cleaning data. Kuwala supports you as a data engineer, data scientist, or business analyst to create a 
 holistic view of your ecosystem by integrating third-party data seamlessly.
 
-### How Kuwala works
+### How Kuwala Works
 
 Kuwala explicitly focuses on integrating third-party data, so data that is not under your company's influence, e.g., 
 weather or population information. To easily combine several domains, we further narrow it down to data with a 
@@ -28,7 +28,7 @@ will also be possible to query the graph through a GraphQL endpoint.
 
 ---
 
-### Quickstart with Docker (OSM and population data)
+## Quick Start
 
 #### Prerequisites
 
@@ -37,10 +37,7 @@ Installed version of *Python3*, *Docker* and
 
 ***Note***: We recommend giving Docker at least 8 GB of RAM (On Docker Desktop you can go under settings -> resources)
 
-You can either **[A]** use a preprocessed demo with data for Portugal, or **[B]** build and run the pipelines yourself for
-which ever country you like.
-
-#### Process data
+#### Running the Containers
 
 1. From inside the root directory, change directory to `kuwala/scripts`
 
@@ -48,62 +45,35 @@ which ever country you like.
 cd kuwala/scripts
 ```
 
-2. Build CLI and Docker images (this may take several minutes)
+2. Initialize the components
 
-For [A], the demo:
+**[A]** Use a preprocessed demo with data for Portugal.\
+**[B]** Build and run the pipelines yourself for which ever country you like.
 
-```zsh
-sh build_cli.sh
+For **[A]**, run:
+
+```zsh 
+sh initialize_core_components.sh
 ```
 
-For [B], the individual pipelines:
+For **[B]**, run:
 
-```zsh
-sh initialize_components.sh
+```zsh 
+sh initialize_all_components.sh
 ```
 
-3. Run CLI to download and process data
+3. Run the CLI. After the database is populated, a Jupyter notebook opens automatically with an example use case for 
+the popularity score.
 
 ```zsh 
 sh run_cli.sh
 ```
 
-WARNING: If you decide to run the google-poi pipeline the scraper may run for several minutes up to several hours 
-depending on the country. You can always see the requests made by the scraper in the logs of the `google-poi-api`
-container in Docker Desktop.
-
-Errors of the following type can be ignored. This is a known bug in the neo4j-pyspark package. The queries are
-compiled and executed correctly.
-
-```
-ERROR SchemaService: Query not compiled because of the following exception:
-org.neo4j.driver.exceptions.ClientException: Variable `event` not defined
-```
-
-#### Query data
-
-Currently, you can query the graph database directly using Cypher. To launch the Neo4j instance run the following:
-
-1. From inside the root directory, change directory to `kuwala/`
-
-```zsh 
-cd kuwala/
-```
-
-2. Launch Neo4j
-
-```zsh
-docker-compose --profile core up
-```
-
-There already is a PR ([#55](https://github.com/kuwala-io/kuwala/pull/55)) open for a Jupyter Notebook environment with convenience functions to query and visualize the 
-data.
-
 ---
 
-### How you can contribute
+### How You Can Contribute
 
-#### Be part of our community
+#### Be Part of Our Community
 
 The best first step to get involved is to 
 [join](https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-pXKFBjbnl7_P3nXtwca5ag) the Kuwala Community 
@@ -111,7 +81,7 @@ on Slack. There we discuss everything related to data integration and new pipeli
 We entirely decide, based on you, our community, which sources to integrate. You can reach out to us on Slack or 
 [email](mailto:community@kuwala.io) to request a new pipeline or contribute yourself. 
 
-#### Contribute to the project
+#### Contribute to the Project
 
 If you want to contribute 
 yourself, you can use your choice's programming language and database technology. We have the only requirement that it 
@@ -120,17 +90,17 @@ geographical transformations. We will then take the responsibility to maintain y
 
 *Note: To submit a pull request, please fork the project and then submit a PR to the base repo.*
 
-### Liberating the work with data
+### Liberating the Work With Data
 
 By working together as a community of data enthusiasts, we can create a network of seamlessly integratable pipelines. 
 It is now causing headaches to integrate third-party data into applications. But together, we will make it 
 straightforward to combine, merge and enrich data sources for powerful models.
 
-### What's coming next for the pipelines?
+### What's Coming Next For the Pipelines?
 Based on the use-cases we have discussed in the community and potential users, we have identified a variety of data 
 sources to connect with next:
 
-#### Semi-structured data
+#### Semi-Structured Data
 Already structured data but not adapted to the Kuwala framework:
 
 - Google Trends - https://github.com/GeneralMills/pytrends
@@ -139,7 +109,7 @@ Already structured data but not adapted to the Kuwala framework:
 - Worldwide Administrative boundaries - https://index.okfn.org/dataset/boundaries/
 - Worldwide scaled calendar events (e.g. bank holidays, school holidays) - https://github.com/commenthol/date-holidays
 
-#### Unstructured data
+#### Unstructured Data
 Unstructured data becomes structured data:
 - Building Footprints from satellite images
 
@@ -150,11 +120,10 @@ Data we would like to integrate, but a scalable approach is still missing:
 
 ---
 
-## Using existing pipelines
+## Using Individual Pipelines
 
-To use our published pipelines clone this repository and navigate to 
-[`./kuwala/pipelines`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines). There is a separate README 
-for each pipeline on how to get started with it.
+Apart from using the CLI, you can also run the pipelines individually without Docker. For more detailed instructions
+please take a look at the [`./kuwala/README.md`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/README.md).
 
 We currently have the following pipelines published:
 - [`osm-poi`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/osm-poi):

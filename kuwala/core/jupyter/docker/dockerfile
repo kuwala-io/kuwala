@@ -15,3 +15,5 @@ RUN rmdir "/home/jovyan/work" && \
     fix-permissions "/home/jovyan"
 
 ENV PYTHONPATH="/home/jovyan/"
+
+CMD ["start.sh", "jupyter", "lab", "--ServerApp.token=''"]

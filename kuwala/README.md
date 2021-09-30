@@ -1,5 +1,4 @@
 # Initialize Main Components
----
 
 ## Prerequisites
 
@@ -8,28 +7,29 @@ Installed version of *Docker* and *docker-compose*
 
 ---
 
-## Setup
-
-All docker services are listed
-
 ### Pipelines
 
-First you always need to change your working directory to `./kuwala/scripts`
-
-Next, it would be safer to always run the below build command after pulling new code changes so that your local images 
-have the latest code. 
-
-Docker images will only be built once when you run the `initialize_components.sh` script, so new changes in the code 
-will not reflect on your local unless you explicitly run the build command below.
+If you want to build all containers for all pipelines, change your working directory to `./kuwala/scripts` and run:
 
 ```zsh
-sh build_all_containers.sh
+sh initialize_all_components.sh
 ```
 
-Please note that the docker runs will create data folders under `./kuwala/tmp/kuwala` that will be used for db, file 
+You can also build the containers individually for single pipelines. All services are listed in the 
+[`./docker-compose.yml`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/docker-compose.yml). Please refer to 
+each pipeline's `README.md` on how to run them. You can find the pipeline directories under 
+[`./pipelines`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines).
+
+It would be safer to always run the build commands after pulling new code changes so that your local images 
+have the latest code. 
+
+Docker images will only be built once when you run the `initialize_all_components.sh` script, so new changes in the code 
+will not reflect on your local unless you explicitly run the build commands.
+
+Please note that the Docker runs will create data folders under `./kuwala/tmp/kuwala` that will be used for db, file 
 downloads, and processing results. You can always find the downloaded files over there.
 
-Now you can proceed to any of the pipelines' Readme and follow the steps to run them individually.
+Now you can proceed to any of the pipelines' `README.md` and follow the steps to run them individually.
 
 ### Core
 
@@ -37,4 +37,16 @@ To initialize the CLI and Jupyter notebook run within the `./kuwala/scripts` dir
 
 ```zsh
 sh initialize_core_components.sh
+```
+
+To launch the CLI run:
+
+```zsh
+sh run_cli.sh
+```
+
+If you only want to start the Jupyter environment run:
+
+```zsh
+sh run_jupyter_notebook.sh
 ```
