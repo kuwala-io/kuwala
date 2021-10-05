@@ -3,7 +3,7 @@ import os
 import time
 from functools import reduce
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, sum
+from pyspark.sql.functions import col, lit, sum
 from pyspark.sql.types import DoubleType
 from python_utils.src.spark_udfs import get_h3_index
 
@@ -37,7 +37,7 @@ class Processor:
             df = df \
                 .withColumnRenamed(df.columns[2], t) \
                 .withColumn(t, col(t).cast(DoubleType())) \
-                .withColumn('h3Index', get_h3_index(col(lat_column), col(lng_column))) \
+                .withColumn('h3Index', get_h3_index(col(lat_column), col(lng_column), lit(11))) \
                 .drop(lat_column, lng_column) \
                 .groupBy('h3Index') \
                 .agg(sum(t).alias(t))
