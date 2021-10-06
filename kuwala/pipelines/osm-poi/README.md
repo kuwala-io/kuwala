@@ -33,18 +33,15 @@ Creating kuwala_osm-poi_run ... done
 ### Parse PBF files to Parquet
 
 ```zsh
-docker-compose run osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar <pbf-path> <parquet-path>
+docker-compose run osm-parquetizer java -jar --continent=<continent> --country=<country> --country_region=<country_region>
 ```
 
-The `pbf-path` starts with `tmp/osmFiles/pbf` and is followed by the path for the region to the `.osm.pbf` file.
-
-The `parquet-path` starts with `tmp/osmFiles/parquet`, is followed by the path for the region without the `.osm.pbf`
-extension and ends with `/osm-parquetizer`.
+The country and continent have to be passed as ISO-3 country codes. The country_region is based on Geofabrik's naming. 
 
 For example:
 
 ```zsh
-docker-compose run osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar tmp/osmFiles/pbf/europe/malta-latest.osm.pbf tmp/osmFiles/parquet/europe/malta-latest/osm-parquetizer
+docker-compose run --rm osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar --continent=eu --country=mlt
 ```
 
 ### Process Parquet files

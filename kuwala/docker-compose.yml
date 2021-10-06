@@ -85,6 +85,7 @@ services:
     container_name: google-poi-pipeline
     environment:
       - GOOGLE_POI_API_HOST=google-poi-api
+      - SPARK_MEMORY=16g
     build:
       context: .
       dockerfile: ./pipelines/google-poi/src/pipeline/dockerfile
@@ -99,7 +100,7 @@ services:
   neo4j-importer:
     environment: 
       - NEO4J_HOST=bolt://neo4j:7687
-      - MONGO_HOST=kuwala-pipelines_mongo_db
+      - SPARK_MEMORY=16G
     build:
       context: .
       dockerfile: ./core/neo4j/importer/dockerfile
@@ -126,6 +127,8 @@ services:
     build:
       context: .
       dockerfile: ./pipelines/osm-poi/dockerfile
+    environment:
+      - SPARK_MEMORY=16G
     restart: always
     volumes:
       - ./tmp/kuwala/osmFiles:/opt/pipelines/app/tmp/osmFiles
@@ -138,6 +141,8 @@ services:
     build:
       context: .
       dockerfile: ./pipelines/population-density/dockerfile
+    environment:
+      - SPARK_MEMORY=16G
     restart: always
     volumes:
       - ./tmp/kuwala/populationFiles:/opt/pipelines/app/tmp/populationFiles
