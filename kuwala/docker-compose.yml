@@ -100,7 +100,7 @@ services:
   neo4j-importer:
     environment: 
       - NEO4J_HOST=bolt://neo4j:7687
-      - SPARK_MEMORY=16G
+      - SPARK_MEMORY=16g
     build:
       context: .
       dockerfile: ./core/neo4j/importer/dockerfile
@@ -128,7 +128,7 @@ services:
       context: .
       dockerfile: ./pipelines/osm-poi/dockerfile
     environment:
-      - SPARK_MEMORY=16G
+      - SPARK_MEMORY=16g
     restart: always
     volumes:
       - ./tmp/kuwala/osmFiles:/opt/pipelines/app/tmp/osmFiles
@@ -142,7 +142,7 @@ services:
       context: .
       dockerfile: ./pipelines/population-density/dockerfile
     environment:
-      - SPARK_MEMORY=16G
+      - SPARK_MEMORY=16g
     restart: always
     volumes:
       - ./tmp/kuwala/populationFiles:/opt/pipelines/app/tmp/populationFiles
