@@ -66,7 +66,7 @@ score. In the demo we have a preprocessed graph and a test dataset with Uber rid
 
 #### Run the demo
 
-From inside the root directory run
+Launch Docker in the background and from inside the root directory run:
 
 ```zsh 
 cd kuwala/scripts && sh initialize_core_components.sh && sh run_cli.sh
