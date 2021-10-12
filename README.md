@@ -79,7 +79,22 @@ To run the pipelines yourself, build the components first from inside the `kuwal
 
 ---
 
-### How You Can Contribute
+## Using Individual Pipelines
+
+Apart from using the CLI, you can also run the pipelines individually without Docker. For more detailed instructions
+please take a look at the [`./kuwala/README.md`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/README.md).
+
+We currently have the following pipelines published:
+- [`osm-poi`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/osm-poi):
+  Global collection of point of interests (POIs)
+- [`population-density`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/population-density): 
+  Detailed population and demographic data
+- [`google-poi`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/google-poi):
+  Scraping API to retrieve POI information from Google (incl. popularity score)
+
+---
+
+## How You Can Contribute
 
 #### Be part of our community
 
@@ -125,18 +140,3 @@ Unstructured data becomes structured data:
 Data we would like to integrate, but a scalable approach is still missing:
 
 - Small scale events (e.g., a festival, movie premiere, nightclub events)
-
----
-
-## Using Individual Pipelines
-
-Apart from using the CLI, you can also run the pipelines individually without Docker. For more detailed instructions
-please take a look at the [`./kuwala/README.md`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/README.md).
-
-We currently have the following pipelines published:
-- [`osm-poi`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/osm-poi):
-  Global collection of point of interests (POIs)
-- [`population-density`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/population-density): 
-  Detailed population and demographic data
-- [`google-poi`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/google-poi):
-  Scraping API to retrieve POI information from Google (incl. popularity score)
