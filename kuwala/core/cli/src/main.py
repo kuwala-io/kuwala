@@ -7,15 +7,10 @@ from PipelineOrchestrator import download_demo, run_command, run_pipelines
 
 def launch_jupyter_notebook():
     run_command('docker-compose --profile core up', exit_keyword='Started.')
-
-    jupyter_notebook = run_command('docker-compose run --service-ports jupyter', exit_keyword='running at')
+    run_command('docker-compose run --service-ports jupyter', exit_keyword='or http')
 
     webbrowser.open('http://localhost:8888/lab/tree/kuwala/notebooks/popularity_correlation.ipynb')
-    jupyter_notebook.terminate()
-    input('Press <Enter> to stop all containers')
-    run_command('docker stop $(docker ps -a -q)')
-    run_command('docker-compose down')
-    run_command('docker-compose rm -f')
+    print('To stop and remove all Docker containers run the "sh stop_all_containers.sh"')
 
 
 if __name__ == '__main__':

@@ -4,31 +4,51 @@
 [![Slack](https://img.shields.io/badge/slack-chat-orange.svg)](
 https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-pXKFBjbnl7_P3nXtwca5ag)
 
-### The Vision of a Global Liquid Data Economy
+## What is Kuwala?
 
-With Kuwala, we want to enable the global liquid data economy. You probably also envision a future of smart cities, 
-autonomously driving cars, and sustainable living. For all of that, we need to leverage the power of data. 
-Unfortunately, many promising data projects fail, however. That's because too many resources are necessary for 
-gathering and cleaning data. Kuwala supports you as a data engineer, data scientist, or business analyst to create a 
-holistic view of your ecosystem by integrating third-party data seamlessly.
+Kuwala is a tool to build rich features for analytics based on clean data. It uses 
+[PySpark](http://spark.apache.org/docs/latest/api/python/) in combination with 
+[Parquet](http://parquet.apache.org/documentation/latest/) for data processing. Different data sources are connected in 
+a Neo4j graph database allowing for fast and flexible feature generation.
 
-### How Kuwala Works
+## How can I use Kuwala?
 
-Kuwala explicitly focuses on integrating third-party data, so data that is not under your company's influence, e.g., 
-weather or population information. To easily combine several domains, we further narrow it down to data with a 
-geo-component which still includes many sources. For matching data on different aggregation levels, such as POIs to a 
-moving thunderstorm, we leverage [Uber's H3](https://eng.uber.com/h3/) spatial indexing.
+There are basically 3 ways you can work with the clean data at the moment:
 
-![H3 Overview](./docs/images/h3_overview.png)
+1. Preprocessed Parquet files
+2. Neo4j graph database queries
+3. Jupyter notebooks with convenience functions
 
-Pipelines wrap individual data sources. Within the pipeline, raw data is cleaned and preprocessed. Then, the 
-preprocessed data is loaded into a graph to establish connections between the different data points. Based on the graph, 
-Kuwala will create a data lake from which you can load the data to a data warehouse, for example. Alternatively, it 
-will also be possible to query the graph through a GraphQL endpoint.
+## Which data pipelines are available right now?
+
+### Google POIs
+
+![Google Popular Times](./docs/images/google_poi_popularity_graph.png)
+
+Kuwala offers a scraper that retrieves all available metadata for POIs as seen on Google Maps. We do not use the
+Google Maps API so there is no need for registration. Instead, the results are generated based on search strings which
+can be based on OpenStreetMap (OSM) data.
+
+### OpenStreetMap (OSM) POIs
+
+We take the daily updated `.pbf` files with the entire data on OSM from [Geofabrik](http://www.geofabrik.de). We filter 
+objects based on tags that are irrelevant for POIs. We then further aggregate the tags to high-level categories 
+allowing for easy query building and extract other metadata such as the address, contact details, or the building 
+footprint.
+
+### High-Resolution Demographic Data
+
+![High-Resolution Demographic Data](./docs/images/population_density_overview.png)
+
+The high-resolution demographic data comes from Facebook's 
+[Data for Good](https://dataforgood.facebook.com/dfg/docs/methodology-high-resolution-population-density-maps) 
+initiative. It provides population estimates roughly 30 x 30 meters for different demographic groups such as total, 
+female, male or youth. It is a statistical model based on official census data combined with Facebook's data and 
+satellite images.
 
 ---
 
-## Quick Start
+## Quick Start & Demo
 
 #### Prerequisites
 
@@ -37,43 +57,31 @@ Installed version of *Python3*, *Docker* and
 
 ***Note***: We recommend giving Docker at least 8 GB of RAM (On Docker Desktop you can go under settings -> resources)
 
-#### Running the Containers
+#### Demo correlating Uber traversals with Google popularities
 
-1. From inside the root directory, change directory to `kuwala/scripts`
+![Jupyter Notebook Popularity Correlation](./docs/images/jupyter_notebook_popularity_correlation.png)
 
-```zsh 
-cd kuwala/scripts
-```
+We have a notebook with which you can correlate any value associated with a geo-reference with the Google popularity 
+score. In the demo we have a preprocessed graph and a test dataset with Uber rides in Lisbon, Portugal.
 
-2. Initialize the components
+#### Run the demo
 
-**[A]** Use a preprocessed demo with data for Portugal.\
-**[B]** Build and run the pipelines yourself for which ever country you like.
-
-For **[A]**, run:
+From inside the root directory run
 
 ```zsh 
-sh initialize_core_components.sh
+cd kuwala/scripts && sh initialize_core_components.sh && sh run_cli.sh
 ```
 
-For **[B]**, run:
+#### Run the data pipelines yourself
 
-```zsh 
-sh initialize_all_components.sh
-```
-
-3. Run the CLI. After the database is populated, a Jupyter notebook opens automatically with an example use case for 
-the popularity score.
-
-```zsh 
-sh run_cli.sh
-```
+To run the pipelines yourself, build the components first from inside the `kuwala/scripts` directory by executing the 
+`initialize_all_components.sh` script and the starting the CLI by running the `run_cli.sh` script.
 
 ---
 
 ### How You Can Contribute
 
-#### Be Part of Our Community
+#### Be part of our community
 
 The best first step to get involved is to 
 [join](https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-pXKFBjbnl7_P3nXtwca5ag) the Kuwala Community 
@@ -81,7 +89,7 @@ on Slack. There we discuss everything related to data integration and new pipeli
 We entirely decide, based on you, our community, which sources to integrate. You can reach out to us on Slack or 
 [email](mailto:community@kuwala.io) to request a new pipeline or contribute yourself. 
 
-#### Contribute to the Project
+#### Contribute to the project
 
 If you want to contribute 
 yourself, you can use your choice's programming language and database technology. We have the only requirement that it 
