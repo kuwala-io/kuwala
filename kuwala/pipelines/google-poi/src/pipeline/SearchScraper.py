@@ -9,6 +9,7 @@ from pandas import DataFrame
 from pathlib import Path
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, lit
+from pyspark.sql.types import StringType
 from python_utils.src.spark_udfs import get_confidence_based_h3_and_name_distance, get_h3_distance, get_string_distance
 from time import sleep
 
@@ -55,7 +56,11 @@ class SearchScraper:
                 'nameDistance',
                 get_string_distance(col('googleName'), col('osmName'), col('df_str.query'))
             ) \
-            .withColumn('h3Distance', get_h3_distance(col('h3Index'), col('data.h3Index'), lit(MAX_H3_DISTANCE))) \
+            .withColumn(
+                'h3Distance',
+                get_h3_distance(col('h3Index').cast(StringType()), col('data.h3Index').cast(StringType()),
+                                lit(MAX_H3_DISTANCE))
+            ) \
             .withColumn(
                 'confidence',
                 get_confidence_based_h3_and_name_distance(col('h3Distance'), col('nameDistance'), lit(MAX_H3_DISTANCE))
@@ -65,6 +70,7 @@ class SearchScraper:
         df_res.write.parquet(path_results.replace('results', 'results_matched'))
 
     """Match the POI ids that have been sent to the received results"""
+
     @staticmethod
     def match_poi_results(directory: str, file_name: str):
         memory = os.getenv('SPARK_MEMORY') or '16g'
@@ -85,14 +91,15 @@ class SearchScraper:
         df_pd.write.parquet(path_poi_data.replace('poi_data', 'poi_data_matched'))
 
     """Send queries in batches for each partition of a dataframe"""
+
     @staticmethod
     def batch_queries(
-        df: DataFrame,
-        output_dir: str,
-        file_name: str,
-        query_property: str,
-        query_type: str,
-        schema=None
+            df: DataFrame,
+            output_dir: str,
+            file_name: str,
+            query_property: str,
+            query_type: str,
+            schema=None
     ):
         batch = list()
         batch_size = 100

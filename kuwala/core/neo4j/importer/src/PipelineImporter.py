@@ -17,6 +17,7 @@ def add_constraints():
 def start(args):
     memory = os.getenv('SPARK_MEMORY') or '16g'
     SparkSession.builder \
+        .master('local[2]') \
         .config('spark.driver.memory', memory) \
         .config('spark.jars.packages', 'neo4j-contrib:neo4j-connector-apache-spark_2.12:4.0.1_for_spark_3') \
         .getOrCreate()

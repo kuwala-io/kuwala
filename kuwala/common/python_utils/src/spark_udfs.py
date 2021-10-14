@@ -10,10 +10,10 @@ DEFAULT_RESOLUTION = 11
 
 # Get H3 index for coordinates pair
 @udf(returnType=StringType())
-def get_h3_index(lat: str, lng: str):
+def get_h3_index(lat: str, lng: str, resolution):
     try:
         # noinspection PyUnresolvedReferences
-        return h3.geo_to_h3(float(lat), float(lng), DEFAULT_RESOLUTION)
+        return h3.geo_to_h3(float(lat), float(lng), resolution)
     except TypeError:
         return None
 
