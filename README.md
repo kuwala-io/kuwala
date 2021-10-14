@@ -21,20 +21,24 @@ There are basically 3 ways you can work with the clean data at the moment:
 
 ## Which data pipelines are available right now?
 
+### OpenStreetMap (OSM) POIs
+
+Points of interest are places that are physically accessible. This includes, for example, businesses, restaurants, schools, tourist attractions and parks. 
+A complete list of categories and further information can be found in our [OSM documentation](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/osm-poi). 
+We take the daily updated `.pbf` files with the entire data on OSM from [Geofabrik](http://www.geofabrik.de). 
+We filter  objects based on tags that are irrelevant for POIs. We then further aggregate the tags to high-level categories 
+allowing for easy query building and extract other metadata such as the address, contact details, or the building 
+footprint. By extracting and cleaning the data from OpenStreetMap, Kuwala has one of the largest POI databases scalable to any place in the world.
+
 ### Google POIs
 
 ![Google Popular Times](./docs/images/google_poi_popularity_graph.png)
 
-Kuwala offers a scraper that retrieves all available metadata for POIs as seen on Google Maps. We do not use the
-Google Maps API so there is no need for registration. Instead, the results are generated based on search strings which
-can be based on OpenStreetMap (OSM) data.
-
-### OpenStreetMap (OSM) POIs
-
-We take the daily updated `.pbf` files with the entire data on OSM from [Geofabrik](http://www.geofabrik.de). We filter 
-objects based on tags that are irrelevant for POIs. We then further aggregate the tags to high-level categories 
-allowing for easy query building and extract other metadata such as the address, contact details, or the building 
-footprint.
+Kuwala offers a scraper that retrieves all available metadata for POIs as seen on Google Search. You can verify the POIs from OSM and enrich 
+them further with an hourly, standardized score for visitation frequency throughout the week.This helps to understand the flow of people throughout a city. 
+We do not use the Google Maps API so there is no need for registration. Instead, the results are generated based on search strings 
+which can be based on OpenStreetMap (OSM) data. For more information, 
+please visit the [complete documentation](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/google-poi).
 
 ### High-Resolution Demographic Data
 
@@ -42,9 +46,15 @@ footprint.
 
 The high-resolution demographic data comes from Facebook's 
 [Data for Good](https://dataforgood.facebook.com/dfg/docs/methodology-high-resolution-population-density-maps) 
-initiative. It provides population estimates roughly 30 x 30 meters for different demographic groups such as total, 
+initiative. It provides population estimates for the whole world roughly 30 x 30 meters for different demographic groups such as total, 
 female, male or youth. It is a statistical model based on official census data combined with Facebook's data and 
-satellite images.
+satellite images. The demographics data represents the highest granularity and most up to date data of population estimates that is available. 
+
+### H3 (Spatial Index)
+H3 is an hierachically ordered indexing method for geo-spatial data which represents the world in unique hexagons of different sizes (bins).
+H3 makes it possible to aggregate data fast on different levels and different forms. It is computional efficient for databases and finds application
+in weighting data. One example might be weighting less granular data like income data with the high resolution demographics data provided 
+through Kuwala. H3 was developed by Uber, for the complete documentation please go to the [H3 Repo](https://github.com/uber/h3)
 
 ---
 
