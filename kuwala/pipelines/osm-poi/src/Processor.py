@@ -278,7 +278,7 @@ class Processor:
 
     @staticmethod
     def df_add_h3_index(df) -> DataFrame:
-        return df.withColumn('h3_index', get_h3_index(col('latitude'), col('longitude')))
+        return df.withColumn('h3_index', get_h3_index(col('latitude'), col('longitude'), lit(15)))
 
     @staticmethod
     def combine_pois(df_node, df_way, df_relation) -> DataFrame:

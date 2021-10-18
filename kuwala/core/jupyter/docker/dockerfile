@@ -1,0 +1,19 @@
+FROM jupyter/pyspark-notebook
+
+RUN pip install pandas-profiling[notebook]
+
+COPY ./common/jupyter/requirements.txt /opt/requirements.txt
+RUN pip install -r /opt/requirements.txt
+
+# Setup work directory for backward-compatibility
+RUN rmdir "/home/jovyan/work" && \
+    mkdir "/home/jovyan/kuwala" && \
+    mkdir "/home/jovyan/kuwala/modules" && \
+    mkdir "/home/jovyan/kuwala/notebooks" && \
+    mkdir "/home/jovyan/kuwala/resources" && \
+    touch "/home/jovyan/kuwala/__init__.py" && \
+    fix-permissions "/home/jovyan"
+
+ENV PYTHONPATH="/home/jovyan/"
+
+CMD ["start.sh", "jupyter", "lab", "--ServerApp.token=''"]
