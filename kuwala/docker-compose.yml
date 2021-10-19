@@ -118,7 +118,9 @@ services:
       dockerfile: ./pipelines/osm-poi/dockerfile
     environment:
       - SPARK_MEMORY=16g
+      - PROXY_ADDRESS=socks5://kuwala-pipelines_torproxy:9050
     restart: always
+    depends_on: [torproxy]
     volumes:
       - ./tmp/kuwala/osmFiles:/opt/pipelines/app/tmp/osmFiles
     profiles:

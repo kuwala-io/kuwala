@@ -46,6 +46,9 @@ docker-compose run --rm osm-parquetizer java -jar target/osm-parquetizer-1.0.1-S
 
 ### Process Parquet files
 
+We need to fetch some GeoJSON over the Nominatim API. In order to not run into rate limits make sure to have a proxy
+running. You can set the proxy address over the environment variable `PROXY_ADDRESS`.
+
 ```zsh
 docker-compose run osm-poi
 Creating kuwala_osm-poi_run ... done

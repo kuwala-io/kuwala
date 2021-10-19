@@ -48,8 +48,12 @@ def create_geo_json_based_on_coordinates(coordinates: [[float]]):
         geo_json_type = 'LineString'
 
     geo_json_coordinates = [coordinates] if geo_json_type == 'Polygon' else coordinates
+    geo_json = json.dumps(dict(type=geo_json_type, coordinates=geo_json_coordinates))
 
-    return json.dumps(dict(type=geo_json_type, coordinates=geo_json_coordinates))
+    if shape(json.loads(geo_json)).is_valid:
+        return geo_json
+
+    return None
 
 
 # Get the centroid of a GeoJSON string
@@ -64,6 +68,8 @@ def get_centroid_of_geo_json(geo_json: str):
             centroid = shape(geo_json).centroid
 
             return dict(latitude=centroid.y, longitude=centroid.x)
+        except TypeError:
+            return
         except ValueError:
             return
         except IndexError:
