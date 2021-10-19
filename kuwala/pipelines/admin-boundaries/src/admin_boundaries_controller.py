@@ -79,10 +79,4 @@ def get_admin_boundaries(sp, continent, country):
     admin_boundaries = sp.createDataFrame(admin_boundaries)
     result_path = os.path.join(script_dir, f'../tmp/{continent}/{country}/admin_boundaries.parquet')
 
-    # admin_boundaries.write.mode('overwrite').parquet(result_path)
-    admin_boundaries.coalesce(1) \
-        .write \
-        .mode('overwrite') \
-        .option('sep', ';') \
-        .option('header', 'true') \
-        .csv(result_path.replace('parquet', 'csv'))
+    admin_boundaries.write.mode('overwrite').parquet(result_path)

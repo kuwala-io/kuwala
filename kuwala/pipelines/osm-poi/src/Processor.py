@@ -361,6 +361,7 @@ class Processor:
         start_time = time.time()
         spark = SparkSession.builder \
             .appName('osm-poi') \
+            .config('spark.network.timeout', '1800s') \
             .config('spark.driver.memory', memory) \
             .config('spark.sql.parquet.binaryAsString', 'true') \
             .getOrCreate() \
@@ -385,7 +386,8 @@ class Processor:
 
             return has_outer
 
-        geo_jsons_to_fetch = df_relation.filter(col('geo_json').isNull() & col('name').isNotNull() & has_polygon_shape(col('members'))) \
+        geo_jsons_to_fetch = df_relation \
+            .filter(col('geo_json').isNull() & col('name').isNotNull() & has_polygon_shape(col('members'))) \
             .select('id', 'geo_json').toPandas()
         nominatim_controller.get_geo_json_by_id(geo_jsons_to_fetch)
         geo_jsons_to_fetch = spark.createDataFrame(geo_jsons_to_fetch).withColumnRenamed('geo_json', 'geo_json_fetched')

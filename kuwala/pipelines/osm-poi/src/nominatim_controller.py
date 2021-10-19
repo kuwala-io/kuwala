@@ -21,19 +21,23 @@ def get_geo_json(relation_id):
     geo_json = None
 
     while not geo_json and (sleep_time < max_sleep_time):
-        result = requests.get(
-            f'https://nominatim.openstreetmap.org/lookup?osm_ids=R{relation_id}&polygon_geojson=1&format=json',
-            proxies=proxies
-        )
+        try:
+            result = requests.get(
+                f'https://nominatim.openstreetmap.org/lookup?osm_ids=R{relation_id}&polygon_geojson=1&format=json',
+                proxies=proxies
+            )
 
-        if result:
-            result_json = result.json()
+            if result:
+                result_json = result.json()
 
-            if len(result_json) > 0 and 'geojson' in result_json[0]:
-                geo_json = result_json[0]['geojson']
+                if len(result_json) > 0 and 'geojson' in result_json[0]:
+                    geo_json = result_json[0]['geojson']
 
-            sleep_time = max_sleep_time
-        else:
+                sleep_time = max_sleep_time
+            else:
+                sleep(sleep_time)
+                sleep_time *= 2
+        except ConnectionError:
             sleep(sleep_time)
             sleep_time *= 2
 
