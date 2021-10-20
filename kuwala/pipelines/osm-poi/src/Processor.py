@@ -299,7 +299,7 @@ class Processor:
                     geo_json = json.dumps(dict(type='Polygon', coordinates=geo_json_coordinates[0]))
 
             try:
-                if shape(json.loads(geo_json)).is_valid:
+                if geo_json and shape(json.loads(geo_json)).is_valid:
                     return geo_json
 
                 return None

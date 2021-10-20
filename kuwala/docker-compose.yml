@@ -51,6 +51,7 @@ services:
     profiles:
       - network
       - google-poi-scraper
+      - proxy
 
   # docker-compose --profile google-poi-scraper up
   google-poi-api:
