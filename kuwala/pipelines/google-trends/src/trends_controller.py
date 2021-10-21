@@ -1,20 +1,24 @@
 import moment
+import os
 import pandas
 from pytrends.request import TrendReq
 
 
-def get_monthly_trend_for_keywords(file_path, delimiter=';', year_start=moment.utcnow().subtract(years=5).year):
-    pytrends = TrendReq(hl='en-US', tz=0)
+def get_monthly_trend_for_keywords(key_words, year_start=moment.utcnow().subtract(years=5).year):
+    proxy = os.environ.get('PROXY_ADDRESS')
+    pytrends = TrendReq(hl='en-US', tz=0, proxies=[proxy], retries=3, backoff_factor=1)
     timeframe = f'{year_start}-01-01 {str(moment.utcnow().date).split(" ")[0]}'
-    kw_file = pandas.read_csv(file_path, delimiter=delimiter)
-    kw_list = kw_file['keyword'].to_list()
-    kw_ids = kw_file['id'].to_list()
+    kw_list = key_words['keyword'].to_list()
     results = None
 
     for index, kw in enumerate(kw_list):
-        pytrends.build_payload([kw], geo='DE', timeframe=timeframe)
+        pytrends.build_payload([kw], geo=key_words['geo'][index], timeframe=timeframe)
         result = pytrends.interest_over_time()
-        results = pandas.concat([results, result[kw]], axis=1) if index > 0 else result[kw]
 
-    results.columns = kw_ids
+        if not result.empty:
+            results = pandas.concat([results, result[kw]], axis=1) if index > 0 else result[kw]
+        else:
+            print('Noob')
+
+    results.columns = key_words['id'].to_list()
     blub = ''

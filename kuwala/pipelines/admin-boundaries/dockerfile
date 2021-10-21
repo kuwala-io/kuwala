@@ -1,0 +1,9 @@
+FROM rappdw/docker-java-python
+
+COPY ./pipelines/admin-boundaries /opt/pipelines/app
+
+WORKDIR /opt/pipelines/app
+RUN pip install -r requirements.txt
+
+WORKDIR /opt/pipelines/app/src
+ENTRYPOINT [ "python", "main.py" ]

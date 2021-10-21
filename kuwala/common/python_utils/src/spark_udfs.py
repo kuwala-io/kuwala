@@ -64,15 +64,12 @@ def get_centroid_of_geo_json(geo_json: str):
     if geo_json:
         geo_json = json.loads(geo_json)
 
+        # noinspection PyBroadException
         try:
             centroid = shape(geo_json).centroid
 
             return dict(latitude=centroid.y, longitude=centroid.x)
-        except TypeError:
-            return
-        except ValueError:
-            return
-        except IndexError:
+        except Exception:
             return
 
 

@@ -21,6 +21,7 @@ def get_geo_json(relation_id):
     geo_json = None
 
     while not geo_json and (sleep_time < max_sleep_time):
+        # noinspection PyBroadException
         try:
             result = requests.get(
                 f'https://nominatim.openstreetmap.org/lookup?osm_ids=R{relation_id}&polygon_geojson=1&format=json',
@@ -37,7 +38,7 @@ def get_geo_json(relation_id):
             else:
                 sleep(sleep_time)
                 sleep_time *= 2
-        except ConnectionError:
+        except Exception:
             sleep(sleep_time)
             sleep_time *= 2
 

@@ -53,6 +53,22 @@ services:
       - google-poi-scraper
       - proxy
 
+  # docker-compose run admin-boundaries --continent=<> --country=<> --country_region=<>
+  admin-boundaries:
+    container_name: admin-boundaries
+    environment:
+      - SPARK_MEMORY=16g
+    build:
+      context: .
+      dockerfile: ./pipelines/admin-boundaries/dockerfile
+    volumes:
+      - ./tmp/kuwala/osmFiles:/opt/tmp/kuwala/osmFiles
+      - ./tmp/kuwala/adminBoundaries:/opt/pipelines/app/tmp
+    restart: always
+    profiles:
+      - network
+
+
   # docker-compose --profile google-poi-scraper up
   google-poi-api:
     container_name: google-poi-api

@@ -6,21 +6,43 @@ from pyspark.sql.types import IntegerType
 from shapely.geometry import shape
 
 
+def get_overlap_ratio(parent_id, child_shape, parent_shape):
+    intersection = child_shape.intersection(parent_shape)
+    intersection_area = intersection.area
+
+    return dict(id=parent_id, overlap_ratio=intersection_area/parent_shape.area)
+
+
 def build_hierarchy(admin_boundaries, admin_levels):
     for i1, r1 in admin_boundaries.iterrows():
         if r1.osm_admin_level != admin_levels[0]:
             child_geo_json = json.loads(r1.geo_json)
             child_shape = shape(child_geo_json)
+            parent_candidates = []
 
             for i2, r2 in admin_boundaries[admin_boundaries.osm_admin_level < r1.osm_admin_level].iterrows():
                 parent_geo_json = json.loads(r2.geo_json)
                 parent_shape = shape(parent_geo_json)
 
-                if not admin_boundaries['parent'][i1] and \
-                        child_shape.is_valid and \
-                        parent_shape.is_valid and \
-                        child_shape.intersects(parent_shape):
-                    admin_boundaries.at[i1, 'parent'] = r2.id
+                if child_shape.is_valid and parent_shape.is_valid and child_shape.intersects(parent_shape):
+                    candidate = [dict(id=r2.id, admin_level=r2.osm_admin_level, shape=parent_shape)]
+
+                    if not len(parent_candidates):
+                        parent_candidates = candidate
+                    elif parent_candidates[0]['admin_level'] == r2.osm_admin_level:
+                        parent_candidates += candidate
+
+            if not len(parent_candidates):
+                continue
+            elif len(parent_candidates) == 1:
+                admin_boundaries.at[i1, 'parent'] = parent_candidates[0]['id']
+            else:
+                parent_candidates = list(map(
+                    lambda p: get_overlap_ratio(parent_id=p['id'], child_shape=child_shape, parent_shape=p['shape']),
+                    parent_candidates)
+                )
+                admin_boundaries.at[i1, 'parent'] = \
+                    list(sorted(parent_candidates, key=lambda p: p['overlap_ratio'], reverse=True))[0]['id']
 
     for i1, r1 in admin_boundaries.iterrows():
         if r1['parent']:
@@ -39,9 +61,13 @@ def build_hierarchy(admin_boundaries, admin_levels):
     return admin_boundaries
 
 
-def get_admin_boundaries(sp, continent, country):
+def get_admin_boundaries(sp, continent, country, country_region):
     script_dir = os.path.dirname(__file__)
-    file_path = os.path.join(script_dir, f'../../../tmp/kuwala/osmFiles/parquet/{continent}/{country}/kuwala.parquet')
+    file_path = os.path.join(
+        script_dir,
+        f'../../../tmp/kuwala/osmFiles/parquet/{continent}/{country}{f"/{country_region}" if country_region else ""}'
+        '/kuwala.parquet'
+    )
 
     if not os.path.exists(file_path):
         logging.error('No OSM data available for building admin boundaries')
@@ -53,6 +79,7 @@ def get_admin_boundaries(sp, continent, country):
         .select('latitude', 'longitude', 'h3_index', 'name', 'boundary', 'osm_admin_level', 'geo_json') \
         .filter(
             col('boundary').isNotNull() &
+            col('osm_admin_level').isNotNull() &
             col('name').isNotNull() &
             col('boundary').isin('administrative') &
             col('geo_json').contains('Polygon')
@@ -77,6 +104,15 @@ def get_admin_boundaries(sp, continent, country):
     osm_admin_levels = osm_admin_levels.value
     admin_boundaries = build_hierarchy(admin_boundaries, osm_admin_levels)
     admin_boundaries = sp.createDataFrame(admin_boundaries)
-    result_path = os.path.join(script_dir, f'../tmp/{continent}/{country}/admin_boundaries.parquet')
+    result_path = os.path.join(
+        script_dir,
+        f'../tmp/{continent}/{country}{f"/{country_region}" if country_region else ""}/admin_boundaries.parquet'
+    )
 
     admin_boundaries.write.mode('overwrite').parquet(result_path)
+    admin_boundaries \
+        .withColumn('children', col('children').cast('string')) \
+        .coalesce(1).write.mode('overwrite') \
+        .option('header', 'true') \
+        .option('sep', ';') \
+        .csv(result_path.replace('parquet', 'csv'))

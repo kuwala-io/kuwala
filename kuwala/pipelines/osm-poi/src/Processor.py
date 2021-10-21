@@ -229,6 +229,7 @@ class Processor:
     @staticmethod
     def get_geo_json_center(df) -> DataFrame:
         return df \
+            .filter(col('geo_json').isNotNull()) \
             .withColumn('centroid', get_centroid_of_geo_json(col('geo_json'))) \
             .withColumn('latitude', col('centroid.latitude')) \
             .withColumn('longitude', col('centroid.longitude'))
