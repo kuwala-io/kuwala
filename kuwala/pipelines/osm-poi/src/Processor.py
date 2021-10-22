@@ -9,7 +9,6 @@ from pyspark.sql.types import \
     ArrayType, BooleanType, FloatType, IntegerType, NullType, StringType, StructField, StructType
 from python_utils.src.FileSelector import select_local_osm_file
 from python_utils.src.spark_udfs import create_geo_json_based_on_coordinates, get_centroid_of_geo_json, get_h3_index
-from shapely.geometry import shape
 
 DEFAULT_RESOLUTION = 15
 
@@ -198,31 +197,6 @@ class Processor:
         return df_way.withColumn('coordinates', get_coordinates(col('nodes')))
 
     @staticmethod
-    def df_mark_relation_members(spark, df_way, df_relation) -> DataFrame:
-        df_members = df_relation.withColumn('members', explode('members')).select('members.*').select('id', 'type') \
-            .sort('id')
-        dict_way_members = df_members.filter(col('type') == 'Way').select('id').distinct().toPandas() \
-            .set_index('id').T.to_dict('list')
-        dict_way_members = spark.sparkContext.broadcast(dict_way_members)
-
-        del df_members
-
-        @udf(returnType=BooleanType())
-        def is_relation_member(osm_id):
-            def is_in_df(broadcast, oid):
-                try:
-                    # noinspection PyComparisonWithNone
-                    return broadcast.value[oid] != None
-                except KeyError:
-                    return False
-
-            return is_in_df(dict_way_members, osm_id)
-
-        df_way = df_way.withColumn('is_relation_member', is_relation_member(col('id')))
-
-        return df_way
-
-    @staticmethod
     def df_way_create_geo_json(df_way) -> DataFrame:
         return df_way.withColumn('geo_json', create_geo_json_based_on_coordinates(col('coordinates')))
 
@@ -233,81 +207,6 @@ class Processor:
             .withColumn('centroid', get_centroid_of_geo_json(col('geo_json'))) \
             .withColumn('latitude', col('centroid.latitude')) \
             .withColumn('longitude', col('centroid.longitude'))
-
-    @staticmethod
-    def df_relation_create_geo_json(spark, df_relation, df_way) -> DataFrame:
-        dict_way_members = df_way.filter(col('is_relation_member')).select('id', 'coordinates').sort('id').toPandas() \
-            .set_index('id').T.to_dict('list')
-        dict_way_members = spark.sparkContext.broadcast(dict_way_members)
-
-        @udf(returnType=StringType())
-        def create_geo_json(relation_type, members):
-            if relation_type not in ['boundary', 'multipolygon']:
-                return
-
-            member_coordinates = []  # [[[[lng, lat]]]]
-            outer_members = list(filter(lambda m: m.role == 'outer', members))
-
-            for member in outer_members:
-                try:
-                    member_coordinates.append(dict_way_members.value[member.id])
-                except KeyError:
-                    continue
-
-            geo_json_coordinates = []
-            joined_member = None
-
-            for index, member in enumerate(member_coordinates):
-                if index == 0:
-                    joined_member = member
-                    continue
-
-                first_coordinates_joined = joined_member[0][0]
-                last_coordinates_joined = list(reversed(joined_member[0]))[0]
-                first_coordinates_new = member[0][0]
-                last_coordinates_new = list(reversed(member[0]))[0]
-                first_lat_joined = first_coordinates_joined[1]
-                first_lng_joined = first_coordinates_joined[0]
-                last_lat_joined = last_coordinates_joined[1]
-                last_lng_joined = last_coordinates_joined[0]
-                first_lat_new = first_coordinates_new[1]
-                first_lng_new = first_coordinates_new[0]
-                last_lat_new = last_coordinates_new[1]
-                last_lng_new = last_coordinates_new[0]
-
-                if last_lat_joined == first_lat_new and last_lng_joined == first_lng_new:
-                    joined_member[0] += member[0]
-                elif last_lat_joined == last_lat_new and last_lng_joined == last_lng_new:
-                    joined_member[0] += list(reversed(member[0]))
-                elif first_lat_joined == first_lat_new and first_lng_joined == first_lng_new:
-                    joined_member[0] = list(reversed(member[0])) + joined_member[0]
-                elif first_lat_joined == last_lat_new and first_lng_joined == last_lng_new:
-                    joined_member[0] = member[0] + joined_member[0]
-                else:
-                    geo_json_coordinates.append(joined_member)
-
-                    joined_member = member
-
-            if joined_member:
-                geo_json_coordinates.append(joined_member)
-
-            geo_json = None
-
-            if len(geo_json_coordinates):
-                if len(geo_json_coordinates) > 1:
-                    geo_json = json.dumps(dict(type='MultiPolygon', coordinates=geo_json_coordinates))
-                else:
-                    geo_json = json.dumps(dict(type='Polygon', coordinates=geo_json_coordinates[0]))
-
-            try:
-                if geo_json and shape(json.loads(geo_json)).is_valid:
-                    return geo_json
-
-                return None
-            except ValueError:
-                return None
-
-        return df_relation.withColumn('geo_json', create_geo_json(col('type'), col('members')))
 
     @staticmethod
     def df_add_h3_index(df) -> DataFrame:
@@ -372,10 +271,8 @@ class Processor:
         df_way = Processor.df_parse_tags(file_path, spark, 'way')
         df_relation = Processor.df_parse_tags(file_path, spark, 'relation')
         # Create GeoJSONs
-        df_way = Processor.df_mark_relation_members(spark, df_way, df_relation)
         df_way = Processor.df_parse_way_coordinates(df_way)
         df_way = Processor.df_way_create_geo_json(df_way)
-        df_relation = Processor.df_relation_create_geo_json(spark, df_relation, df_way)
 
         @udf(returnType=BooleanType())
         def has_polygon_shape(members):
@@ -387,13 +284,14 @@ class Processor:
 
             return has_outer
 
-        geo_jsons_to_fetch = df_relation \
-            .filter(col('geo_json').isNull() & col('name').isNotNull() & has_polygon_shape(col('members'))) \
-            .select('id', 'geo_json').toPandas()
+        geo_jsons_to_fetch = df_relation.filter(
+            col('name').isNotNull() &
+            has_polygon_shape(col('members')) &
+            col('type').isin(['boundary', 'multipolygon'])
+        ).withColumn('geo_json', lit(None)).select('id', 'geo_json').toPandas()
         nominatim_controller.get_geo_json_by_id(geo_jsons_to_fetch)
-        geo_jsons_to_fetch = spark.createDataFrame(geo_jsons_to_fetch).withColumnRenamed('geo_json', 'geo_json_fetched')
-        df_relation = df_relation.join(geo_jsons_to_fetch, 'id', 'left') \
-            .withColumn('geo_json', coalesce('geo_json_fetched', 'geo_json'))
+        geo_jsons_to_fetch = spark.createDataFrame(geo_jsons_to_fetch)
+        df_relation = df_relation.join(geo_jsons_to_fetch, 'id', 'left')
         df_way = Processor.get_geo_json_center(df_way)
         df_relation = Processor.get_geo_json_center(df_relation)
         # Add H3 index

@@ -110,9 +110,3 @@ def get_admin_boundaries(sp, continent, country, country_region):
     )
 
     admin_boundaries.write.mode('overwrite').parquet(result_path)
-    admin_boundaries \
-        .withColumn('children', col('children').cast('string')) \
-        .coalesce(1).write.mode('overwrite') \
-        .option('header', 'true') \
-        .option('sep', ';') \
-        .csv(result_path.replace('parquet', 'csv'))
