@@ -1,24 +1,39 @@
+import logging
 import moment
 import os
 import pandas
 from pytrends.request import TrendReq
+from time import sleep
 
 
+# noinspection PyBroadException
 def get_monthly_trend_for_keywords(key_words, year_start=moment.utcnow().subtract(years=5).year):
+    max_retries = 7
     proxy = os.environ.get('PROXY_ADDRESS')
-    pytrends = TrendReq(hl='en-US', tz=0, proxies=[proxy], retries=3, backoff_factor=1)
+    pytrends = TrendReq(hl='en-US', tz=0, proxies=[proxy], retries=max_retries, backoff_factor=1, timeout=60)
     timeframe = f'{year_start}-01-01 {str(moment.utcnow().date).split(" ")[0]}'
     kw_list = key_words['keyword'].to_list()
-    results = None
+    results = pandas.DataFrame(columns=kw_list)
 
     for index, kw in enumerate(kw_list):
-        pytrends.build_payload([kw], geo=key_words['geo'][index], timeframe=timeframe)
-        result = pytrends.interest_over_time()
+        attempt = 1
+        sleep_time = 2
+        got_response = False
 
-        if not result.empty:
-            results = pandas.concat([results, result[kw]], axis=1) if index > 0 else result[kw]
-        else:
-            print('Noob')
+        while not got_response and attempt <= max_retries:
+            try:
+                pytrends.build_payload([kw], geo=key_words['geo'][index], timeframe=timeframe)
+                result = pytrends.interest_over_time()
+                got_response = True
+            except Exception:
+                sleep(sleep_time)
+                sleep_time *= 2
+
+        if got_response and not result.empty:
+            results[kw] = result[kw]
+        elif not got_response:
+            logging.warning(f'Could not get response for {kw}')
 
     results.columns = key_words['id'].to_list()
-    blub = ''
+
+    return results
