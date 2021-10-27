@@ -2,25 +2,24 @@ version: '3.1'
 
 services:
 
-  neo4j:
-    container_name: neo4j
+  postgres:
+    container_name: postgres
+    image: postgres
     build:
       context: .
-      dockerfile: ./core/neo4j/docker/dockerfile
     restart: always
-    environment: 
-      - NEO4J_AUTH=none
-      - NEO4JLABS_PLUGINS=["apoc"]
-      - NEO4J_dbms_memory_heap_initial__size=512m
-      - NEO4J_dbms_memory_heap_max__size=4G
+    environment:
+      - POSTGRES_USER=kuwala
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=kuwala
     ports:
-      - '7474:7474'
-      - '7687:7687'
+      - '5432:5432'
     volumes:
-      - ./tmp/kuwala/db/neo4j/data:/data
+      - ./tmp/kuwala/db/postgres/data:/var/lib/postgresql/data
+      - ./core/database/importer/sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
     profiles:
-      - core
       - network
+      - database
 
   jupyter:
     container_name: jupyter
@@ -29,7 +28,6 @@ services:
       dockerfile: ./core/jupyter/docker/dockerfile
     restart: always
     environment: 
-      - NEO4J_HOST=bolt://neo4j:7687
       - JUPYTER_ENABLE_LAB=yes
     volumes:
       - ./common/jupyter/modules:/home/jovyan/kuwala/modules
@@ -41,7 +39,7 @@ services:
       - network
 
   torproxy:
-    container_name: kuwala-pipelines_torproxy
+    container_name: torproxy
     image: dperson/torproxy:latest
     environment: 
       - TOR_MaxCircuitDirtiness=10
@@ -102,23 +100,9 @@ services:
     profiles:
       - network
 
-  # docker-compose run neo4j-importer
-  neo4j-importer:
-    environment: 
-      - NEO4J_HOST=bolt://neo4j:7687
-      - SPARK_MEMORY=16g
-    build:
-      context: .
-      dockerfile: ./core/neo4j/importer/dockerfile
-    volumes:
-      - ./tmp/kuwala:/opt/core/app/importer/tmp/kuwala
-    restart: always
-    depends_on: [neo4j]
-    profiles:
-      - network
-
   # docker-compose run osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar <pbf-path> <parquet-path>
   osm-parquetizer:
+    container_name: osm-parquetizer
     build:
       context: .
       dockerfile: ./pipelines/osm-poi/osm-parquetizer/dockerfile
@@ -130,12 +114,13 @@ services:
 
   # docker-compose run osm-poi
   osm-poi:
+    container_name: osm-poi
     build:
       context: .
       dockerfile: ./pipelines/osm-poi/dockerfile
     environment:
       - SPARK_MEMORY=16g
-      - PROXY_ADDRESS=socks5://kuwala-pipelines_torproxy:9050
+      - PROXY_ADDRESS=socks5://torproxy:9050
     restart: always
     depends_on: [torproxy]
     volumes:
@@ -146,6 +131,7 @@ services:
 
   # docker-compose run  population-density
   population-density:
+    container_name: population-density
     build:
       context: .
       dockerfile: ./pipelines/population-density/dockerfile

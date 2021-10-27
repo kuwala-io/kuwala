@@ -7,7 +7,7 @@ from time import sleep
 
 def get_geo_json_by_id(df_ids):
     for index, row in df_ids.iterrows():
-        geo_json = get_geo_json(row.id)
+        geo_json = get_geo_json(row.osm_id)
         df_ids.at[index, 'geo_json'] = json.dumps(geo_json)
 
     return df_ids
