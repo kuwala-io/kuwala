@@ -71,7 +71,7 @@ services:
   google-poi-api:
     container_name: google-poi-api
     environment:
-      - PROXY_ADDRESS=socks5://kuwala-pipelines_torproxy:9050
+      - PROXY_ADDRESS=socks5://torproxy:9050
       - QUART_DEBUG=False
     build:
       context: .
@@ -94,8 +94,8 @@ services:
       context: .
       dockerfile: ./pipelines/google-poi/src/pipeline/dockerfile
     volumes:
-      - ./tmp/kuwala/googleFiles:/opt/pipelines/app/tmp/googleFiles
-      - ./tmp/kuwala/osmFiles:/opt/pipelines/app/tmp/osmFiles
+      - ./tmp/kuwala/google_files:/opt/app/tmp/kuwala/google_files
+      - ./tmp/kuwala/osm_files:/opt/app/tmp/kuwala/osm_files
     restart: always
     profiles:
       - network
@@ -108,7 +108,7 @@ services:
       dockerfile: ./pipelines/osm-poi/osm-parquetizer/dockerfile
     restart: always
     volumes:
-      - ./tmp/kuwala/osmFiles:/opt/app/tmp/osmFiles
+      - ./tmp/kuwala/osm_files:/opt/app/tmp/kuwala/osm_files
     profiles:
       - network
 
@@ -124,7 +124,7 @@ services:
     restart: always
     depends_on: [torproxy]
     volumes:
-      - ./tmp/kuwala/osmFiles:/opt/pipelines/app/tmp/osmFiles
+      - ./tmp/kuwala/osm_files:/opt/app/tmp/kuwala/osm_files
     profiles:
       - network
 
@@ -139,6 +139,6 @@ services:
       - SPARK_MEMORY=16g
     restart: always
     volumes:
-      - ./tmp/kuwala/populationFiles:/opt/pipelines/app/tmp/populationFiles
+      - ./tmp/kuwala/population_files:/opt/app/tmp/kuwala/population_files
     profiles:
       - network

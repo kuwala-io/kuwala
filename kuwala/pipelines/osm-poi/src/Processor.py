@@ -1,5 +1,6 @@
 import itertools
 import json
+import logging
 import nominatim_controller
 import os
 import time
@@ -154,7 +155,7 @@ class Processor:
                         else:
                             address[keys[0]][keys[1]] = tag.value
                     else:
-                        print(f'Invalid address key: {tag.key}')
+                        logging.warning(f'Invalid address key: {tag.key}')
 
             return address
 
@@ -181,9 +182,9 @@ class Processor:
 
     @staticmethod
     def df_parse_tags(file_path, spark, osm_type) -> DataFrame:
-        files = os.listdir(file_path + '/osm-parquetizer')
+        files = os.listdir(file_path + '/parquet/osm_parquetizer')
         file = list(filter(lambda f: (osm_type in f) and ('crc' not in f), files))[0]
-        df = spark.read.parquet(f'{file_path}/osm-parquetizer/{file}')
+        df = spark.read.parquet(f'{file_path}/parquet/osm_parquetizer/{file}')
         df = Processor.is_poi(df)
         df = Processor.parse_categories(df)
         df = Processor.parse_address(df)
@@ -279,7 +280,7 @@ class Processor:
     @staticmethod
     def start(args):
         script_dir = os.path.dirname(__file__)
-        directory = os.path.join(script_dir, '../tmp/osmFiles/parquet')
+        directory = os.path.join(script_dir, '../../../tmp/kuwala/osm_files')
 
         if not args.continent:
             file_path = select_local_osm_file(directory)
@@ -336,8 +337,8 @@ class Processor:
         # Combine all data frames
         df_pois = Processor.combine_pois(df_node, df_way, df_relation)
 
-        df_pois.write.mode('overwrite').parquet(file_path + '/kuwala.parquet')
+        df_pois.write.mode('overwrite').parquet(file_path + '/parquet/kuwala.parquet')
 
         end_time = time.time()
 
-        print(f'Processed OSM files in {round(end_time - start_time)} s')
+        logging.info(f'Processed OSM files in {round(end_time - start_time)} s')

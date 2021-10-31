@@ -28,11 +28,11 @@ def parse_opening_hours(opening_hours):
 
         return dict(
             date=str(moment.date(date)),
-            openingTime=str(moment.date(date).add(
+            opening_time=str(moment.date(date).add(
                 hours=opening_time_hours,
                 minutes=opening_time_minutes
             )) if opening_time_hours is not None else None,
-            closingTime=str(moment.date(date).add(
+            closing_time=str(moment.date(date).add(
                 days=1 if  # Necessary if closing at midnight or later or when place is open 24 hours (all values 0)
                 closing_time_hours < opening_time_hours | (
                         opening_time_hours == 0 &
@@ -85,7 +85,7 @@ def parse_popularity_data(popularity_data, timezone):
             ))
 
             p.append(dict(timestamp=timestamp, popularity=0))
-            w.append(dict(timestamp=timestamp, waitingTime=0))
+            w.append(dict(timestamp=timestamp, waiting_time=0))
 
         if day[1] is not None:
             for p_info in day[1]:
@@ -101,7 +101,7 @@ def parse_popularity_data(popularity_data, timezone):
                 # check if the waiting string is available and convert to minutes
                 if len(p_info) > 5:
                     includes_waiting_time = True
-                    w[index]['waitingTime'] = parse_waiting_time_data(p_info[3])
+                    w[index]['waiting_time'] = parse_waiting_time_data(p_info[3])
 
         popularity += p
         waiting_time += w
@@ -175,22 +175,22 @@ async def get_poi_information():
             id=r['id'],
             data=dict(
                 name=name,
-                placeID=place_id,
+                place_id=place_id,
                 location=dict(lat=lat, lng=lng),
-                h3Index=h3_index,
+                h3_index=h3_index,
                 address=address,
                 timezone=timezone,
                 categories=complete_categories(categories),
-                temporarilyClosed=temporarily_closed,
-                permanentlyClosed=permanently_closed,
-                insideOf=inside_of,
+                temporarily_closed=temporarily_closed,
+                permanently_closed=permanently_closed,
+                inside_of=inside_of,
                 contact=dict(phone=phone, website=website),
-                openingHours=opening_hours,
-                rating=dict(stars=rating_stars, numberOfReviews=rating_number_of_reviews),
-                priceLevel=len(price_level) if price_level else None,
+                opening_hours=opening_hours,
+                rating=dict(stars=rating_stars, number_of_reviews=rating_number_of_reviews),
+                price_level=len(price_level) if price_level else None,
                 popularity=popularity,
-                waitingTime=waiting_time,
-                spendingTime=spending_time
+                waiting_time=waiting_time,
+                spending_time=spending_time
             )
         )
 

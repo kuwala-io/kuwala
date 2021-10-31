@@ -42,7 +42,7 @@ class Downloader:
             selected_resources = select_demographic_groups(d)
 
         script_dir = os.path.dirname(__file__)
-        dir_path = f'../tmp/populationFiles/{dataset["continent"]}/{dataset["country"]}/'
+        dir_path = f'../../../tmp/kuwala/population_files/{dataset["continent"]}/{dataset["country"]}/'
         dir_path = os.path.join(script_dir, dir_path)
         file_paths = list()
 

@@ -13,8 +13,8 @@ def import_osm_pois(spark, database_url, database_properties, continent, country
 
     script_dir = os.path.dirname(__file__)
     file_path = os.path.join(script_dir,
-                             f'../../../../tmp/kuwala/osmFiles/parquet/{continent}/{country}'
-                             f'{f"/{country_region}" if country_region else ""}/kuwala.parquet')
+                             f'../../../../tmp/kuwala/osm_files/{continent}/{country}'
+                             f'{f"/{country_region}" if country_region else ""}/parquet/kuwala.parquet')
 
     @udf(returnType=ArrayType(elementType=StringType()))
     def concat_tags(tags):

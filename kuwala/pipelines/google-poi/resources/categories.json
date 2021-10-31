@@ -286,6 +286,7 @@
     "medical": {
         "category": "medical",
         "tags": [
+            "doctor",
             "hospital",
             "pharmaceutical_company",
             "medical_center",
@@ -352,7 +353,37 @@
             "youth_organization",
             "tool_store",
             "wallpaper_store",
-            "level"
+            "level",
+            "fire_protection_consultant",
+            "burglar_alarm_store",
+            "foreign_consulate",
+            "towing_service",
+            "laser_hair_removal_service",
+            "blinds_shop",
+            "glass_and_mirror_shop",
+            "serviced_apartment",
+            "musical_club",
+            "transportation_service",
+            "tourist_information_center",
+            "indian_takeaway",
+            "ham_shop",
+            "student_housing_center",
+            "shrine",
+            "curtain_and_upholstery_cleaner",
+            "carpet_cleaning_service",
+            "buffet_restaurant",
+            "pakistani_restaurant",
+            "punjabi_restaurant",
+            "bulgarian_restaurant",
+            "property_administrator",
+            "breakfast_restaurant",
+            "water_sports_equipment_rental_service",
+            "auto_tag_agency",
+            "tire_shop",
+            "massage_spa",
+            "tour_operator",
+            "halal_restaurant",
+            "produce_wholesaler"
         ]
     },
     "office": {
@@ -382,7 +413,8 @@
         "tags": [
             "transit_station",
             "bus_stop",
-            "train_station"
+            "train_station",
+            "bus_station"
         ]
     },
     "recreation": {

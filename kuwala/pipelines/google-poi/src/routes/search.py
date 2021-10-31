@@ -35,7 +35,7 @@ async def search_places():
                     query=r['query'],
                     data=dict(
                         location=dict(lat=lat, lng=lng),
-                        h3Index=h3_index,
+                        h3_index=h3_index,
                         id=pb_id,
                         name=name
                     )

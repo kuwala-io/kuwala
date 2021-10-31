@@ -1,10 +1,10 @@
 FROM rappdw/docker-java-python
 
-COPY ./common/python_utils /opt/common/python_utils
-COPY ./pipelines/population-density /opt/pipelines/app
+COPY ./common/python_utils /opt/app/common/python_utils
+COPY ./pipelines/population-density /opt/app/pipelines/population-density
 
-WORKDIR /opt/pipelines/app
+WORKDIR /opt/app/pipelines/population-density
 RUN pip install -r requirements.txt
 
-WORKDIR /opt/pipelines/app/src
+WORKDIR /opt/app/pipelines/population-density/src
 ENTRYPOINT [ "python", "main.py" ]

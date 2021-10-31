@@ -42,7 +42,7 @@ def select_local_country(directory):
 def select_local_osm_file(directory):
     country_path = select_local_country(directory)
 
-    if os.path.isdir(country_path + '/osm-parquetizer'):
+    if os.path.isdir(country_path + '/parquet/osm_parquetizer'):
         return country_path
 
     regions = os.listdir(country_path)
