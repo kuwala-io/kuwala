@@ -35,5 +35,5 @@ if __name__ == '__main__':
         sys.exit(1)
 
     generate_search_strings(continent=continent, country=country, country_region=country_region,
-                            polygon_coords=polygon_coords, polygon_resolution=polygon_resolution)
+                            polygon_coords=polygon_coords, polygon_res=polygon_resolution)
     SearchScraper.scrape_with_search_string(continent=continent, country=country, country_region=country_region)

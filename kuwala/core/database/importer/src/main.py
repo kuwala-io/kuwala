@@ -2,6 +2,7 @@ import argparse
 import logging
 import os
 import sys
+from admin_boundary_importer import import_admin_boundaries
 from google_osm_poi_matcher import import_google_osm_poi_matching_data
 from google_poi_importer import import_google_pois
 from osm_poi_importer import import_osm_pois
@@ -44,10 +45,13 @@ if __name__ == '__main__':
     database_user = os.getenv('DATABASE_USER') or 'kuwala'
     database_password = os.getenv('DATABASE_PASSWORD') or 'password'
     database_url = f'jdbc:postgresql://{database_host}:5432/{database_name}'
-    database_properties = dict(user=database_user, password=database_password, driver='org.postgresql.Driver')
+    database_properties = dict(user=database_user, password=database_password, driver='org.postgresql.Driver',
+                               stringtype='unspecified')
 
     create_tables(database_host=database_host, database_name=database_name, database_user=database_user,
                   database_password=database_password)
+    import_admin_boundaries(spark=spark, database_url=database_url, database_properties=database_properties,
+                            continent=continent, country=country, country_region=country_region)
     import_population_density(spark=spark, database_url=database_url, database_properties=database_properties,
                               continent=continent, country=country)
     import_osm_pois(spark=spark, database_url=database_url, database_properties=database_properties,

@@ -53,11 +53,6 @@ def build_hierarchy(admin_boundaries, admin_levels):
             else:
                 continue
 
-            if not admin_boundaries['children'][parent_index]:
-                admin_boundaries.at[parent_index, 'children'] = [r1['id']]
-            else:
-                admin_boundaries.at[parent_index, 'children'] = admin_boundaries['children'][parent_index] + [r1['id']]
-
     return admin_boundaries
 
 
@@ -65,7 +60,7 @@ def get_admin_boundaries(sp, continent, country, country_region):
     script_dir = os.path.dirname(__file__)
     file_path = os.path.join(
         script_dir,
-        f'../../../tmp/kuwala/osmFiles/parquet/{continent}/{country}{f"/{country_region}" if country_region else ""}'
+        f'../../../tmp/kuwala/osm_files/{continent}/{country}{f"/{country_region}" if country_region else ""}/parquet'
         '/kuwala.parquet'
     )
 
@@ -99,14 +94,14 @@ def get_admin_boundaries(sp, continent, country, country_region):
         .withColumn('id', concat_ws('_', lit(continent), lit(country), col('kuwala_admin_level'), col('h3_index'))) \
         .sort(col('kuwala_admin_level').desc()) \
         .withColumn('parent', lit(None)) \
-        .withColumn('children', lit(None)) \
         .toPandas()
     osm_admin_levels = osm_admin_levels.value
     admin_boundaries = build_hierarchy(admin_boundaries, osm_admin_levels)
     admin_boundaries = sp.createDataFrame(admin_boundaries)
     result_path = os.path.join(
         script_dir,
-        f'../tmp/{continent}/{country}{f"/{country_region}" if country_region else ""}/admin_boundaries.parquet'
+        f'../../../tmp/kuwala/admin_boundary_files/{continent}/{country}'
+        f'{f"/{country_region}" if country_region else ""}/admin_boundaries.parquet'
     )
 
     admin_boundaries.write.mode('overwrite').parquet(result_path)

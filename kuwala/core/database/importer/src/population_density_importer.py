@@ -13,6 +13,7 @@ def import_population_density(spark, database_url, database_properties, continen
                                          f'/result.parquet')
     data = spark.read.parquet(file_path)
 
-    data.write.jdbc(url=database_url, table='population_density', mode='overwrite', properties=database_properties)
+    data.write.option('truncate', True) \
+        .jdbc(url=database_url, table='population_density', mode='overwrite', properties=database_properties)
     logging.info(f'Successfully imported population density data for {country}, {continent} after '
                  f'{round(time.time() - start_time)} s')

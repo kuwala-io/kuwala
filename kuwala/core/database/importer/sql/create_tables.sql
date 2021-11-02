@@ -1,3 +1,25 @@
+--create types
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'osm_type_enum') THEN
+        CREATE TYPE osm_type_enum AS ENUM('node', 'way', 'relation');
+    END IF;
+END$$;
+
+-- Creation of admin_boundary table
+
+CREATE TABLE IF NOT EXISTS admin_boundary (
+    id text NOT NULL PRIMARY KEY,
+    name text NOT NULL,
+    h3_index varchar(15) NOT NULL,
+    latitude decimal NOT NULL,
+    longitude decimal NOT NULL,
+    kuwala_admin_level integer NOT NULL,
+    osm_admin_level integer NOT NULL,
+    parent text REFERENCES admin_boundary(id),
+    geo_json text NOT NULL
+);
+
 -- Creation of population_density table
 
 CREATE TABLE IF NOT EXISTS population_density (
@@ -14,7 +36,7 @@ CREATE TABLE IF NOT EXISTS population_density (
 -- Creation of osm_poi table
 
 CREATE TABLE IF NOT EXISTS osm_poi (
-    osm_type text NOT NULL,
+    osm_type osm_type_enum NOT NULL,
     osm_id text NOT NULL,
     h3_index varchar(15) NOT NULL,
     latitude decimal NOT NULL,
@@ -92,8 +114,8 @@ CREATE TABLE IF NOT EXISTS google_poi_popularity (
 CREATE TABLE IF NOT EXISTS google_poi_opening_hours (
     internal_id text NOT NULL,
     date timestamp with time zone NOT NULL,
-    opening_time timestamp with time zone NOT NULL,
-    closing_time timestamp with time zone NOT NULL,
+    opening_time timestamp with time zone,
+    closing_time timestamp with time zone,
     CONSTRAINT fk_google_poi_opening_hours FOREIGN KEY(internal_id) REFERENCES google_poi(internal_id)
 );
 
@@ -109,7 +131,7 @@ CREATE TABLE IF NOT EXISTS google_poi_waiting_time (
 -- Creation of google_osm_poi_matching table
 
 CREATE TABLE IF NOT EXISTS google_osm_poi_matching (
-    osm_type text NOT NULL,
+    osm_type osm_type_enum NOT NULL,
     osm_id text NOT NULL,
     internal_id text NOT NULL,
     confidence decimal NOT NULL,

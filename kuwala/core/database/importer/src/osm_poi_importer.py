@@ -22,6 +22,7 @@ def import_osm_pois(spark, database_url, database_properties, continent, country
 
     data = spark.read.parquet(file_path).withColumn('tags', concat_tags(col('tags')))
 
-    data.write.jdbc(url=database_url, table='osm_poi', mode='overwrite', properties=database_properties)
+    data.write.option('truncate', True).option('cascadeTruncate', True) \
+        .jdbc(url=database_url, table='osm_poi', mode='overwrite', properties=database_properties)
     logging.info(f'Successfully imported OSM POIs for {f"{country_region}, " if country_region else ""}{country}, '
                  f'{continent} after {round(time.time() - start_time)} s')
