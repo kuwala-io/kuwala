@@ -168,7 +168,8 @@
             "educational_institution",
             "education_center",
             "english_language_instructor",
-            "english_language_camp"
+            "english_language_camp",
+            "elementary_school"
         ]
     },
     "entertainment": {
@@ -383,7 +384,15 @@
             "massage_spa",
             "tour_operator",
             "halal_restaurant",
-            "produce_wholesaler"
+            "produce_wholesaler",
+            "business_to_business_service",
+            "inn",
+            "tea_and_coffee_merchant",
+            "villa",
+            "apartment_rental_agency",
+            "commercial_agent",
+            "property_investment",
+            "scuba_tour_agency"
         ]
     },
     "office": {
@@ -452,7 +461,8 @@
             "mosque",
             "religious_organization",
             "religious_institution",
-            "dome"
+            "dome",
+            "place_of_worship"
         ]
     },
     "service": {
@@ -649,7 +659,9 @@
             "office_supply_store",
             "rubber_stamp_store",
             "stationery_store",
-            "clothing_store"
+            "clothing_store",
+            "fabric_store",
+            "carpet_store"
         ]
     },
     "socialService": {
@@ -671,7 +683,8 @@
             "gym",
             "dance_school",
             "golf_course",
-            "sports_complex"
+            "sports_complex",
+            "fitness_center"
         ]
     },
     "tourism": {

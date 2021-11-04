@@ -48,7 +48,7 @@ class SearchScraper:
         # noinspection PyTypeChecker
         df_res = df_str \
             .alias('df_str') \
-            .join(df_res, on='query', how='inner') \
+            .join(df_res, on='query', how='left') \
             .filter(col('data.h3_index').isNotNull()) \
             .withColumn('osm_name', col('df_str.name')) \
             .withColumn('google_name', col('data.name')) \
@@ -87,7 +87,7 @@ class SearchScraper:
         # noinspection PyTypeChecker
         df_pd = df_res \
             .alias('df_res') \
-            .join(df_pd, on='internal_id', how='inner') \
+            .join(df_pd, on='internal_id', how='left') \
             .filter(col('data.h3_index').isNotNull()) \
             .select('osm_id', 'osm_type', 'confidence', 'internal_id', 'data.*') \
             .withColumn('latitude', col('location.lat')) \
@@ -95,7 +95,6 @@ class SearchScraper:
             .drop('location') \
             .withColumn('tags', col('categories.google')) \
             .withColumn('categories', col('categories.kuwala')) \
-            .drop('categories') \
             .withColumn('contact_phone', col('contact.phone')) \
             .withColumn('contact_website', col('contact.website')) \
             .drop('contact') \
@@ -237,7 +236,7 @@ class SearchScraper:
     """Send search strings to get Google POI ids"""
     @staticmethod
     def send_search_queries(directory, file_name, continent, country, country_region):
-        search_strings = pq.read_table(directory + file_name).to_pandas()
+        search_strings = pq.read_table(directory + file_name).to_pandas()[['query']].drop_duplicates()
         schema = pa.schema([
             pa.field('query', pa.string()),
             pa.field('data', pa.struct([

@@ -1,0 +1,32 @@
+SELECT
+    concat_ws('_', h3_index, osm_id) AS poi_id,
+    confidence AS poi_confidence_google,
+    place_id AS poi_google_place_id,
+    h3_index AS poi_h3_index,
+    latitude,
+    longitude,
+    google_poi.name AS poi_name_google,
+    osm_poi.name AS poi_name_osm,
+    array_to_string(osm_poi.categories, ',') AS poi_categories_osm,
+    array_to_string(google_poi.categories, ',') AS poi_categories_google,
+    array_to_string(tags, ',') AS poi_categories_google_raw,
+    osm_poi.address AS poi_address_osm,
+    array_to_string(google_poi.address, ', ') AS poi_address_google,
+    number_of_reviews AS poi_reviews,
+    rating_stars AS poi_rating,
+    price_level AS poi_price_level,
+    opening_time_total AS poi_opening_time_total,
+    popularity_total AS poi_popularity_total,
+    popularity_morning_total AS poi_popularity_morning_total,
+    popularity_noon_total AS poi_popularity_noon_total,
+    popularity_afternoon_total AS poi_popularity_afternoon_total,
+    popularity_evening_total AS poi_popularity_evening_total,
+    (temporarily_closed OR permanently_closed) AS poi_closed,
+    permanently_closed AS poi_closed_permanently,
+    spending_time AS poi_spending_time,
+    waiting_time_total AS poi_waiting_time,
+    inside_of AS poi_inside_of,
+    15 AS h3_resolution
+FROM {{ ref('osm_poi') }}
+    LEFT JOIN {{ ref('google_osm_poi_matching') }} USING (osm_id)
+    LEFT JOIN {{ ref('google_poi') }} USING (internal_id)

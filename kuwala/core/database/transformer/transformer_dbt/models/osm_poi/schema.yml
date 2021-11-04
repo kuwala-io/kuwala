@@ -1,0 +1,45 @@
+
+version: 2
+
+models:
+  - name: osm_poi_address
+    description: 'Address components combined as string'
+    columns:
+      - name: osm_type
+        description: 'Type of the OSM object'
+        tests:
+          - not_null
+          - accepted_values:
+              values: [ 'node', 'way', 'relation' ]
+      - name: osm_id
+        description: 'ID for the related OSM type'
+        tests:
+          - not_null
+      - name: address
+        description: 'Address components combined as string'
+  - name: osm_poi
+    description: 'POI data of OSM objects'
+    columns:
+      - name: osm_id
+        description: 'Concatenated osm_type and osm_id'
+        tests:
+          - unique
+          - not_null
+      - name: h3_index
+        description: 'H3 index at resolution 15 based on the OSM POI coordinates'
+        tests:
+          - not_null
+      - name: latitude
+        description: 'Latitude of the OSM POI'
+        tests:
+          - not_null
+      - name: longitude
+        description: 'Longitude of the OSM POI'
+        tests:
+          - not_null
+      - name: name
+        description: 'Name of the OSM POI'
+      - name: categories
+        description: 'Kuwala POI categories based on OSM tags'
+      - name: address
+        description: 'String based on address components'

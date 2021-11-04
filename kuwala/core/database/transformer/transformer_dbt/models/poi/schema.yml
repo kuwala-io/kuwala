@@ -1,0 +1,92 @@
+
+version: 2
+
+models:
+  - name: google_osm_poi_matching
+    description: 'Matching of OSM POIs to Google results based on name and location'
+    columns:
+      - name: osm_id
+        description: 'Combined OSM type with respective OSM ID'
+        tests:
+          - unique
+          - not_null
+      - name: internal_id
+        description: 'ID of the Google POI'
+        tests:
+          - not_null
+      - name: confidence
+        description: 'Confidence score based on name and location'
+        tests:
+          - not_null
+  - name: poi
+    description: 'POI model based on OSM and Google data'
+    columns:
+      - name: poi_id
+        description: 'Unique ID referring to a POI'
+        tests:
+          - unique
+          - not_null
+      - name: poi_confidence_google
+        description: 'The confidence of the Google result based on the query input'
+      - name: poi_google_place_id
+        description: "Google's ID for entries on Google Maps"
+      - name: poi_h3_index
+        description: 'H3 index of the POI'
+        tests:
+          - not_null
+      - name: latitude
+        description: 'Latitude of the center of the H3 index'
+        tests:
+          - not_null
+      - name: longitude
+        description: 'Longitude of the center of the H3 index'
+        tests:
+          - not_null
+      - name: poi_name_google
+        description: 'Name of the POI how it appears on Google'
+      - name: poi_name_osm
+        description: 'Name of the POI how it appears on OSM'
+      - name: poi_categories_osm
+        description: 'POI categories based on OSM'
+      - name: poi_categories_google
+        description: 'POI categories based on Google Maps'
+      - name: poi_categories_google_raw
+        description: 'Raw category tags returned from Google Maps that are used to build high-level POI categories'
+      - name: poi_address_osm
+        description: 'The address string based on OSM address tags'
+      - name: poi_address_google
+        description: 'The address string form Google Maps'
+      - name: poi_reviews
+        description: 'Number of reviews on Google Maps'
+      - name: poi_rating
+        description: 'Average rating on Google Maps'
+      - name: poi_price_level
+        description: 'Price level on Google Maps'
+      - name: poi_opening_time_total
+        description: 'The total opening hours of the POI during a given timeframe'
+      - name: poi_popularity_total
+        description: 'The total popularity values of the POI during a given timeframe'
+      - name: poi_popularity_morning_total
+        description: 'The total popularity values of the POI in the morning hours during a given timeframe'
+      - name: poi_popularity_noon_total
+        description: 'The total popularity values of the POI in the noon hours during a given timeframe'
+      - name: poi_popularity_afternoon_total
+        description: 'The total popularity values of the POI in the afternoon hours during a given timeframe'
+      - name: poi_popularity_evening_total
+        description: 'The total popularity values of the POI in the evening hours during a given timeframe'
+      - name: poi_closed
+        description: 'Indicating whether the POI is marked as closed on Google Maps (temporarily or permanently)'
+      - name: poi_closed_permanently
+        description: 'Indicating whether the POI is marked as permanently closed on Google Maps'
+      - name: poi_spending_time
+        description: 'The average duration people spend at the POI in minutes'
+      - name: poi_waiting_time
+        description: 'The average duration people wait at the POI in minutes cumulated throughout one week'
+      - name: poi_inside_of
+        description: 'Indicating whether the POI is located inside another POI (e.g., a shopping mall)'
+      - name: h3_resolution
+        description: 'The resolution of the H3 index (for POI 15)'
+        tests:
+          - not_null
+          - accepted_values:
+              values: [ 15 ]
