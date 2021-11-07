@@ -7,7 +7,7 @@ from google_osm_poi_matcher import import_google_osm_poi_matching_data
 from google_poi_importer import import_google_pois
 from osm_poi_importer import import_osm_pois
 from population_density_importer import import_population_density
-from postgres_controller import create_tables
+from postgres_controller import send_query
 from pyspark.sql import SparkSession
 
 if __name__ == '__main__':
@@ -48,10 +48,11 @@ if __name__ == '__main__':
     database_properties = dict(user=database_user, password=database_password, driver='org.postgresql.Driver',
                                stringtype='unspecified')
 
-    create_tables(database_host=database_host, database_name=database_name, database_user=database_user,
-                  database_password=database_password)
-    import_admin_boundaries(spark=spark, database_url=database_url, database_properties=database_properties,
-                            continent=continent, country=country, country_region=country_region)
+    send_query(database_host=database_host, database_name=database_name, database_user=database_user,
+               database_password=database_password, path_to_query_file='../sql/create_tables.sql')
+    import_admin_boundaries(spark=spark, database_host=database_host, database_name=database_name,
+                            database_url=database_url, database_properties=database_properties, continent=continent,
+                            country=country, country_region=country_region)
     import_population_density(spark=spark, database_url=database_url, database_properties=database_properties,
                               continent=continent, country=country)
     import_osm_pois(spark=spark, database_url=database_url, database_properties=database_properties,

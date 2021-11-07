@@ -1,0 +1,28 @@
+
+version: 2
+
+models:
+  - name: population_density
+    description: 'Population density per demographic group aggregated by H3 index'
+    columns:
+      - name: h3_index
+        description: 'H3 index of the aggregated area'
+        tests:
+          - unique
+          - not_null
+      - name: total
+        description: 'Total popularity in the given H3 index'
+        tests:
+          - not_null
+      - name: children_under_five
+        description: 'Number of children under five in the given H3 index'
+      - name: elderly_60_plus
+        description: 'Number of elderly people over 60 in the given H3 index'
+      - name: men
+        description: 'Number of men in the given H3 index'
+      - name: women
+        description: 'Number of women in the given H3 index'
+      - name: women_reproductive_age_15_49
+        description: 'Number of women in the reproductive age between 15 and 49 in the given H3 index'
+      - name: youth_15_24
+        description: 'Number of young people between 15 and 24 in the given H3 index'

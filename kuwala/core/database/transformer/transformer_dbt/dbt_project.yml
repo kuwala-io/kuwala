@@ -25,6 +25,8 @@ clean-targets:         # directories to be removed by `dbt clean`
   - "dbt_modules"
 
 vars:
+  # Aggregation grid
+  grid_resolution: 8
   # Time frame
   start_date: DATE '2021-10-25'
   end_date: DATE '2021-10-31'
@@ -38,7 +40,6 @@ vars:
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
 
 models:
-  poi:
-    +materialized: view
-  osm_poi:
-    +materialized: view
+  kuwala_core_database_transformer:
+    poi:
+      +materialized: table

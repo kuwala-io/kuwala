@@ -4,19 +4,19 @@ services:
 
   postgres:
     container_name: postgres
-    image: postgres
     build:
       context: .
+      dockerfile: ./core/database/dockerfile
     restart: always
     environment:
       - POSTGRES_USER=kuwala
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=kuwala
+      - POSTGRES_MULTIPLE_EXTENSIONS=postgis,hstore,postgis_topology,postgis_raster,pgrouting,h3
     ports:
       - '5432:5432'
     volumes:
       - ./tmp/kuwala/db/postgres/data:/var/lib/postgresql/data
-      - ./core/database/importer/sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
     profiles:
       - network
       - database

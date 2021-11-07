@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS admin_boundary (
     kuwala_admin_level integer NOT NULL,
     osm_admin_level integer NOT NULL,
     parent text REFERENCES admin_boundary(id),
-    geo_json text NOT NULL
+    geo_json text NOT NULL,
+    geometry geometry
 );
 
 -- Creation of population_density table

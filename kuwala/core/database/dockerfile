@@ -1,0 +1,10 @@
+FROM kartoza/postgis:14-3.1
+
+# Install h3-pg
+RUN apt-get update && apt-get install -y cmake gcc git libtool make python3 python3-pip
+RUN pip3 install --no-cache --upgrade pip setuptools && pip3 install pgxnclient
+RUN pgxn install h3
+
+# Initialize tables script
+RUN mkdir -p /docker-entrypoint-initdb.d
+COPY ./core/database/importer/sql/create_tables.sql /docker-entrypoint-initdb.d/create_tables.sql
