@@ -16,6 +16,11 @@ def import_google_osm_poi_matching_data(spark, database_url, database_properties
     poi_data_dir = os.path.join(script_dir,
                                 f'../../../../tmp/kuwala/google_files/{continent}/{country}'
                                 f'{f"/{country_region}" if country_region else ""}/poi_data')
+
+    if not (os.path.exists(search_results_dir) and os.path.exists(poi_data_dir)):
+        logging.warning('Search results and poi data are not both available. Skipping import.')
+        return
+
     file_path_search_results = os.path.join(search_results_dir,
                                             sorted(filter(lambda f: 'matched' in f, os.listdir(search_results_dir)),
                                                    reverse=True)[0])

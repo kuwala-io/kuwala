@@ -15,6 +15,11 @@ def import_google_pois(spark, database_url, database_properties, continent, coun
     poi_data_dir = os.path.join(script_dir,
                                 f'../../../../tmp/kuwala/google_files/{continent}/{country}'
                                 f'{f"/{country_region}" if country_region else ""}/poi_data')
+
+    if not os.path.exists(poi_data_dir):
+        logging.warning('No Google data available. Skipping import.')
+        return
+
     file_path = os.path.join(poi_data_dir,
                              sorted(filter(lambda f: 'matched' in f, os.listdir(poi_data_dir)), reverse=True)[0])
     data = spark.read.parquet(file_path).dropDuplicates(['internal_id'])

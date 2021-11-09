@@ -16,6 +16,10 @@ def import_osm_pois(spark, database_url, database_properties, continent, country
                              f'../../../../tmp/kuwala/osm_files/{continent}/{country}'
                              f'{f"/{country_region}" if country_region else ""}/parquet/kuwala.parquet')
 
+    if not os.path.exists(file_path):
+        logging.warning('No OSM data available. Skipping import.')
+        return
+
     @udf(returnType=ArrayType(elementType=StringType()))
     def concat_tags(tags):
         return list(map(lambda tag: f'{tag["key"]}={tag["value"]}', tags))

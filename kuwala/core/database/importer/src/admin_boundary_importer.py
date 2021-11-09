@@ -15,6 +15,11 @@ def import_admin_boundaries(spark, database_host, database_name, database_url, d
     file_path = os.path.join(script_dir,
                              f'../../../../tmp/kuwala/admin_boundary_files/{continent}/{country}'
                              f'{f"/{country_region}" if country_region else ""}/admin_boundaries.parquet')
+
+    if not os.path.exists(file_path):
+        logging.warning('No admin boundaries file available. Skipping import.')
+        return
+
     data = spark.read.parquet(file_path).coalesce(1).sort('kuwala_admin_level')
 
     data.write.option('truncate', True).option('batchsize', 1) \

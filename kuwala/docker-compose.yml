@@ -60,8 +60,8 @@ services:
       context: .
       dockerfile: ./pipelines/admin-boundaries/dockerfile
     volumes:
-      - ./tmp/kuwala/osmFiles:/opt/tmp/kuwala/osmFiles
-      - ./tmp/kuwala/adminBoundaries:/opt/pipelines/app/tmp
+      - ./tmp/kuwala/osm_files:/opt/tmp/kuwala/osm_files
+      - ./tmp/kuwala/admin_boundary_files:/opt/tmp/kuwala/admin_boundary_files
     restart: always
     profiles:
       - network

@@ -2,6 +2,7 @@
 version: 2
 
 models:
+  # Google OSM POI matching
   - name: google_osm_poi_matching
     description: 'Matching of OSM POIs to Google results based on name and location'
     columns:
@@ -18,6 +19,8 @@ models:
         description: 'Confidence score based on name and location'
         tests:
           - not_null
+
+  # POI
   - name: poi
     description: 'POIs with matching admin boundary'
     columns:
@@ -95,6 +98,8 @@ models:
         descending order'
       - name: poi_address_country
         description: 'Name of admin boundary having kuwala_admin_level 1 containing POI coordinates'
+
+  # POI admin boundary
   - name: poi_admin_boundary
     description: 'Admin boundary names containing POI coordinates'
     columns:
@@ -108,6 +113,22 @@ models:
         descending order'
       - name: poi_address_country
         description: 'Name of admin boundary having kuwala_admin_level 1 containing POI coordinates'
+
+  # POI aggregated
+  - name: poi_aggregated
+    description: 'Aggregated POI data based on H3 resolution'
+    columns:
+      - name: h3_index
+        description: 'H3 index data has been aggregated on'
+        tests:
+          - unique
+          - not_null
+      - name: pois_total
+        description: 'Total number of POIs in H3 index'
+        tests:
+          - not_null
+
+  # POI matched
   - name: poi_matched
     description: 'POI model based on OSM and Google data'
     columns:

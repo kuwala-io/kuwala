@@ -11,6 +11,11 @@ def import_population_density(spark, database_url, database_properties, continen
     script_dir = os.path.dirname(__file__)
     file_path = os.path.join(script_dir, f'../../../../tmp/kuwala/population_files/{continent}/{country}'
                                          f'/result.parquet')
+
+    if not os.path.exists(file_path):
+        logging.warning('No population data available. Skipping import.')
+        return
+
     data = spark.read.parquet(file_path)
 
     data.write.option('truncate', True) \

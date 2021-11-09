@@ -28,8 +28,8 @@ vars:
   # Aggregation grid
   grid_resolution: 8
   # Time frame
-  start_date: DATE '2021-10-25'
-  end_date: DATE '2021-10-31'
+  start_date: DATE '2021-11-01'
+  end_date: DATE '2021-11-07'
   first_morning_hour: 0
   last_morning_hour: 9
   last_noon_hour: 13
@@ -42,4 +42,6 @@ vars:
 models:
   kuwala_core_database_transformer:
     poi:
+      +materialized: table
+    poi_aggregated:
       +materialized: table
