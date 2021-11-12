@@ -15,7 +15,7 @@ def import_matches(spark, database_url, database_properties, search_results_dir,
 
     file_path_search_results = os.path.join(search_results_dir, search_results_files[0])
     file_path_poi_data = os.path.join(poi_data_dir, poi_data_files[0])
-    df_search_results = spark.read.parquet(file_path_search_results).dropDuplicates(['internal_id'])
+    df_search_results = spark.read.parquet(file_path_search_results)
     df_poi_data = spark.read.parquet(file_path_poi_data).dropDuplicates(['internal_id']).select('internal_id')
     df_search_results = df_search_results.join(df_poi_data, on='internal_id', how='inner')
 

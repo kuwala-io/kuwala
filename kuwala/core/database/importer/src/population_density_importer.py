@@ -1,6 +1,7 @@
 import logging
 import os
 import time
+from pyspark.sql.functions import lit
 
 
 def import_population_density(spark, database_url, database_properties, continent, country):
@@ -16,7 +17,7 @@ def import_population_density(spark, database_url, database_properties, continen
         logging.warning('No population data available. Skipping import.')
         return
 
-    data = spark.read.parquet(file_path)
+    data = spark.read.parquet(file_path).withColumn('kuwala_import_country', lit(country))
 
     data.write.option('truncate', True) \
         .jdbc(url=database_url, table='population_density', mode='overwrite', properties=database_properties)

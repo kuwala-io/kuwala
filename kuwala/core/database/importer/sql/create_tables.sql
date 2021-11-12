@@ -10,6 +10,7 @@ END$$;
 
 CREATE TABLE IF NOT EXISTS admin_boundary (
     id text NOT NULL PRIMARY KEY,
+    kuwala_import_country varchar(3) NOT NULL,
     name text NOT NULL,
     h3_index varchar(15) NOT NULL,
     latitude decimal NOT NULL,
@@ -25,6 +26,7 @@ CREATE TABLE IF NOT EXISTS admin_boundary (
 
 CREATE TABLE IF NOT EXISTS population_density (
     h3_index varchar(15) NOT NULL PRIMARY KEY,
+    kuwala_import_country varchar(3) NOT NULL,
     total decimal,
     children_under_five decimal,
     elderly_60_plus decimal,
@@ -39,6 +41,7 @@ CREATE TABLE IF NOT EXISTS population_density (
 CREATE TABLE IF NOT EXISTS osm_poi (
     osm_type osm_type_enum NOT NULL,
     osm_id text NOT NULL,
+    kuwala_import_country varchar(3) NOT NULL,
     h3_index varchar(15) NOT NULL,
     latitude decimal NOT NULL,
     longitude decimal NOT NULL,
@@ -78,6 +81,7 @@ CREATE TABLE IF NOT EXISTS osm_poi (
 
 CREATE TABLE IF NOT EXISTS google_poi (
     internal_id text NOT NULL PRIMARY KEY,
+    kuwala_import_country varchar(3) NOT NULL,
     h3_index varchar(15) NOT NULL,
     latitude decimal NOT NULL,
     longitude decimal NOT NULL,
@@ -149,7 +153,9 @@ CREATE TABLE IF NOT EXISTS google_osm_poi_matching (
 CREATE TABLE IF NOT EXISTS google_custom_poi_matching (
     custom_id text NOT NULL PRIMARY KEY,
     internal_id text NOT NULL,
+    confidence decimal NOT NULL,
     name_distance decimal NOT NULL,
+    h3_distance decimal NOT NULL,
     query text NOT NULL,
     CONSTRAINT fk_google_osm_poi_matching_google_id FOREIGN KEY(internal_id) REFERENCES google_poi(internal_id)
 );

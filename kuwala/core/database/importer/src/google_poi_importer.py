@@ -1,7 +1,7 @@
 import logging
 import os
 import time
-from pyspark.sql.functions import col, explode, regexp_replace
+from pyspark.sql.functions import col, explode, lit, regexp_replace
 from pyspark.sql.types import TimestampType
 
 
@@ -24,13 +24,13 @@ def import_google_pois(spark, database_url, database_properties, continent, coun
         poi_data_dir, sorted(filter(lambda f: 'osm' in f and 'matched' in f, os.listdir(poi_data_dir)), reverse=True)[0]
     )
     data = spark.read.parquet(osm_based_file_path).dropDuplicates(['internal_id']) \
-        .drop('osm_id', 'osm_type', 'confidence')
+        .drop('osm_id', 'osm_type', 'confidence').withColumn('kuwala_import_country', lit(country))
     custom_files = sorted(filter(lambda f: 'custom' in f and 'matched' in f, os.listdir(poi_data_dir)), reverse=True)
 
     if len(custom_files):
         custom_based_file_path = os.path.join(poi_data_dir, custom_files[0])
         custom_based_data = spark.read.parquet(custom_based_file_path).dropDuplicates(['internal_id'])\
-            .drop('id', 'name_distance')
+            .drop('id', 'confidence').withColumn('kuwala_import_country', lit(country))
         data = data.union(custom_based_data)
 
     poi_data = data \

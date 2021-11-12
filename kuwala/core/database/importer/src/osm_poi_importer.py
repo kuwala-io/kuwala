@@ -24,7 +24,8 @@ def import_osm_pois(spark, database_url, database_properties, continent, country
     def concat_tags(tags):
         return list(map(lambda tag: f'{tag["key"]}={tag["value"]}', tags))
 
-    data = spark.read.parquet(file_path).withColumn('tags', concat_tags(col('tags')))
+    data = spark.read.parquet(file_path).withColumn('tags', concat_tags(col('tags'))) \
+        .withColumn('kuwala_import_country', lit(country))
 
     data.write.option('truncate', True).option('cascadeTruncate', True) \
         .jdbc(url=database_url, table='osm_poi', mode='overwrite', properties=database_properties)

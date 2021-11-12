@@ -2,6 +2,7 @@ import logging
 import os
 import time
 from postgres_controller import send_query
+from pyspark.sql.functions import lit
 
 
 def import_admin_boundaries(spark, database_host, database_name, database_url, database_properties, continent, country,
@@ -20,7 +21,8 @@ def import_admin_boundaries(spark, database_host, database_name, database_url, d
         logging.warning('No admin boundaries file available. Skipping import.')
         return
 
-    data = spark.read.parquet(file_path).coalesce(1).sort('kuwala_admin_level')
+    data = spark.read.parquet(file_path).withColumn('kuwala_import_country', lit(country)).coalesce(1) \
+        .sort('kuwala_admin_level')
 
     data.write.option('truncate', True).option('batchsize', 1) \
         .jdbc(url=database_url, table='admin_boundary', mode='overwrite', properties=database_properties)
