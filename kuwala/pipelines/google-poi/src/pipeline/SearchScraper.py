@@ -10,7 +10,8 @@ from pathlib import Path
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, lit
 from pyspark.sql.types import StringType
-from python_utils.src.spark_udfs import get_confidence_based_h3_and_name_distance, get_h3_distance, get_string_distance
+from python_utils.src.spark_udfs import \
+    get_confidence_based_h3_and_name_distance, get_h3_distance, get_h3_index, get_string_distance
 from time import sleep
 
 MAX_H3_DISTANCE = 500
@@ -39,10 +40,15 @@ class SearchScraper:
 
     """Match the queries that have been sent to the received results"""
     @staticmethod
-    def match_search_results(directory, file_name):
+    def match_search_results(directory, file_name, search_string_basis):
         memory = os.getenv('SPARK_MEMORY') or '16g'
         spark = SparkSession.builder.appName('google-poi').config('spark.driver.memory', memory).getOrCreate()
-        df_str = spark.read.parquet(directory + file_name)
+
+        if search_string_basis == 'osm':
+            df_str = spark.read.parquet(directory + file_name)
+        else:
+            df_str = spark.read.option('header', 'true').csv(directory + file_name.replace('parquet', 'csv'))
+
         path_results = directory.replace('strings', 'results') + file_name.replace('strings', 'results')
         df_res = spark.read.parquet(path_results)
         # noinspection PyTypeChecker
@@ -50,31 +56,49 @@ class SearchScraper:
             .alias('df_str') \
             .join(df_res, on='query', how='left') \
             .filter(col('data.h3_index').isNotNull()) \
-            .withColumn('osm_name', col('df_str.name')) \
-            .withColumn('google_name', col('data.name')) \
-            .withColumn(
-                'name_distance',
-                get_string_distance(col('google_name'), col('osm_name'), col('df_str.query'))
-            ) \
-            .withColumn(
-                'h3_distance',
-                get_h3_distance(col('h3_index').cast(StringType()), col('data.h3_index').cast(StringType()),
-                                lit(MAX_H3_DISTANCE))
-            ) \
-            .withColumn(
-                'confidence',
-                get_confidence_based_h3_and_name_distance(col('h3_distance'), col('name_distance'),
-                                                          lit(MAX_H3_DISTANCE))
-            ) \
-            .select('osm_type', 'osm_id', col('data.id').alias('internal_id'), 'confidence', 'name_distance',
-                    'h3_distance', 'query')
+            .withColumn('google_name', col('data.name'))
+
+        if search_string_basis == 'osm':
+            df_res = df_res \
+                .withColumn('osm_name', col('df_str.name')) \
+                .withColumn(
+                    'name_distance',
+                    get_string_distance(col('google_name'), col('osm_name'), col('df_str.query'))
+                ) \
+                .withColumn(
+                    'h3_distance',
+                    get_h3_distance(col('h3_index').cast(StringType()), col('data.h3_index').cast(StringType()),
+                                    lit(MAX_H3_DISTANCE))
+                ) \
+                .withColumn(
+                    'confidence',
+                    get_confidence_based_h3_and_name_distance(col('h3_distance'), col('name_distance'),
+                                                              lit(MAX_H3_DISTANCE))
+                ) \
+                .select('osm_type', 'osm_id', col('data.id').alias('internal_id'), 'confidence', 'name_distance',
+                        'h3_distance', 'query')
+        else:
+            df_res = df_res \
+                .withColumn('h3_index', get_h3_index(col('latitude'), col('longitude'), lit(15))) \
+                .withColumn('name_distance',
+                            get_string_distance(col('google_name'), col('name'), col('df_str.query'))) \
+                .withColumn('h3_distance',
+                            get_h3_distance(col('h3_index').cast(StringType()), col('data.h3_index').cast(StringType()),
+                                            lit(MAX_H3_DISTANCE))) \
+                .withColumn(
+                    'confidence',
+                    get_confidence_based_h3_and_name_distance(col('h3_distance'), col('name_distance'),
+                                                              lit(MAX_H3_DISTANCE))
+                ) \
+                .select('id', col('data.id').alias('internal_id'), 'confidence', 'name_distance', 'h3_distance',
+                        'query')
 
         df_res.write.parquet(path_results.replace('_search_results', '_search_results_matched'))
 
     """Match the POI ids that have been sent to the received results"""
 
     @staticmethod
-    def match_poi_results(directory: str, file_name: str):
+    def match_poi_results(directory: str, file_name: str, search_string_basis):
         memory = os.getenv('SPARK_MEMORY') or '16g'
         spark = SparkSession.builder.appName('google-poi').config('spark.driver.memory', memory).getOrCreate()
         df_res = spark.read.parquet(
@@ -88,8 +112,14 @@ class SearchScraper:
         df_pd = df_res \
             .alias('df_res') \
             .join(df_pd, on='internal_id', how='left') \
-            .filter(col('data.h3_index').isNotNull()) \
-            .select('osm_id', 'osm_type', 'confidence', 'internal_id', 'data.*') \
+            .filter(col('data.h3_index').isNotNull())
+
+        if search_string_basis == 'osm':
+            df_pd = df_pd.select('osm_id', 'osm_type', 'confidence', 'internal_id', 'data.*')
+        else:
+            df_pd = df_pd.select('id', 'confidence', 'internal_id', 'data.*')
+
+        df_pd = df_pd \
             .withColumn('latitude', col('location.lat')) \
             .withColumn('longitude', col('location.lng')) \
             .drop('location') \
@@ -235,8 +265,12 @@ class SearchScraper:
 
     """Send search strings to get Google POI ids"""
     @staticmethod
-    def send_search_queries(directory, file_name, continent, country, country_region):
-        search_strings = pq.read_table(directory + file_name).to_pandas()[['query']].drop_duplicates()
+    def send_search_queries(directory, file_name, continent, country, country_region, search_string_basis):
+        if search_string_basis == 'osm':
+            search_strings = pq.read_table(directory + file_name).to_pandas()[['query']].drop_duplicates()
+        else:
+            search_strings = pandas.read_csv(directory + file_name.replace('parquet', 'csv'))
+
         schema = pa.schema([
             pa.field('query', pa.string()),
             pa.field('data', pa.struct([
@@ -262,15 +296,20 @@ class SearchScraper:
 
     """Write scraped POI information to a Parquet file"""
     @staticmethod
-    def scrape_with_search_string(continent, country, country_region):
+    def scrape_with_search_string(continent, country, country_region, search_string_basis='osm'):
         script_dir = os.path.dirname(__file__)
         parquet_files = os.path.join(script_dir, f'../../../../tmp/kuwala/google_files/{continent}/{country}'
                                                  f'{f"/{country_region}" if country_region else ""}/search_strings/')
-        file_name = sorted(os.listdir(parquet_files), reverse=True)[0]
+
+        if search_string_basis == 'osm':
+            file_name = sorted(filter(lambda f: 'osm' in f, os.listdir(parquet_files)), reverse=True)[0]
+        else:
+            file_name = 'custom_search_strings.parquet'
 
         SearchScraper.send_search_queries(directory=parquet_files, file_name=file_name, continent=continent,
-                                          country=country, country_region=country_region)
-        SearchScraper.match_search_results(parquet_files, file_name)
+                                          country=country, country_region=country_region,
+                                          search_string_basis=search_string_basis)
+        SearchScraper.match_search_results(parquet_files, file_name, search_string_basis=search_string_basis)
         SearchScraper.send_poi_queries(directory=parquet_files, file_name=file_name, continent=continent,
                                        country=country, country_region=country_region)
-        SearchScraper.match_poi_results(parquet_files, file_name)
+        SearchScraper.match_poi_results(parquet_files, file_name, search_string_basis=search_string_basis)

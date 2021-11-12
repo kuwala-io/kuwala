@@ -16,7 +16,7 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - ./tmp/kuwala/db/postgres/data:/var/lib/postgresql/data
+      - ./tmp/kuwala/db/postgres:/var/lib/postgresql
     profiles:
       - network
       - database
@@ -76,6 +76,8 @@ services:
     build:
       context: .
       dockerfile: ./pipelines/google-poi/dockerfile
+    volumes:
+      - ./pipelines/google-poi/resources/categories.json:/opt/app/pipelines/google-poi/resources/categories.json
     restart: always
     depends_on: [torproxy]
     ports:

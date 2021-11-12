@@ -143,3 +143,13 @@ CREATE TABLE IF NOT EXISTS google_osm_poi_matching (
     CONSTRAINT fk_google_osm_poi_matching_google_id FOREIGN KEY(internal_id) REFERENCES google_poi(internal_id),
     CONSTRAINT fk_google_osm_poi_matching_osm_id FOREIGN KEY(osm_type, osm_id) REFERENCES osm_poi(osm_type, osm_id)
 );
+
+-- Creation of google_osm_poi_matching table
+
+CREATE TABLE IF NOT EXISTS google_custom_poi_matching (
+    custom_id text NOT NULL PRIMARY KEY,
+    internal_id text NOT NULL,
+    name_distance decimal NOT NULL,
+    query text NOT NULL,
+    CONSTRAINT fk_google_osm_poi_matching_google_id FOREIGN KEY(internal_id) REFERENCES google_poi(internal_id)
+);

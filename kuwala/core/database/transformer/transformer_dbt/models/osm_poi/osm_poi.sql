@@ -7,3 +7,4 @@ SELECT
        categories,
        address
 FROM osm_poi LEFT JOIN {{ ref('osm_poi_address') }} USING (osm_type, osm_id)
+WHERE cardinality(categories) IS NOT NULL

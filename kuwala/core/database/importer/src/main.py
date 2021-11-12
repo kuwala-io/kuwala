@@ -3,7 +3,7 @@ import logging
 import os
 import sys
 from admin_boundary_importer import import_admin_boundaries
-from google_osm_poi_matcher import import_google_osm_poi_matching_data
+from google_poi_matcher import import_google_poi_matching_data
 from google_poi_importer import import_google_pois
 from osm_poi_importer import import_osm_pois
 from population_density_importer import import_population_density
@@ -59,5 +59,5 @@ if __name__ == '__main__':
                     continent=continent, country=country, country_region=country_region)
     import_google_pois(spark=spark, database_url=database_url, database_properties=database_properties,
                        continent=continent, country=country, country_region=country_region)
-    import_google_osm_poi_matching_data(spark=spark, database_url=database_url, database_properties=database_properties,
-                                        continent=continent, country=country, country_region=country_region)
+    import_google_poi_matching_data(spark=spark, database_url=database_url, database_properties=database_properties,
+                                    continent=continent, country=country, country_region=country_region)

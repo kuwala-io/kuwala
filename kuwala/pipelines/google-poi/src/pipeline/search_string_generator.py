@@ -75,5 +75,5 @@ def generate_search_strings(continent, country, country_region, polygon_coords=N
         union = union.limit(limit)
 
     union.write.parquet(f'../../../../tmp/kuwala/google_files/{continent}/{country}'
-                        f'{f"/{country_region}" if country_region else ""}/search_strings/google_search_strings_'
+                        f'{f"/{country_region}" if country_region else ""}/search_strings/osm_search_strings_'
                         f'{moment.now().format("YYYY-MM-DDTHH-mm-ss")}.parquet')

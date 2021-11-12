@@ -124,7 +124,10 @@
             "coffee_store",
             "art_cafe",
             "chocolate_cafe",
-            "ice_cream_shop"
+            "ice_cream_shop",
+            "coffee_stand",
+            "coffee",
+            "coffe_container"
         ]
     },
     "drinks": {
@@ -392,7 +395,10 @@
             "apartment_rental_agency",
             "commercial_agent",
             "property_investment",
-            "scuba_tour_agency"
+            "scuba_tour_agency",
+            "underwear_store",
+            "business_networking_company",
+            "photo_shop"
         ]
     },
     "office": {

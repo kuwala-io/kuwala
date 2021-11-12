@@ -20,14 +20,24 @@ def import_google_pois(spark, database_url, database_properties, continent, coun
         logging.warning('No Google data available. Skipping import.')
         return
 
-    file_path = os.path.join(poi_data_dir,
-                             sorted(filter(lambda f: 'matched' in f, os.listdir(poi_data_dir)), reverse=True)[0])
-    data = spark.read.parquet(file_path).dropDuplicates(['internal_id'])
+    osm_based_file_path = os.path.join(
+        poi_data_dir, sorted(filter(lambda f: 'osm' in f and 'matched' in f, os.listdir(poi_data_dir)), reverse=True)[0]
+    )
+    data = spark.read.parquet(osm_based_file_path).dropDuplicates(['internal_id']) \
+        .drop('osm_id', 'osm_type', 'confidence')
+    custom_files = sorted(filter(lambda f: 'custom' in f and 'matched' in f, os.listdir(poi_data_dir)), reverse=True)
+
+    if len(custom_files):
+        custom_based_file_path = os.path.join(poi_data_dir, custom_files[0])
+        custom_based_data = spark.read.parquet(custom_based_file_path).dropDuplicates(['internal_id'])\
+            .drop('id', 'name_distance')
+        data = data.union(custom_based_data)
+
     poi_data = data \
         .withColumn('has_popularity', col('popularity').isNotNull()) \
         .withColumn('has_opening_hours', col('opening_hours').isNotNull()) \
         .withColumn('has_waiting_time', col('waiting_time').isNotNull()) \
-        .drop('osm_id', 'osm_type', 'confidence', 'opening_hours', 'popularity', 'waiting_time')
+        .drop('opening_hours', 'popularity', 'waiting_time')
     popularity_data = data.select('internal_id', 'popularity').withColumn('popularity', explode('popularity')) \
         .select('internal_id', col('popularity.popularity').alias('popularity'),
                 col('popularity.timestamp').alias('timestamp')) \
