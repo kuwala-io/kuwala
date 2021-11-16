@@ -21,6 +21,35 @@ services:
       - network
       - database
 
+  # docker-compose run database-importer --continent=<> --country=<> --country_region=<>
+  database-importer:
+    container_name: database-importer
+    build:
+      context: .
+      dockerfile: ./core/database/importer/dockerfile
+    restart: always
+    environment:
+      - DATABASE_HOST=postgres
+      - DATABASE_NAME=kuwala
+      - DATABASE_USER=kuwala
+      - DATABASE_PASSWORD=password
+    volumes:
+      - ./tmp/kuwala:/opt/tmp/kuwala
+    profiles:
+      - network
+
+  # docker-compose run database-transformer
+  database-transformer:
+    container_name: database-transformer
+    build:
+      context: .
+      dockerfile: ./core/database/transformer/dockerfile
+    restart: always
+    environment:
+      - DBT_HOST=postgres
+    profiles:
+      - network
+
   jupyter:
     container_name: jupyter
     build:

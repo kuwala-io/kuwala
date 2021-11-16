@@ -1,0 +1,9 @@
+FROM rappdw/docker-java-python
+
+COPY ./core/database/importer /opt/core/database/importer
+
+WORKDIR /opt/core/database/importer
+RUN pip install -r requirements.txt
+
+WORKDIR /opt/core/database/importer/src
+ENTRYPOINT [ "python", "main.py" ]

@@ -93,7 +93,7 @@ class SearchScraper:
                 .select('id', col('data.id').alias('internal_id'), 'confidence', 'name_distance', 'h3_distance',
                         'query')
 
-        df_res.write.parquet(path_results.replace('_search_results', '_search_results_matched'))
+        df_res.write.mode('overwrite').parquet(path_results.replace('_search_results', '_search_results_matched'))
 
     """Match the POI ids that have been sent to the received results"""
 
@@ -135,7 +135,7 @@ class SearchScraper:
             .withColumn('spending_time_max', col('spending_time').getItem(1)) \
             .drop('spending_time')
 
-        df_pd.write.parquet(path_poi_data.replace('_poi_data', '_poi_data_matched'))
+        df_pd.write.mode('overwrite').parquet(path_poi_data.replace('_poi_data', '_poi_data_matched'))
 
     """Send queries in batches for each partition of a dataframe"""
 
