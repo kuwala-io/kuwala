@@ -29,6 +29,10 @@ models:
         tests:
           - unique
           - not_null
+      - name: external_poi_id
+        description: 'Custom defined POI ID'
+        tests:
+          - unique
       - name: poi_confidence_google
         description: 'The confidence of the Google result based on the query input'
       - name: poi_google_place_id
@@ -94,27 +98,47 @@ models:
           - accepted_values:
               values: [ 15 ]
       - name: poi_address_city
-        description: 'Combined names of admin boundaries lower than kuwala_admin_level 1 containing POI coordinates in
-        descending order'
+        description: 'Name of the admin boundary with the highest kuwala_admin_level containing POI coordinates'
       - name: poi_address_country
         description: 'Name of admin boundary having kuwala_admin_level 1 containing POI coordinates'
 
-  # POI admin boundary
-  - name: poi_admin_boundary
-    description: 'Admin boundary names containing POI coordinates'
+  # POI city based on admin boundary
+  - name: poi_address_city
+    description: 'Admin boundary name with highest admin level containing POI coordinates'
     columns:
       - name: poi_id
         description: 'Unique ID referring to a POI'
         tests:
           - unique
           - not_null
-      - name: poi_address_city
-        description: 'Combined names of admin boundaries lower than kuwala_admin_level 1 containing POI coordinates in
-        descending order'
-      - name: poi_address_country
-        description: 'Name of admin boundary having kuwala_admin_level 1 containing POI coordinates'
+      - name: name
+        description: 'Name of matching admin boundary'
+        tests:
+          - not_null
+      - name: id
+        description: 'ID of matching admin boundary'
+        tests:
+          - not_null
 
-  # POI aggregated
+  # POI country based on admin boundary
+  - name: poi_address_country
+    description: 'Admin boundary name with lowest admin level containing POI coordinates'
+    columns:
+      - name: poi_id
+        description: 'Unique ID referring to a POI'
+        tests:
+          - unique
+          - not_null
+      - name: name
+        description: 'Name of matching admin boundary'
+        tests:
+          - not_null
+      - name: id
+        description: 'ID of matching admin boundary'
+        tests:
+          - not_null
+
+  # POI data aggregated on H3 indexes
   - name: poi_aggregated
     description: 'Aggregated POI data based on H3 resolution'
     columns:
@@ -127,6 +151,113 @@ models:
         description: 'Total number of POIs in H3 index'
         tests:
           - not_null
+      - name: poi_confidence_google_average
+        description: 'The average confidence of POIs with Google data'
+      - name: poi_reviews_total
+        description: 'The total amount of reviews across all POIs'
+      - name: poi_rating_average
+        description: 'The average rating across all POIs'
+      - name: poi_price_level_average
+        description: 'The average price level across all POIs'
+      - name: poi_opening_time_total
+        description: 'The total opening time throughout an entire week across all POIs'
+      - name: poi_popularity_total
+        description: 'The total popularity scores throughout an entire week across all POIs'
+      - name: poi_popularity_morning_total
+        description: 'The total popularity values of the POI in the morning hours during one week across all POIs'
+      - name: poi_popularity_noon_total
+        description: 'The total popularity values of the POI in the noon hours during one week across all POIs'
+      - name: poi_popularity_afternoon_total
+        description: 'The total popularity values of the POI in the afternoon hours during one week across all POIs'
+      - name: poi_popularity_evening_total
+        description: 'The total popularity values of the POI in the evening hours during one week across all POIs'
+      - name: poi_closed_total
+        description: 'Total number of POIs marked as closed'
+      - name: poi_closed_permanently_total
+        description: 'Total number of POIs marked as permanently closed'
+      - name: poi_spending_time_average
+        description: 'The average spending time across all POIs'
+      - name: poi_waiting_time_average
+        description: 'The average waiting time cumulated throughout one week across all POIs'
+      - name: poi_inside_of_total
+        description: 'Number of POIs that are located inside another POI'
+      - name: number_of_espresso_houses
+        description: 'Number of Espresso Houses within the given H3 index'
+      - name: number_of_competitors
+        description: 'Number of competitors within the given H3 index'
+      - name: poi_category_administration
+        description: 'Number of POIs belonging to the POI category "administration"'
+      - name: poi_category_airport
+        description: 'Number of POIs belonging to the POI category "airport"'
+      - name: poi_category_apartment
+        description: 'Number of POIs belonging to the POI category "apartment"'
+      - name: poi_category_art_culture
+        description: 'Number of POIs belonging to the POI category "art_culture"'
+      - name: poi_category_automobile
+        description: 'Number of POIs belonging to the POI category "automobile"'
+      - name: poi_category_beauty
+        description: 'Number of POIs belonging to the POI category "beauty"'
+      - name: poi_category_cafe
+        description: 'Number of POIs belonging to the POI category "cafe"'
+      - name: poi_category_drinks
+        description: 'Number of POIs belonging to the POI category "drinks"'
+      - name: poi_category_education
+        description: 'Number of POIs belonging to the POI category "education"'
+      - name: poi_category_entertainment
+        description: 'Number of POIs belonging to the POI category "entertainment"'
+      - name: poi_category_food
+        description: 'Number of POIs belonging to the POI category "food"'
+      - name: poi_category_groceries
+        description: 'Number of POIs belonging to the POI category "groceries"'
+      - name: poi_category_medical
+        description: 'Number of POIs belonging to the POI category "medical"'
+      - name: poi_category_misc
+        description: 'Number of POIs belonging to the POI category "misc"'
+      - name: poi_category_office
+        description: 'Number of POIs belonging to the POI category "office"'
+      - name: poi_category_public_service
+        description: 'Number of POIs belonging to the POI category "public_service"'
+      - name: poi_category_public_transportation
+        description: 'Number of POIs belonging to the POI category "public_transportation"'
+      - name: poi_category_recreation
+        description: 'Number of POIs belonging to the POI category "recreation"'
+      - name: poi_category_religious_building
+        description: 'Number of POIs belonging to the POI category "religious_building"'
+      - name: poi_category_service
+        description: 'Number of POIs belonging to the POI category "service"'
+      - name: poi_category_shopping
+        description: 'Number of POIs belonging to the POI category "shopping"'
+      - name: poi_category_social_service
+        description: 'Number of POIs belonging to the POI category "social_service"'
+      - name: poi_category_shopping
+        description: 'Number of POIs belonging to the POI category "shopping"'
+      - name: poi_category_social_service
+        description: 'Number of POIs belonging to the POI category "social_service"'
+      - name: poi_category_sport
+        description: 'Number of POIs belonging to the POI category "sport"'
+      - name: poi_category_tourism
+        description: 'Number of POIs belonging to the POI category "tourism"'
+      - name: poi_category_wholesaler
+        description: 'Number of POIs belonging to the POI category "wholesaler"'
+      - name: latitude
+        description: 'Latitude of the center of the H3 index'
+        tests:
+          - not_null
+          - unique
+      - name: longitude
+        description: 'Longitude of the center of the H3 index'
+        tests:
+          - not_null
+          - unique
+      - name: geo_boundary
+        description: 'GeoJSON of the H3 index'
+        tests:
+          - not_null
+          - unique
+      - name: resolution
+        description: 'Resolution of the H3 index'
+        tests:
+          - not_null
 
   # POI matched
   - name: poi_matched
@@ -137,6 +268,10 @@ models:
         tests:
           - unique
           - not_null
+      - name: external_poi_id
+        description: 'Custom defined POI ID'
+        tests:
+          - unique
       - name: poi_confidence_google
         description: 'The confidence of the Google result based on the query input'
       - name: poi_google_place_id
@@ -201,3 +336,20 @@ models:
           - not_null
           - accepted_values:
               values: [ 15 ]
+
+  # POI popularity data as a time series
+  - name: poi_popularity_time_series
+    description: 'The hourly popularity of a POI as a time series'
+    columns:
+      - name: poi_id
+        description: 'Unique ID referring to a POI'
+        tests:
+          - not_null
+      - name: popularity
+        description: 'Popularity score between 0 and 100 indicating relative to the POI how busy it is at the given hour'
+        tests:
+          - not_null
+      - name: timestamp
+        description: 'ISO date time string for the hour the popularity value is referring to'
+        tests:
+          - not_null

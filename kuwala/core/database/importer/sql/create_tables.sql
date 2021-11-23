@@ -155,7 +155,7 @@ CREATE TABLE IF NOT EXISTS google_custom_poi_matching (
     internal_id text NOT NULL,
     confidence decimal NOT NULL,
     name_distance decimal NOT NULL,
-    h3_distance decimal NOT NULL,
+    h3_distance decimal,
     query text NOT NULL,
     CONSTRAINT fk_google_osm_poi_matching_google_id FOREIGN KEY(internal_id) REFERENCES google_poi(internal_id)
 );

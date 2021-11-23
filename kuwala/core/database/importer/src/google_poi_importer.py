@@ -29,9 +29,9 @@ def import_google_pois(spark, database_url, database_properties, continent, coun
 
     if len(custom_files):
         custom_based_file_path = os.path.join(poi_data_dir, custom_files[0])
-        custom_based_data = spark.read.parquet(custom_based_file_path).dropDuplicates(['internal_id'])\
+        custom_based_data = spark.read.parquet(custom_based_file_path).dropDuplicates(['internal_id']) \
             .drop('id', 'confidence').withColumn('kuwala_import_country', lit(country))
-        data = data.union(custom_based_data)
+        data = data.union(custom_based_data).dropDuplicates(['internal_id'])
 
     poi_data = data \
         .withColumn('has_popularity', col('popularity').isNotNull()) \

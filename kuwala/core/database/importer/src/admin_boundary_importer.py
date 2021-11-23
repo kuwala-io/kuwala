@@ -5,8 +5,8 @@ from postgres_controller import send_query
 from pyspark.sql.functions import lit
 
 
-def import_admin_boundaries(spark, database_host, database_name, database_url, database_properties, continent, country,
-                            country_region):
+def import_admin_boundaries(spark, database_host, database_port, database_name, database_url, database_properties,
+                            continent, country, country_region):
     start_time = time.time()
 
     logging.info(f'Starting import of admin boundaries for '
@@ -27,7 +27,7 @@ def import_admin_boundaries(spark, database_host, database_name, database_url, d
     data.write.option('truncate', True).option('batchsize', 1) \
         .jdbc(url=database_url, table='admin_boundary', mode='overwrite', properties=database_properties)
 
-    send_query(database_host=database_host, database_name=database_name,
+    send_query(database_host=database_host, database_port=database_port, database_name=database_name,
                database_user=database_properties['user'], database_password=database_properties['password'],
                path_to_query_file='../sql/create_admin_boundary_geometries.sql')
 

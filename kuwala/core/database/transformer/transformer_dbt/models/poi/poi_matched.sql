@@ -1,10 +1,26 @@
 SELECT
-    concat_ws('_', h3_index, osm_id) AS poi_id,
-    confidence AS poi_confidence_google,
+    (CASE WHEN osm_id IS NOT NULL
+        THEN concat_ws('_', osm_poi.h3_index, osm_id)
+        ELSE concat_ws('_', google_poi.h3_index, custom_id)
+    END) AS poi_id,
+    custom_id AS external_poi_id,
+    (CASE WHEN google_custom_poi_matching.confidence IS NOT NULL
+        THEN google_custom_poi_matching.confidence
+        ELSE google_osm_poi_matching.confidence
+    END) AS poi_confidence_google,
     place_id AS poi_google_place_id,
-    h3_index AS poi_h3_index,
-    latitude,
-    longitude,
+    (CASE WHEN osm_poi.h3_index IS NOT NULL
+        THEN osm_poi.h3_index
+        ELSE google_poi.h3_index
+    END) AS poi_h3_index,
+    (CASE WHEN osm_poi.latitude IS NOT NULL
+        THEN osm_poi.latitude
+        ELSE google_poi.latitude
+    END) AS latitude,
+    (CASE WHEN osm_poi.longitude IS NOT NULL
+        THEN osm_poi.longitude
+        ELSE google_poi.longitude
+    END) AS longitude,
     google_poi.name AS poi_name_google,
     osm_poi.name AS poi_name_osm,
     array_to_string(osm_poi.categories, ',') AS poi_categories_osm,
@@ -29,4 +45,5 @@ SELECT
     15 AS h3_resolution
 FROM {{ ref('osm_poi') }}
     LEFT JOIN {{ ref('google_osm_poi_matching') }} USING (osm_id)
+    FULL JOIN google_custom_poi_matching USING (internal_id)
     LEFT JOIN {{ ref('google_poi') }} USING (internal_id)

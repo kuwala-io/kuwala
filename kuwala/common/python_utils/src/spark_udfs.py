@@ -24,6 +24,8 @@ def get_h3_distance(h1: str, h2: str, default_value):
     try:
         # noinspection PyUnresolvedReferences
         return h3.h3_distance(h1, h2)
+    except TypeError:
+        return None
     except h3.H3ValueError:
         return default_value
 
@@ -100,10 +102,10 @@ def get_confidence_based_h3_and_name_distance(h3_distance: int, name_distance: i
     def get_name_confidence(d):
         return d / 100
 
-    h3_confidence = get_h3_confidence(h3_distance)
+    h3_confidence = get_h3_confidence(h3_distance) if h3_distance else None
     name_confidence = get_name_confidence(name_distance)
 
-    return h3_confidence * (2 / 3) + name_confidence * (1 / 3)
+    return (h3_confidence * (2 / 3) + name_confidence * (1 / 3)) if h3_confidence else name_confidence
 
 
 # Based on the confidence build the POI id using the H3 index and OSM id

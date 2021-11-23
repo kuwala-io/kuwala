@@ -52,7 +52,7 @@ running. You can set the proxy address over the environment variable `PROXY_ADDR
 To use the Tor proxy over Docker simply run in a separate terminal window:
 
 ```zsh
-docker-compose --profile core up
+docker-compose --profile proxy up
 ```
 
 And then:

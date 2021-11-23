@@ -15,6 +15,18 @@ models:
         tests:
           - unique
           - not_null
+      - name: h3_index
+        description: 'H3 index of the POI'
+        tests:
+          - not_null
+      - name: latitude
+        description: 'Latitude coordinate of the POI'
+        tests:
+          - not_null
+      - name: longitude
+        description: 'Longitude coordinate of the POI'
+        tests:
+          - not_null
       - name: name
         description: 'Name of the POI'
         tests:
@@ -35,6 +47,8 @@ models:
         description: 'Number of reviews the POI received'
       - name: rating_stars
         description: 'Average star rating of reviews the POI received'
+      - name: price_level
+        description: 'Price level of the POI'
       - name: opening_time_total
         description: 'Sum of opening hours in a given timeframe'
       - name: popularity_total
@@ -69,7 +83,7 @@ models:
         description: 'Sum of opening hours in a given timeframe'
         tests:
           - not_null
-  - name: google_poi_popularity
+  - name: google_poi_popularity_aggregated
     description: 'Aggregated popularity scores of a POI in a given timeframe'
     columns:
       - name: internal_id

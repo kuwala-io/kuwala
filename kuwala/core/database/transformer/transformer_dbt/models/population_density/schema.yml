@@ -11,7 +11,7 @@ models:
           - unique
           - not_null
       - name: total
-        description: 'Total popularity in the given H3 index'
+        description: 'Total population in the given H3 index'
         tests:
           - not_null
       - name: children_under_five

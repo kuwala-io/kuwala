@@ -131,7 +131,7 @@ services:
     profiles:
       - network
 
-  # docker-compose run osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar <pbf-path> <parquet-path>
+  # docker-compose run osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar --continent=<> --country=<> --country_region=<>
   osm-parquetizer:
     container_name: osm-parquetizer
     build:

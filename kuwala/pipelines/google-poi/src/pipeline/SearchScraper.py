@@ -44,7 +44,7 @@ class SearchScraper:
         memory = os.getenv('SPARK_MEMORY') or '16g'
         spark = SparkSession.builder.appName('google-poi').config('spark.driver.memory', memory).getOrCreate()
 
-        if search_string_basis == 'osm':
+        if not search_string_basis or search_string_basis == 'osm':
             df_str = spark.read.parquet(directory + file_name)
         else:
             df_str = spark.read.option('header', 'true').csv(directory + file_name.replace('parquet', 'csv'))
@@ -58,7 +58,7 @@ class SearchScraper:
             .filter(col('data.h3_index').isNotNull()) \
             .withColumn('google_name', col('data.name'))
 
-        if search_string_basis == 'osm':
+        if not search_string_basis or search_string_basis == 'osm':
             df_res = df_res \
                 .withColumn('osm_name', col('df_str.name')) \
                 .withColumn(
@@ -114,7 +114,7 @@ class SearchScraper:
             .join(df_pd, on='internal_id', how='left') \
             .filter(col('data.h3_index').isNotNull())
 
-        if search_string_basis == 'osm':
+        if not search_string_basis or search_string_basis == 'osm':
             df_pd = df_pd.select('osm_id', 'osm_type', 'confidence', 'internal_id', 'data.*')
         else:
             df_pd = df_pd.select('id', 'confidence', 'internal_id', 'data.*')
@@ -266,7 +266,7 @@ class SearchScraper:
     """Send search strings to get Google POI ids"""
     @staticmethod
     def send_search_queries(directory, file_name, continent, country, country_region, search_string_basis):
-        if search_string_basis == 'osm':
+        if not search_string_basis or search_string_basis == 'osm':
             search_strings = pq.read_table(directory + file_name).to_pandas()[['query']].drop_duplicates()
         else:
             search_strings = pandas.read_csv(directory + file_name.replace('parquet', 'csv'))
@@ -301,7 +301,7 @@ class SearchScraper:
         parquet_files = os.path.join(script_dir, f'../../../../tmp/kuwala/google_files/{continent}/{country}'
                                                  f'{f"/{country_region}" if country_region else ""}/search_strings/')
 
-        if search_string_basis == 'osm':
+        if not search_string_basis or search_string_basis == 'osm':
             file_name = sorted(filter(lambda f: 'osm' in f, os.listdir(parquet_files)), reverse=True)[0]
         else:
             file_name = 'custom_search_strings.parquet'

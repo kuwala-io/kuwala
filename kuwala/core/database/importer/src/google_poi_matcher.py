@@ -20,7 +20,7 @@ def import_matches(spark, database_url, database_properties, search_results_dir,
     df_search_results = df_search_results.join(df_poi_data, on='internal_id', how='inner')
 
     if basis == 'custom':
-        df_search_results = df_search_results.withColumnRenamed('id', 'custom_id')
+        df_search_results = df_search_results.withColumnRenamed('id', 'custom_id').dropDuplicates(['custom_id'])
 
     df_search_results.write.option('truncate', True) \
         .jdbc(url=database_url, table=f'google_{basis}_poi_matching', mode='overwrite', properties=database_properties)
