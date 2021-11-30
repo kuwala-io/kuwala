@@ -82,17 +82,19 @@ score. In the demo we have a preprocessed graph and a test dataset with Uber rid
 
 Launch Docker in the background and from inside the root directory run:
 
+Linux/Mac:
 ```zsh 
 cd kuwala/scripts && sh initialize_core_components.sh && sh run_cli.sh
 ```
-
-***Note***: Some people on Windows experience installation issues with the CLI. If that is the case for you please open 
-an issue. In the meantime you can run the pipelines individually.
+and for Windows (Please use PowerShell or any Docker integrated terminal):
+```PS
+cd kuwala/scripts/windows && sh initialize_core_components.sh && sh run_cli.sh
+```
 
 #### Run the data pipelines yourself
 
-To run the pipelines yourself, build the components first from inside the `kuwala/scripts` directory by executing the 
-`initialize_all_components.sh` script and the starting the CLI by running the `run_cli.sh` script.
+To run the pipelines yourself, build the components first from inside the `kuwala/scripts` directory (or if the computer uses Windows, go to `kuwala/scripts/windows`) by executing the 
+`initialize_all_components.sh` script and the starting the CLI by running the `run_cli.sh` script. .
 
 ---
 
