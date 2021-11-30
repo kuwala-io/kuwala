@@ -86,7 +86,7 @@ Linux/Mac:
 ```zsh 
 cd kuwala/scripts && sh initialize_core_components.sh && sh run_cli.sh
 ```
-and for Windows:
+and for Windows (Please use PowerShell or any Docker integrated terminal):
 ```PS
 cd kuwala/scripts/windows && sh initialize_core_components.sh && sh run_cli.sh
 ```
