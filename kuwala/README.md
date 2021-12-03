@@ -9,7 +9,7 @@ Installed version of *Docker* and *docker-compose*
 
 ### Pipelines
 
-If you want to build all containers for all pipelines, change your working directory to `./kuwala/scripts` and run:
+If you want to build all containers for all pipelines, change your working directory to `./kuwala/scripts` (or move to `./kuwala/scripts/`, run `initialize_windows.sh`, and change directory to `windows/` if you are running a Windows machine) and run:
 
 ```zsh
 sh initialize_all_components.sh
@@ -33,7 +33,7 @@ Now you can proceed to any of the pipelines' `README.md` and follow the steps to
 
 ### Core
 
-To initialize the CLI and Jupyter notebook run within the `./kuwala/scripts` directory:
+To initialize the CLI and Jupyter notebook run within the `./kuwala/scripts` directory (or `./kuwala/scripts/windows` ):
 
 ```zsh
 sh initialize_core_components.sh
