@@ -10,4 +10,3 @@ sed 's/\r$//' run_cli.sh > ./windows/run_cli.sh
 sed 's/\r$//' run_jupyter_notebook.sh > ./windows/run_jupyter_notebook.sh
 sed 's/\r$//' stop_all_containers.sh > ./windows/stop_all_containers.sh
 sed 's/\r$//' build_all_containers.sh > ./windows/build_all_containers.sh
-cd windows

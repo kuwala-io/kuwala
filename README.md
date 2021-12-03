@@ -88,7 +88,7 @@ cd kuwala/scripts && sh initialize_core_components.sh && sh run_cli.sh
 ```
 and for Windows (Please use PowerShell or any Docker integrated terminal):
 ```PS
-cd kuwala/scripts && sh initialize_windows.sh && sh initialize_core_components.sh && sh run_cli.sh
+cd kuwala/scripts && sh initialize_windows.sh && cd windows && sh initialize_core_components.sh && sh run_cli.sh
 ```
 
 #### Run the data pipelines yourself
