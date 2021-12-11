@@ -1,6 +1,7 @@
 import math
 import os
 import time
+from datetime import date as dte
 from functools import reduce
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, lit, sum
@@ -46,7 +47,23 @@ class Processor:
 
         df = reduce((lambda d1, d2: d1.join(d2, ['h3Index'], 'full').repartition(number_of_partitions, 'h3Index')), dfs)
 
-        df.write.mode('overwrite').parquet(output_dir + 'result.parquet')
+        today=str(dte.today())
+
+        if (os.path.isdir(output_dir + 'result.parquet'+'_'+today)):
+            print("parquet files already exist")
+            deci=''
+            while(deci!='n' or deci!='N' or deci!='y' or deci!='Y'):
+                deci=input("do you want to overwrite? [Y] or skip donwload [N]?   ")
+                if deci=='n' or deci=='N':
+                    print("Download skipped.")
+                    break
+                elif deci=='y' or deci=='Y':
+                    df.write.mode('overwrite').parquet(output_dir + 'result.parquet'+'_'+today)
+                    print("parquet overwritted")  
+                    break
+
+        else:
+            df.write.mode('overwrite').parquet(output_dir + 'result.parquet'+'_'+today)   
 
         end_time = time.time()
 
