@@ -1,5 +1,5 @@
 WITH full_address AS (
-    SELECT osm_type, osm_id, address_full AS address
+    SELECT osm_type, osm_id, replace(address_full, ';', ' ') AS address
     FROM osm_poi
     WHERE address_full IS NOT NULL
 ),
@@ -30,7 +30,10 @@ address_components AS (
 ),
 
 combined_address AS (
-    SELECT osm_type, osm_id, concat_ws(', ', street_component, city_component, address_country) AS address
+    SELECT
+           osm_type,
+           osm_id,
+           replace(concat_ws(', ', street_component, city_component, address_country), ';', ' ') AS address
     FROM address_components
 )
 

@@ -3,7 +3,7 @@ SELECT
        h3_index,
        latitude,
        longitude,
-       name,
+       replace(name, ';', ' ') AS name,
        categories,
        address
 FROM osm_poi LEFT JOIN {{ ref('osm_poi_address') }} USING (osm_type, osm_id)

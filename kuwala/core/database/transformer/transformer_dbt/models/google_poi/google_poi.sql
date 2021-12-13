@@ -4,7 +4,7 @@ SELECT
     h3_index,
     latitude,
     longitude,
-    name,
+    replace(name, ';', ' ') AS name,
     categories,
     tags,
     address,
