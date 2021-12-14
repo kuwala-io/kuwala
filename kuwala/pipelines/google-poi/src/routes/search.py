@@ -14,7 +14,7 @@ async def search_places():
     queries = await request.get_json()
 
     if queries is None:
-        abort(415, description='Invalid request body, is the request body type a JSON?')
+        abort(400, description='Invalid request body, is the request body type a JSON?')
 
     if len(queries) > 100:
         abort(400, description='You can send at most 100 queries at once.')
