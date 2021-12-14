@@ -53,8 +53,8 @@ class Processor:
             print("parquet files already exist")
             decision=''
             while(decision!='n' or decision!='N' or decision!='y' or decision!='Y'):
-                decisionsion=input("do you want to overwrite? [Y] or skip download [N]? ")
-                if decisionsion=='n' or decisionsion=='N':
+                decision=input("do you want to overwrite? [Y] or skip download [N]? ")
+                if decision=='n' or decision=='N':
                     print("Download skipped.")
                     break
                 elif decision=='y' or decision=='Y':
