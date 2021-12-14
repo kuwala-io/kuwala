@@ -215,7 +215,8 @@ def select_demographic_groups(d: Dataset):
             lambda resource: dict(
                 id=resource.get('id'),
                 format=resource.get('format'),
-                type=get_type(resource.get('name'))
+                type=get_type(resource.get('name')),
+                date=resource.get('last_modified')
             ),
             resources
         )
