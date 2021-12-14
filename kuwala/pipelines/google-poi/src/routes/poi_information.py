@@ -135,6 +135,9 @@ def parse_spending_time_data(spending_time_data):
 async def get_poi_information():
     """Retrieve POI information for an array of ids"""
     ids = await request.get_json()
+    
+    if ids is None:
+        abort(400, description='Invalid request body, is the request body type a JSON?')
 
     if len(ids) > 100:
         abort(400, description='You can send at most 100 ids at once.')

@@ -14,3 +14,6 @@ tmp
 env
 !.env.local
 __pycache__
+
+
+kuwala/scripts/windows/
