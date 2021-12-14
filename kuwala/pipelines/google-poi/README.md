@@ -70,7 +70,7 @@ URL: `/search`<br/>
 Request Body (**required**): Array of search strings<br/>
 
 *Example*: `localhost:3003/search`</br>
-Request Body:
+Request Body (in JSON format):
 
 ```json 
     [
@@ -89,7 +89,7 @@ URL: `/poi-information`<br/>
 Request Body (**required**): Array of encoded placeIDs<br/>
 
 *Example*: `localhost:3003/poi-information`<br>
-Request Body:
+Request Body (in JSON format):
 
 ```json 
     [
@@ -108,7 +108,7 @@ URL: `/popularity`<br/>
 Request Body (**required**): Array of encoded placeIDs<br/>
 
 *Example*: `localhost:3003/popularity`<br>
-Request Body:
+Request Body (in JSON format):
 
 ```json 
     [
