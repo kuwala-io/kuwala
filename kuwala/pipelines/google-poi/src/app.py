@@ -19,7 +19,7 @@ app.register_blueprint(poi_information)
 app.register_blueprint(popularity)
 app.register_error_handler(error=400, func=general_error)
 app.register_error_handler(error=429, func=general_error)
-app.register_error_handler(error=415, func=general_error)
+
 
 
 if __name__ == '__main__':
