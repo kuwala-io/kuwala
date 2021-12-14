@@ -49,21 +49,21 @@ class Processor:
 
         today=str(dte.today())
 
-        if (os.path.isdir(output_dir + 'result.parquet'+'_'+today)):
+        if (os.path.isdir(output_dir + 'result'+'_'+today+'.parquet')):
             print("parquet files already exist")
-            deci=''
-            while(deci!='n' or deci!='N' or deci!='y' or deci!='Y'):
-                deci=input("do you want to overwrite? [Y] or skip donwload [N]?   ")
-                if deci=='n' or deci=='N':
+            decision=''
+            while(decision!='n' or decision!='N' or decision!='y' or decision!='Y'):
+                decisionsion=input("do you want to overwrite? [Y] or skip download [N]? ")
+                if decisionsion=='n' or decisionsion=='N':
                     print("Download skipped.")
                     break
-                elif deci=='y' or deci=='Y':
-                    df.write.mode('overwrite').parquet(output_dir + 'result.parquet'+'_'+today)
+                elif decision=='y' or decision=='Y':
+                    df.write.mode('overwrite').parquet(output_dir + 'result'+'_'+today+'.parquet')
                     print("parquet overwritted")  
                     break
 
         else:
-            df.write.mode('overwrite').parquet(output_dir + 'result.parquet'+'_'+today)   
+            df.write.mode('overwrite').parquet(output_dir + 'result'+'_'+today+'.parquet')   
 
         end_time = time.time()
 
