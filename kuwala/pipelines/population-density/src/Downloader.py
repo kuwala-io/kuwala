@@ -36,16 +36,17 @@ class Downloader:
                 dataset['continent'] = args.continent
                 dataset['country'] = args.country
                 d = Dataset.read_from_hdx(dataset['id'])
+                #update_date=Dataset.read_from_hdx(dataset['updated'])
                 selected_resources = select_demographic_groups(d)
         else:
             d = Dataset.read_from_hdx(dataset['id'])
+            #update_date=Dataset.read_from_hdx(dataset['updated'])
             selected_resources = select_demographic_groups(d)
 
         script_dir = os.path.dirname(__file__)
         dir_path = f'../tmp/populationFiles/{dataset["continent"]}/{dataset["country"]}/'
         dir_path = os.path.join(script_dir, dir_path)
         file_paths = list()
-
         for r in selected_resources:
             dir_path_type = f'{dir_path}{r["type"]}/'
 
@@ -59,12 +60,12 @@ class Downloader:
 
                 url, file_path = r_hdx.download(dir_path_type)
                 file_path_without_ext = file_path.replace('.CSV', '')
-
                 os.rename(file_path, file_path_without_ext)
 
                 with zipfile.ZipFile(file_path_without_ext, 'r') as zip_ref:
                     zip_ref.extractall(dir_path_type)
-
+                file_path_with_update_date=file_path_without_ext.split('_csv')[0]+'_'+r['updated']+'.csv'
+                os.rename(file_path_without_ext.split('_csv')[0]+'.csv', file_path_with_update_date)
                 os.remove(file_path_without_ext)
 
                 end_time = time.time()

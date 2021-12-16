@@ -216,12 +216,12 @@ def select_demographic_groups(d: Dataset):
                 id=resource.get('id'),
                 format=resource.get('format'),
                 type=get_type(resource.get('name')),
-                date=resource.get('last_modified')
+                date=resource.get('last_modified')[:10],
             ),
             resources
         )
     ))
-    resources = list(map(lambda r: dict(id=r['id'], type=r['type']), resources))
+    resources = list(map(lambda r: dict(id=r['id'], type=r['type'], updated=r['date']), resources))
     resource_names = list(map(lambda r: r['type'], resources))
     selected_resources = questionary \
         .checkbox('Which demographic groups do you want to include?', choices=resource_names) \
