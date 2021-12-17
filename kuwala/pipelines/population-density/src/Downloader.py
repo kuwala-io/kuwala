@@ -20,9 +20,9 @@ class Downloader:
         else:
             dataset = select_population_file()
 
-        files, output_dir = Downloader.download_files(dataset, args)
+        files, output_dir, updated_date = Downloader.download_files(dataset, args)
 
-        return files, output_dir
+        return files, output_dir, updated_date
 
     @staticmethod
     def download_files(dataset: dict, args) -> [str]:
@@ -36,11 +36,9 @@ class Downloader:
                 dataset['continent'] = args.continent
                 dataset['country'] = args.country
                 d = Dataset.read_from_hdx(dataset['id'])
-                #update_date=Dataset.read_from_hdx(dataset['updated'])
                 selected_resources = select_demographic_groups(d)
         else:
             d = Dataset.read_from_hdx(dataset['id'])
-            #update_date=Dataset.read_from_hdx(dataset['updated'])
             selected_resources = select_demographic_groups(d)
 
         script_dir = os.path.dirname(__file__)
@@ -52,7 +50,9 @@ class Downloader:
 
             file_paths.append(dict(path=dir_path_type, type=r['type']))
 
+
             if not os.path.exists(dir_path_type):
+                print("Downloading.....")
                 r_hdx = Resource().read_from_hdx(identifier=r['id'])
                 start_time = time.time()
 
@@ -72,4 +72,4 @@ class Downloader:
 
                 print(f'Downloaded data for {r["type"]} in {round(end_time - start_time)} s')
 
-        return file_paths, dir_path
+        return file_paths, dir_path, r['updated']

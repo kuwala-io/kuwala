@@ -1,7 +1,6 @@
 import math
 import os
 import time
-from datetime import date as dte
 from functools import reduce
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, lit, sum
@@ -11,7 +10,7 @@ from python_utils.src.spark_udfs import get_h3_index
 
 class Processor:
     @staticmethod
-    def start(files: [dict], output_dir: str):
+    def start(files: [dict], output_dir: str, updated_date: str):
         memory = os.getenv('SPARK_MEMORY') or '16g'
         start_time = time.time()
         dfs = list()
@@ -47,23 +46,8 @@ class Processor:
 
         df = reduce((lambda d1, d2: d1.join(d2, ['h3Index'], 'full').repartition(number_of_partitions, 'h3Index')), dfs)
 
-        today=str(dte.today())
 
-        if (os.path.isdir(output_dir + 'result'+'_'+today+'.parquet')):
-            print("parquet files already exist")
-            decision=''
-            while(decision!='n' or decision!='N' or decision!='y' or decision!='Y'):
-                decision=input("do you want to overwrite? [Y] or skip download [N]? ")
-                if decision=='n' or decision=='N':
-                    print("Download skipped.")
-                    break
-                elif decision=='y' or decision=='Y':
-                    df.write.mode('overwrite').parquet(output_dir + 'result'+'_'+today+'.parquet')
-                    print("parquet overwritted")  
-                    break
-
-        else:
-            df.write.mode('overwrite').parquet(output_dir + 'result'+'_'+today+'.parquet')   
+        df.write.mode('overwrite').parquet(output_dir + 'result'+'_'+updated_date+'.parquet')
 
         end_time = time.time()
 
