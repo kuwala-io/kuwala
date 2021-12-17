@@ -13,7 +13,7 @@ if __name__ == '__main__':
     parser.add_argument('--demographic_groups', help='Demographic groups to be downloaded')
     args = parser.parse_args()
 
-    files, output_dir, update_date = Downloader.start(args)
+    files, output_dir, updated_date = Downloader.start(args)
 
-    Processor.start(files, output_dir, update_date)
+    Processor.start(files, output_dir, updated_date)
 
