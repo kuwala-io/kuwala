@@ -65,7 +65,10 @@ class Downloader:
                 date=r['updated'].replace('-','_')
                 with zipfile.ZipFile(file_path_without_ext, 'r') as zip_ref:
                     zip_ref.extractall(dir_path_type)
-                file_path_with_update_date=file_path_without_ext.split('_csv')[0]+'_'+date+'.csv'
+                file_path_with_update_date=file_path_without_ext.split('/')
+                file_path_with_update_date[-1]=date+'_'+file_path_with_update_date[-1]
+                file_path_with_update_date='/'.join(file_path_with_update_date)
+                file_path_with_update_date=file_path_with_update_date.split('_csv')[0]+'.csv'
                 os.rename(file_path_without_ext.split('_csv')[0]+'.csv', file_path_with_update_date)
                 os.remove(file_path_without_ext)
 
