@@ -73,4 +73,4 @@ class Downloader:
 
                 print(f'Downloaded data for {r["type"]} in {round(end_time - start_time)} s')
 
-        return file_paths, dir_path, r['updated']
+        return file_paths, dir_path, date
