@@ -4,7 +4,7 @@ COPY ./common/python_utils /opt/common/python_utils
 COPY ./pipelines/google-poi /opt/pipelines/app
 
 WORKDIR /opt/pipelines/app
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 WORKDIR /opt/pipelines/app/src
 ENTRYPOINT [ "python", "-u", "app.py", "local" ]

@@ -1,9 +1,9 @@
-FROM jupyter/pyspark-notebook
+FROM jupyter/pyspark-notebook:2021-11-20
 
-RUN pip install pandas-profiling[notebook]
+RUN pip install --no-cache-dir "pandas-profiling[notebook]==3.1.0"
 
 COPY ./common/jupyter/requirements.txt /opt/requirements.txt
-RUN pip install -r /opt/requirements.txt
+RUN pip install --no-cache-dir -r /opt/requirements.txt
 
 # Setup work directory for backward-compatibility
 RUN rmdir "/home/jovyan/work" && \

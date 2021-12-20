@@ -1,10 +1,10 @@
-FROM rappdw/docker-java-python
+FROM rappdw/docker-java-python:zulu11.43-python3.7.9
 
 COPY ./common/python_utils /opt/common/python_utils
 COPY ./core/neo4j /opt/core/app
 
 WORKDIR /opt/core/app/importer
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 WORKDIR /opt/core/app/importer/src
 ENTRYPOINT [ "python", "-u", "main.py" ]
