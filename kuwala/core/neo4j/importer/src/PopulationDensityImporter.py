@@ -35,17 +35,19 @@ def import_population_density(args, limit=None):
     file_path = os.path.join(script_dir, '../tmp/kuwala/populationFiles/')
     continent = args.continent
     country = args.country
+    date = args.date #added this, 
+    date = str(date).replace('-','_')
 
     if continent is None or country is None:
         try:
             file_path = select_local_country(file_path)
-            file_path += '/result.parquet'
+            file_path += '/result'+date+'.parquet' #fix this 
         except FileNotFoundError:
             print('No population data available for import')
 
             return
-    else:
-        file_path += f'{continent}/{country}/result.parquet'
+    else: 
+        file_path += f'{continent}/{country}/result_{date}.parquet' #fix this
 
     if not os.path.exists(file_path):
         print('No population data available for import')
