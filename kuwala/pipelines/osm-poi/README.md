@@ -74,7 +74,8 @@ categories. When committing, also include the new tags under `misc` for later ca
 ---
 ### License
 
-We are neither providing nor are we responsible for the OSM data. This repository is purely a tool for working
-with that data. You are responsible for complying with OSM's and [Geofabrik](http://www.geofabrik.de)'s licences when using the data.
+We are neither providing nor are we responsible for the OSM data. This repository is purely a tool for working with 
+that data. You are responsible for complying with OSM's and [Geofabrik](http://www.geofabrik.de)'s licences when using 
+the data.
 
 OSM is published under the [Open Data Commons Open Database License](https://www.openstreetmap.org/copyright).
