@@ -2,6 +2,7 @@ import json
 import os
 import time
 import zipfile
+import glob
 from hdx.data.dataset import Dataset
 from hdx.data.resource import Resource
 from hdx.hdx_configuration import Configuration
@@ -65,12 +66,17 @@ class Downloader:
                 date=r['updated'].replace('-','_')
                 with zipfile.ZipFile(file_path_without_ext, 'r') as zip_ref:
                     zip_ref.extractall(dir_path_type)
-                file_path_with_update_date=file_path_without_ext.split('/')
+                
+                #check the extracted file name as in https://github.com/kuwala-io/kuwala/pull/67#discussion_r774395338
+                csv_file=glob.glob(dir_path_type + "*.csv", recursive = True)[0]
+                
+                #assuming there will be only one csv file as extract result
+                file_path_with_update_date=csv_file.split('/')
                 file_path_with_update_date[-1]=date+'_'+file_path_with_update_date[-1]
                 file_path_with_update_date='/'.join(file_path_with_update_date)
-                file_path_with_update_date=file_path_with_update_date.split('_csv')[0]+'.csv'
-                os.rename(file_path_without_ext.split('_csv')[0]+'.csv', file_path_with_update_date)
-                os.remove(file_path_without_ext)
+                #file_path_with_update_date=file_path_with_update_date.split('_csv')[0]+'.csv' 
+                os.rename(csv_file, file_path_with_update_date)
+                os.remove(csv_file)
 
                 end_time = time.time()
 
