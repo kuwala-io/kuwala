@@ -76,7 +76,7 @@ class Downloader:
                 file_path_with_update_date='/'.join(file_path_with_update_date)
                 #file_path_with_update_date=file_path_with_update_date.split('_csv')[0]+'.csv' 
                 os.rename(csv_file, file_path_with_update_date)
-                os.remove(csv_file)
+                os.remove(file_path_without_ext)
 
                 end_time = time.time()
 
