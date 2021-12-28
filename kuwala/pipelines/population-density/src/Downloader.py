@@ -51,6 +51,7 @@ class Downloader:
 
             file_paths.append(dict(path=dir_path_type, type=r['type']))
 
+            date=r['updated'].replace('-','_')
 
             if not os.path.exists(dir_path_type):
                 print("Downloading.....")
@@ -63,7 +64,7 @@ class Downloader:
                 file_path_without_ext = file_path.replace('.CSV', '')
                 os.rename(file_path, file_path_without_ext)
 
-                date=r['updated'].replace('-','_')
+                
                 with zipfile.ZipFile(file_path_without_ext, 'r') as zip_ref:
                     zip_ref.extractall(dir_path_type)
                 
