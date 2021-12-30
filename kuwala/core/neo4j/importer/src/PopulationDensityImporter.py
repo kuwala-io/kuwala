@@ -41,13 +41,13 @@ def import_population_density(args, limit=None):
     if continent is None or country is None:
         try:
             file_path = select_local_country(file_path)
-            file_path += '/result'+'_'+date+'.parquet' 
+            file_path += '/'+ date +'_result.parquet' 
         except FileNotFoundError:
             print('No population data available for import')
 
             return
     else: 
-        file_path += f'{continent}/{country}/result_{date}.parquet'
+        file_path += f'{continent}/{country}/{date}_result.parquet'
 
     if not os.path.exists(file_path):
         print('No population data available for import')
