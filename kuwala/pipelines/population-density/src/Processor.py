@@ -46,7 +46,7 @@ class Processor:
 
         df = reduce((lambda d1, d2: d1.join(d2, ['h3Index'], 'full').repartition(number_of_partitions, 'h3Index')), dfs)
 
-        df.write.mode('overwrite').parquet(output_dir + 'result'+'_'+updated_date+'.parquet')
+        df.write.mode('overwrite').parquet(output_dir + updated_date + '_' + 'result.parquet')
 
         end_time = time.time()
 
