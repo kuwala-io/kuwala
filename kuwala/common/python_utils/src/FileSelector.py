@@ -152,7 +152,7 @@ def get_countries_with_population_data(return_country_code=False):
             lambda d: 'population' in d['title'].lower() and 'csv' in d['file_types'],
             map(
                 lambda d: dict(id=d.get('id'), title=d.get('title'), location=d.get_location_names(),
-                               country_code=d.get_location_iso3s(), file_types=d.get_filetypes()),
+                               country_code=d.get_location_iso3s(), file_types=d.get_filetypes(), updated_date=d.get('last_modified')[:10]),
                 datasets
             )
         ), key=lambda d: d['location'][0])

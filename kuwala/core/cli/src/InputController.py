@@ -63,7 +63,7 @@ def select_region(pipelines: [str]) -> [str, str]:
         continent = file['continent']
         country = file['country']
         population_density_id = file['id']
-        population_density_update_date=file['last_modified']
+        population_density_update_date=file['updated_date']
 
 
     # TODO if both osm-poi and population density are selected, check if population data is available for the selected

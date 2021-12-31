@@ -11,6 +11,7 @@ if __name__ == '__main__':
     parser.add_argument('--continent', help='Continent of the file')
     parser.add_argument('--country', help='Country of the file')
     parser.add_argument('--demographic_groups', help='Demographic groups to be downloaded')
+    parser.add_argument('--population_density_date',help='Selected update date to process' )
     args = parser.parse_args()
 
     files, output_dir, updated_date = Downloader.start(args)

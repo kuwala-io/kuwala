@@ -35,7 +35,7 @@ def import_population_density(args, limit=None):
     file_path = os.path.join(script_dir, '../tmp/kuwala/populationFiles/')
     continent = args.continent
     country = args.country
-    date = args.population-density-date 
+    date = args.population_density_date 
     date = str(date).replace('-','_')
 
     if continent is None or country is None:
