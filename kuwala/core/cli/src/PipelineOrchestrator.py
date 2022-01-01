@@ -91,13 +91,14 @@ def run_population_density_pipeline(continent, country, demographic_groups):
     run_command([f'docker-compose run --rm population-density {continent_arg} {country_arg} {demographic_groups_arg}'])
 
 
-def run_neo4j_importer(continent, country, country_region):
+def run_neo4j_importer(continent, country, country_region, population_density_update_date):
     continent_arg = f'--continent={continent}' if continent else ''
     country_arg = f'--country={country}' if country else ''
     country_region_arg = f'--country_region={country_region}' if country_region else ''
     neo4j_process = run_command(f'docker-compose --profile core up', exit_keyword='Started.')
+    population_density_update_date_arg=f'--population_density_date={population_density_update_date}' if population_density_update_date else ''
 
-    run_command([f'docker-compose run --rm neo4j-importer {continent_arg} {country_arg} {country_region_arg}'])
+    run_command([f'docker-compose run --rm neo4j-importer {continent_arg} {country_arg} {country_region_arg} {population_density_update_date_arg} '])
     neo4j_process.terminate()
 
 
@@ -105,6 +106,8 @@ def run_pipelines(pipelines: [str], selected_region: dict):
     continent = selected_region['continent']
     country = selected_region['country']
     country_region = selected_region['country_region']
+    population_density_update_date = selected_region['population_density_update_date']
+
 
     if 'google-poi' in pipelines or 'osm-poi' in pipelines:
         run_osm_poi_pipeline(selected_region['osm_url'], continent, country, country_region)
@@ -115,5 +118,5 @@ def run_pipelines(pipelines: [str], selected_region: dict):
     if 'population-density' in pipelines:
         run_population_density_pipeline(continent, country, selected_region['demographic_groups'])
 
-    run_neo4j_importer(continent, country, country_region)
+    run_neo4j_importer(continent, country, country_region, population_density_update_date)
     run_command(['docker-compose down --remove-orphans'])
