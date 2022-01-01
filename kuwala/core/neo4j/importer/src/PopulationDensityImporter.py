@@ -50,9 +50,6 @@ def import_population_density(args, limit=None):
         file_path += f'{continent}/{country}/{date}_result.parquet'
 
     if not os.path.exists(file_path):
-        print('file_path:')
-        print(file_path)
-        print()
         print('No population data available for import')
 
         return
