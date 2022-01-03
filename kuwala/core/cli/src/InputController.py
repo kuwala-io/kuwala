@@ -50,6 +50,7 @@ def select_region(pipelines: [str]) -> [str, str]:
     country_region = None
     population_density_id = None
     osm_url = None
+    population_density_update_date = None
 
     if 'osm-poi' in pipelines or 'google-poi' in pipelines:
         file = FileSelector.select_osm_file()
@@ -62,8 +63,9 @@ def select_region(pipelines: [str]) -> [str, str]:
         continent = file['continent']
         country = file['country']
         population_density_id = file['id']
+        population_density_update_date = file['updated_date']
 
-    # TODO if both osm-poi and population density are selected, check if population data is available for the selected
+    #  TODO if both osm-poi and population density are selected, check if population data is available for the selected
     #   country
 
     return dict(
@@ -71,7 +73,8 @@ def select_region(pipelines: [str]) -> [str, str]:
         country=country,
         country_region=country_region,
         population_density_id=population_density_id,
-        osm_url=osm_url
+        osm_url=osm_url,
+        population_density_update_date=population_density_update_date
     )
 
 

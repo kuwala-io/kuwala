@@ -2,6 +2,7 @@ import json
 import os
 import time
 import zipfile
+import glob
 from hdx.data.dataset import Dataset
 from hdx.data.resource import Resource
 from hdx.hdx_configuration import Configuration
@@ -20,9 +21,9 @@ class Downloader:
         else:
             dataset = select_population_file()
 
-        files, output_dir = Downloader.download_files(dataset, args)
+        files, output_dir, updated_date = Downloader.download_files(dataset, args)
 
-        return files, output_dir
+        return files, output_dir, updated_date
 
     @staticmethod
     def download_files(dataset: dict, args) -> [str]:
@@ -45,13 +46,21 @@ class Downloader:
         dir_path = f'../../../tmp/kuwala/population_files/{dataset["continent"]}/{dataset["country"]}/'
         dir_path = os.path.join(script_dir, dir_path)
         file_paths = list()
+        latest_update_date = None
 
         for r in selected_resources:
             dir_path_type = f'{dir_path}{r["type"]}/'
 
             file_paths.append(dict(path=dir_path_type, type=r['type']))
+            update_date = r['updated'].replace('-', '_')
+
+            if not latest_update_date:
+                latest_update_date = update_date
+            elif latest_update_date < update_date:
+                latest_update_date = update_date
 
             if not os.path.exists(dir_path_type):
+                print("Downloading.....")
                 r_hdx = Resource().read_from_hdx(identifier=r['id'])
                 start_time = time.time()
 
@@ -59,16 +68,22 @@ class Downloader:
 
                 url, file_path = r_hdx.download(dir_path_type)
                 file_path_without_ext = file_path.replace('.CSV', '')
-
                 os.rename(file_path, file_path_without_ext)
 
                 with zipfile.ZipFile(file_path_without_ext, 'r') as zip_ref:
                     zip_ref.extractall(dir_path_type)
 
+                # check the extracted file name as in https://github.com/kuwala-io/kuwala/pull/67#discussion_r774395338
+                csv_file = glob.glob(dir_path_type + "*.csv", recursive=True)[0]
+                # assuming there will be only one csv file as extract result
+                file_path_with_update_date = csv_file.split('/')
+                file_path_with_update_date[-1] = update_date + '_' + file_path_with_update_date[-1]
+                file_path_with_update_date = '/'.join(file_path_with_update_date)
+                os.rename(csv_file, file_path_with_update_date)
                 os.remove(file_path_without_ext)
 
                 end_time = time.time()
 
                 print(f'Downloaded data for {r["type"]} in {round(end_time - start_time)} s')
 
-        return file_paths, dir_path
+        return file_paths, dir_path, latest_update_date
