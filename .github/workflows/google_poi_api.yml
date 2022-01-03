@@ -1,7 +1,7 @@
-name: Build Neo4j Importer Docker Image
+name: Build Google-POI API Docker image
 on:
   push:
-    branches: '*'
+    branches: '**'
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -12,7 +12,7 @@ jobs:
 
     - uses: hadolint/hadolint-action@v1.6.0
       with:
-        dockerfile: kuwala/core/neo4j/importer/dockerfile
+        dockerfile: kuwala/pipelines/google-poi/dockerfile
   build:
     runs-on: ubuntu-latest
     steps:
@@ -20,7 +20,7 @@ jobs:
       with:
         fetch-depth: 0
 
-    # This is the a separate action that sets up buildx runner
+    # This is a separate action that sets up buildx runner
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1 
     # So now you can use Actions' own caching!
@@ -33,12 +33,12 @@ jobs:
           ${{ runner.os }}-buildx-
 
     # And make it available for the builds
-    - name: Build neo4j and push
+    - name: Build google-poi API and push
       uses: docker/build-push-action@v2
       with:
         context: kuwala
-        file: kuwala/core/neo4j/importer/dockerfile
+        file: kuwala/pipelines/google-poi/dockerfile
         push: false
-        tags: kuwala/neo4j:${{ github.sha }}
+        tags: kuwala/google_poi_api:${{ github.sha }}
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new

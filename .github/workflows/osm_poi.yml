@@ -1,7 +1,7 @@
-name: Build OSM-POI Docker Image
+name: Build OSM-POI Docker image
 on:
   push:
-    branches: '*'
+    branches: '**'
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -20,7 +20,7 @@ jobs:
       with:
         fetch-depth: 0
 
-    # This is the a separate action that sets up buildx runner
+    # This is a separate action that sets up buildx runner
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1 
     # So now you can use Actions' own caching!
@@ -33,12 +33,12 @@ jobs:
           ${{ runner.os }}-buildx-
 
     # And make it available for the builds
-    - name: Build neo4j and push
+    - name: Build osm_poi and push
       uses: docker/build-push-action@v2
       with:
         context: kuwala
         file: kuwala/pipelines/osm-poi/dockerfile
         push: false
-        tags: kuwala/neo4j:${{ github.sha }}
+        tags: kuwala/osm_poi:${{ github.sha }}
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
