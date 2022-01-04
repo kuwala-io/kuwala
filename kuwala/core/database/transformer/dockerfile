@@ -3,6 +3,6 @@ FROM python:3.9.5
 COPY ./core/database/transformer /opt/app/core/database/transformer
 
 WORKDIR /opt/app/core/database/transformer
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 ENTRYPOINT [ "python", "main.py" ]

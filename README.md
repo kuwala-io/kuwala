@@ -1,8 +1,7 @@
 ![Logo Banner](./docs/images/kuwala_title_banner.png)
 
+[![Slack](https://img.shields.io/badge/slack-chat-orange.svg)](https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-pXKFBjbnl7_P3nXtwca5ag)
 ![License](https://img.shields.io/github/license/kuwala-io/kuwala)
-[![Slack](https://img.shields.io/badge/slack-chat-orange.svg)](
-https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-pXKFBjbnl7_P3nXtwca5ag)
 
 ## What is Kuwala?
 
@@ -68,7 +67,7 @@ Uber. For the complete documentation please go to the [H3 Repo](https://github.c
 #### Prerequisites
 
 Installed version of *Python3*, *Docker* and 
-*docker-compose* ([*Go here for instructions*](https://docs.docker.com/compose/install/)) or use the Binder batch in 
+*docker-compose v2* ([*Go here for instructions*](https://docs.docker.com/compose/install/)) or use the Binder batch in 
 the next section.
 
 ***Note***: We recommend giving Docker at least 8 GB of RAM (On Docker Desktop you can go under settings -> resources)

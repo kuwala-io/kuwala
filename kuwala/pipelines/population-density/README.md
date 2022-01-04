@@ -23,13 +23,23 @@ For more general information check out our
 
 ---
 
-## Run
+## Usage
 
-Proceed only if you followed the initial steps to initialize the main components mentioned here:
-[`Initialize Main Components`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/)
+To make sure you are running the latest version of the pipeline, build the Docker image by running:
 
 ```zsh
-docker-compose run  population-density
+docker-compose build population-density
+```
+
+Those are the command line parameters for setting the geographic scope:
+
+- `--continent` (optional)
+- `--country` (optional)
+
+To start the pipeline run:
+
+```zsh
+docker-compose run population-density
 ```
 
 Follow the prompts to download, process and save data [1]
@@ -57,9 +67,9 @@ Follow the prompts to download, process and save data [1]
 
 ---
 
-## Usage
+## Working with the data
 
-At the moment you can query the data directly using Cypher on top of Neo4j, or you can process the transformed results 
+At the moment you can query the data directly using SQL on top of Postgres, or you can process the transformed results 
 in Parquet format. We are working on a Jupyter notebook environment where you visualize the data directly and use 
 functions to transform the data to your desired aggregation and ultimately send it to your destination. You can follow 
 the progress on our [GitHub milestones](https://github.com/kuwala-io/kuwala/milestones) page.

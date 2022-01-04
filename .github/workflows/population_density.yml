@@ -1,6 +1,9 @@
 name: Build population-density Docker image
 on:
   push:
+    branches:
+      - main
+  pull_request:
     branches: '**'
 jobs:
   lint:

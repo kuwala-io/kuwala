@@ -17,7 +17,40 @@ we also consolidate the OSM tags into separate objects.
 
 ---
 
-## Run
+## Usage
+
+To transform the standard `pbf` files, which is the file format of the OSM data, we are using the OSM-parquetizer. The 
+OSM-parquetizer is based on a Git submodule which needs to be initialized first. To initialize the submodule, run from 
+inside the root directory:
+
+Linux/Mac:
+
+```zsh
+cd kuwala/scripts && sh initialize_git_submodules.sh
+```
+
+Windows:
+
+```zsh
+cd kuwala/scripts && sh initialize_windows.sh && cd windows && sh initialize_git_submodules.sh
+```
+
+To make sure you are running the latest version of the pipeline, build the Docker images by running:
+
+```zsh
+docker-compose build osm-poi osm-parquetizer
+```
+
+Those are the command line parameters for setting the geographic scope:
+
+- `--continent` (optional)
+- `--country` (optional)
+- `--country_region` (optional)
+
+Do set directly whether to download or to process files you can pass `--action` (options: "download", "process") as a 
+command line argument.
+
+You can also provide a direct download url from Geofabrik by passing it with the `--url` command line parameter.
 
 ### Download PBF files
 
@@ -33,7 +66,7 @@ Creating kuwala_osm-poi_run ... done
 ### Parse PBF files to Parquet
 
 ```zsh
-docker-compose run osm-parquetizer java -jar --continent=<continent> --country=<country> --country_region=<country_region>
+docker-compose run --rm osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar --continent=<continent> --country=<country> --country_region=<country_region>
 ```
 
 The country and continent have to be passed as ISO-3 country codes. The country_region is based on Geofabrik's naming. 
@@ -49,7 +82,8 @@ docker-compose run --rm osm-parquetizer java -jar target/osm-parquetizer-1.0.1-S
 We need to fetch some GeoJSON over the Nominatim API. In order to not run into rate limits make sure to have a proxy
 running. You can set the proxy address over the environment variable `PROXY_ADDRESS`.
 
-To use the Tor proxy over Docker simply run in a separate terminal window:
+To use the Tor proxy over Docker, simply run in a separate terminal window (when running the `osm-poi` pipeline itself
+over Docker the proxy is launched automatically):
 
 ```zsh
 docker-compose --profile proxy up
@@ -59,10 +93,9 @@ And then:
 
 ```zsh
 docker-compose run osm-poi
-Creating kuwala_osm-poi_run ... done
-? What do you want to do? Process
-? Which continent are you interested in? europe
-? Which country are you interested in? malta-latest
+? What do you want to do? process
+? Which continent are you interested in? Europe
+? Which country are you interested in? Malta
 ```
 
 ---
@@ -75,7 +108,7 @@ categories. When committing, also include the new tags under `misc` for later ca
 ### License
 
 We are neither providing nor are we responsible for the OSM data. This repository is purely a tool for working with 
-that data. You are responsible for complying with OSM's and [Geofabrik](http://www.geofabrik.de)'s licences when using 
+that data. You are responsible for complying with OSM's and [Geofabrik's](http://www.geofabrik.de) licences when using 
 the data.
 
 OSM is published under the [Open Data Commons Open Database License](https://www.openstreetmap.org/copyright).

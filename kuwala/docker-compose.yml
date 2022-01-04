@@ -2,6 +2,19 @@ version: '3.1'
 
 services:
 
+  torproxy:
+    container_name: torproxy
+    image: dperson/torproxy:latest
+    environment:
+      - TOR_MaxCircuitDirtiness=10
+    restart: always
+    ports:
+      - '9050:9050'
+    profiles:
+      - network
+      - google-poi-scraper
+      - proxy
+
   postgres:
     container_name: postgres
     build:
@@ -67,19 +80,6 @@ services:
     profiles:
       - network
 
-  torproxy:
-    container_name: torproxy
-    image: dperson/torproxy:latest
-    environment: 
-      - TOR_MaxCircuitDirtiness=10
-    restart: always
-    ports:
-      - '9050:9050'
-    profiles:
-      - network
-      - google-poi-scraper
-      - proxy
-
   # docker-compose run admin-boundaries --continent=<> --country=<> --country_region=<>
   admin-boundaries:
     container_name: admin-boundaries
@@ -115,7 +115,7 @@ services:
       - network
       - google-poi-scraper
 
-  # docker-compose run google-poi-pipeline
+  # docker-compose run google-poi-pipeline --continent=<> --country=<> --country_region=<> --polygon_coords=<> --polygon_resolution=<> --search_string_basis=<>
   google-poi-pipeline:
     container_name: google-poi-pipeline
     environment:
@@ -128,6 +128,22 @@ services:
       - ./tmp/kuwala/google_files:/opt/app/tmp/kuwala/google_files
       - ./tmp/kuwala/osm_files:/opt/app/tmp/kuwala/osm_files
     restart: always
+    profiles:
+      - network
+
+  # docker-compose run google-trends --continent=<> --country=<> --country_region=<> --keyword=<>
+  google-trends:
+    container_name: google-trends
+    environment:
+      - PROXY_ADDRESS=socks5://torproxy:9050
+    build:
+      context: .
+      dockerfile: ./pipelines/google-trends/dockerfile
+    volumes:
+      - ./tmp/kuwala/admin_boundary_files:/opt/tmp/kuwala/admin_boundary_files
+      - ./tmp/kuwala/google_trends_files:/opt/tmp/kuwala/google_trends_files
+    restart: always
+    depends_on: [torproxy]
     profiles:
       - network
 

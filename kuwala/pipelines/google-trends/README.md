@@ -1,6 +1,6 @@
 # Google Trends
 
-### EXPERIMENTAL: Pipeline is WIP and not fully functional yet
+### EXPERIMENTAL: Pipeline is WIP and not integrated into the CLI
 
 [Google Trends](https://trends.google.com/trends) is a tool provided by Google that provides insights in search trends
 of specific terms. The search volume of one or up to five search terms is indexed from 0 to 100 in a given timeframe. The 
@@ -11,12 +11,13 @@ Google Trends.
 
 ---
 
-## Run
+## Usage
 
-### Rate Limits
+To make sure you are running the latest version of the pipeline, build the Docker image by running:
 
-In order to not run into rate limits, you have to use a proxy. You can specify the proxy address through the environment
-variable `PROXY_ADDRESS` (e.g., when using Tor, the value should be `socks5://localhost:9150`).
+```zsh
+docker-compose build google-trends
+```
 
 ### Parameters
 
@@ -27,8 +28,20 @@ with the respective admin boundary. For this, the admin boundaries have to be ge
 Those are the command line parameters for setting the geographic scope and search term:
 - `--continent`
 - `--country`
-- `--country_region`
+- `--country_region` (optional)
 - `--keyword`
+
+### Starting the scraper
+
+```zsh
+docker-compose run google-trends --continent=<> --country=<> --country_region=<> --keyword=<>
+```
+
+### Rate Limits
+
+In order to not run into rate limits, you have to use a proxy. You can specify the proxy address through the environment
+variable `PROXY_ADDRESS` (e.g., when using Tor, the value should be `socks5://localhost:9150`). If you run the pipeline
+through Docker, a proxy via Tor is automatically launched.
 
 ---
 ### License

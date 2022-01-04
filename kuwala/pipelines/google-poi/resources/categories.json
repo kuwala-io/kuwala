@@ -473,7 +473,14 @@
             "department_of_motor_vehicles",
             "smart_shop",
             "university_department",
-            "poke_bar"
+            "poke_bar",
+            "cemetery",
+            "community_center",
+            "air_conditioning_store",
+            "cupcake_shop",
+            "local_history_museum",
+            "optical_products_manufacturer",
+            "taco_restaurant"
         ]
     },
     "office": {

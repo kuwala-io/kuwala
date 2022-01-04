@@ -36,28 +36,50 @@ This score can also be over 100 if the number of visitors is extraordinarily hig
 
 ## Usage
 
-Proceed only if you followed the initial steps to initialize the main components mentioned here:
-[`Initialize Main Components`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/)
+To make sure you are running the latest version of the pipeline, build the Docker image by running:
 
-1. Start the scraping api
+```zsh
+docker-compose build google-poi-api google-poi-pipeline
+```
+
+### Start the scraping api
 
 ```zsh
 docker-compose --profile google-poi-scraper up
 ```
 
-2. OPTIONAL: To scrape the Google data for all OSM POIs that are in the database after running the OSM pipeline execute:
+### Getting Google POI data based on OSM queries
+
+Those are the command line parameters for setting the geographic scope:
+
+- `--continent`
+- `--country`
+- `--country_region` (optional)
+- `--polygon_coords` (optional)
+- `--polygon_resolution` (optional, default: 9)
+
+To scrape the Google data for all OSM POIs that are in the database after running the 
+[OSM pipeline](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/osm-poi) execute in a new terminal 
+window:
 
 ```zsh
-docker-compose run google-poi-pipeline
+docker-compose run google-poi-pipeline --continent=<> --country=<> --country_region=<>
 ```
 
 To run the scraper just for a subregion of the processed OSM data, you can provide the optional parameter 
-`polygon_coords`, which passes the coordinates according to the GeoJSON format for Polygons. Additionally, the H3
+`polygon_coords`, which passes the coordinates according to the GeoJSON format for polygons. Additionally, the H3
 resolution for the polyfill can be provided through the `polygon_resolution` parameter (default: 9).
 
 ```zsh
-docker-compose run google-poi-pipeline --polygon_coords "[[[14.490726008861989,35.88842705928255],[14.490726008861989,35.90641346655704],[14.51292661409779,35.90641346655704],[14.51292661409779,35.88842705928255],[14.490726008861989,35.88842705928255]]]"
+docker-compose run google-poi-pipeline --continent=<> --country=<> --country_region=<> --polygon_coords="[[[14.490726008861989,35.88842705928255],[14.490726008861989,35.90641346655704],[14.51292661409779,35.90641346655704],[14.51292661409779,35.88842705928255],[14.490726008861989,35.88842705928255]]]"
 ```
+
+### Getting Google POI data for a list of search strings
+
+Instead of generating search strings based on OSM data, you can also provide a list of custom search strings and scrape
+the Google data based on that. You still need to provide `--continent` and `--country` to give the results geographical 
+context. The search strings have to be in a CSV file with the columns `id` and `query`. The CSV has to be placed under
+`kuwala/tmp/kuwala/google_files/<continent>/<country>/search_strings/custom_search_strings.csv`
 
 ### API Calls
 
@@ -70,14 +92,14 @@ URL: `/search`<br/>
 Request Body (**required**): Array of search strings<br/>
 
 *Example*: `localhost:3003/search`</br>
-Request Body (in JSON format):
+Request Body (sent in JSON format):
 
 ```json 
-    [
-        "Eiffel Tower, Avenue Anatole France 5,  75007 Paris",
-        "Piccadilly Circus station, London",
-        "Starbucks, Grunerstraße 20, 10179 Berlin"
-    ]
+[
+    "Eiffel Tower, Avenue Anatole France 5,  75007 Paris",
+    "Piccadilly Circus station, London",
+    "Starbucks, Grunerstraße 20, 10179 Berlin"
+]
 ```
 
 #### Get POI information based on encoded placeID
@@ -89,14 +111,14 @@ URL: `/poi-information`<br/>
 Request Body (**required**): Array of encoded placeIDs<br/>
 
 *Example*: `localhost:3003/poi-information`<br>
-Request Body (in JSON format):
+Request Body (sent in JSON format):
 
 ```json 
-    [
-        "0x47e66e2964e34e2d:0x8ddca9ee380ef7e0",
-        "0x487604d3e05e54bd:0xa3f4c9ef40a075c3",
-        "0x47a84e22134bcf99:0x5541176eb2ed92f7"
-    ]
+[
+    "0x47e66e2964e34e2d:0x8ddca9ee380ef7e0",
+    "0x487604d3e05e54bd:0xa3f4c9ef40a075c3",
+    "0x47a84e22134bcf99:0x5541176eb2ed92f7"
+]
 ```
 
 #### Get current popularity based on encoded placeID
@@ -108,14 +130,14 @@ URL: `/popularity`<br/>
 Request Body (**required**): Array of encoded placeIDs<br/>
 
 *Example*: `localhost:3003/popularity`<br>
-Request Body (in JSON format):
+Request Body (sent in JSON format):
 
 ```json 
-    [
-        "0x47e66e2964e34e2d:0x8ddca9ee380ef7e0",
-        "0x487604d3e05e54bd:0xa3f4c9ef40a075c3",
-        "0x47a84e22134bcf99:0x5541176eb2ed92f7"
-    ]
+[
+    "0x47e66e2964e34e2d:0x8ddca9ee380ef7e0",
+    "0x487604d3e05e54bd:0xa3f4c9ef40a075c3",
+    "0x47a84e22134bcf99:0x5541176eb2ed92f7"
+]
 ```
 
 ---

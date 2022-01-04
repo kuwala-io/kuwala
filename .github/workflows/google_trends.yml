@@ -1,4 +1,4 @@
-name: Build Google-POI pipeline Docker image
+name: Build Google trends Docker image
 on:
   push:
     branches:
@@ -15,7 +15,7 @@ jobs:
 
     - uses: hadolint/hadolint-action@v1.6.0
       with:
-        dockerfile: kuwala/pipelines/google-poi/src/pipeline/dockerfile
+        dockerfile: kuwala/pipelines/google-trends/dockerfile
   build:
     runs-on: ubuntu-latest
     steps:
@@ -25,7 +25,7 @@ jobs:
 
     # This is a separate action that sets up buildx runner
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1 
+      uses: docker/setup-buildx-action@v1
     # So now you can use Actions' own caching!
     - name: Cache Docker layers
       uses: actions/cache@v2
@@ -36,12 +36,12 @@ jobs:
           ${{ runner.os }}-buildx-
 
     # And make it available for the builds
-    - name: Build google-poi-pipeline and push
+    - name: Build Google trends and push
       uses: docker/build-push-action@v2
       with:
         context: kuwala
-        file: kuwala/pipelines/google-poi/src/pipeline/dockerfile
+        file: kuwala/pipelines/google-trends/dockerfile
         push: false
-        tags: kuwala/google_poi_pipeline:${{ github.sha }}
+        tags: kuwala/google-trends:${{ github.sha }}
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new

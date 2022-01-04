@@ -1,2 +1,2 @@
 cd ..
-docker-compose build google-poi-api google-poi-pipeline neo4j-importer osm-parquetizer osm-poi population-density admin-boundaries
+docker-compose build postgres database-importer database-transformer jupyter admin-boundaries google-poi-api google-poi-pipeline google-trends osm-parquetizer osm-poi population-density

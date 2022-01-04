@@ -1,5 +1,6 @@
 import argparse
 import os
+import sys
 from keyword_controller import get_keyword_by_region
 from pathlib import Path
 from pyspark.sql import SparkSession
@@ -28,12 +29,20 @@ if __name__ == '__main__':
 
     keywords = get_keyword_by_region(
         sp=spark, continent=continent, country=country, country_region=country_region, keyword=keyword)
+
+    try:
+        if keywords.empty:
+            sys.exit(1)
+    except AttributeError:
+        sys.exit(1)
+
     results = get_monthly_trend_for_keywords(keywords)
 
     script_dir = os.path.dirname(__file__)
     result_dir = os.path.join(
         script_dir,
-        f'../tmp/{continent}/{country}/{f"{country_region}/" if country_region else ""}{keyword.lower()}')
+        f'../../../tmp/kuwala/google_trends_files/{continent}/{country}/'
+        f'{f"{country_region}/" if country_region else ""}{keyword.lower()}')
     result_path = result_dir + '/results.csv'
 
     Path(result_dir).mkdir(parents=True, exist_ok=True)

@@ -8,7 +8,7 @@ and the goal would be to include them as well in the future.
 
 ---
 
-## Run
+## Usage
 
 To make sure you are running the latest version of the pipeline, build the Docker image by running:
 
@@ -16,15 +16,15 @@ To make sure you are running the latest version of the pipeline, build the Docke
 docker-compose build admin-boundaries
 ```
 
-We are building the admin boundaries based on the pre-processed OSM files. So first, you need to run the OSM-pipeline for
-the country you are interested in. With this pipeline, we retrieve the admin boundaries and build a harmonized 
-hierarchy.
+We are building the admin boundaries based on the pre-processed OSM files. So first, you need to run the 
+[OSM-pipeline](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/osm-poi) for the country you are 
+interested in. With this pipeline, we retrieve the admin boundaries and build a harmonized hierarchy.
 
 Those are the command line parameters for setting the geographic scope:
 
 - `--continent`
 - `--country`
-- `--country_region`
+- `--country_region` (optional)
 
 So for starting the pipeline, run the following command:
 
@@ -36,7 +36,7 @@ docker-compose run admin-boundaries --continent=<> --country=<> --country_region
 ### License
 
 We are neither providing nor are we responsible for the OSM data. This repository is purely a tool for working with 
-that data. You are responsible for complying with OSM's and [Geofabrik](http://www.geofabrik.de)'s licences when using 
+that data. You are responsible for complying with OSM's and [Geofabrik's](http://www.geofabrik.de) licences when using 
 the data.
 
 OSM is published under the [Open Data Commons Open Database License](https://www.openstreetmap.org/copyright).
