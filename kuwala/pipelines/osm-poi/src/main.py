@@ -25,5 +25,6 @@ if __name__ == '__main__':
 
     if action == 'download':
         Downloader.start(args)
+        Downloader.names_downloader()
     else:
         Processor.start(args)
