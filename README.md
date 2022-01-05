@@ -98,8 +98,8 @@ cd kuwala/scripts && sh initialize_windows.sh && cd windows && sh initialize_cor
 
 #### Run the data pipelines yourself
 
-To run the pipelines yourself, build the components first from inside the `kuwala/scripts` directory (or if the computer uses Windows, go to `kuwala/scripts/windows`) by executing the 
-`initialize_all_components.sh` script and the starting the CLI by running the `run_cli.sh` script. .
+To run the pipelines yourself, please follow the instructions for the 
+[CLI](https://github.com/kuwala-io/kuwala/tree/master/kuwala/core/cli/README.md).
 
 ---
 
@@ -115,6 +115,13 @@ We currently have the following pipelines published:
   Detailed population and demographic data
 - [`google-poi`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/google-poi):
   Scraping API to retrieve POI information from Google (incl. popularity score)
+
+*Experimental:*
+
+- [`admin-boundaries`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/admin-boundaries):
+  Worldwide administrative boundaries
+- [`google-trends`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/google-trends):
+  Detailed insights into search trends for keywords in specific regions
 
 ---
 
@@ -153,10 +160,8 @@ sources to connect with next:
 #### Semi-Structured Data
 Already structured data but not adapted to the Kuwala framework:
 
-- Google Trends - https://github.com/GeneralMills/pytrends
 - Instascraper - https://github.com/chris-greening/instascrape
 - GDELT - https://www.gdeltproject.org/
-- Worldwide Administrative boundaries - https://index.okfn.org/dataset/boundaries/
 - Worldwide scaled calendar events (e.g. bank holidays, school holidays) - https://github.com/commenthol/date-holidays
 
 #### Unstructured Data

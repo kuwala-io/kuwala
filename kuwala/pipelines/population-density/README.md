@@ -25,7 +25,8 @@ For more general information check out our
 
 ## Usage
 
-To make sure you are running the latest version of the pipeline, build the Docker image by running:
+To make sure you are running the latest version of the pipeline, build the Docker image from inside the `kuwala` 
+directory by running:
 
 ```zsh
 docker-compose build population-density

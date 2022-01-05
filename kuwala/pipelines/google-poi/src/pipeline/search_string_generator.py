@@ -28,7 +28,7 @@ def generate_search_strings(continent, country, country_region, polygon_coords=N
 
         polygon_cells = polyfill_polygon(polygon, resolution=polygon_resolution)
         df = df.withColumn('h3_polygon', h3_to_parent(col('h3_index'), lit(polygon_resolution)))
-        df = df.filter(df.h3Polygon.isin(polygon_cells))
+        df = df.filter(df.h3_polygon.isin(polygon_cells))
 
     df = df \
         .filter(

@@ -12,7 +12,8 @@ and the goal would be to include them as well in the future.
 
 ## Usage
 
-To make sure you are running the latest version of the pipeline, build the Docker image by running:
+To make sure you are running the latest version of the pipeline, build the Docker image from inside the `kuwala` 
+directory by running:
 
 ```zsh
 docker-compose build admin-boundaries

@@ -6,7 +6,7 @@ from PipelineOrchestrator import download_demo, run_command, run_pipelines
 
 
 def launch_jupyter_notebook():
-    run_command('docker-compose --profile core up', exit_keyword='Started.')
+    run_command('docker-compose --profile database up', exit_keyword='database system is ready to accept connections')
     run_command('docker-compose run --service-ports jupyter', exit_keyword='or http')
 
     webbrowser.open('http://localhost:8888/lab/tree/kuwala/notebooks/popularity_correlation.ipynb')

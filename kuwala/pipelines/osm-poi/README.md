@@ -35,7 +35,8 @@ Windows:
 cd kuwala/scripts && sh initialize_windows.sh && cd windows && sh initialize_git_submodules.sh
 ```
 
-To make sure you are running the latest version of the pipeline, build the Docker images by running:
+To make sure you are running the latest version of the pipeline, build the Docker images from inside the `kuwala` 
+directory by running:
 
 ```zsh
 docker-compose build osm-poi osm-parquetizer
@@ -82,14 +83,8 @@ docker-compose run --rm osm-parquetizer java -jar target/osm-parquetizer-1.0.1-S
 We need to fetch some GeoJSON over the Nominatim API. In order to not run into rate limits make sure to have a proxy
 running. You can set the proxy address over the environment variable `PROXY_ADDRESS`.
 
-To use the Tor proxy over Docker, simply run in a separate terminal window (when running the `osm-poi` pipeline itself
-over Docker the proxy is launched automatically):
 
-```zsh
-docker-compose --profile proxy up
-```
-
-And then:
+The Docker image automatically launches Tor as a proxy. So you can simply process the data by running:
 
 ```zsh
 docker-compose run osm-poi

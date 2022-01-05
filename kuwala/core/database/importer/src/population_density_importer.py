@@ -9,6 +9,7 @@ def import_population_density(spark, database_url, database_properties, continen
 
     logging.info(f'Starting import of population density data for {country}, {continent}')
 
+    population_density_date = population_density_date.replace('-', '_')
     script_dir = os.path.dirname(__file__)
     file_path = os.path.join(script_dir, f'../../../../tmp/kuwala/population_files/{continent}/{country}'
                                          f'/{population_density_date}_result.parquet')
