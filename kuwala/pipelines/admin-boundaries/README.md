@@ -1,5 +1,7 @@
 # Admin Boundaries
 
+### EXPERIMENTAL: Pipeline is WIP and not integrated into the CLI
+
 Having a source for worldwide admin boundaries is a common base functionality for different use cases. An admin
 boundary can be as big as a continent or country or as small as a city or district. There exist different datasets of
 different quality for specific regions in the world. We identified OpenStreetMap (OSM) to be the best starting point

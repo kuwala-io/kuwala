@@ -15,6 +15,7 @@ services:
       - google-poi-scraper
       - proxy
 
+  # docker-compose --profile database up
   postgres:
     container_name: postgres
     build:

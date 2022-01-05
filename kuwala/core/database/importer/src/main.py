@@ -24,11 +24,13 @@ if __name__ == '__main__':
     parser.add_argument('--continent', help='Continent of the file')
     parser.add_argument('--country', help='Country of the file')
     parser.add_argument('--country_region', help='Country of the file')
+    parser.add_argument('--population_density_date', help='Selected update date to process')
 
     args = parser.parse_args()
     continent = args.continent
     country = args.country
     country_region = args.country_region
+    population_density_date = args.population_density_date
 
     if not (continent and country):
         logging.error('Please provide the continent and country as runtime arguments.')
@@ -68,7 +70,7 @@ if __name__ == '__main__':
                             database_properties=database_properties, continent=continent, country=country,
                             country_region=country_region)
     import_population_density(spark=spark, database_url=database_url, database_properties=database_properties,
-                              continent=continent, country=country)
+                              continent=continent, country=country, population_density_date=population_density_date)
     import_osm_pois(spark=spark, database_url=database_url, database_properties=database_properties,
                     continent=continent, country=country, country_region=country_region)
     import_google_pois(spark=spark, database_url=database_url, database_properties=database_properties,

@@ -4,14 +4,14 @@ import time
 from pyspark.sql.functions import lit
 
 
-def import_population_density(spark, database_url, database_properties, continent, country):
+def import_population_density(spark, database_url, database_properties, continent, country, population_density_date):
     start_time = time.time()
 
     logging.info(f'Starting import of population density data for {country}, {continent}')
 
     script_dir = os.path.dirname(__file__)
     file_path = os.path.join(script_dir, f'../../../../tmp/kuwala/population_files/{continent}/{country}'
-                                         f'/result.parquet')
+                                         f'/{population_density_date}_result.parquet')
 
     if not os.path.exists(file_path):
         logging.warning('No population data available. Skipping import.')
