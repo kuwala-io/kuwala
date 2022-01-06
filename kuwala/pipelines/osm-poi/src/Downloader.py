@@ -8,7 +8,7 @@ import pandas as pd
 
 class Downloader:
     @staticmethod
-    def start(args):
+    def download_pbf(args):
         file = None
 
         if args.url is None:
@@ -27,7 +27,7 @@ class Downloader:
 
         download_file(url=args.url or file['url'], path=file_path)
 
-    def names_downloader():
+    def download_names():
         # here, instead of cloning the repository that recommended using extra library,
         # we download the whole repo in zip, then extract it.
         if not os.path.exists('../tmp/name-suggestion-index-main'):

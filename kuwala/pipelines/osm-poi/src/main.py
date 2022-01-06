@@ -24,7 +24,7 @@ if __name__ == '__main__':
         action = 'download' if option == choices[0] else 'process'
 
     if action == 'download':
-        Downloader.start(args)
-        Downloader.names_downloader()
+        Downloader.download_pbf(args)
+        Downloader.download_names()
     else:
         Processor.start(args)
