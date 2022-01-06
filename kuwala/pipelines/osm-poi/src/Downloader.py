@@ -26,7 +26,7 @@ class Downloader:
         file_path += '.osm.pbf'
 
         download_file(url=args.url or file['url'], path=file_path)
-        
+
     @staticmethod
     def download_names():
         # here, instead of cloning the repository that recommended using extra library,
@@ -41,20 +41,20 @@ class Downloader:
         file_paths=['../tmp/name-suggestion-index-main/data/brands','../tmp/name-suggestion-index-main/data/operators']
         data = {'id': [], 'display_name': [], 'wiki_data': []}
         for file_path in file_paths:
-            for folders in os.listdir(file_path):
-                if os.path.isdir(os.path.join(file_path,folders)):
-                    for files in os.listdir(os.path.join(file_path,folders)):
-                        with open(os.path.join(file_path,folders,files)) as f:
+            for folder in os.listdir(file_path):
+                if os.path.isdir(os.path.join(file_path,folder)):
+                    for file in os.listdir(os.path.join(file_path,folder)):
+                        with open(os.path.join(file_path,folders,file)) as f:
                             file_content=json.load(f)
-                        for a in file_content['items'] :
+                        for item in file_content['items'] :
                             wiki_data=id=display_name='-'
-                            if ('id' in a.keys()):
-                                id=(dict(a)['id'])
-                            if ('displayName' in a.keys()):
-                                display_name=(dict(a)['displayName'])
-                            if ("tags" in a.keys()):
-                                if ('brand:wikidata' in list(a['tags'].keys())):
-                                    wiki_data=(dict(a["tags"].items())['brand:wikidata'])
+                            if ('id' in item.keys()):
+                                id=(dict(item)['id'])
+                            if ('displayName' in item.keys()):
+                                display_name=(dict(item)['displayName'])
+                            if ("tags" in item.keys()):
+                                if ('brand:wikidata' in list(item['tags'].keys())):
+                                    wiki_data=(dict(item["tags"].items())['brand:wikidata'])
 
                             data['id'].append(id)
                             data['display_name'].append(display_name)
