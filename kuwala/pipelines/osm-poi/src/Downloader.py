@@ -26,7 +26,8 @@ class Downloader:
         file_path += '.osm.pbf'
 
         download_file(url=args.url or file['url'], path=file_path)
-    @staticmethod(f)
+        
+    @staticmethod
     def download_names():
         # here, instead of cloning the repository that recommended using extra library,
         # we download the whole repo in zip, then extract it.
