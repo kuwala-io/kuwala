@@ -55,6 +55,8 @@ class Downloader:
                             if ("tags" in item.keys()):
                                 if ('brand:wikidata' in list(item['tags'].keys())):
                                     wiki_data=(dict(item["tags"].items())['brand:wikidata'])
+                                elif ('operator:wikidata' in list(item['tags'].keys())):
+                                    wiki_data=(dict(item["tags"].items())['operator:wikidata'])
 
                             data['id'].append(id)
                             data['display_name'].append(display_name)
