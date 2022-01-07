@@ -15,5 +15,5 @@ env
 !.env.local
 __pycache__
 
-
+debug
 kuwala/scripts/windows/
