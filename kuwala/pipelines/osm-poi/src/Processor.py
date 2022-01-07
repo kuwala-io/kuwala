@@ -7,7 +7,8 @@ from pyspark.sql.functions import col, explode, lit, udf
 from pyspark.sql.types import \
     ArrayType, BooleanType, FloatType, IntegerType, NullType, StringType, StructField, StructType
 from python_utils.src.FileSelector import select_local_osm_file
-from python_utils.src.spark_udfs import create_geo_json_based_on_coordinates, get_centroid_of_geo_json, get_h3_index
+from python_utils.src.spark_udfs import create_geo_json_based_on_coordinates, get_centroid_of_geo_json, get_h3_index, get_string_distance
+import pandas as pd
 
 DEFAULT_RESOLUTION = 15
 
@@ -308,6 +309,33 @@ class Processor:
         df_relation = df_relation.filter(col('is_poi') & col('h3_index').isNotNull()).select(columns)
 
         return df_node.union(df_way).union(df_relation)
+    
+    # search brands and oprerator from names.csv and put that into pyspark dataframe
+    @udf(returnType=StringType())
+    def match_brand_and_operator_names(df_pois):
+            names=pd.read_csv(os.path.join(script_dir, '../tmp/names.csv'))[['display_name','is_operator']]
+            operator_names=names.query('is_operator == 1')
+            brand_names=names.query('is_operator == 0')
+            names_in_df=df_pois.select('brand','operator','name').toPandas()
+            closest_operators=[]
+            closest_brand=[]
+            for name in names_in_df['name']:
+                similar_operator=-1;best_match_operator='';similar_brand=-1;best_match_brand=''
+                if(str(name)=='nan'):continue
+                for ops,brand in zip(operator_names['display_name'],brand_names['display_name']):
+                    distance_ops=get_string_distance(name,ops)
+                    if(distance_ops>similar_operator):
+                        similar_operator=distance_ops
+                        best_match_operator=ops
+                    distance_brand=get_string_distance(name, brand)
+                    if(distance_brand>similar_brand):
+                        similar_brand=distance_brand
+                        best_match_brand=brand
+                closest_operators.append(best_match_operator)
+                closest_brand.append(best_match_brand)
+
+            return df_pois.withColumn('brand_matched', best_match_brand).withColumn('operator_matched',best_match_operator)
+
 
     @staticmethod
     def start(args):
@@ -350,7 +378,9 @@ class Processor:
         df_relation = Processor.df_add_h3_index(df_relation)
         # Combine all data frames
         df_pois = Processor.combine_pois(df_node, df_way, df_relation)
-
+       
+        df_pois = Processor.match_brand_and_operator_names(df_pois)
+       
         df_pois.write.mode('overwrite').parquet(file_path + '/kuwala.parquet')
 
         end_time = time.time()
