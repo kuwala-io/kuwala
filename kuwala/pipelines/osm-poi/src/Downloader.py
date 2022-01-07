@@ -47,7 +47,7 @@ class Downloader:
                         with open(os.path.join(file_path,folder,file)) as f:
                             file_content=json.load(f)
                         for item in file_content['items'] :
-                            wiki_data=id=display_name='-'
+                            wiki_data=id=display_name=None
                             if ('id' in item.keys()):
                                 id=(dict(item)['id'])
                             if ('displayName' in item.keys()):
