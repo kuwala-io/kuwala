@@ -44,7 +44,7 @@ class Downloader:
             for folder in os.listdir(file_path):
                 if os.path.isdir(os.path.join(file_path,folder)):
                     for file in os.listdir(os.path.join(file_path,folder)):
-                        with open(os.path.join(file_path,folders,file)) as f:
+                        with open(os.path.join(file_path,folder,file)) as f:
                             file_content=json.load(f)
                         for item in file_content['items'] :
                             wiki_data=id=display_name='-'
