@@ -325,7 +325,12 @@ class Processor:
 
             for name in names_in_df['name']:
                 similar_operator=-1;best_match_operator='';similar_brand=-1;best_match_brand=''
-                if(str(name)=='nan'):continue
+                if(str(name)=='nan'):
+                    best_match_operator=None
+                    best_match_brand=None
+                    temp_operator.append(best_match_operator)
+                    temp_brand.append(best_match_brand)
+                    continue
                 for ops,brand in zip(operator_names['display_name'],brand_names['display_name']):
                     distance_ops=get_string_distance(name,ops)
                     if(distance_ops>similar_operator):
