@@ -316,9 +316,13 @@ class Processor:
             names=pd.read_csv(os.path.join(script_dir, '../tmp/names.csv'))[['display_name','is_operator']]
             operator_names=names.query('is_operator == 1')
             brand_names=names.query('is_operator == 0')
+
             names_in_df=df_pois.select('brand','operator','name').toPandas()
-            closest_operators=[]
-            closest_brand=[]
+            temp=df_pois.toPandas()
+
+            temp_operator=[]
+            temp_brand=[]
+
             for name in names_in_df['name']:
                 similar_operator=-1;best_match_operator='';similar_brand=-1;best_match_brand=''
                 if(str(name)=='nan'):continue
@@ -331,10 +335,25 @@ class Processor:
                     if(distance_brand>similar_brand):
                         similar_brand=distance_brand
                         best_match_brand=brand
-                closest_operators.append(best_match_operator)
-                closest_brand.append(best_match_brand)
+                temp_operator.append(best_match_operator)
+                temp_brand.append(best_match_brand)
 
-            return df_pois.withColumn('brand_matched', best_match_brand).withColumn('operator_matched',best_match_operator)
+            temp['operator_matched']=temp_operator
+            temp['brand_matched']=temp_brand
+            return spark.createDataFrame(temp)
+
+
+            # closest_brands_dataframe=sqlContext.createDataFrame([(l,) for l in closest_brands], ['brand_matched'])
+            # closest_operators_dataframe=sqlContext.createDataFrame([(l,) for l in closest_operators], ['operator_matched'])
+            
+            # a = df_pois.withColumn("row_idx", row_number().over(Window.orderBy(monotonically_increasing_id())))
+            # b = closest_brands_dataframe.withColumn("row_idx", row_number().over(Window.orderBy(monotonically_increasing_id())))
+            # c = closest_operators_dataframe.withColumn("row_idx", row_number().over(Window.orderBy(monotonically_increasing_id())))
+
+            # temp_df = a.join(b, a.row_idx == b.row_idx)
+            # return temp_df.join(c, temp_df.row_idx == c.row_idx).drop('row_idx')
+
+            #return df_pois.withColumn('brand_matched', best_match_brand).withColumn('operator_matched',best_match_operator)
 
 
     @staticmethod
@@ -378,9 +397,9 @@ class Processor:
         df_relation = Processor.df_add_h3_index(df_relation)
         # Combine all data frames
         df_pois = Processor.combine_pois(df_node, df_way, df_relation)
-       
+        
         df_pois = Processor.match_brand_and_operator_names(df_pois)
-       
+
         df_pois.write.mode('overwrite').parquet(file_path + '/kuwala.parquet')
 
         end_time = time.time()
