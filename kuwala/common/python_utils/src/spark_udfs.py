@@ -1,6 +1,6 @@
 import h3
 import json
-from fuzzywuzzy import fuzz
+from thefuzz import fuzz
 from pyspark.sql.functions import udf
 from pyspark.sql.types import ArrayType, DoubleType, FloatType, IntegerType, StringType, StructField, StructType
 from shapely.geometry import shape

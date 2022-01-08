@@ -5,7 +5,7 @@ import urllib.error
 import pycountry
 import pycountry_convert as pcc
 import requests.exceptions
-from fuzzywuzzy import fuzz
+from thefuzz import fuzz
 from pyquery import PyQuery
 from hdx.data.dataset import Dataset
 from hdx.data.organization import Organization
