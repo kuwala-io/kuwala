@@ -321,9 +321,6 @@ class Processor:
             operator_names=spark.sparkContent.broadcast(operator_names)
             brand_names=spark.sparkContent.broadcast(brand_names)
 
-            df_pois_brand=df_pois.select('brand')
-            df_pois_operator=df_pois.select('operator')
-
             @udf(returnType=StringType())
             def brand_name_matching(df_pois_brand):
                 similar_brand_score=-1;best_match_brand=''
@@ -349,7 +346,12 @@ class Processor:
                         similar_operator_score=distance_ops
                         best_match_operator=ops
                 return best_match_operator
+
+
+            df_pois.withColumn('brand_matched', brand_name_matching(col('brand')))
+            df_pois.withColumn('operator_matched', operator_name_matching(col('operator')))
     
+
 
     @staticmethod
     def start(args):
