@@ -311,45 +311,45 @@ class Processor:
         return df_node.union(df_way).union(df_relation)
     
     # search brands and oprerator from names.csv and put that into pyspark dataframe
-    @udf(returnType=StringType())
-    def match_brand_and_operator_names(df_pois):
+
+    @staticmethod
+    def match_brand_and_operator_names(spark, df_pois):
             names=pd.read_csv(os.path.join(script_dir, '../tmp/names.csv'))[['display_name','is_operator']]
-            operator_names=names.query('is_operator == 1')
-            brand_names=names.query('is_operator == 0')
+            operator_names=names.query('is_operator == 1')['display_name'].tolist()
+            brand_names=names.query('is_operator == 0')['display_name'].tolist()
 
-            names_in_df=df_pois.select('brand','operator','name').toPandas()
-            temp=df_pois.toPandas()
+            operator_names=spark.sparkContent.broadcast(operator_names)
+            brand_names=spark.sparkContent.broadcast(brand_names)
 
-            temp_operator=[]
-            temp_brand=[]
+            df_pois_brand=df_pois.select('brand')
+            df_pois_operator=df_pois.select('operator')
 
-            for name_brand,name_operator in zip(names_in_df['brand'], names_in_df['operator']):
-                similar_operator=-1;best_match_operator='';similar_brand=-1;best_match_brand=''
-                if(str(name_brand)=='nan'):
+            @udf(returnType=StringType())
+            def brand_name_matching(df_pois_brand):
+                similar_brand_score=-1;best_match_brand=''
+                if(str(df_pois_brand)=='nan'):
                     best_match_brand=None
-                    temp_brand.append(best_match_brand)
-                    continue
-                if(str(name_operator)=='nan'):
-                     best_match_operator=None
-                     temp_operator.append(best_match_operator)
-                     continue
-
-                for ops,brand in zip(operator_names['display_name'],brand_names['display_name']):
-                    distance_ops=get_string_distance(name_operator,ops)
-                    if(distance_ops>similar_operator):
-                        similar_operator=distance_ops
-                        best_match_operator=ops
-                    distance_brand=get_string_distance(name_brand, brand)
-                    if(distance_brand>similar_brand):
-                        similar_brand=distance_brand
+                    return best_match_brand
+                for brand in brand_names:
+                    distance_brand=get_string_distance(df_pois_brand, brand)
+                    if(distance_brand>similar_brand_score):
+                        similar_brand_score=distance_brand
                         best_match_brand=brand
-                temp_operator.append(best_match_operator)
-                temp_brand.append(best_match_brand)
+                return best_match_brand
 
-            # temp is the pyspark dataframe converted into pandas dataframe, 
-            temp['operator_matched']=temp_operator
-            temp['brand_matched']=temp_brand
-            return spark.createDataFrame(temp)
+            @udf(returnType=StringType())
+            def operator_name_matching(df_pois_operator):
+                similar_operator_score=-1;best_match_operator=''
+                if(str(df_pois_operator)=='nan'):
+                    best_match_operator=None
+                    return best_match_operator
+                for ops in operator_names:
+                    distance_ops=get_string_distance(df_pois_operator,ops)
+                    if(distance_ops>similar_operator_score):
+                        similar_operator_score=distance_ops
+                        best_match_operator=ops
+                return best_match_operator
+    
 
     @staticmethod
     def start(args):
@@ -393,7 +393,7 @@ class Processor:
         # Combine all data frames
         df_pois = Processor.combine_pois(df_node, df_way, df_relation)
 
-        df_pois = Processor.match_brand_and_operator_names(df_pois)
+        df_pois = Processor.match_brand_and_operator_names(spark,df_pois)
 
         df_pois.write.mode('overwrite').parquet(file_path + '/kuwala.parquet')
 
