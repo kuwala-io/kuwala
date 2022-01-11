@@ -1,11 +1,21 @@
 import geojson
 import h3
+import os
 from pyspark.ml.feature import MinMaxScaler
 from pyspark.ml.feature import VectorAssembler
 from pyspark.ml import Pipeline
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, lit, udf
 from pyspark.sql.types import DoubleType, StringType
+from kuwala.dbt.src.controller.kuwala_dbt_controller import KuwalaDbtController
+
+
+def get_dbt_controller():
+    dbt_host = os.getenv('DBT_HOST')
+    script_dir = os.path.dirname(__file__)
+    result_path = os.path.join(script_dir, '../tmp/kuwala/transformer')
+
+    return KuwalaDbtController(dbt_path='../dbt/dbt', dbt_host=dbt_host, result_path=result_path)
 
 
 # Create a Spark session that is use to query and transform data from the database
@@ -14,7 +24,6 @@ def get_spark_session(memory_in_gb):
         .builder \
         .appName('jupyter') \
         .config('spark.driver.memory', f'{memory_in_gb}g') \
-        .config('spark.jars.packages', 'neo4j-contrib:neo4j-connector-apache-spark_2.12:4.0.1_for_spark_3') \
         .getOrCreate()
 
 

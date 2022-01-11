@@ -64,18 +64,22 @@ services:
     profiles:
       - network
 
+  # docker-compose run --service-ports jupyter
   jupyter:
     container_name: jupyter
     build:
       context: .
-      dockerfile: ./core/jupyter/docker/dockerfile
+      dockerfile: core/jupyter/dockerfile
     restart: always
     environment: 
       - JUPYTER_ENABLE_LAB=yes
+      - DBT_HOST=postgres
     volumes:
-      - ./common/jupyter/modules:/home/jovyan/kuwala/modules
-      - ./common/jupyter/notebooks:/home/jovyan/kuwala/notebooks
-      - ./common/jupyter/resources:/home/jovyan/kuwala/resources
+      - ./core/jupyter/modules:/home/jovyan/kuwala/modules
+      - ./core/database/transformer:/home/jovyan/kuwala/dbt
+      - ./core/jupyter/notebooks:/home/jovyan/kuwala/notebooks
+      - ./core/jupyter/resources:/home/jovyan/kuwala/resources
+      - ./tmp/kuwala/transformer:/home/jovyan/kuwala/tmp/kuwala/transformer
     ports:
       - '8888:8888'
     profiles:

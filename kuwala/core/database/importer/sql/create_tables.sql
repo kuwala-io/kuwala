@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS google_poi (
     categories text[],
     place_id text NOT NULL,
     address text[],
-    timezone text NOT NULL,
+    timezone text,
     temporarily_closed bool NOT NULL,
     permanently_closed bool NOT NULL,
     inside_of text,
