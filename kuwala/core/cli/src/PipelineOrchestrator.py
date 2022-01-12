@@ -7,11 +7,11 @@ from kuwala.common.python_utils.src.FileDownloader import download_file
 
 def download_demo():
     script_dir = os.path.dirname(__file__)
-    file_path = os.path.join(script_dir, f'../../../tmp/kuwala/db/neo4j.zip')
-    download_file(url='https://kuwala-demo.s3.eu-central-1.amazonaws.com/neo4j.zip', path=file_path)
+    file_path = os.path.join(script_dir, f'../../../tmp/kuwala/db/postgres.zip')
+    download_file(url='https://kuwala-demo.s3.eu-central-1.amazonaws.com/postgres.zip', path=file_path)
 
     with zipfile.ZipFile(file_path, 'r') as zip_ref:
-        zip_ref.extractall(file_path.split('/neo4j.zip')[0])
+        zip_ref.extractall(file_path.split('/postgres.zip')[0])
 
     os.remove(file_path)
 

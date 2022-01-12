@@ -16,8 +16,8 @@ In case no data has been processed for the specified region, the import for the 
 
 ## Usage
 
-To make sure you are running the latest version of the importer, build the Docker from inside the `kuwala` directory 
-image by running:
+To make sure you are running the latest version of the importer, build the Docker image from inside the `kuwala` 
+directory by running:
 
 ```zsh
 docker-compose build database-importer

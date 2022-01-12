@@ -21,6 +21,7 @@ services:
     build:
       context: .
       dockerfile: ./core/database/dockerfile
+    shm_size: 16g
     restart: always
     environment:
       - POSTGRES_USER=kuwala
