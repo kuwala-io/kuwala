@@ -313,13 +313,13 @@ class Processor:
     # search brands and oprerator from names.csv and put that into pyspark dataframe
 
     @staticmethod
-    def match_brand_and_operator_names(spark, df_pois):
+    def match_brand_and_operator_names(script_dir,spark, df_pois) -> DataFrame:
             names=pd.read_csv(os.path.join(script_dir, '../tmp/names.csv'))[['display_name','is_operator']]
             operator_names=names.query('is_operator == 1')['display_name'].tolist()
             brand_names=names.query('is_operator == 0')['display_name'].tolist()
 
-            operator_names=spark.sparkContent.broadcast(operator_names)
-            brand_names=spark.sparkContent.broadcast(brand_names)
+            operator_names=spark.sparkContext.broadcast(operator_names)
+            brand_names=spark.sparkContext.broadcast(brand_names)
 
             @udf(returnType=StringType())
             def brand_name_matching(df_pois_brand):
@@ -348,8 +348,9 @@ class Processor:
                 return best_match_operator
 
 
-            df_pois.withColumn('brand_matched', brand_name_matching(col('brand')))
-            df_pois.withColumn('operator_matched', operator_name_matching(col('operator')))
+            return df_pois \
+            .withColumn('brand_matched', brand_name_matching(col('brand'))) \
+            .withColumn('operator_matched', operator_name_matching(col('operator')))
     
 
 
@@ -395,7 +396,7 @@ class Processor:
         # Combine all data frames
         df_pois = Processor.combine_pois(df_node, df_way, df_relation)
 
-        df_pois = Processor.match_brand_and_operator_names(spark,df_pois)
+        df_pois = Processor.match_brand_and_operator_names(script_dir,spark,df_pois)
 
         df_pois.write.mode('overwrite').parquet(file_path + '/kuwala.parquet')
 
