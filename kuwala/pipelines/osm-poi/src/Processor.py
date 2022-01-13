@@ -322,35 +322,40 @@ class Processor:
             brand_names=spark.sparkContext.broadcast(brand_names)
 
             @udf(returnType=StringType())
-            def brand_name_matching(df_pois_brand):
-                similar_brand_score=-1;best_match_brand=''
+            def brand_and_operator_name_matching(df_pois_brand,df_pois_operator):
+                similar_brand_score=-1;best_match_brand='';similar_operator_score=-1;best_match_operator=''
+                skip_brand_matching=False
+                skip_operator_matching=False
+
+                #Check if the brand and operator is empty
                 if(str(df_pois_brand)=='nan'):
                     best_match_brand=None
-                    return best_match_brand
-                for brand in brand_names:
-                    distance_brand=get_string_distance(df_pois_brand, brand)
-                    if(distance_brand>similar_brand_score):
-                        similar_brand_score=distance_brand
-                        best_match_brand=brand
-                return best_match_brand
-
-            @udf(returnType=StringType())
-            def operator_name_matching(df_pois_operator):
-                similar_operator_score=-1;best_match_operator=''
+                    skip_brand_matching=True
                 if(str(df_pois_operator)=='nan'):
                     best_match_operator=None
-                    return best_match_operator
-                for ops in operator_names:
-                    distance_ops=get_string_distance(df_pois_operator,ops)
-                    if(distance_ops>similar_operator_score):
-                        similar_operator_score=distance_ops
-                        best_match_operator=ops
-                return best_match_operator
+                    skip_operator_matching=True
 
+                #brand matching
+                if(skip_brand_matching==False):    
+                    for brand in brand_names:
+                        distance_brand=get_string_distance(df_pois_brand, brand)
+                        if(distance_brand>similar_brand_score):
+                            similar_brand_score=distance_brand
+                            best_match_brand=brand
 
+                #operator matching
+                if(skip_operator_matching==False):
+                    for ops in operator_names:
+                        distance_ops=get_string_distance(df_pois_operator,ops)
+                        if(distance_ops>similar_operator_score):
+                            similar_operator_score=distance_ops
+                            best_match_operator=ops
+                
+                return(best_match_brand,best_match_operator)
+                
             return df_pois \
-            .withColumn('brand_matched', brand_name_matching(col('brand'))) \
-            .withColumn('operator_matched', operator_name_matching(col('operator')))
+            .withColumn('brand_matched', brand_and_operator_name_matching(col('brand'),col('operator')[0])) \
+            .withColumn('operator_matched', brand_and_operator_name_matching(col('brand'),col('operator')[1]))
     
 
 
