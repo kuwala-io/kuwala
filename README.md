@@ -125,6 +125,25 @@ We currently have the following pipelines published:
 
 ---
 
+## Further Documentation
+
+For each major component we have dedicated READMEs. This is an overview of all components:
+
+- Core
+  - [CLI](https://github.com/kuwala-io/kuwala/tree/master/kuwala/core/cli/README.md)
+  - Database
+    - [Importer](https://github.com/kuwala-io/kuwala/tree/master/kuwala/core/database/importer/README.md)
+    - [Transformer](https://github.com/kuwala-io/kuwala/tree/master/kuwala/core/database/transformer/README.md)
+  - [Jupyter](https://github.com/kuwala-io/kuwala/tree/master/kuwala/core/jupyter/README.md)
+- Pipelines
+  - [Admin Boundaries](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/admin-boundaries/README.md)
+  - [Google POIs](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/google-poi/README.md)
+  - [Google Trends](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/google-trends/README.md)
+  - [OSM POIs](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/osm-poi/README.md)
+  - [Population Density](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/population-density/README.md)
+
+---
+
 ## How You Can Contribute
 
 Every new issue, question, or comment is a contribution and very welcome! This project lives from your feedback and

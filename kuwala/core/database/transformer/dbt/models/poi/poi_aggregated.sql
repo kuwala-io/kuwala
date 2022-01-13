@@ -1,3 +1,6 @@
+{% set focus_brand_regex = ("'%" + var('focus_brand') + "%'") %}
+{% set focus_brand_column_name = ('number_of_' + var('focus_brand')) %}
+
 SELECT
     h3_to_parent(poi_h3_index::h3index, {{ var('grid_resolution') }}) AS h3_index,
     count(poi_id) AS pois_total,
@@ -16,8 +19,8 @@ SELECT
     avg(poi_spending_time) AS poi_spending_time_average,
     avg(poi_waiting_time) AS poi_waiting_time_average,
     count(poi_inside_of) AS poi_inside_of_total,
-    count(external_poi_id) FILTER ( WHERE external_poi_id LIKE '%espresso_house%') AS number_of_espresso_houses,
-    count(external_poi_id) FILTER ( WHERE external_poi_id IS NOT NULL AND external_poi_id NOT LIKE '%espresso_house%') AS number_of_competitors,
+    count(external_poi_id) FILTER ( WHERE external_poi_id LIKE {{ focus_brand_regex }}) AS {{ focus_brand_column_name }},
+    count(external_poi_id) FILTER ( WHERE external_poi_id IS NOT NULL AND external_poi_id NOT LIKE {{ focus_brand_regex }}) AS number_of_competitors,
     count(poi_id) FILTER ( WHERE poi_categories_osm LIKE '%administration%' OR poi_categories_google LIKE '%administration%') AS poi_category_administration,
     count(poi_id) FILTER ( WHERE poi_categories_osm LIKE '%airport%' OR poi_categories_google LIKE '%airport%') AS poi_category_airport,
     count(poi_id) FILTER ( WHERE poi_categories_osm LIKE '%apartment%' OR poi_categories_google LIKE '%apartment%') AS poi_category_apartment,

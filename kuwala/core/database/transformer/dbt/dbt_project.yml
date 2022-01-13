@@ -2,7 +2,7 @@
 # Name your project! Project names should contain only lowercase characters
 # and underscores. A good package name should reflect your organization's
 # name or the intended use of these models
-name: 'kuwala_core_database_transformer'
+name: 'kuwala_core_transformer'
 version: '1.0.0'
 config-version: 2
 
@@ -25,11 +25,13 @@ clean-targets:         # directories to be removed by `dbt clean`
   - "dbt_modules"
 
 vars:
+  # POI brand
+  focus_brand: 'focus_brand_id_prefix'
   # Aggregation grid
   grid_resolution: 8
   # Time frame
-  start_date: DATE '2021-11-14'
-  end_date: DATE '2021-11-21'
+  start_date: DATE '2020-01-01'
+  end_date: DATE '2025-01-01'
   first_morning_hour: 0
   last_morning_hour: 9
   last_noon_hour: 13
@@ -40,10 +42,11 @@ vars:
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
 
 models:
-  kuwala_core_database_transformer:
+  kuwala_core_transformer:
     poi:
-      +materialized: table
-    poi_aggregated:
-      +materialized: table
-    poi_popularity_time_series:
-      +materialized: table
+      poi:
+        +materialized: table
+      poi_aggregated:
+        +materialized: table
+      poi_popularity_time_series:
+        +materialized: table
