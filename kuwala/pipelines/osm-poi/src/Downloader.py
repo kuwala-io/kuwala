@@ -39,7 +39,7 @@ class Downloader:
             os.remove('../tmp/main.zip')
 
         file_paths=['../tmp/name-suggestion-index-main/data/brands','../tmp/name-suggestion-index-main/data/operators']
-        data = {'id': [], 'display_name': [], 'wiki_data': [], 'is_operator': []}
+        data = {'id': [], 'display_name': [], 'wiki_data': []}
         for file_path in file_paths:
             for folder in os.listdir(file_path):
                 if os.path.isdir(os.path.join(file_path,folder)):
@@ -48,7 +48,6 @@ class Downloader:
                             file_content=json.load(f)
                         for item in file_content['items'] :
                             wiki_data=id=display_name=None
-                            is_operator=0
                             if ('id' in item.keys()):
                                 id=(dict(item)['id'])
                             if ('displayName' in item.keys()):
@@ -58,12 +57,10 @@ class Downloader:
                                     wiki_data=(dict(item["tags"].items())['brand:wikidata'])
                                 elif ('operator:wikidata' in list(item['tags'].keys())):
                                     wiki_data=(dict(item["tags"].items())['operator:wikidata'])
-                                    is_operator=1
 
                             data['id'].append(id)
                             data['display_name'].append(display_name)
                             data['wiki_data'].append(wiki_data)
-                            data['is_operator'].append(is_operator)
 
         df=pd.DataFrame(data)
         df.to_csv('../tmp/names.csv',index=False)
