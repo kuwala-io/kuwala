@@ -337,8 +337,7 @@ class Processor:
                 
             return df_pois \
             .withColumn('brand_matched', brand_and_operator_name_matching(col('brand'))) \
-            .withColumn('operator_matched', brand_and_operator_name_matching(col('operator'))) \ 
-            .withColumn('name_matched', brand_and_operator_name_matching(col('name')))
+            .withColumn('operator_matched', brand_and_operator_name_matching(col('operator'))).withColumn('name_matched', brand_and_operator_name_matching(col('name')))
     
 
 
