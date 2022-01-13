@@ -15,7 +15,7 @@ jobs:
 
     - uses: hadolint/hadolint-action@v1.6.0
       with:
-        dockerfile: kuwala/core/jupyter/docker/dockerfile
+        dockerfile: kuwala/core/jupyter/dockerfile
   build:
     runs-on: ubuntu-latest
     steps:
@@ -40,7 +40,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: kuwala
-        file: kuwala/core/jupyter/docker/dockerfile
+        file: kuwala/core/jupyter/dockerfile
         push: false
         tags: kuwala/jupyter:${{ github.sha }}
         cache-from: type=local,src=/tmp/.buildx-cache
