@@ -63,4 +63,5 @@ class Downloader:
                             data['wiki_data'].append(wiki_data)
 
         df=pd.DataFrame(data)
+        df.drop_duplicates(subset=['display_name','wiki_data'])
         df.to_csv('../tmp/names.csv',index=False)
