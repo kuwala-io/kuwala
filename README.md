@@ -69,7 +69,9 @@ Uber. For the complete documentation please go to the [H3 Repo](https://github.c
 Installed version of *Python3*, *Docker* and 
 *docker-compose* ([*Go here for instructions*](https://docs.docker.com/compose/install/))
 
-***Note***: We recommend giving Docker at least 8 GB of RAM (On Docker Desktop you can go under settings -> resources)
+***Note***: 
+1) We recommend giving Docker at least 8 GB of RAM (On Docker Desktop you can go under settings -> resources)
+2) If you are a Windows user, we recommend you to install the *Windows Subsystem for Linux (WSL)* and integrate docker with WSL. WSL presence is highly recommended since many automation scripts written in Unix Shell (or `.sh`) format. For WSL installation's guidance can be found [here](https://docs.microsoft.com/en-us/windows/wsl/install). We use Ubuntu on WSL for debug and testing purposes.
 
 #### Demo correlating Uber traversals with Google popularities
 
@@ -86,15 +88,14 @@ Linux/Mac:
 ```zsh 
 cd kuwala/scripts && sh initialize_core_components.sh && sh run_cli.sh
 ```
-and for Windows (Please use PowerShell or any Docker integrated terminal):
-```PS
-cd kuwala/scripts && sh initialize_windows.sh && cd windows && sh initialize_core_components.sh && sh run_cli.sh
-```
+Windows PowerShell with WSL:
+1) Activate the WSL with `bash` command.
+2) Run the same command as Linux/Mac above.
 
 #### Run the data pipelines yourself
 
-To run the pipelines yourself, build the components first from inside the `kuwala/scripts` directory (or if the computer uses Windows, go to `kuwala/scripts/windows`) by executing the 
-`initialize_all_components.sh` script and the starting the CLI by running the `run_cli.sh` script. .
+To run the pipelines yourself, build the components first from inside the `kuwala/scripts` directory (or if the computer uses Windows, activate WSL with `bash` command first) by executing the 
+`initialize_all_components.sh` script and the starting the CLI by running the `run_cli.sh` script.
 
 ---
 
