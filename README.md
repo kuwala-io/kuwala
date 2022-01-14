@@ -103,7 +103,7 @@ To run the pipelines yourself, please follow the instructions for the
 
 ---
 
-## Using Individual Pipelines
+## Using Pipelines Independently
 
 Apart from using the CLI, you can also run the pipelines individually without Docker. For more detailed instructions
 please take a look at the [`./kuwala/README.md`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/README.md).
@@ -164,7 +164,7 @@ yourself, you can use your choice's programming language and database technology
 is possible to run the pipeline locally and use [Uber's H3](https://eng.uber.com/h3/) functionality to handle 
 geographical transformations. We will then take the responsibility to maintain your pipeline.
 
-*Note: To submit a pull request, please fork the project and then submit a PR to the base repo.*
+***Note: To submit a pull request, please fork the project and then submit a PR to the base repo.***
 
 ### Liberating the Work With Data
 

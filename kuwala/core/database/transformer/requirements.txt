@@ -1,2 +1,3 @@
 dbt-postgres
+pandas
 sshtunnel

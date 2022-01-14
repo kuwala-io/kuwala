@@ -486,7 +486,13 @@
             "furniture_manufacturer",
             "garden_furniture_store",
             "furniture_wholesaler",
-            "brewpub"
+            "brewpub",
+            "design_agency",
+            "shopping",
+            "irish_pub",
+            "heritage_preservation",
+            "fish_restaurant",
+            "chinese_supermarket"
         ]
     },
     "office": {

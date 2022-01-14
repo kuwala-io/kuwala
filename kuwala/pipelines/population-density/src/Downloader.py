@@ -60,7 +60,6 @@ class Downloader:
                 latest_update_date = update_date
 
             if not os.path.exists(dir_path_type):
-                print("Downloading.....")
                 r_hdx = Resource().read_from_hdx(identifier=r['id'])
                 start_time = time.time()
 

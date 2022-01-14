@@ -102,6 +102,13 @@ def run_database_importer(continent, country, country_region, population_density
 
     run_command([f'docker-compose run --rm database-importer {continent_arg} {country_arg} {country_region_arg} '
                  f'{population_density_update_date_arg}'])
+
+    return database_process
+
+
+def run_database_transformer(database_process):
+    run_command(['docker-compose run database-transformer'])
+
     database_process.terminate()
 
 
@@ -120,5 +127,7 @@ def run_pipelines(pipelines: [str], selected_region: dict):
     if 'population-density' in pipelines:
         run_population_density_pipeline(continent, country, selected_region['demographic_groups'])
 
-    run_database_importer(continent, country, country_region, population_density_update_date)
+    database_process = run_database_importer(continent, country, country_region, population_density_update_date)
+
+    run_database_transformer(database_process)
     run_command(['docker-compose down --remove-orphans'])
