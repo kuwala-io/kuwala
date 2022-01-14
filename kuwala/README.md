@@ -34,20 +34,20 @@ Now you can proceed to any of the pipelines' `README.md` and follow the steps to
 
 ### Core
 
-To initialize the CLI and Jupyter notebook run within the `./kuwala/scripts` directory (or `./kuwala/scripts/windows` ):
+To initialize the CLI and Jupyter notebook run within the `./kuwala/scripts` directory:
 
 ```zsh
-sh initialize_core_components.sh
+python3 initialize_core_components.py
 ```
 
 To launch the CLI run:
 
 ```zsh
-sh run_cli.sh
+python3 run_cli.py
 ```
 
 If you only want to start the Jupyter environment run:
 
 ```zsh
-sh run_jupyter_notebook.sh
+python3 run_jupyter_notebook.py
 ```

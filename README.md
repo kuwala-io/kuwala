@@ -86,7 +86,7 @@ Launch Docker in the background and from inside the root directory run:
 
 Linux/Mac:
 ```zsh 
-cd kuwala/scripts && sh initialize_core_components.sh && sh run_cli.sh
+cd kuwala/scripts && python3 initialize_core_components.py && python3 run_cli.py
 ```
 Windows PowerShell with WSL:
 1) Activate the WSL with `bash` command.
@@ -95,7 +95,7 @@ Windows PowerShell with WSL:
 #### Run the data pipelines yourself
 
 To run the pipelines yourself, build the components first from inside the `kuwala/scripts` directory (or if the computer uses Windows, activate WSL with `bash` command first) by executing the 
-`initialize_all_components.sh` script and the starting the CLI by running the `run_cli.sh` script.
+`initialize_all_components.py` script and the starting the CLI by running the `run_cli.py` script.
 
 ---
 
