@@ -12,6 +12,7 @@ sed 's/\r$//' initialize_core_components.sh > ./windows/initialize_core_componen
 sed 's/\r$//' initialize_git_submodules.sh > ./windows/initialize_git_submodules.sh
 sed -i '1 a cd ..' ./windows/initialize_git_submodules.sh
 sed 's/\r$//' run_cli.sh > ./windows/run_cli.sh
+sed -i '1 a cd ..' ./windows/run_cli.sh
 sed 's/\r$//' run_jupyter_notebook.sh > ./windows/run_jupyter_notebook.sh
 sed -i '1 a cd ..' ./windows/run_jupyter_notebook.sh
 sed 's/\r$//' stop_all_containers.sh > ./windows/stop_all_containers.sh
