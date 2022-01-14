@@ -31,6 +31,7 @@ def select_local_country(directory):
     continent = continents[continent_names.index(continent)]
     continent_path = f'{directory}/{continent}'
     countries = os.listdir(continent_path)
+    countries = list(filter(lambda c: not c.startswith('.'), countries))
     country_names = list(map(lambda c: pcc.map_country_alpha3_to_country_name()[c.upper()] or c, countries))
     country = questionary.select('Which country are you interested in?', choices=country_names).ask()
     country = countries[country_names.index(country)]
@@ -41,7 +42,7 @@ def select_local_country(directory):
 def select_local_osm_file(directory):
     country_path = select_local_country(directory)
 
-    if os.path.isdir(country_path + '/osm-parquetizer'):
+    if os.path.isdir(country_path + '/parquet/osm_parquetizer'):
         return country_path
 
     regions = os.listdir(country_path)

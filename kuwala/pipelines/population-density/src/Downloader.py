@@ -43,7 +43,7 @@ class Downloader:
             selected_resources = select_demographic_groups(d)
 
         script_dir = os.path.dirname(__file__)
-        dir_path = f'../tmp/populationFiles/{dataset["continent"]}/{dataset["country"]}/'
+        dir_path = f'../../../tmp/kuwala/population_files/{dataset["continent"]}/{dataset["country"]}/'
         dir_path = os.path.join(script_dir, dir_path)
         file_paths = list()
         latest_update_date = None
@@ -60,7 +60,6 @@ class Downloader:
                 latest_update_date = update_date
 
             if not os.path.exists(dir_path_type):
-                print("Downloading.....")
                 r_hdx = Resource().read_from_hdx(identifier=r['id'])
                 start_time = time.time()
 

@@ -1,0 +1,9 @@
+FROM rappdw/docker-java-python:zulu11.43-python3.7.9
+
+COPY ./core/database/importer /opt/core/database/importer
+
+WORKDIR /opt/core/database/importer
+RUN pip install --no-cache-dir -r requirements.txt
+
+WORKDIR /opt/core/database/importer/src
+ENTRYPOINT [ "python", "main.py" ]

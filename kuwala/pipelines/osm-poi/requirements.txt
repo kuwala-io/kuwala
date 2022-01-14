@@ -59,6 +59,7 @@ pyOpenSSL==20.0.1
 pyparsing==2.4.7
 pyphonetics==0.5.3
 pyquery==1.4.3
+PySocks==1.7.1
 pyspark==3.1.2
 pytest==6.2.4
 pytest-cov==2.12.1

@@ -2,14 +2,16 @@
 
 ## Prerequisites
 
-Installed version of *Docker* and *docker-compose* 
+Installed version of *Docker* and *docker-compose v2*
 ([*Go here for instructions*](https://docs.docker.com/compose/install/))
 
 ---
 
 ### Pipelines
 
-If you want to build all containers for all pipelines, change your working directory to `./kuwala/scripts` (or move to `./kuwala/scripts/`, run `initialize_windows.sh`, and change directory to `windows/` if you are running a Windows machine) and run:
+If you want to build all containers for all pipelines, change your working directory to `./kuwala/scripts` (or move to 
+`./kuwala/scripts/`, run `initialize_windows.sh`, and change directory to `windows/` if you are running a Windows 
+machine) and run:
 
 ```zsh
 sh initialize_all_components.sh
