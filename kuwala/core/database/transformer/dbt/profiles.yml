@@ -1,0 +1,12 @@
+default:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      threads: 4
+      host: "{{ env_var('DBT_HOST', 'localhost') }}"
+      port: "{{ env_var('DBT_PORT', 5432) | as_number }}"
+      user: kuwala
+      pass: password
+      dbname: kuwala
+      schema: dbt

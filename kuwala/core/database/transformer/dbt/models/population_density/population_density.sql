@@ -1,0 +1,2 @@
+SELECT *
+FROM ({{ sum_by_h3('population_density', ('total', 'children_under_five', 'elderly_60_plus', 'men', 'women', 'women_of_reproductive_age_15_49', 'youth_15_24'), 8) }}) AS population_density_sums

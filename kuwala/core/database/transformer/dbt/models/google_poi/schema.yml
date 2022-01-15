@@ -1,0 +1,125 @@
+
+version: 2
+
+models:
+  - name: google_poi
+    description: 'POI data based on Google Maps'
+    columns:
+      - name: internal_id
+        description: 'ID of the POI'
+        tests:
+          - unique
+          - not_null
+      - name: place_id
+        description: 'Google place ID'
+        tests:
+          - unique
+          - not_null
+      - name: h3_index
+        description: 'H3 index of the POI'
+        tests:
+          - not_null
+      - name: latitude
+        description: 'Latitude coordinate of the POI'
+        tests:
+          - not_null
+      - name: longitude
+        description: 'Longitude coordinate of the POI'
+        tests:
+          - not_null
+      - name: name
+        description: 'Name of the POI'
+        tests:
+          - not_null
+      - name: categories
+        description: 'Kuwala POI categories based on Google tags'
+        tests:
+          - not_null
+      - name: tags
+        description: 'Google POI categories'
+        tests:
+          - not_null
+      - name: address
+        description: 'Address of the POI'
+        tests:
+          - not_null
+      - name: number_of_reviews
+        description: 'Number of reviews the POI received'
+      - name: rating_stars
+        description: 'Average star rating of reviews the POI received'
+      - name: price_level
+        description: 'Price level of the POI'
+      - name: opening_time_total
+        description: 'Sum of opening hours in a given timeframe'
+      - name: popularity_total
+        description: 'Sum of hourly popularity score in a given timeframe'
+      - name: popularity_morning_total
+        description: 'Sum of hourly popularity score in a given timeframe during the morning hours'
+      - name: popularity_noon_total
+        description: 'Sum of hourly popularity score in a given timeframe during the noon hours'
+      - name: popularity_afternoon_total
+        description: 'Sum of hourly popularity score in a given timeframe during the afternoon hours'
+      - name: popularity_evening_total
+        description: 'Sum of hourly popularity score in a given timeframe during the evening hours'
+      - name: temporarily_closed
+        description: 'Flag indicating whether the POI is temporarily closed'
+      - name: permanently_closed
+        description: 'Flag indicating whether the POI is permanently closed'
+      - name: spending_time
+        description: 'The average time people spend at the POI'
+      - name: waiting_time_total
+        description: 'The total time people are waiting at the POI in minutes'
+      - name: inside_of
+        description: 'The internal_id of another POI this POI is inside of'
+  - name: google_poi_opening_hours
+    description: 'Aggregated opening time of a POI in a given timeframe'
+    columns:
+      - name: internal_id
+        description: 'ID of the Google POI'
+        tests:
+          - unique
+          - not_null
+      - name: opening_time_total
+        description: 'Sum of opening hours in a given timeframe'
+        tests:
+          - not_null
+  - name: google_poi_popularity_aggregated
+    description: 'Aggregated popularity scores of a POI in a given timeframe'
+    columns:
+      - name: internal_id
+        description: 'ID of the Google POI'
+        tests:
+          - unique
+          - not_null
+      - name: popularity_total
+        description: 'Sum of hourly popularity score in a given timeframe'
+        tests:
+          - not_null
+      - name: popularity_morning_total
+        description: 'Sum of hourly popularity score in a given timeframe during the morning hours'
+        tests:
+          - not_null
+      - name: popularity_noon_total
+        description: 'Sum of hourly popularity score in a given timeframe during the noon hours'
+        tests:
+          - not_null
+      - name: popularity_afternoon_total
+        description: 'Sum of hourly popularity score in a given timeframe during the afternoon hours'
+        tests:
+          - not_null
+      - name: popularity_evening_total
+        description: 'Sum of hourly popularity score in a given timeframe during the evening hours'
+        tests:
+          - not_null
+  - name: google_poi_waiting_time
+    description: 'Aggregated waiting time of a POI in a given timeframe'
+    columns:
+      - name: internal_id
+        description: 'ID of the Google POI'
+        tests:
+          - unique
+          - not_null
+      - name: waiting_time_total
+        description: 'Sum of hourly waiting time in a given timeframe'
+        tests:
+          - not_null

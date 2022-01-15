@@ -9,6 +9,7 @@ kuwala.egg-info/
 kuwala.zip
 venv/
 **/.ipynb_checkpoints
+!**/.gitkeep
 
 tmp
 env

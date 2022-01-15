@@ -1,7 +1,10 @@
-name: Build Jupyter Docker Image
+name: Build Jupyter Docker image
 on:
   push:
-    branches: '*'
+    branches:
+      - main
+  pull_request:
+    branches: '**'
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -12,7 +15,7 @@ jobs:
 
     - uses: hadolint/hadolint-action@v1.6.0
       with:
-        dockerfile: kuwala/core/jupyter/docker/dockerfile
+        dockerfile: kuwala/core/jupyter/dockerfile
   build:
     runs-on: ubuntu-latest
     steps:
@@ -20,7 +23,7 @@ jobs:
       with:
         fetch-depth: 0
 
-    # This is the a separate action that sets up buildx runner
+    # This is a separate action that sets up buildx runner
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1 
     # So now you can use Actions' own caching!
@@ -33,12 +36,12 @@ jobs:
           ${{ runner.os }}-buildx-
 
     # And make it available for the builds
-    - name: Build neo4j and push
+    - name: Build jupyter and push
       uses: docker/build-push-action@v2
       with:
         context: kuwala
-        file: kuwala/core/jupyter/docker/dockerfile
+        file: kuwala/core/jupyter/dockerfile
         push: false
-        tags: kuwala/neo4j:${{ github.sha }}
+        tags: kuwala/jupyter:${{ github.sha }}
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new

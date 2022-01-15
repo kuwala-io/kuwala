@@ -2,48 +2,10 @@ version: '3.1'
 
 services:
 
-  neo4j:
-    container_name: neo4j
-    build:
-      context: .
-      dockerfile: ./core/neo4j/docker/dockerfile
-    restart: always
-    environment: 
-      - NEO4J_AUTH=none
-      - NEO4JLABS_PLUGINS=["apoc"]
-      - NEO4J_dbms_memory_heap_initial__size=512m
-      - NEO4J_dbms_memory_heap_max__size=4G
-    ports:
-      - '7474:7474'
-      - '7687:7687'
-    volumes:
-      - ./tmp/kuwala/db/neo4j/data:/data
-    profiles:
-      - core
-      - network
-
-  jupyter:
-    container_name: jupyter
-    build:
-      context: .
-      dockerfile: ./core/jupyter/docker/dockerfile
-    restart: always
-    environment: 
-      - NEO4J_HOST=bolt://neo4j:7687
-      - JUPYTER_ENABLE_LAB=yes
-    volumes:
-      - ./common/jupyter/modules:/home/jovyan/kuwala/modules
-      - ./common/jupyter/notebooks:/home/jovyan/kuwala/notebooks
-      - ./common/jupyter/resources:/home/jovyan/kuwala/resources
-    ports:
-      - '8888:8888'
-    profiles:
-      - network
-
   torproxy:
-    container_name: kuwala-pipelines_torproxy
+    container_name: torproxy
     image: dperson/torproxy:latest
-    environment: 
+    environment:
       - TOR_MaxCircuitDirtiness=10
     restart: always
     ports:
@@ -51,16 +13,106 @@ services:
     profiles:
       - network
       - google-poi-scraper
+      - proxy
+
+  # docker-compose --profile database up
+  postgres:
+    container_name: postgres
+    build:
+      context: .
+      dockerfile: ./core/database/dockerfile
+    shm_size: 16g
+    restart: always
+    environment:
+      - POSTGRES_USER=kuwala
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=kuwala
+      - POSTGRES_MULTIPLE_EXTENSIONS=postgis,hstore,postgis_topology,postgis_raster,pgrouting,h3
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./tmp/kuwala/db/postgres:/var/lib/postgresql
+    profiles:
+      - network
+      - database
+
+  # docker-compose run database-importer --continent=<> --country=<> --country_region=<>
+  database-importer:
+    container_name: database-importer
+    build:
+      context: .
+      dockerfile: ./core/database/importer/dockerfile
+    restart: always
+    environment:
+      - DATABASE_HOST=postgres
+      - DATABASE_NAME=kuwala
+      - DATABASE_USER=kuwala
+      - DATABASE_PASSWORD=password
+    volumes:
+      - ./tmp/kuwala:/opt/tmp/kuwala
+    profiles:
+      - network
+
+  # docker-compose run database-transformer
+  database-transformer:
+    container_name: database-transformer
+    build:
+      context: .
+      dockerfile: ./core/database/transformer/dockerfile
+    restart: always
+    environment:
+      - DBT_HOST=postgres
+    profiles:
+      - network
+
+  # docker-compose run --service-ports jupyter
+  jupyter:
+    container_name: jupyter
+    build:
+      context: .
+      dockerfile: core/jupyter/dockerfile
+    restart: always
+    environment: 
+      - JUPYTER_ENABLE_LAB=yes
+      - DBT_HOST=postgres
+    volumes:
+      - ./core/jupyter/modules:/home/jovyan/kuwala/modules
+      - ./core/database/transformer:/home/jovyan/kuwala/dbt
+      - ./core/jupyter/notebooks:/home/jovyan/kuwala/notebooks
+      - ./core/jupyter/resources:/home/jovyan/kuwala/resources
+      - ./tmp/kuwala/transformer:/home/jovyan/kuwala/tmp/kuwala/transformer
+    ports:
+      - '8888:8888'
+    profiles:
+      - network
+
+  # docker-compose run admin-boundaries --continent=<> --country=<> --country_region=<>
+  admin-boundaries:
+    container_name: admin-boundaries
+    environment:
+      - SPARK_MEMORY=16g
+    build:
+      context: .
+      dockerfile: ./pipelines/admin-boundaries/dockerfile
+    volumes:
+      - ./tmp/kuwala/osm_files:/opt/tmp/kuwala/osm_files
+      - ./tmp/kuwala/admin_boundary_files:/opt/tmp/kuwala/admin_boundary_files
+    restart: always
+    profiles:
+      - network
+
 
   # docker-compose --profile google-poi-scraper up
   google-poi-api:
     container_name: google-poi-api
     environment:
-      - PROXY_ADDRESS=socks5://kuwala-pipelines_torproxy:9050
+      - PROXY_ADDRESS=socks5://torproxy:9050
       - QUART_DEBUG=False
     build:
       context: .
       dockerfile: ./pipelines/google-poi/dockerfile
+    volumes:
+      - ./pipelines/google-poi/resources/categories.json:/opt/app/pipelines/google-poi/resources/categories.json
     restart: always
     depends_on: [torproxy]
     ports:
@@ -69,7 +121,7 @@ services:
       - network
       - google-poi-scraper
 
-  # docker-compose run google-poi-pipeline
+  # docker-compose run google-poi-pipeline --continent=<> --country=<> --country_region=<> --polygon_coords=<> --polygon_resolution=<> --search_string_basis=<>
   google-poi-pipeline:
     container_name: google-poi-pipeline
     environment:
@@ -79,54 +131,60 @@ services:
       context: .
       dockerfile: ./pipelines/google-poi/src/pipeline/dockerfile
     volumes:
-      - ./tmp/kuwala/googleFiles:/opt/pipelines/app/tmp/googleFiles
-      - ./tmp/kuwala/osmFiles:/opt/pipelines/app/tmp/osmFiles
+      - ./tmp/kuwala/google_files:/opt/app/tmp/kuwala/google_files
+      - ./tmp/kuwala/osm_files:/opt/app/tmp/kuwala/osm_files
     restart: always
     profiles:
       - network
 
-  # docker-compose run neo4j-importer
-  neo4j-importer:
-    environment: 
-      - NEO4J_HOST=bolt://neo4j:7687
-      - SPARK_MEMORY=16g
+  # docker-compose run google-trends --continent=<> --country=<> --country_region=<> --keyword=<>
+  google-trends:
+    container_name: google-trends
+    environment:
+      - PROXY_ADDRESS=socks5://torproxy:9050
     build:
       context: .
-      dockerfile: ./core/neo4j/importer/dockerfile
+      dockerfile: ./pipelines/google-trends/dockerfile
     volumes:
-      - ./tmp/kuwala:/opt/core/app/importer/tmp/kuwala
+      - ./tmp/kuwala/admin_boundary_files:/opt/tmp/kuwala/admin_boundary_files
+      - ./tmp/kuwala/google_trends_files:/opt/tmp/kuwala/google_trends_files
     restart: always
-    depends_on: [neo4j]
+    depends_on: [torproxy]
     profiles:
       - network
 
-  # docker-compose run osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar <pbf-path> <parquet-path>
+  # docker-compose run osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar --continent=<> --country=<> --country_region=<>
   osm-parquetizer:
+    container_name: osm-parquetizer
     build:
       context: .
       dockerfile: ./pipelines/osm-poi/osm-parquetizer/dockerfile
     restart: always
     volumes:
-      - ./tmp/kuwala/osmFiles:/opt/app/tmp/osmFiles
+      - ./tmp/kuwala/osm_files:/opt/app/tmp/kuwala/osm_files
     profiles:
       - network
 
   # docker-compose run osm-poi
   osm-poi:
+    container_name: osm-poi
     build:
       context: .
       dockerfile: ./pipelines/osm-poi/dockerfile
     environment:
       - SPARK_MEMORY=16g
+      - PROXY_ADDRESS=socks5://torproxy:9050
     restart: always
+    depends_on: [torproxy]
     volumes:
-      - ./tmp/kuwala/osmFiles:/opt/pipelines/app/tmp/osmFiles
+      - ./tmp/kuwala/osm_files:/opt/app/tmp/kuwala/osm_files
     profiles:
       - network
 
 
   # docker-compose run  population-density
   population-density:
+    container_name: population-density
     build:
       context: .
       dockerfile: ./pipelines/population-density/dockerfile
@@ -134,6 +192,6 @@ services:
       - SPARK_MEMORY=16g
     restart: always
     volumes:
-      - ./tmp/kuwala/populationFiles:/opt/pipelines/app/tmp/populationFiles
+      - ./tmp/kuwala/population_files:/opt/app/tmp/kuwala/population_files
     profiles:
       - network

@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-Installed version of *Docker* and *docker-compose* 
+Installed version of *Docker* and *docker-compose v2*
 ([*Go here for instructions*](https://docs.docker.com/compose/install/))
 
 ---
@@ -10,6 +10,7 @@ Installed version of *Docker* and *docker-compose*
 ### Pipelines
 
 If you want to build all containers for all pipelines, change your working directory to `./kuwala/scripts` and run:
+
 
 ```zsh
 python3 initialize_all_components.py

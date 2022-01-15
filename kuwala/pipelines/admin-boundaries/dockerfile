@@ -1,0 +1,9 @@
+FROM rappdw/docker-java-python:zulu11.43-python3.7.9
+
+COPY ./pipelines/admin-boundaries /opt/pipelines/app
+
+WORKDIR /opt/pipelines/app
+RUN pip install --no-cache-dir -r requirements.txt
+
+WORKDIR /opt/pipelines/app/src
+ENTRYPOINT [ "python", "main.py" ]

@@ -38,14 +38,15 @@ class Processor:
             df = df \
                 .withColumnRenamed(df.columns[2], t) \
                 .withColumn(t, col(t).cast(DoubleType())) \
-                .withColumn('h3Index', get_h3_index(col(lat_column), col(lng_column), lit(11))) \
+                .withColumn('h3_index', get_h3_index(col(lat_column), col(lng_column), lit(11))) \
                 .drop(lat_column, lng_column) \
-                .groupBy('h3Index') \
+                .groupBy('h3_index') \
                 .agg(sum(t).alias(t))
 
             dfs.append(df)
 
-        df = reduce((lambda d1, d2: d1.join(d2, ['h3Index'], 'full').repartition(number_of_partitions, 'h3Index')), dfs)
+        df = reduce((lambda d1, d2: d1.join(d2, ['h3_index'], 'full').repartition(number_of_partitions, 'h3_index')),
+                    dfs)
 
         df.write.mode('overwrite').parquet(f'{output_dir}{updated_date}_result.parquet')
 

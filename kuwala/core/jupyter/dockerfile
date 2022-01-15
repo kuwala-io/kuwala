@@ -1,0 +1,20 @@
+FROM jupyter/pyspark-notebook:2021-11-20
+
+RUN pip install --no-cache-dir "pandas-profiling[notebook]==3.1.0"
+
+COPY ./core/jupyter/requirements.txt /opt/requirements.txt
+RUN pip install --no-cache-dir -r /opt/requirements.txt
+
+# Setup work directory for backward-compatibility
+RUN rmdir "/home/jovyan/work" && \
+    mkdir "/home/jovyan/kuwala" && \
+    mkdir "/home/jovyan/kuwala/modules" && \
+    mkdir "/home/jovyan/kuwala/dbt" && \
+    mkdir "/home/jovyan/kuwala/notebooks" && \
+    mkdir "/home/jovyan/kuwala/resources" && \
+    touch "/home/jovyan/kuwala/__init__.py" && \
+    fix-permissions "/home/jovyan"
+
+ENV PYTHONPATH="/home/jovyan/"
+
+CMD ["start.sh", "jupyter", "lab", "--ServerApp.token=''"]

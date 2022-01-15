@@ -7,11 +7,11 @@ from kuwala.common.python_utils.src.FileDownloader import download_file
 
 def download_demo():
     script_dir = os.path.dirname(__file__)
-    file_path = os.path.join(script_dir, f'../../../tmp/kuwala/db/neo4j.zip')
-    download_file(url='https://kuwala-demo.s3.eu-central-1.amazonaws.com/neo4j.zip', path=file_path)
+    file_path = os.path.join(script_dir, f'../../../tmp/kuwala/db/postgres.zip')
+    download_file(url='https://kuwala-demo.s3.eu-central-1.amazonaws.com/postgres.zip', path=file_path)
 
     with zipfile.ZipFile(file_path, 'r') as zip_ref:
-        zip_ref.extractall(file_path.split('/neo4j.zip')[0])
+        zip_ref.extractall(file_path.split('/postgres.zip')[0])
 
     os.remove(file_path)
 
@@ -91,17 +91,25 @@ def run_population_density_pipeline(continent, country, demographic_groups):
     run_command([f'docker-compose run --rm population-density {continent_arg} {country_arg} {demographic_groups_arg}'])
 
 
-def run_neo4j_importer(continent, country, country_region, population_density_update_date):
+def run_database_importer(continent, country, country_region, population_density_update_date):
     continent_arg = f'--continent={continent}' if continent else ''
     country_arg = f'--country={country}' if country else ''
     country_region_arg = f'--country_region={country_region}' if country_region else ''
-    neo4j_process = run_command(f'docker-compose --profile core up', exit_keyword='Started.')
     population_density_update_date_arg = f'--population_density_date={population_density_update_date}' if \
         population_density_update_date else ''
+    database_process = run_command(f'docker-compose --profile database up',
+                                   exit_keyword='database system is ready to accept connections')
 
-    run_command([f'docker-compose run --rm neo4j-importer {continent_arg} {country_arg} {country_region_arg} '
-                 f'{population_density_update_date_arg} '])
-    neo4j_process.terminate()
+    run_command([f'docker-compose run --rm database-importer {continent_arg} {country_arg} {country_region_arg} '
+                 f'{population_density_update_date_arg}'])
+
+    return database_process
+
+
+def run_database_transformer(database_process):
+    run_command(['docker-compose run database-transformer'])
+
+    database_process.terminate()
 
 
 def run_pipelines(pipelines: [str], selected_region: dict):
@@ -119,5 +127,7 @@ def run_pipelines(pipelines: [str], selected_region: dict):
     if 'population-density' in pipelines:
         run_population_density_pipeline(continent, country, selected_region['demographic_groups'])
 
-    run_neo4j_importer(continent, country, country_region, population_density_update_date)
+    database_process = run_database_importer(continent, country, country_region, population_density_update_date)
+
+    run_database_transformer(database_process)
     run_command(['docker-compose down --remove-orphans'])

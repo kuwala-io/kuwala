@@ -1,4 +1,5 @@
 import argparse
+import logging
 import questionary
 import sys
 
@@ -8,12 +9,20 @@ from Downloader import Downloader
 from Processor import Processor
 
 if __name__ == '__main__':
+    logging.basicConfig(
+        format='%(levelname)s %(asctime)s: %(message)s',
+        level=logging.INFO,
+        datefmt='%m/%d/%Y %I:%M:%S %p'
+    )
+
     parser = argparse.ArgumentParser()
+
     parser.add_argument('--action', help='Download or process file')
     parser.add_argument('--continent', help='Continent of the file')
     parser.add_argument('--country', help='Country of the file')
     parser.add_argument('--country_region', help='Country region of the file')
     parser.add_argument('--url', help='URL to download file from Geofabrik server')
+
     args = parser.parse_args()
     choices = ['download', 'process']
 
