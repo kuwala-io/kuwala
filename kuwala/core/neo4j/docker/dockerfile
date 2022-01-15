@@ -1,7 +1,0 @@
-FROM maven:3.8.4-jdk-11-slim AS maven
-COPY ./core/neo4j/plugins/udfs /usr/src/mymaven
-WORKDIR /usr/src/mymaven
-RUN mvn clean install
-
-FROM neo4j:4.3.0-community
-COPY --from=maven /usr/src/mymaven/target/cypher-udfs-0.1-SNAPSHOT.jar /var/lib/neo4j/plugins/cypher-udfs-0.1-SNAPSHOT.jar

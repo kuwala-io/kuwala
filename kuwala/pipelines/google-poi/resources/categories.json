@@ -25,6 +25,9 @@
     "apartment": {
         "category": "apartment",
         "tags": [
+            "apartment_building",
+            "serviced_apartment",
+            "compound_building",
             "cc_housing_center",
             "real_estate_rental",
             "assisted_living_facility",
@@ -124,7 +127,10 @@
             "coffee_store",
             "art_cafe",
             "chocolate_cafe",
-            "ice_cream_shop"
+            "ice_cream_shop",
+            "coffee_stand",
+            "coffee",
+            "coffe_container"
         ]
     },
     "drinks": {
@@ -148,6 +154,7 @@
     "education": {
         "category": "education",
         "tags": [
+            "education",
             "library",
             "training_center",
             "college",
@@ -168,7 +175,8 @@
             "educational_institution",
             "education_center",
             "english_language_instructor",
-            "english_language_camp"
+            "english_language_camp",
+            "elementary_school"
         ]
     },
     "entertainment": {
@@ -187,6 +195,7 @@
     "food": {
         "category": "food",
         "tags": [
+            "food_and_drink",
             "food_court",
             "delivery_service",
             "pizza_delivery_service",
@@ -204,6 +213,7 @@
             "lebanese_restaurant",
             "meal_takeaway",
             "fast_food_restaurant",
+            "tapas_restaurant",
             "maltese_restaurant",
             "tapas_bar",
             "pizza_restaurant",
@@ -286,6 +296,7 @@
     "medical": {
         "category": "medical",
         "tags": [
+            "doctor",
             "hospital",
             "pharmaceutical_company",
             "medical_center",
@@ -352,7 +363,136 @@
             "youth_organization",
             "tool_store",
             "wallpaper_store",
-            "level"
+            "level",
+            "fire_protection_consultant",
+            "burglar_alarm_store",
+            "foreign_consulate",
+            "towing_service",
+            "laser_hair_removal_service",
+            "blinds_shop",
+            "glass_and_mirror_shop",
+            "musical_club",
+            "transportation_service",
+            "tourist_information_center",
+            "indian_takeaway",
+            "ham_shop",
+            "student_housing_center",
+            "shrine",
+            "curtain_and_upholstery_cleaner",
+            "carpet_cleaning_service",
+            "buffet_restaurant",
+            "pakistani_restaurant",
+            "punjabi_restaurant",
+            "bulgarian_restaurant",
+            "property_administrator",
+            "breakfast_restaurant",
+            "water_sports_equipment_rental_service",
+            "auto_tag_agency",
+            "tire_shop",
+            "massage_spa",
+            "tour_operator",
+            "halal_restaurant",
+            "produce_wholesaler",
+            "business_to_business_service",
+            "inn",
+            "tea_and_coffee_merchant",
+            "villa",
+            "apartment_rental_agency",
+            "commercial_agent",
+            "property_investment",
+            "scuba_tour_agency",
+            "underwear_store",
+            "business_networking_company",
+            "photo_shop",
+            "yacht_club",
+            "museum_of_zoology",
+            "courthouse",
+            "medical_diagnostic_imaging_center",
+            "radiologist",
+            "custom_t_shirt_store",
+            "security_service",
+            "beer_store",
+            "logical_transit_station",
+            "city_park",
+            "telephone_company",
+            "bridge",
+            "watch_store",
+            "building",
+            "health",
+            "non_profit_organization",
+            "radio_broadcaster",
+            "website_designer",
+            "marketing_consultant",
+            "anglican_church",
+            "engineering_consultant",
+            "swimming_facility",
+            "prison",
+            "masonry_contractor",
+            "dairy",
+            "hypermarket",
+            "fitness_equipment_store",
+            "ski_store",
+            "soccer_club",
+            "bicycle_store",
+            "pastry_shop",
+            "health_insurance_agency",
+            "jewelry_designer",
+            "insurance_agency",
+            "home_insurance_agency",
+            "credit_counseling_service",
+            "investment_bank",
+            "fire_station",
+            "art",
+            "meat_restaurant",
+            "investment_service",
+            "disco",
+            "rolls_royce_dealer",
+            "pasta_shop",
+            "tuning_automobile",
+            "telemarketing_service",
+            "haute_couture_fashion_house",
+            "foundation",
+            "falafel_restaurant",
+            "asador",
+            "auto_repair_shop",
+            "hot_dog_stand",
+            "cabin_rental_agency",
+            "rv_dealer",
+            "betting_agency",
+            "motel",
+            "market",
+            "car_accessories_store",
+            "lpg_conversion",
+            "bowling_alley",
+            "juice_shop",
+            "jeweler",
+            "bagel_shop",
+            "newsstand",
+            "subway_station",
+            "magazine_store",
+            "department_of_motor_vehicles",
+            "smart_shop",
+            "university_department",
+            "poke_bar",
+            "cemetery",
+            "community_center",
+            "air_conditioning_store",
+            "cupcake_shop",
+            "local_history_museum",
+            "optical_products_manufacturer",
+            "taco_restaurant",
+            "furniture_maker",
+            "fitted_furniture_supplier",
+            "furniture_manufacturer",
+            "garden_furniture_store",
+            "furniture_wholesaler",
+            "brewpub",
+            "design_agency",
+            "shopping",
+            "irish_pub",
+            "heritage_preservation",
+            "fish_restaurant",
+            "chinese_supermarket"
         ]
     },
     "office": {
@@ -382,7 +522,8 @@
         "tags": [
             "transit_station",
             "bus_stop",
-            "train_station"
+            "train_station",
+            "bus_station"
         ]
     },
     "recreation": {
@@ -420,7 +561,8 @@
             "mosque",
             "religious_organization",
             "religious_institution",
-            "dome"
+            "dome",
+            "place_of_worship"
         ]
     },
     "service": {
@@ -617,7 +759,9 @@
             "office_supply_store",
             "rubber_stamp_store",
             "stationery_store",
-            "clothing_store"
+            "clothing_store",
+            "fabric_store",
+            "carpet_store"
         ]
     },
     "socialService": {
@@ -639,7 +783,8 @@
             "gym",
             "dance_school",
             "golf_course",
-            "sports_complex"
+            "sports_complex",
+            "fitness_center"
         ]
     },
     "tourism": {

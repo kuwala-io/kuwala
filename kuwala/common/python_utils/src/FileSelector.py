@@ -31,6 +31,7 @@ def select_local_country(directory):
     continent = continents[continent_names.index(continent)]
     continent_path = f'{directory}/{continent}'
     countries = os.listdir(continent_path)
+    countries = list(filter(lambda c: not c.startswith('.'), countries))
     country_names = list(map(lambda c: pcc.map_country_alpha3_to_country_name()[c.upper()] or c, countries))
     country = questionary.select('Which country are you interested in?', choices=country_names).ask()
     country = countries[country_names.index(country)]
@@ -41,7 +42,7 @@ def select_local_country(directory):
 def select_local_osm_file(directory):
     country_path = select_local_country(directory)
 
-    if os.path.isdir(country_path + '/osm-parquetizer'):
+    if os.path.isdir(country_path + '/parquet/osm_parquetizer'):
         return country_path
 
     regions = os.listdir(country_path)
@@ -152,7 +153,7 @@ def get_countries_with_population_data(return_country_code=False):
             lambda d: 'population' in d['title'].lower() and 'csv' in d['file_types'],
             map(
                 lambda d: dict(id=d.get('id'), title=d.get('title'), location=d.get_location_names(),
-                               country_code=d.get_location_iso3s(), file_types=d.get_filetypes()),
+                               country_code=d.get_location_iso3s(), file_types=d.get_filetypes(), updated_date=d.get('last_modified')[:10]),
                 datasets
             )
         ), key=lambda d: d['location'][0])
@@ -215,12 +216,13 @@ def select_demographic_groups(d: Dataset):
             lambda resource: dict(
                 id=resource.get('id'),
                 format=resource.get('format'),
-                type=get_type(resource.get('name'))
+                type=get_type(resource.get('name')),
+                date=resource.get('last_modified')[:10],
             ),
             resources
         )
     ))
-    resources = list(map(lambda r: dict(id=r['id'], type=r['type']), resources))
+    resources = list(map(lambda r: dict(id=r['id'], type=r['type'], updated=r['date']), resources))
     resource_names = list(map(lambda r: r['type'], resources))
     selected_resources = questionary \
         .checkbox('Which demographic groups do you want to include?', choices=resource_names) \

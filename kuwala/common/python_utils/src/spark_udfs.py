@@ -24,6 +24,8 @@ def get_h3_distance(h1: str, h2: str, default_value):
     try:
         # noinspection PyUnresolvedReferences
         return h3.h3_distance(h1, h2)
+    except TypeError:
+        return None
     except h3.H3ValueError:
         return default_value
 
@@ -48,8 +50,12 @@ def create_geo_json_based_on_coordinates(coordinates: [[float]]):
         geo_json_type = 'LineString'
 
     geo_json_coordinates = [coordinates] if geo_json_type == 'Polygon' else coordinates
+    geo_json = json.dumps(dict(type=geo_json_type, coordinates=geo_json_coordinates))
 
-    return json.dumps(dict(type=geo_json_type, coordinates=geo_json_coordinates))
+    if shape(json.loads(geo_json)).is_valid:
+        return geo_json
+
+    return None
 
 
 # Get the centroid of a GeoJSON string
@@ -60,13 +66,12 @@ def get_centroid_of_geo_json(geo_json: str):
     if geo_json:
         geo_json = json.loads(geo_json)
 
+        # noinspection PyBroadException
         try:
             centroid = shape(geo_json).centroid
 
             return dict(latitude=centroid.y, longitude=centroid.x)
-        except ValueError:
-            return
-        except IndexError:
+        except Exception:
             return
 
 
@@ -97,10 +102,10 @@ def get_confidence_based_h3_and_name_distance(h3_distance: int, name_distance: i
     def get_name_confidence(d):
         return d / 100
 
-    h3_confidence = get_h3_confidence(h3_distance)
+    h3_confidence = get_h3_confidence(h3_distance) if h3_distance else None
     name_confidence = get_name_confidence(name_distance)
 
-    return h3_confidence * (2 / 3) + name_confidence * (1 / 3)
+    return (h3_confidence * (2 / 3) + name_confidence * (1 / 3)) if h3_confidence else name_confidence
 
 
 # Based on the confidence build the POI id using the H3 index and OSM id

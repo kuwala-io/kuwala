@@ -1,10 +1,10 @@
 FROM rappdw/docker-java-python:zulu11.43-python3.7.9
 
-COPY ./common/python_utils /opt/common/python_utils
-COPY ./pipelines/osm-poi /opt/pipelines/app
+COPY ./common/python_utils /opt/app/common/python_utils
+COPY ./pipelines/osm-poi /opt/app/pipelines/osm-poi
 
-WORKDIR /opt/pipelines/app
+WORKDIR /opt/app/pipelines/osm-poi
 RUN pip install --no-cache-dir -r requirements.txt
 
-WORKDIR /opt/pipelines/app/src
+WORKDIR /opt/app/pipelines/osm-poi/src
 ENTRYPOINT [ "python", "main.py" ]

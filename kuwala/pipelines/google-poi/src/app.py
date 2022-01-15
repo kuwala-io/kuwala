@@ -21,7 +21,6 @@ app.register_error_handler(error=400, func=general_error)
 app.register_error_handler(error=429, func=general_error)
 
 
-
 if __name__ == '__main__':
     environment = sys.argv[1] if len(sys.argv) > 1 else 'local'
     load_dotenv(dotenv_path=f'../config/env/.env.{environment}')

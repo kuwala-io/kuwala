@@ -10,7 +10,7 @@ from python_utils.src.spark_udfs import get_h3_index
 
 class Processor:
     @staticmethod
-    def start(files: [dict], output_dir: str):
+    def start(files: [dict], output_dir: str, updated_date: str):
         memory = os.getenv('SPARK_MEMORY') or '16g'
         start_time = time.time()
         dfs = list()
@@ -29,7 +29,8 @@ class Processor:
 
         for file in files:
             t = file['type']
-            df = spark.read.option('header', 'true').csv(file['path'])
+            file_versions = sorted(os.listdir(file['path']), reverse=True)
+            df = spark.read.option('header', 'true').csv(f'{file["path"]}{file_versions[0]}')
             # Column names can be written differently for different countries
             lat_column = next((c for c in df.columns if 'lat' in c.lower()), 'latitude')
             lng_column = next((c for c in df.columns if 'lon' in c.lower()), 'longitude')
@@ -37,16 +38,17 @@ class Processor:
             df = df \
                 .withColumnRenamed(df.columns[2], t) \
                 .withColumn(t, col(t).cast(DoubleType())) \
-                .withColumn('h3Index', get_h3_index(col(lat_column), col(lng_column), lit(11))) \
+                .withColumn('h3_index', get_h3_index(col(lat_column), col(lng_column), lit(11))) \
                 .drop(lat_column, lng_column) \
-                .groupBy('h3Index') \
+                .groupBy('h3_index') \
                 .agg(sum(t).alias(t))
 
             dfs.append(df)
 
-        df = reduce((lambda d1, d2: d1.join(d2, ['h3Index'], 'full').repartition(number_of_partitions, 'h3Index')), dfs)
+        df = reduce((lambda d1, d2: d1.join(d2, ['h3_index'], 'full').repartition(number_of_partitions, 'h3_index')),
+                    dfs)
 
-        df.write.mode('overwrite').parquet(output_dir + 'result.parquet')
+        df.write.mode('overwrite').parquet(f'{output_dir}{updated_date}_result.parquet')
 
         end_time = time.time()
 

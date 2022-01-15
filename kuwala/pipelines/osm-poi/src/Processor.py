@@ -1,9 +1,11 @@
 import itertools
 import json
+import logging
+import nominatim_controller
 import os
 import time
 from pyspark.sql import DataFrame, SparkSession
-from pyspark.sql.functions import col, explode, lit, udf
+from pyspark.sql.functions import coalesce, col, explode, lit, udf
 from pyspark.sql.types import \
     ArrayType, BooleanType, FloatType, IntegerType, NullType, StringType, StructField, StructType
 from python_utils.src.FileSelector import select_local_osm_file
@@ -154,21 +156,40 @@ class Processor:
                         else:
                             address[keys[0]][keys[1]] = tag.value
                     else:
-                        print(f'Invalid address key: {tag.key}')
+                        logging.warning(f'Invalid address key: {tag.key}')
 
             return address
 
-        return df.withColumn('address', parse_tags(col('is_poi'), col('tags')))
+        return df \
+            .withColumn('address', parse_tags(col('is_poi'), col('tags'))) \
+            .withColumn('address_house_nr', col('address.house_nr')) \
+            .withColumn('address_street', col('address.street')) \
+            .withColumn('address_zip_code', col('address.zip_code')) \
+            .withColumn('address_city', col('address.city')) \
+            .withColumn('address_country', col('address.country')) \
+            .withColumn('address_full', col('address.full')) \
+            .withColumn('address_region_neighborhood', col('address.region.neighborhood')) \
+            .withColumn('address_region_suburb', col('address.region.suburb')) \
+            .withColumn('address_region_district', col('address.region.district')) \
+            .withColumn('address_region_province', col('address.region.province')) \
+            .withColumn('address_region_state', col('address.region.state')) \
+            .withColumn('address_house_name', col('address.house_name')) \
+            .withColumn('address_place', col('address.place')) \
+            .withColumn('address_block', col('address.block')) \
+            .withColumn('address_details_level', col('address.details.level')) \
+            .withColumn('address_details_flats', col('address.details.flats')) \
+            .withColumn('address_details_unit', col('address.details.unit')) \
+            .drop('address')
 
     @staticmethod
     def df_parse_tags(file_path, spark, osm_type) -> DataFrame:
-        files = os.listdir(file_path + '/osm-parquetizer')
+        files = os.listdir(file_path + '/parquet/osm_parquetizer')
         file = list(filter(lambda f: (osm_type in f) and ('crc' not in f), files))[0]
-        df = spark.read.parquet(f'{file_path}/osm-parquetizer/{file}')
+        df = spark.read.parquet(f'{file_path}/parquet/osm_parquetizer/{file}')
         df = Processor.is_poi(df)
         df = Processor.parse_categories(df)
         df = Processor.parse_address(df)
-        df = df.withColumn('osm_type', lit(osm_type))
+        df = df.withColumn('osm_type', lit(osm_type)).withColumnRenamed('id', 'osm_id')
         df = Processor.parse_single_tag(df, 'name', ['name'])
         df = Processor.parse_single_tag(df, 'phone', ['phone'])
         df = Processor.parse_single_tag(df, 'email', ['email'])
@@ -197,85 +218,16 @@ class Processor:
         return df_way.withColumn('coordinates', get_coordinates(col('nodes')))
 
     @staticmethod
-    def df_mark_relation_members(spark, df_way, df_relation) -> DataFrame:
-        df_members = df_relation.withColumn('members', explode('members')).select('members.*').select('id', 'type') \
-            .sort('id')
-        dict_way_members = df_members.filter(col('type') == 'Way').select('id').distinct().toPandas() \
-            .set_index('id').T.to_dict('list')
-        dict_way_members = spark.sparkContext.broadcast(dict_way_members)
-
-        del df_members
-
-        @udf(returnType=BooleanType())
-        def is_relation_member(osm_id):
-            def is_in_df(broadcast, oid):
-                try:
-                    # noinspection PyComparisonWithNone
-                    return broadcast.value[oid] != None
-                except KeyError:
-                    return False
-
-            return is_in_df(dict_way_members, osm_id)
-
-        df_way = df_way.withColumn('is_relation_member', is_relation_member(col('id')))
-
-        return df_way
-
-    @staticmethod
     def df_way_create_geo_json(df_way) -> DataFrame:
         return df_way.withColumn('geo_json', create_geo_json_based_on_coordinates(col('coordinates')))
 
     @staticmethod
     def get_geo_json_center(df) -> DataFrame:
         return df \
+            .filter(col('geo_json').isNotNull()) \
             .withColumn('centroid', get_centroid_of_geo_json(col('geo_json'))) \
             .withColumn('latitude', col('centroid.latitude')) \
             .withColumn('longitude', col('centroid.longitude'))
-
-    @staticmethod
-    def df_relation_create_geo_json(spark, df_relation, df_way) -> DataFrame:
-        dict_way_members = df_way.filter(col('is_relation_member')).select('id', 'coordinates').sort('id').toPandas() \
-            .set_index('id').T.to_dict('list')
-        dict_way_members = spark.sparkContext.broadcast(dict_way_members)
-
-        @udf(returnType=StringType())
-        def create_geo_json(relation_type, members):
-            if relation_type not in ['boundary', 'multipolygon']:
-                return
-
-            geo_json_coordinates = []  # [[[[lng, lat]]]]
-
-            for member in members:
-                if member.role == 'outer':
-                    try:
-                        coordinates = dict_way_members.value[member.id][0]  # [[lng, lat]]
-                    except KeyError:
-                        continue
-
-                    if not coordinates:
-                        continue
-
-                    if len(geo_json_coordinates) < 1:
-                        geo_json_coordinates.append([coordinates])
-                    else:
-                        last_index_geo_json = len(geo_json_coordinates) - 1
-                        last_index_coordinate_pair = len(geo_json_coordinates[last_index_geo_json][0]) - 1
-                        last_coordinate_pair = geo_json_coordinates[last_index_geo_json][0][last_index_coordinate_pair]
-
-                        if last_coordinate_pair[0] == coordinates[0][0] and \
-                                last_coordinate_pair[1] == coordinates[0][1]:
-                            geo_json_coordinates[last_index_geo_json].append(coordinates)
-                        # Check if coordinates in reversed order fit
-                        elif last_coordinate_pair[0] == list(reversed(coordinates))[0][0] and \
-                                last_coordinate_pair[1] == list(reversed(coordinates))[0][1]:
-                            geo_json_coordinates[last_index_geo_json].append(list(reversed(coordinates)))
-                        else:
-                            geo_json_coordinates.append([coordinates])
-
-            if geo_json_coordinates:
-                return json.dumps(dict(type='MultiPolygon', coordinates=geo_json_coordinates))
-
-        return df_relation.withColumn('geo_json', create_geo_json(col('type'), col('members')))
 
     @staticmethod
     def df_add_h3_index(df) -> DataFrame:
@@ -285,13 +237,29 @@ class Processor:
     def combine_pois(df_node, df_way, df_relation) -> DataFrame:
         columns = [
             'osm_type',
-            'id',
+            'osm_id',
             'tags',
             'latitude',
             'longitude',
             'h3_index',
             'categories',
-            'address',
+            'address_house_nr',
+            'address_street',
+            'address_zip_code',
+            'address_city',
+            'address_country',
+            'address_full',
+            'address_region_neighborhood',
+            'address_region_suburb',
+            'address_region_district',
+            'address_region_province',
+            'address_region_state',
+            'address_house_name',
+            'address_place',
+            'address_block',
+            'address_details_level',
+            'address_details_flats',
+            'address_details_unit',
             'name',
             'phone',
             'email',
@@ -344,7 +312,7 @@ class Processor:
     @staticmethod
     def start(args):
         script_dir = os.path.dirname(__file__)
-        directory = os.path.join(script_dir, '../tmp/osmFiles/parquet')
+        directory = os.path.join(script_dir, '../../../tmp/kuwala/osm_files')
 
         if not args.continent:
             file_path = select_local_osm_file(directory)
@@ -361,6 +329,7 @@ class Processor:
         start_time = time.time()
         spark = SparkSession.builder \
             .appName('osm-poi') \
+            .config('spark.network.timeout', '1800s') \
             .config('spark.driver.memory', memory) \
             .config('spark.sql.parquet.binaryAsString', 'true') \
             .getOrCreate() \
@@ -370,10 +339,27 @@ class Processor:
         df_way = Processor.df_parse_tags(file_path, spark, 'way')
         df_relation = Processor.df_parse_tags(file_path, spark, 'relation')
         # Create GeoJSONs
-        df_way = Processor.df_mark_relation_members(spark, df_way, df_relation)
         df_way = Processor.df_parse_way_coordinates(df_way)
         df_way = Processor.df_way_create_geo_json(df_way)
-        df_relation = Processor.df_relation_create_geo_json(spark, df_relation, df_way)
+
+        @udf(returnType=BooleanType())
+        def has_polygon_shape(members):
+            has_outer = False
+
+            for member in members:
+                if member.role == 'outer':
+                    has_outer = True
+
+            return has_outer
+
+        geo_jsons_to_fetch = df_relation.filter(
+            col('name').isNotNull() &
+            has_polygon_shape(col('members')) &
+            col('type').isin(['boundary', 'multipolygon'])
+        ).withColumn('geo_json', lit(None)).select('osm_id', 'geo_json').toPandas()
+        nominatim_controller.get_geo_json_by_id(geo_jsons_to_fetch)
+        geo_jsons_to_fetch = spark.createDataFrame(geo_jsons_to_fetch)
+        df_relation = df_relation.join(geo_jsons_to_fetch, 'osm_id', 'left')
         df_way = Processor.get_geo_json_center(df_way)
         df_relation = Processor.get_geo_json_center(df_relation)
         # Add H3 index
@@ -385,8 +371,8 @@ class Processor:
 
         df_pois = Processor.name_matching(script_dir, spark, df_pois)
 
-        df_pois.write.mode('overwrite').parquet(file_path + '/kuwala.parquet')
+        df_pois.write.mode('overwrite').parquet(file_path + '/parquet/kuwala.parquet')
 
         end_time = time.time()
 
-        print(f'Processed OSM files in {round(end_time - start_time)} s')
+        logging.info(f'Processed OSM files in {round(end_time - start_time)} s')
