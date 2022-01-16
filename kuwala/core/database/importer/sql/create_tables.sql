@@ -22,6 +22,30 @@ CREATE TABLE IF NOT EXISTS admin_boundary (
     geometry geometry
 );
 
+-- Creation of admin_boundary_geonames_cities table
+
+CREATE TABLE IF NOT EXISTS admin_boundary_geonames_cities (
+    geoname_id text NOT NULL PRIMARY KEY,
+    name text NOT NULL,
+    ascii_name text,
+    alternate_names text[],
+    latitude decimal NOT NULL,
+    longitude decimal NOT NULL,
+    feature_class text NOT NULL,
+    feature_code text,
+    country_code text,
+    alternate_country_codes text[],
+    admin_1_code text,
+    admin_2_code text,
+    admin_3_code text,
+    admin_4_code text,
+    population integer NOT NULL,
+    elevation integer,
+    digital_elevation_model integer NOT NULL,
+    timezone text NOT NULL,
+    modification_date date NOT NULL
+);
+
 -- Creation of population_density table
 
 CREATE TABLE IF NOT EXISTS population_density (
