@@ -2,9 +2,9 @@ from quart import abort, Blueprint, request, jsonify
 from instascrape import *
 from utils import processor
 
-hashtag = Blueprint('hashtag', __name__, url_prefix='/hashtag')
+locations = Blueprint('locations', __name__, url_prefix='/locations')
 
-@hashtag.route('/', methods=['GET'])
+@locations.route('/', methods=['GET'])
 async def get_hashtag_information():
     urls = await request.get_json()
     
@@ -14,6 +14,6 @@ async def get_hashtag_information():
     if len(urls) > 100:
         abort(400, description='You can send at most 100 ids at once.')
 
-    result = processor.process_by_type(urls, 'hashtag')
+    result = processor.process_by_type(urls, 'locations')
 
     return jsonify(result)
