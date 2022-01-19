@@ -25,7 +25,7 @@ each pipeline's `README.md` on how to run them. You can find the pipeline direct
 It would be safer to always run the build commands after pulling new code changes so that your local images 
 have the latest code. 
 
-Docker images will only be built once when you run the `initialize_all_components.sh` script, so new changes in the code 
+Docker images will only be built once when you run the `initialize_all_components.py` script, so new changes in the code 
 will not reflect on your local unless you explicitly run the build commands.
 
 Please note that the Docker runs will create data folders under `./kuwala/tmp/kuwala` that will be used for db, file 
