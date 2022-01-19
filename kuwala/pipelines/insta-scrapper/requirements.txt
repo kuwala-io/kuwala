@@ -1,0 +1,17 @@
+aiofiles==0.8.0
+blinker==1.4
+click==8.0.3
+h11==0.12.0
+h2==4.1.0
+hpack==4.0.0
+hypercorn==0.13.2
+hyperframe==6.0.1
+itsdangerous==2.0.1
+Jinja2==3.0.3
+MarkupSafe==2.0.1
+priority==2.0.0
+python-dotenv==0.19.2
+quart==0.16.2
+toml==0.10.2
+Werkzeug==2.0.2
+wsproto==1.0.0
