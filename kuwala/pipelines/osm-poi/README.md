@@ -23,16 +23,8 @@ To transform the standard `pbf` files, which is the file format of the OSM data,
 OSM-parquetizer is based on a Git submodule which needs to be initialized first. To initialize the submodule, run from 
 inside the root directory:
 
-Linux/Mac:
-
 ```zsh
-cd kuwala/scripts && sh initialize_git_submodules.sh
-```
-
-Windows:
-
-```zsh
-cd kuwala/scripts && sh initialize_windows.sh && cd windows && sh initialize_git_submodules.sh
+cd kuwala/scripts && python3 initialize_git_submodules.py
 ```
 
 To make sure you are running the latest version of the pipeline, build the Docker images from inside the `kuwala` 
