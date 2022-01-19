@@ -72,7 +72,7 @@ the next section.
 
 ***Note***: 
 1) We recommend giving Docker at least 8 GB of RAM (On Docker Desktop you can go under settings -> resources)
-2) If you are a Windows user, we recommend you to install the *Windows Subsystem for Linux (WSL)* and integrate docker with WSL. WSL presence is highly recommended since many automation scripts written in Unix Shell (or `.sh`) format. For WSL installation's guidance can be found [here](https://docs.microsoft.com/en-us/windows/wsl/install). We use Ubuntu on WSL for debug and testing purposes.
+2) If you are a Windows user, we recommend you to install the *Windows Subsystem for Linux (WSL)* and integrate docker with WSL. For WSL installation's guidance can be found [here](https://docs.microsoft.com/en-us/windows/wsl/install). We use Ubuntu on WSL for debug and testing purposes.
 
 #### Demo correlating Uber traversals with Google popularities
 
