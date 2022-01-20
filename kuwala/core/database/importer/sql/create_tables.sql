@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS osm_poi (
     latitude decimal NOT NULL,
     longitude decimal NOT NULL,
     name text,
+    name_matched text,
     tags text[],
     categories text[],
     address_house_nr text,
@@ -69,7 +70,9 @@ CREATE TABLE IF NOT EXISTS osm_poi (
     email text,
     website text,
     brand text,
+    brand_matched text,
     operator text,
+    operator_matched text,
     boundary text,
     admin_level smallint,
     type text,
@@ -148,7 +151,7 @@ CREATE TABLE IF NOT EXISTS google_osm_poi_matching (
     CONSTRAINT fk_google_osm_poi_matching_osm_id FOREIGN KEY(osm_type, osm_id) REFERENCES osm_poi(osm_type, osm_id)
 );
 
--- Creation of google_osm_poi_matching table
+-- Creation of google_custom_poi_matching table
 
 CREATE TABLE IF NOT EXISTS google_custom_poi_matching (
     custom_id text NOT NULL PRIMARY KEY,
