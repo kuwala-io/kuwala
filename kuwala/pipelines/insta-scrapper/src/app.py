@@ -12,6 +12,6 @@ app.register_blueprint(locations)
 
 @app.route('/')
 async def hello():
-    return 'hello'
+    return 'Running Insta Scrapper API on 3016'
 
-app.run(host='0.0.0.0', port='3016')
+app.run(host='0.0.0.0', port=3016)

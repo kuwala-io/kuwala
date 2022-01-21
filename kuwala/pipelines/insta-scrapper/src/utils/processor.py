@@ -14,6 +14,12 @@ def process_by_type(data, type):
     
     return result
 
+def process_bulk(data, processor):
+    result = []
+    for item in data:
+        result.append(processor(item))
+    return result
+
 def process_hashtag(url):
     temp = Hashtag(url)
     temp.scrape()
@@ -33,9 +39,3 @@ def process_locations(url):
     temp = Location(url)
     temp.scrape()
     return temp.to_dict()
-
-def process_bulk(data, processor):
-    result = []
-    for item in data:
-        result.append(processor(item))
-    return result
