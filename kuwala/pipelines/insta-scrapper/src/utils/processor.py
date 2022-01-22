@@ -10,7 +10,11 @@ def process_by_type(data, type):
     elif type == 'profiles':
         result = process_bulk(data, process_profile) 
     elif type == 'locations':
-        result = process_bulk(data, process_locations)                      
+        result = process_bulk(data, process_location)                 
+    elif type == "reels":
+        result = process_bulk(data, process_reel)        
+    elif type == "igtv":
+        result = process_bulk(data, process_igtv)         
     
     return result
 
@@ -35,7 +39,17 @@ def process_profile(url):
     temp.scrape()
     return temp.to_dict()
 
-def process_locations(url):
+def process_location(url):
     temp = Location(url)
+    temp.scrape()
+    return temp.to_dict()
+
+def process_reel(url):
+    temp = Reel(url)
+    temp.scrape()
+    return temp.to_dict()
+
+def process_igtv(url):
+    temp = IGTV(url)
     temp.scrape()
     return temp.to_dict()
