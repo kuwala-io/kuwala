@@ -15,6 +15,7 @@ itsdangerous==2.0.1
 Jinja2==3.0.3
 MarkupSafe==2.0.1
 priority==2.0.0
+PySocks==1.7.1
 python-dotenv==0.19.2
 quart==0.16.2
 requests==2.27.1
