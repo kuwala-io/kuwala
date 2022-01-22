@@ -29,16 +29,17 @@ class Downloader:
 
     @staticmethod
     def download_names():
+        temp_files_dir='../../../tmp/kuwala/osm_files/'
         # here, instead of cloning the repository that recommended using extra library,
         # we download the whole repo in zip, then extract it.
         if not os.path.exists('../tmp/name-suggestion-index-main'):
             download_link='https://github.com/osmlab/name-suggestion-index/archive/refs/heads/main.zip'
-            req.urlretrieve(download_link, "../tmp/main.zip")
-            with zipfile.ZipFile('../tmp/main.zip', 'r') as zip_ref:
-                zip_ref.extractall('../tmp/')
-            os.remove('../tmp/main.zip')
+            req.urlretrieve(download_link, temp_files_dir+"main.zip")
+            with zipfile.ZipFile(temp_files_dir+'main.zip', 'r') as zip_ref:
+                zip_ref.extractall(temp_files_dir)
+            os.remove(temp_files_dir+'main.zip')
 
-        file_paths=['../tmp/name-suggestion-index-main/data/brands','../tmp/name-suggestion-index-main/data/operators']
+        file_paths=[temp_files_dir+'name-suggestion-index-main/data/brands',temp_files_dir+'name-suggestion-index-main/data/operators']
         data = {'id': [], 'display_name': [], 'wiki_data': []}
         for file_path in file_paths:
             for folder in os.listdir(file_path):
