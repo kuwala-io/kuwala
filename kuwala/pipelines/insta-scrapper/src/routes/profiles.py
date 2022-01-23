@@ -12,7 +12,7 @@ async def get_posts_information():
         abort(400, description='Invalid request body, is the request body type a JSON?')
 
     if len(search_queries) > 100:
-        abort(400, description='You can send at most 100 ids at once.')
+        abort(400, description='You can send at most 100 queries at once.')
 
     urls = list(map(convert_into_url_list, search_queries))
     result = processor.process_by_type(urls, 'profiles')
