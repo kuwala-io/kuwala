@@ -1,8 +1,10 @@
+from charset_normalizer import logging
 from instascrape import *
+from utils.session import generate_header
 
 def process_by_type(data, type):
     result = []
-
+   
     if (type == 'hashtag') :
         result = process_bulk(data, process_hashtag)
     elif type == 'posts':
@@ -14,8 +16,8 @@ def process_by_type(data, type):
     elif type == "reels":
         result = process_bulk(data, process_reel)        
     elif type == "igtv":
-        result = process_bulk(data, process_igtv)         
-    
+        result = process_bulk(data, process_igtv)   
+
     return result
 
 def process_bulk(data, processor):
@@ -41,8 +43,13 @@ def process_profile(url):
 
 def process_location(url):
     temp = Location(url)
-    temp.scrape()
-    return temp.to_dict()
+    header = generate_header()
+    if header == False:
+        logging.warning("Failed to get data, provide a correct header")
+        return None
+    temp.scrape(headers=header)
+    temp.to_dict()
+    return temp
 
 def process_reel(url):
     temp = Reel(url)
