@@ -4,7 +4,7 @@ import time
 from pyspark.sql.functions import lit
 
 
-def import_population_density(spark, database_url, database_properties, continent, country, population_density_date):
+def import_population_density(spark, database_url, database_properties, continent, country, population_density_date=''):
     start_time = time.time()
 
     logging.info(f'Starting import of population density data for {country}, {continent}')
