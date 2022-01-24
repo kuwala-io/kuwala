@@ -65,4 +65,4 @@ class Downloader:
 
         df=pd.DataFrame(data)
         df.drop_duplicates(subset=['display_name','wiki_data'])
-        df.to_csv('../tmp/names.csv',index=False)
+        df.to_csv(temp_files_dir+'names.csv',index=False)
