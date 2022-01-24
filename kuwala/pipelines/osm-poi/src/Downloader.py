@@ -32,7 +32,8 @@ class Downloader:
         temp_files_dir='../../../tmp/kuwala/osm_files/'
         # here, instead of cloning the repository that recommended using extra library,
         # we download the whole repo in zip, then extract it.
-        if not os.path.exists('../tmp/name-suggestion-index-main'):
+        if not os.path.exists(temp_files_dir+'name-suggestion-index-main'):
+            print("Downloading brand and operator name reference...")
             download_link='https://github.com/osmlab/name-suggestion-index/archive/refs/heads/main.zip'
             req.urlretrieve(download_link, temp_files_dir+"main.zip")
             with zipfile.ZipFile(temp_files_dir+'main.zip', 'r') as zip_ref:
@@ -41,6 +42,7 @@ class Downloader:
 
         file_paths=[temp_files_dir+'name-suggestion-index-main/data/brands',temp_files_dir+'name-suggestion-index-main/data/operators']
         data = {'id': [], 'display_name': [], 'wiki_data': []}
+        print("Composing brand and operator name list...")
         for file_path in file_paths:
             for folder in os.listdir(file_path):
                 if os.path.isdir(os.path.join(file_path,folder)):
@@ -66,3 +68,4 @@ class Downloader:
         df=pd.DataFrame(data)
         df.drop_duplicates(subset=['display_name','wiki_data'])
         df.to_csv(temp_files_dir+'names.csv',index=False)
+        print("Done!")
