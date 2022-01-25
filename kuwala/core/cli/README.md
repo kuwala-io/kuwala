@@ -20,18 +20,23 @@ The following pipelines can currently be selected through the CLI:
 
 To make sure you are running the latest version of all pipelines, run from inside the root directory:
 
-Linux/Mac:
 
 ```zsh
-cd kuwala/scripts && python3 initialize_all_components.py
+cd kuwala/scripts/shell && sh initialize_all_components.sh
 ```
 
-Windows PowerShell with WSL:
-1) Activate the WSL with `bash` command.
-2) Run the same command as Linux/Mac above.
-
-To start the CLI, run the following script from inside the `kuwala/scripts` directory and follow the instructions:
+Or if you are a Windows User having issue to run a `shell` script, you can run a `python` script as an alternative:
 
 ```zsh
-python3 run_cli.py
+cd kuwala/scripts/python && python3 initialize_all_components.py
 ```
+
+*All `shell` scripts are also available in  `python` script using the same file naming, inside the `/python` directory*
+
+
+To start the CLI, run the following script from inside the `kuwala/scripts/shell` directory and follow the instructions:
+
+```zsh
+sh run_cli.sh
+```
+or `python3 run_cli.py` from inside the `kuwala/scripts/python` directory

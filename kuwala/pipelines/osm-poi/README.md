@@ -24,8 +24,15 @@ OSM-parquetizer is based on a Git submodule which needs to be initialized first.
 inside the root directory:
 
 ```zsh
-cd kuwala/scripts && python3 initialize_git_submodules.py
+cd kuwala/scripts/shell && sh initialize_git_submodules.sh
 ```
+Or if you are a Windows User having issue to run a `shell` script, you can run a `python` script as an alternative:
+
+```zsh
+cd kuwala/scripts/python && python3 initialize_git_submodules.py
+```
+
+*All `shell` scripts are also available in  `python` script using the same file naming, inside the `/python` directory*
 
 To make sure you are running the latest version of the pipeline, build the Docker images from inside the `kuwala` 
 directory by running:

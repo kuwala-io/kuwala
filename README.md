@@ -97,7 +97,7 @@ Or if you are a Windows User having issue to run a `shell` script, you can run a
 ```zsh
 cd kuwala/scripts/python && python3 initialize_core_components.py && python3 run_cli.py
 ```
-All `shell` scripts are also available in  `python` script using the same file naming, inside the `/python` directory
+*All `shell` scripts are also available in  `python` script using the same file naming, inside the `/python` directory*
 #### Run the data pipelines yourself
 
 To run the pipelines yourself, please follow the instructions for the 
