@@ -89,14 +89,15 @@ You could either use the deployed example on Binder using the badge above or run
 simply uses Pandas dataframes and is not connecting to a data warehouse. \
 To run the demo locally, launch Docker in the background and from inside the root directory run:
 
-Linux/Mac:
 ```zsh 
-cd kuwala/scripts && python3 initialize_core_components.py && python3 run_cli.py
+cd kuwala/scripts/shell && sh initialize_core_components.sh && sh run_cli.sh
 ```
-Windows PowerShell with WSL:
-1) Activate the WSL with `bash` command.
-2) Run the same command as Linux/Mac above.
+Or if you are a Windows User having issue to run a `shell` script, you can run a `python` script as an alternative:
 
+```zsh
+cd kuwala/scripts/python && python3 initialize_core_components.py && python3 run_cli.py
+```
+All `shell` scripts are also available in  `python` script using the same file naming, inside the `/python` directory
 #### Run the data pipelines yourself
 
 To run the pipelines yourself, please follow the instructions for the 

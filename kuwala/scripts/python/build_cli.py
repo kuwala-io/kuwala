@@ -14,7 +14,7 @@ import run_command as rc
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
-os.chdir(os.path.join(script_dir,'../..'))
+os.chdir(os.path.join(script_dir,'../../../'))
 rc.run_command(['pip3 install virtualenv'])
 rc.run_command(['virtualenv -p python3 venv'])
 rc.run_command(['source ./venv/bin/activate'])
