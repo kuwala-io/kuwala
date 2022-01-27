@@ -41,7 +41,7 @@ class Downloader:
             with zipfile.ZipFile(temp_files_dir+'main.zip', 'r') as zip_ref:
                 zip_ref.extractall(temp_files_dir)
             os.remove(temp_files_dir+'main.zip')
-            shutil.rmtree(temp_files_dir+'name-suggestion-index-main')
+            
 
         file_paths=[temp_files_dir+'name-suggestion-index-main/data/brands',temp_files_dir+'name-suggestion-index-main/data/operators']
         data = {'id': [], 'display_name': [], 'wiki_data': []}
@@ -67,7 +67,8 @@ class Downloader:
                                 data['id'].append(id)
                                 data['display_name'].append(display_name)
                                 data['wiki_data'].append(wiki_data)
-
+        
+        shutil.rmtree(temp_files_dir+'name-suggestion-index-main')
         df=pd.DataFrame(data)
         df.drop_duplicates(subset=['display_name','wiki_data'])
         df=df.sort_values('id')

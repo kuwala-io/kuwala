@@ -26,6 +26,7 @@ CONTINENTS = [
 
 def select_local_country(directory):
     continents = os.listdir(directory)
+    continents.remove('brand_names.csv')
     continent_names = list(map(lambda c: pcc.convert_continent_code_to_continent_name(c.upper()), continents))
     continent = questionary.select('Which continent are you interested in?', choices=continent_names).ask()
     continent = continents[continent_names.index(continent)]
