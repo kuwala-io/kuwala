@@ -5,6 +5,7 @@ import urllib.request as req
 import zipfile
 import json
 import pandas as pd
+import shutil
 
 class Downloader:
     @staticmethod
@@ -39,6 +40,7 @@ class Downloader:
             with zipfile.ZipFile(temp_files_dir+'main.zip', 'r') as zip_ref:
                 zip_ref.extractall(temp_files_dir)
             os.remove(temp_files_dir+'main.zip')
+            shutil.rmtree(temp_files_dir+'name-suggestion-index-main')
 
         file_paths=[temp_files_dir+'name-suggestion-index-main/data/brands',temp_files_dir+'name-suggestion-index-main/data/operators']
         data = {'id': [], 'display_name': [], 'wiki_data': []}
@@ -67,5 +69,5 @@ class Downloader:
 
         df=pd.DataFrame(data)
         df.drop_duplicates(subset=['display_name','wiki_data'])
-        df.to_csv(temp_files_dir+'names.csv',index=False)
+        df.to_csv(temp_files_dir+'brand_names.csv',index=False)
         print("Done!")

@@ -278,11 +278,11 @@ class Processor:
 
         return df_node.union(df_way).union(df_relation)
     
-    # search brands and oprerator from names.csv and put that into pyspark dataframe
+    # search brands and oprerator from brand_names.csv and put that into pyspark dataframe
 
     @staticmethod
     def name_matching(script_dir,spark, df_strings) -> DataFrame:
-            names=pd.read_csv(os.path.join(script_dir, '../tmp/names.csv'))['display_name'].tolist()
+            names=pd.read_csv(os.path.join(script_dir, '../../../tmp/kuwala/osm_files/brand_names.csv'))['display_name'].tolist()
 
             names=spark.sparkContext.broadcast(names)
 
