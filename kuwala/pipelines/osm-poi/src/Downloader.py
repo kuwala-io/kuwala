@@ -6,6 +6,7 @@ import zipfile
 import json
 import pandas as pd
 import shutil
+import logging as log
 
 class Downloader:
     @staticmethod
@@ -34,7 +35,7 @@ class Downloader:
         # here, instead of cloning the repository that recommended using extra library,
         # we download the whole repo in zip, then extract it.
         if not os.path.exists(temp_files_dir+'name-suggestion-index-main'):
-            print("Downloading brand and operator name reference...")
+            log.info("Downloading brand and operator name reference...")
             download_link='https://github.com/osmlab/name-suggestion-index/archive/refs/heads/main.zip'
             req.urlretrieve(download_link, temp_files_dir+"main.zip")
             with zipfile.ZipFile(temp_files_dir+'main.zip', 'r') as zip_ref:
@@ -44,7 +45,7 @@ class Downloader:
 
         file_paths=[temp_files_dir+'name-suggestion-index-main/data/brands',temp_files_dir+'name-suggestion-index-main/data/operators']
         data = {'id': [], 'display_name': [], 'wiki_data': []}
-        print("Composing brand and operator name list...")
+        log.info("Composing brand and operator name list...")
         for file_path in file_paths:
             for folder in os.listdir(file_path):
                 if os.path.isdir(os.path.join(file_path,folder)):
@@ -62,12 +63,13 @@ class Downloader:
                                     wiki_data=(dict(item["tags"].items())['brand:wikidata'])
                                 elif ('operator:wikidata' in list(item['tags'].keys())):
                                     wiki_data=(dict(item["tags"].items())['operator:wikidata'])
-
-                            data['id'].append(id)
-                            data['display_name'].append(display_name)
-                            data['wiki_data'].append(wiki_data)
+                            if str(id) != 'nan':
+                                data['id'].append(id)
+                                data['display_name'].append(display_name)
+                                data['wiki_data'].append(wiki_data)
 
         df=pd.DataFrame(data)
         df.drop_duplicates(subset=['display_name','wiki_data'])
+        df=df.sort_values('id')
         df.to_csv(temp_files_dir+'brand_names.csv',index=False)
-        print("Done!")
+        log.info("Done!")
