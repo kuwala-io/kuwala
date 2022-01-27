@@ -25,7 +25,7 @@ To make sure you are running the latest version of all pipelines, run from insid
 cd kuwala/scripts/shell && sh initialize_all_components.sh
 ```
 
-Or if you are a Windows User having issue to run a `shell` script, you can run a `python` script as an alternative:
+Or if you are a Windows user having issues to run a `shell` script, you can run a `python` script as an alternative:
 
 ```zsh
 cd kuwala/scripts/python && python3 initialize_all_components.py

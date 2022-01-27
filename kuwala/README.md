@@ -9,11 +9,11 @@ Installed version of *Docker* and *docker-compose v2*
 
 ### Pipelines
 
-If you want to build all containers for all pipelines, change your working directory to `./kuwala/scripts` and run:
+If you want to build all containers for all pipelines, change your working directory to `./kuwala/scripts/shell` and run:
 
 
 ```zsh
-python3 initialize_all_components.py
+sh initialize_all_components.sh
 ```
 
 
@@ -25,7 +25,7 @@ each pipeline's `README.md` on how to run them. You can find the pipeline direct
 It would be safer to always run the build commands after pulling new code changes so that your local images 
 have the latest code. 
 
-Docker images will only be built once when you run the `initialize_all_components.py` script, so new changes in the code 
+Docker images will only be built once when you run the `initialize_all_components.sh` script, so new changes in the code 
 will not reflect on your local unless you explicitly run the build commands.
 
 Please note that the Docker runs will create data folders under `./kuwala/tmp/kuwala` that will be used for db, file 
@@ -35,20 +35,23 @@ Now you can proceed to any of the pipelines' `README.md` and follow the steps to
 
 ### Core
 
-To initialize the CLI and Jupyter notebook run within the `./kuwala/scripts` directory:
+To initialize the CLI and Jupyter notebook run within the `./kuwala/scripts/shell` directory:
 
 ```zsh
-python3 initialize_core_components.py
+sh initialize_core_components.sh
 ```
 
 To launch the CLI run:
 
 ```zsh
-python3 run_cli.py
+sh run_cli.sh
 ```
 
 If you only want to start the Jupyter environment run:
 
 ```zsh
-python3 run_jupyter_notebook.py
+sh run_jupyter_notebook.sh
 ```
+Or if you are a Windows user having issues to run a `shell` script, you can run a `python` script as an alternative. For example you can run `initialize_core_components.py` under `kuwala/scripts/python`.\
+\
+*All `shell` scripts are also available in  `python` script using the same file naming, inside the `kuwala/scripts/python` directory*

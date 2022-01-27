@@ -26,7 +26,7 @@ inside the root directory:
 ```zsh
 cd kuwala/scripts/shell && sh initialize_git_submodules.sh
 ```
-Or if you are a Windows User having issue to run a `shell` script, you can run a `python` script as an alternative:
+Or if you are a Windows user having issues to run a a `shell` script, you can run a `python` script as an alternative:
 
 ```zsh
 cd kuwala/scripts/python && python3 initialize_git_submodules.py

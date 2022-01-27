@@ -92,7 +92,7 @@ To run the demo locally, launch Docker in the background and from inside the roo
 ```zsh 
 cd kuwala/scripts/shell && sh initialize_core_components.sh && sh run_cli.sh
 ```
-Or if you are a Windows User having issue to run a `shell` script, you can run a `python` script as an alternative:
+Or if you are a  Windows user having issues to run a `shell` script, you can run a `python` script as an alternative:
 
 ```zsh
 cd kuwala/scripts/python && python3 initialize_core_components.py && python3 run_cli.py

@@ -10,7 +10,7 @@ def launch_jupyter_notebook():
     run_command('docker-compose run --service-ports jupyter', exit_keyword='or http')
 
     webbrowser.open('http://localhost:8888/lab/tree/kuwala/notebooks/popularity_correlation.ipynb')
-    print('To stop and remove all Docker containers run the "python3 stop_all_containers.py"')
+    print('To stop and remove all Docker containers run the "sh stop_all_containers.sh" or "python3 stop_all_containers.py"')
 
 
 if __name__ == '__main__':

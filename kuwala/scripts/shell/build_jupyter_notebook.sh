@@ -1,3 +1,2 @@
-cd ..
-cd ..
+cd ../..
 docker-compose build jupyter
