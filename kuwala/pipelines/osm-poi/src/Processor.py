@@ -281,29 +281,29 @@ class Processor:
     # search brands and oprerator from names.csv and put that into pyspark dataframe
 
     @staticmethod
-    def name_matching(script_dir,spark, df_pois) -> DataFrame:
+    def name_matching(script_dir,spark, df_strings) -> DataFrame:
             names=pd.read_csv(os.path.join(script_dir, '../tmp/names.csv'))['display_name'].tolist()
 
             names=spark.sparkContext.broadcast(names)
 
             @udf(returnType=StringType())
-            def brand_and_operator_name_matching(df_pois):
+            def brand_and_operator_name_matching(df_strings):
                 similar_name_score=-1;best_match=None
 
                 #Check if the input is empty
-                if(str(df_pois)=='nan'):
+                if(str(df_strings)=='nan'):
                     return best_match
 
                 #name matching  
                 for name in names:
-                    distance=get_string_distance(df_pois, name)
+                    distance=get_string_distance(df_strings, name)
                     if(distance>similar_name_score):
                         similar_name_score=distance
                         best_match=name
                 
                 return best_match
                 
-            return df_pois \
+            return df_strings \
             .withColumn('brand_matched', brand_and_operator_name_matching(col('brand'))) \
             .withColumn('operator_matched', brand_and_operator_name_matching(col('operator'))).withColumn('name_matched', brand_and_operator_name_matching(col('name')))
     
