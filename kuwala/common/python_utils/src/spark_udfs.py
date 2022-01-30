@@ -1,8 +1,17 @@
-import h3
 import json
+
 from fuzzywuzzy import fuzz
+import h3
 from pyspark.sql.functions import udf
-from pyspark.sql.types import ArrayType, DoubleType, FloatType, IntegerType, StringType, StructField, StructType
+from pyspark.sql.types import (
+    ArrayType,
+    DoubleType,
+    FloatType,
+    IntegerType,
+    StringType,
+    StructField,
+    StructType,
+)
 from shapely.geometry import shape
 
 DEFAULT_RESOLUTION = 11
@@ -44,12 +53,14 @@ def create_geo_json_based_on_coordinates(coordinates: [[float]]):
         return
 
     last_index = len(coordinates) - 1
-    geo_json_type = 'Polygon'
+    geo_json_type = "Polygon"
 
-    if (coordinates[0][0] != coordinates[last_index][0]) or (coordinates[0][1] != coordinates[last_index][1]):
-        geo_json_type = 'LineString'
+    if (coordinates[0][0] != coordinates[last_index][0]) or (
+        coordinates[0][1] != coordinates[last_index][1]
+    ):
+        geo_json_type = "LineString"
 
-    geo_json_coordinates = [coordinates] if geo_json_type == 'Polygon' else coordinates
+    geo_json_coordinates = [coordinates] if geo_json_type == "Polygon" else coordinates
     geo_json = json.dumps(dict(type=geo_json_type, coordinates=geo_json_coordinates))
 
     if shape(json.loads(geo_json)).is_valid:
@@ -59,9 +70,14 @@ def create_geo_json_based_on_coordinates(coordinates: [[float]]):
 
 
 # Get the centroid of a GeoJSON string
-@udf(returnType=StructType([
-    StructField(name='latitude', dataType=FloatType()), StructField(name='longitude', dataType=FloatType())
-]))
+@udf(
+    returnType=StructType(
+        [
+            StructField(name="latitude", dataType=FloatType()),
+            StructField(name="longitude", dataType=FloatType()),
+        ]
+    )
+)
 def get_centroid_of_geo_json(geo_json: str):
     if geo_json:
         geo_json = json.loads(geo_json)
@@ -92,7 +108,9 @@ def concat_list_of_key_value_pairs(tags):
 
 # Calculate the confidence of a Google result based on the name and H3 distance"""
 @udf(returnType=DoubleType())
-def get_confidence_based_h3_and_name_distance(h3_distance: int, name_distance: int, max_h3_distance: int):
+def get_confidence_based_h3_and_name_distance(
+    h3_distance: int, name_distance: int, max_h3_distance: int
+):
     def get_h3_confidence(d):
         if d <= 25:
             return 1
@@ -105,13 +123,17 @@ def get_confidence_based_h3_and_name_distance(h3_distance: int, name_distance: i
     h3_confidence = get_h3_confidence(h3_distance) if h3_distance else None
     name_confidence = get_name_confidence(name_distance)
 
-    return (h3_confidence * (2 / 3) + name_confidence * (1 / 3)) if h3_confidence else name_confidence
+    return (
+        (h3_confidence * (2 / 3) + name_confidence * (1 / 3))
+        if h3_confidence
+        else name_confidence
+    )
 
 
 # Based on the confidence build the POI id using the H3 index and OSM id
 @udf(returnType=StringType())
 def build_poi_id_based_on_confidence(confidence, h3_index_google, h3_index_osm, osm_id):
     if confidence and confidence >= 0.9:
-        return f'{h3_index_google}_{osm_id}'
+        return f"{h3_index_google}_{osm_id}"
 
-    return f'{h3_index_osm}_{osm_id}'
+    return f"{h3_index_osm}_{osm_id}"

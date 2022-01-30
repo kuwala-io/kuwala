@@ -9,5 +9,5 @@ def print_elapsed_time(exit_event):
         if exit_event.is_set():
             break
 
-        print(f'Running for {round(time.time() - start_time)} s', end='\r')
+        print(f"Running for {round(time.time() - start_time)} s", end="\r")
         sleep(1)
