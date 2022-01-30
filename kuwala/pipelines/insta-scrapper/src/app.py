@@ -26,7 +26,7 @@ app.register_blueprint(reels)
 app.register_blueprint(igtv)
 
 @app.route('/')
-async def hello():
+def hello():
     return 'Running Insta Scrapper API on 3016'
 
 environment = sys.argv[1] if len(sys.argv) > 1 else 'local'

@@ -1,6 +1,6 @@
-from charset_normalizer import logging
+from venv import create
 from instascrape import *
-from utils.session import generate_header
+from utils.session import create_proxy_session
 
 def process_by_type(data, type):
     result = []
@@ -23,40 +23,37 @@ def process_by_type(data, type):
 def process_bulk(data, processor):
     result = []
     for item in data:
-        result.append(processor(item))
+        session = create_proxy_session()
+        result.append(processor(item, session))
     return result
 
-def process_hashtag(url):
+def process_hashtag(url, session):
     temp = Hashtag(url)
-    temp.scrape()
+    temp.scrape(session=session)
     return temp.to_dict()
 
-def process_post(url):
+def process_post(url, session):
     temp = Post(url)
-    temp.scrape()
+    temp.scrape(session=session)
     return temp.to_dict()
 
-def process_profile(url):
+def process_profile(url, session):
     temp = Profile(url)
-    temp.scrape()
+    temp.scrape(session=session)
     return temp.to_dict()
 
-def process_location(url):
+def process_location(url, session):
     temp = Location(url)
-    header = generate_header()
-    if header == False:
-        logging.warning("Failed to get data, provide a correct header")
-        return None
-    temp.scrape(headers=header)
+    temp.scrape(session=session)
     temp.to_dict()
     return temp
 
-def process_reel(url):
+def process_reel(url, session):
     temp = Reel(url)
-    temp.scrape()
+    temp.scrape(session=session)
     return temp.to_dict()
 
-def process_igtv(url):
+def process_igtv(url, session):
     temp = IGTV(url)
-    temp.scrape()
+    temp.scrape(session=session)
     return temp.to_dict()
