@@ -77,6 +77,7 @@ def scrape_location(
                 ## Get Data Points
                 data = result['graphql']['location']['edge_location_to_media']
                 location_info = result['graphql']['location']
+                location_directory = result['graphql']['directory']
                 total_posts = data['count']
                 node_list = data['edges']
                 number_of_post_scrapped = number_of_post_scrapped + len(node_list) if isinstance(len(node_list), int) else 0
@@ -92,6 +93,10 @@ def scrape_location(
                     'lat': location_info['lat'],
                     'long': location_info['lng'],
                     'h3': str(h3_index),
+                    'country': location_directory['country']['name'],
+                    'country_id': location_directory['country']['id'],
+                    'city': location_directory['city']['name'],
+                    'city_id': location_directory['city']['id']
                 }
 
                 ## Enrich & Shape data
