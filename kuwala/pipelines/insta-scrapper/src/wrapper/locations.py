@@ -1,5 +1,6 @@
 from func_timeout import func_timeout
 from scrapper import locations
+import os
 
 def location_wrapper(
     max_sessions,
@@ -22,7 +23,10 @@ def location_wrapper(
     ## Read number of scrapped post
     if continue_last_cursor == True:
         try:
-            file = open(f"data/location_{location_id}.csv", "r")
+            file_name = f"data_location_{location_id}.csv"
+            dir_path = locations.get_locations_file_path()
+            file_path = f'{dir_path}/{file_name}'
+            file = open(file_path, "r")
             line_count = 0
             for line in file:
                 if line != "\n":

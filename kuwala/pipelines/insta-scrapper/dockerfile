@@ -6,4 +6,4 @@ WORKDIR /opt/app/pipelines/insta-scrapper
 RUN pip install --no-cache-dir -r requirements.txt
 
 WORKDIR /opt/app/pipelines/insta-scrapper/src
-ENTRYPOINT [ "python", "app.py"]
+ENTRYPOINT [ "python", "main.py"]

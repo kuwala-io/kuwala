@@ -9,7 +9,7 @@ if __name__ == '__main__':
 
     ## Necessary Arguments
     parser.add_argument('--location_id', help='Location id to scrape', default='')
-    parser.add_argument('--process_type', help='Available type = locations | hashtag | profile', default='')
+    parser.add_argument('--type', help='Available type = locations | hashtag | profile', default='')
 
     ## Optional Arguments
     parser.add_argument('--max_sessions', help='Maximum tor session created', default=1000)
@@ -34,7 +34,7 @@ if __name__ == '__main__':
     location_id = args.location_id
     request_sleep_time = args.request_sleep_time
     headers = args.headers
-    process_type = args.process_type
+    process_type = args.type
 
     if process_type == 'locations':
         print('\nScrapping locations')

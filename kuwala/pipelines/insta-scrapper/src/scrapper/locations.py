@@ -104,8 +104,12 @@ def scrape_location(
 
                 ## Load Data & Need To Append CSV
                 pf = pd.json_normalize(posts)
-                file_name = f"data/location_{location_id}.csv"
-                pf.to_csv(file_name, mode='a', header=not os.path.exists(file_name), index=False)
+                file_name = f"data_location_{location_id}.csv"
+                dir_path = get_locations_file_path()
+                file_path = f'{dir_path}/{file_name}'
+                
+                pf.to_csv(file_path, mode='a', header=not os.path.exists(file_path), index=False)
+                
 
                 # Determine Next Cursor
                 
@@ -203,3 +207,15 @@ def get_h3_index(lat, lng):
     except Exception as e:
         print(f"Failed to convert H3 {e}")
         return None
+
+def get_locations_file_path():
+    current_file = os.path.dirname(__file__)
+    
+    res = os.path.abspath(current_file+'/../../../../tmp/kuwala/insta_pipelines/locations')
+
+    isExist = os.path.exists(res)
+
+    if not isExist:
+        os.makedirs(res)
+    
+    return res
