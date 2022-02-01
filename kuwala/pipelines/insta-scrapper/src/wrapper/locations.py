@@ -20,7 +20,7 @@ def location_wrapper(
         return
 
     ## Read number of scrapped post
-    if continue_last_cursor:
+    if continue_last_cursor == True:
         try:
             file = open(f"data/location_{location_id}.csv", "r")
             line_count = 0
@@ -54,16 +54,16 @@ def location_wrapper(
                 locations.scrape_location, 
                 args=([
                     location_id,
-                    "",
                     continue_last_cursor, # Continue Last Cursor Default to False
                     log_error, # Log Error default to False
-                    max_request_per_session, # Max Request per Session Default to 100
+                    max_request_per_session, # Max Request per Session Default to 1000
                     scrapped_posts, # Number of Post Scrapped
                     max_posts,# Maximum Number of Post to Scrape,
                     headers,
                     request_sleep_time, # 15+ Seconds is Recommended
                 ])
             )
+            continue_last_cursor = True # Will keep continuing the cursor until terminated
 
             if temp_res == "NO_LOCATION_ID":
                 print("\n=== Make sure location id is supplied! ===\n")

@@ -7,7 +7,6 @@ def test_tor_network():
             torobj = sess.adapters.popitem()[1]
             router = torobj._tor_info._guard._router
             print(f'Relay Address: {router._ip}\n')
-            i = 0
             return
 
 def get_relay_address(relay_sesssion):

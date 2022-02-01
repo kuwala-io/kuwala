@@ -1,7 +1,4 @@
-from pkg_resources import ResolutionError
-from torpy.http.requests import TorRequests, tor_requests_session
-from tqdm import tqdm
-import json
+from torpy.http.requests import TorRequests
 from utils import tor
 import time
 import pandas as pd
@@ -9,8 +6,7 @@ import h3
 import os
 
 def scrape_location(
-        location_id='', 
-        request_cursor ='', 
+        location_id='',  
         continue_last_cursor=False, 
         log_error = False,
         max_request_per_session = 100,
@@ -23,6 +19,8 @@ def scrape_location(
     if not location_id or location_id == '':
         return "NO_LOCATION_ID"
 
+    request_cursor = ''
+
     with TorRequests() as tor_requests:
         
         with tor_requests.get_session() as sess:
@@ -31,7 +29,7 @@ def scrape_location(
             number_of_requests = 0
 
             ## Check if it continues from the latest cusor
-            if continue_last_cursor:
+            if continue_last_cursor == True:
                 ## Read & Set Latest Cusor as Current Request Cursor
                 try:
                     with open(f"cursors/location_{location_id}.txt", 'r') as f:
@@ -40,6 +38,8 @@ def scrape_location(
                 except:
                     print("Cursor not found, fresh start")
                     request_cursor = ''
+            else:
+                print('Fresh start')
             
             # Request Loop for This Tor Session
             while number_of_requests < max_request_per_session:
@@ -133,6 +133,7 @@ def scrape_location(
                 if number_of_post_scrapped >= total_posts:
                     return "ALL_POST_SCRAPPED"
                 
+                continue_last_cursor = True
                 number_of_requests = number_of_requests + 1
                 print(f'Sleep for {request_sleep_time} Seconds ----')
                 time.sleep(request_sleep_time)
@@ -185,6 +186,7 @@ def enrich_and_shape_post(post, key_info):
         post['post_width'] = post['dimensions']['width']
         del post['dimensions']
     except Exception as e:
+        print('Error when shaping data')
         print(e)
 
     # Merge 2 Dict
