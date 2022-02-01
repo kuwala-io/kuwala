@@ -22,7 +22,7 @@ def location_wrapper(
     ## Read number of scrapped post
     if continue_last_cursor:
         try:
-            file = open(f"data_{location_id}.csv", "r")
+            file = open(f"data/location_{location_id}.csv", "r")
             line_count = 0
             for line in file:
                 if line != "\n":
@@ -34,7 +34,7 @@ def location_wrapper(
             print(f"\nContinue Last Session specified but no CSV file found")
 
         try:
-            file =open(f"cursors_{location_id}.txt", 'r')
+            file =open(f"cursors/location_{location_id}.txt", 'r')
             last_cursor = file.readlines()[-1]
             if last_cursor.strip() == "LAST_CURSOR_REACHED":
                 print("\n=== Last Session is Already Reached Last Page ===\n")

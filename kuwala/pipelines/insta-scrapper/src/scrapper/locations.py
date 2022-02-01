@@ -34,7 +34,7 @@ def scrape_location(
             if continue_last_cursor:
                 ## Read & Set Latest Cusor as Current Request Cursor
                 try:
-                    with open(f"cursors_{location_id}.txt", 'r') as f:
+                    with open(f"cursors/location_{location_id}.txt", 'r') as f:
                         request_cursor = f.readlines()[-1]
                         print(f"Continuing from last Session with Cursor {request_cursor}")
                 except:
@@ -77,7 +77,7 @@ def scrape_location(
                 ## Get Data Points
                 data = result['graphql']['location']['edge_location_to_media']
                 location_info = result['graphql']['location']
-                location_directory = result['graphql']['directory']
+                location_directory = result['graphql']['location']['directory']
                 total_posts = data['count']
                 node_list = data['edges']
                 number_of_post_scrapped = number_of_post_scrapped + len(node_list) if isinstance(len(node_list), int) else 0
@@ -104,7 +104,7 @@ def scrape_location(
 
                 ## Load Data & Need To Append CSV
                 pf = pd.json_normalize(posts)
-                file_name = f"data_{location_id}.csv"
+                file_name = f"data/location_{location_id}.csv"
                 pf.to_csv(file_name, mode='a', header=not os.path.exists(file_name), index=False)
 
                 # Determine Next Cursor
@@ -123,7 +123,7 @@ def scrape_location(
                 request_cursor = response_end_cursor
 
                 ## Saves the Cursor into file
-                file = open(f"cursors_{location_id}.txt", 'a')
+                file = open(f"cursors/location_{location_id}.txt", 'a')
                 file.write(str(request_cursor)+'\n')
                 file.close()
 
@@ -151,7 +151,7 @@ def enrich_and_shape_post(post, key_info):
     # Flatten and Rename
     try:
         try:
-            post['caption'] = post['edge_media_to_caption']['edges'][0]['node']['text']
+            post['caption'] = "".join(str(post['edge_media_to_caption']['edges'][0]['node']['text']).splitlines())
         except:
             post['caption'] = ''
         finally:
