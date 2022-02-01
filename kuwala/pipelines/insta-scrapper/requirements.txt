@@ -22,6 +22,7 @@ func-timeout==4.3.5
 geopandas==0.10.2
 h11==0.12.0
 h2==4.1.0
+h3==3.7.3
 hpack==4.0.0
 hypercorn==0.13.2
 hyperframe==6.0.1
