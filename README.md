@@ -66,7 +66,7 @@ Uber. For the complete documentation please go to the [H3 Repo](https://github.c
 
 #### Prerequisites
 
-Installed version of *Python3*, *Docker* and 
+Installed version of *^Python3.7*, *Docker* and 
 *docker-compose v2* ([*Go here for instructions*](https://docs.docker.com/compose/install/)) or use the Binder batch in 
 the next section.
 
@@ -165,9 +165,10 @@ is possible to run the pipeline locally and use [Uber's H3](https://eng.uber.com
 geographical transformations. We will then take the responsibility to maintain your pipeline.
 
 ***Note: To submit a pull request, please fork the project and then submit a PR to the base repo.***
+
 ***Note: For Python contributors, please install these linters/formatters listed below***
 
-1. Install prerequisites: `poetry install`
+1. Install prerequisites: `pip install poetry && poetry install`
 2. Format your code before committing: `make format`
 3. If no exception then you're good to go
 ### Liberating the Work With Data
