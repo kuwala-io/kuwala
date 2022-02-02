@@ -2,7 +2,7 @@ name: Build Jupyter Docker image
 on:
   push:
     branches:
-    - '*'
+    - 'master'
   pull_request:
     branches:
     - '**'

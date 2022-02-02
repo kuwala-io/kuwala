@@ -2,7 +2,7 @@ name: Build admin boundaries Docker image
 on:
   push:
     branches:
-    - '*'
+    - 'master'
   pull_request:
     branches:
     - '**'

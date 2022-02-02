@@ -170,7 +170,8 @@ geographical transformations. We will then take the responsibility to maintain y
 
 1. Install prerequisites: `pip install poetry && poetry install`
 2. Format your code before committing: `make format`
-3. If no exception then you're good to go
+3. Run linter on your code before committing: `make lint`
+4. If no exception then you're good to go
 ### Liberating the Work With Data
 
 By working together as a community of data enthusiasts, we can create a network of seamlessly integratable pipelines. 

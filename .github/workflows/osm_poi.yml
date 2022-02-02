@@ -2,7 +2,7 @@ name: Build OSM-POI Docker image
 on:
   push:
     branches:
-    - '*'
+    - 'master'
   pull_request:
     branches:
     - '**'

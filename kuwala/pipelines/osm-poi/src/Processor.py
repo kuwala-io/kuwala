@@ -6,7 +6,7 @@ import time
 
 import nominatim_controller
 from pyspark.sql import DataFrame, SparkSession
-from pyspark.sql.functions import coalesce, col, explode, lit, udf
+from pyspark.sql.functions import col, lit, udf
 from pyspark.sql.types import (
     ArrayType,
     BooleanType,
