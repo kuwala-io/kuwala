@@ -1,38 +1,43 @@
+import os
+
 import geojson
 import h3
-import os
-from pyspark.ml.feature import MinMaxScaler
-from pyspark.ml.feature import VectorAssembler
 from pyspark.ml import Pipeline
+from pyspark.ml.feature import MinMaxScaler, VectorAssembler
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, lit, udf
 from pyspark.sql.types import DoubleType, StringType
+
 from kuwala.dbt.src.controller.kuwala_dbt_controller import KuwalaDbtController
 
 
 def get_dbt_controller():
-    dbt_host = os.getenv('DBT_HOST')
+    dbt_host = os.getenv("DBT_HOST")
     script_dir = os.path.dirname(__file__)
-    result_path = os.path.join(script_dir, '../tmp/kuwala/transformer')
+    result_path = os.path.join(script_dir, "../tmp/kuwala/transformer")
 
-    return KuwalaDbtController(dbt_path='../dbt/dbt', dbt_host=dbt_host, result_path=result_path)
+    return KuwalaDbtController(
+        dbt_path="../dbt/dbt", dbt_host=dbt_host, result_path=result_path
+    )
 
 
 # Create a Spark session that is use to query and transform data from the database
 def get_spark_session(memory_in_gb):
-    return SparkSession \
-        .builder \
-        .appName('jupyter') \
-        .config('spark.driver.memory', f'{memory_in_gb}g') \
+    return (
+        SparkSession.builder.appName("jupyter")
+        .config("spark.driver.memory", f"{memory_in_gb}g")
         .getOrCreate()
+    )
 
 
 # Get all the H3 indexes inside a polygon
 def polyfill_polygon(polygon: geojson.Polygon, resolution):
     # noinspection PyUnresolvedReferences
-    h3_indexes = h3.polyfill(dict(type=polygon.type, coordinates=polygon.coordinates),
-                             resolution,
-                             geo_json_conformant=True)
+    h3_indexes = h3.polyfill(
+        dict(type=polygon.type, coordinates=polygon.coordinates),
+        resolution,
+        geo_json_conformant=True,
+    )
 
     return h3_indexes
 
@@ -47,7 +52,9 @@ def add_h3_index_column(df, lat_column, lng_column, resolution):
         except TypeError:
             return None
 
-    return df.withColumn('h3_index', get_h3_index(col(lat_column), col(lng_column), lit(resolution)))
+    return df.withColumn(
+        "h3_index", get_h3_index(col(lat_column), col(lng_column), lit(resolution))
+    )
 
 
 # Normalize one or multiple columns using a min-max scaler
@@ -64,6 +71,11 @@ def scale_spark_columns(df, columns):
         # Pipeline of VectorAssembler and MinMaxScaler
         pipeline = Pipeline(stages=[assembler, scaler])
         # Fitting pipeline on dataframe
-        df = pipeline.fit(df).transform(df).withColumn(i + "_scaled", unlist(i + "_scaled")).drop(i + "_vect")
+        df = (
+            pipeline.fit(df)
+            .transform(df)
+            .withColumn(i + "_scaled", unlist(i + "_scaled"))
+            .drop(i + "_vect")
+        )
 
     return df

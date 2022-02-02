@@ -1,4 +1,5 @@
 import os
+
 from python_utils.src.FileDownloader import download_file
 from python_utils.src.FileSelector import select_osm_file
 import urllib.request as req
@@ -17,17 +18,20 @@ class Downloader:
             file = select_osm_file()
 
         script_dir = os.path.dirname(__file__)
-        file_path = os.path.join(script_dir, f'../../../tmp/kuwala/osm_files/{args.continent or file["continent"]}')
+        file_path = os.path.join(
+            script_dir,
+            f'../../../tmp/kuwala/osm_files/{args.continent or file["continent"]}',
+        )
 
-        if args.country or (file and file['country']):
+        if args.country or (file and file["country"]):
             file_path += f'/{args.country or file["country"]}'
 
-        if args.country_region or (file and file['country_region']):
+        if args.country_region or (file and file["country_region"]):
             file_path += f'/{args.country_region or file["country_region"]}'
 
-        file_path += '/pbf/geo_fabrik.osm.pbf'
+        file_path += "/pbf/geo_fabrik.osm.pbf"
 
-        download_file(url=args.url or file['url'], path=file_path)
+        download_file(url=args.url or file["url"], path=file_path)
 
     @staticmethod
     def download_names():
@@ -41,7 +45,7 @@ class Downloader:
             with zipfile.ZipFile(temp_files_dir+'main.zip', 'r') as zip_ref:
                 zip_ref.extractall(temp_files_dir)
             os.remove(temp_files_dir+'main.zip')
-            
+
 
         file_paths=[temp_files_dir+'name-suggestion-index-main/data/brands',temp_files_dir+'name-suggestion-index-main/data/operators']
         data = {'id': [], 'display_name': [], 'wiki_data': []}
@@ -67,7 +71,7 @@ class Downloader:
                                 data['id'].append(id)
                                 data['display_name'].append(display_name)
                                 data['wiki_data'].append(wiki_data)
-        
+
         shutil.rmtree(temp_files_dir+'name-suggestion-index-main')
         df=pd.DataFrame(data)
         df.drop_duplicates(subset=['display_name','wiki_data'])

@@ -1,15 +1,15 @@
+import re
+
+from config.h3.h3_config import POI_RESOLUTION
 import h3
 import moment
-import re
-import src.utils.google as google
-from config.h3.h3_config import POI_RESOLUTION
-from quart import abort, Blueprint, request
+from quart import Blueprint, abort, request
 from src.utils.array_utils import get_nested_value
-from src.utils.futures import execute_futures
-
 from src.utils.cat_mapping import complete_categories
+from src.utils.futures import execute_futures
+import src.utils.google as google
 
-poi_information = Blueprint('poi-information', __name__)
+poi_information = Blueprint("poi-information", __name__)
 
 
 def parse_opening_hours(opening_hours):
@@ -28,21 +28,32 @@ def parse_opening_hours(opening_hours):
 
         return dict(
             date=str(moment.date(date)),
-            opening_time=str(moment.date(date).add(
-                hours=opening_time_hours,
-                minutes=opening_time_minutes
-            )) if opening_time_hours is not None else None,
-            closing_time=str(moment.date(date).add(
-                days=1 if  # Necessary if closing at midnight or later or when place is open 24 hours (all values 0)
-                closing_time_hours < opening_time_hours | (
-                        opening_time_hours == 0 &
-                        opening_time_minutes == 0 &
-                        closing_time_hours == 0 &
-                        closing_time_minutes == 0
-                ) else 0,
-                hours=closing_time_hours,
-                minutes=closing_time_minutes
-            )) if closing_time_hours is not None else None
+            opening_time=str(
+                moment.date(date).add(
+                    hours=opening_time_hours, minutes=opening_time_minutes
+                )
+            )
+            if opening_time_hours is not None
+            else None,
+            closing_time=str(
+                moment.date(date).add(
+                    days=1
+                    if closing_time_hours  # Necessary if closing at midnight or later or when place is open 24 hours (all values 0)
+                    < opening_time_hours
+                    | (
+                        opening_time_hours
+                        == 0 & opening_time_minutes
+                        == 0 & closing_time_hours
+                        == 0 & closing_time_minutes
+                        == 0
+                    )
+                    else 0,
+                    hours=closing_time_hours,
+                    minutes=closing_time_minutes,
+                )
+            )
+            if closing_time_hours is not None
+            else None,
         )
 
     return list(map(parse_list, opening_hours))
@@ -50,7 +61,7 @@ def parse_opening_hours(opening_hours):
 
 def parse_waiting_time_data(waiting_time_data):
     """Parse waiting time string to minutes"""
-    numbers = re.findall(r'\d+', waiting_time_data)
+    numbers = re.findall(r"\d+", waiting_time_data)
 
     if len(numbers) == 0:
         waiting_time = 0
@@ -77,38 +88,42 @@ def parse_popularity_data(popularity_data, timezone):
         # Create timestamps for each hour of the week and set popularity and waiting time to 0 by default since the
         # returned popularity array doesn't necessarily cover all 24 hours of a day but only relevant hours
         for h in range(24):
-            timestamp = str(moment.utcnow().timezone(timezone).replace(
-                weekday=weekday,
-                hours=h,
-                minutes=0,
-                seconds=0
-            ))
+            timestamp = str(
+                moment.utcnow()
+                .timezone(timezone)
+                .replace(weekday=weekday, hours=h, minutes=0, seconds=0)
+            )
 
             p.append(dict(timestamp=timestamp, popularity=0))
             w.append(dict(timestamp=timestamp, waiting_time=0))
 
         if day[1] is not None:
             for p_info in day[1]:
-                timestamp = str(moment.utcnow().timezone(timezone).replace(
-                    weekday=weekday,
-                    hours=p_info[0],
-                    minutes=0,
-                    seconds=0
-                ))
-                index = next((i for i, item in enumerate(p) if item['timestamp'] == timestamp), -1)
-                p[index]['popularity'] = p_info[1]
+                timestamp = str(
+                    moment.utcnow()
+                    .timezone(timezone)
+                    .replace(weekday=weekday, hours=p_info[0], minutes=0, seconds=0)
+                )
+                index = next(
+                    (i for i, item in enumerate(p) if item["timestamp"] == timestamp),
+                    -1,
+                )
+                p[index]["popularity"] = p_info[1]
 
                 # check if the waiting string is available and convert to minutes
                 if len(p_info) > 5:
                     includes_waiting_time = True
-                    w[index]['waiting_time'] = parse_waiting_time_data(p_info[3])
+                    w[index]["waiting_time"] = parse_waiting_time_data(p_info[3])
 
         popularity += p
         waiting_time += w
 
-    return \
-        sorted(popularity, key=lambda x: x['timestamp']), \
-        sorted(waiting_time, key=lambda x: x['timestamp']) if includes_waiting_time else None
+    return (
+        sorted(popularity, key=lambda x: x["timestamp"]),
+        sorted(waiting_time, key=lambda x: x["timestamp"])
+        if includes_waiting_time
+        else None,
+    )
 
 
 def parse_spending_time_data(spending_time_data):
@@ -116,34 +131,40 @@ def parse_spending_time_data(spending_time_data):
         return None
 
     # Example: 'People typically spend up to 25 min here'
-    numbers = [float(f) for f in re.findall(r'\d*\.\d+|\d+', spending_time_data.replace(',', '.'))]
-    contains_min = 'min' in spending_time_data
-    contains_hour = 'hour' in spending_time_data or 'hr' in spending_time_data
+    numbers = [
+        float(f)
+        for f in re.findall(r"\d*\.\d+|\d+", spending_time_data.replace(",", "."))
+    ]
+    contains_min = "min" in spending_time_data
+    contains_hour = "hour" in spending_time_data or "hr" in spending_time_data
     spending_time = None
 
     if contains_min and contains_hour:
         spending_time = [numbers[0], numbers[1] * 60]
     elif contains_hour:
-        spending_time = [numbers[0] * 60, (numbers[0] if len(numbers) == 1 else numbers[1]) * 60]
+        spending_time = [
+            numbers[0] * 60,
+            (numbers[0] if len(numbers) == 1 else numbers[1]) * 60,
+        ]
     elif contains_min:
         spending_time = [numbers[0], numbers[0] if len(numbers) == 1 else numbers[1]]
 
     return [int(t) for t in spending_time]
 
 
-@poi_information.route('/poi-information', methods=['GET'])
+@poi_information.route("/poi-information", methods=["GET"])
 async def get_poi_information():
     """Retrieve POI information for an array of ids"""
     ids = await request.get_json()
-    
+
     if ids is None:
-        abort(400, description='Invalid request body, is the request body type a JSON?')
+        abort(400, description="Invalid request body, is the request body type a JSON?")
 
     if len(ids) > 100:
-        abort(400, description='You can send at most 100 ids at once.')
+        abort(400, description="You can send at most 100 ids at once.")
 
     def parse_result(r):
-        data = r['data'][6]
+        data = r["data"][6]
         name = get_nested_value(data, 11)
         place_id = get_nested_value(data, 78)
         lat = get_nested_value(data, 9, 2)
@@ -159,8 +180,11 @@ async def get_poi_information():
         timezone = get_nested_value(data, 30)
         categories = [t[0] for t in (get_nested_value(data, 76) or [])]
         opening_hours = parse_opening_hours(get_nested_value(data, 34, 1))
-        permanently_closed = get_nested_value(data, 88, 0) == 'CLOSED'
-        temporarily_closed = get_nested_value(data, 96, 5, 0, 2) == 'Reopen this place' and not permanently_closed
+        permanently_closed = get_nested_value(data, 88, 0) == "CLOSED"
+        temporarily_closed = (
+            get_nested_value(data, 96, 5, 0, 2) == "Reopen this place"
+            and not permanently_closed
+        )
         inside_of = get_nested_value(data, 93, 0, 0, 0, 1)
         phone = get_nested_value(data, 178, 0, 3)
         website = get_nested_value(data, 7, 0)
@@ -175,7 +199,7 @@ async def get_poi_information():
             popularity, waiting_time = parse_popularity_data(popularity_data, timezone)
 
         return dict(
-            id=r['id'],
+            id=r["id"],
             data=dict(
                 name=name,
                 place_id=place_id,
@@ -189,12 +213,14 @@ async def get_poi_information():
                 inside_of=inside_of,
                 contact=dict(phone=phone, website=website),
                 opening_hours=opening_hours,
-                rating=dict(stars=rating_stars, number_of_reviews=rating_number_of_reviews),
+                rating=dict(
+                    stars=rating_stars, number_of_reviews=rating_number_of_reviews
+                ),
                 price_level=len(price_level) if price_level else None,
                 popularity=popularity,
                 waiting_time=waiting_time,
-                spending_time=spending_time
-            )
+                spending_time=spending_time,
+            ),
         )
 
     return execute_futures(ids, google.get_by_id, parse_result)
