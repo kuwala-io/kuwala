@@ -1,26 +1,26 @@
-import h3
-import src.utils.google as google
 from config.h3.h3_config import POI_RESOLUTION
-from quart import abort, Blueprint, request
+import h3
+from quart import Blueprint, abort, request
 from src.utils.array_utils import get_nested_value
 from src.utils.futures import execute_futures
+import src.utils.google as google
 
-search = Blueprint('search', __name__)
+search = Blueprint("search", __name__)
 
 
-@search.route('/search', methods=['GET'])
+@search.route("/search", methods=["GET"])
 async def search_places():
     """Retrieve placeIDs for an array of query strings"""
     queries = await request.get_json()
 
     if queries is None:
-        abort(400, description='Invalid request body, is the request body type a JSON?')
+        abort(400, description="Invalid request body, is the request body type a JSON?")
 
     if len(queries) > 100:
-        abort(400, description='You can send at most 100 queries at once.')
+        abort(400, description="You can send at most 100 queries at once.")
 
     def parse_result(r):
-        data = r['data']
+        data = r["data"]
 
         if data:
             lat = get_nested_value(data, 9, 2)
@@ -35,15 +35,15 @@ async def search_places():
                 name = get_nested_value(data, 11)
 
                 return dict(
-                    query=r['query'],
+                    query=r["query"],
                     data=dict(
                         location=dict(lat=lat, lng=lng),
                         h3_index=h3_index,
                         id=pb_id,
-                        name=name
-                    )
+                        name=name,
+                    ),
                 )
 
-        return dict(query=r['query'], data=None)
+        return dict(query=r["query"], data=None)
 
     return execute_futures(queries, google.search, parse_result)
