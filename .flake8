@@ -6,8 +6,10 @@ ignore =
     W503,
     # E501: Line too long
     E501,
-    ; whitespace before ':'
-    E203
+    # E203: whitespace before ':'
+    E203,
+    # E402: module level import not at top of file
+    E402
 exclude =
     .git,
     __pycache__,
