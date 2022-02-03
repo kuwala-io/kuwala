@@ -23,7 +23,6 @@ from python_utils.src.spark_udfs import (
     get_centroid_of_geo_json,
     get_h3_index,
 )
-import pandas as pd
 
 DEFAULT_RESOLUTION = 15
 
@@ -339,37 +338,6 @@ class Processor:
 
         return df_node.union(df_way).union(df_relation)
 
-    # search brands and oprerator from brand_names.csv and put that into pyspark dataframe
-
-    @staticmethod
-    def name_matching(script_dir,spark, df_strings) -> DataFrame:
-            names=pd.read_csv(os.path.join(script_dir, '../../../tmp/kuwala/osm_files/brand_names.csv'))['display_name'].tolist()
-
-            names=spark.sparkContext.broadcast(names)
-
-            @udf(returnType=StringType())
-            def brand_and_operator_name_matching(df_strings):
-                similar_name_score=-1;best_match=None
-
-                #Check if the input is empty
-                if(str(df_strings)=='nan'):
-                    return best_match
-
-                #name matching
-                for name in names:
-                    distance=get_string_distance(df_strings, name)
-                    if(distance>similar_name_score):
-                        similar_name_score=distance
-                        best_match=name
-
-                return best_match
-
-            return df_strings \
-            .withColumn('brand_matched', brand_and_operator_name_matching(col('brand'))) \
-            .withColumn('operator_matched', brand_and_operator_name_matching(col('operator'))).withColumn('name_matched', brand_and_operator_name_matching(col('name')))
-
-
-
     @staticmethod
     def start(args):
         script_dir = os.path.dirname(__file__)
@@ -435,8 +403,6 @@ class Processor:
         df_relation = Processor.df_add_h3_index(df_relation)
         # Combine all data frames
         df_pois = Processor.combine_pois(df_node, df_way, df_relation)
-
-        df_pois = Processor.name_matching(script_dir, spark, df_pois)
 
         df_pois.write.mode("overwrite").parquet(file_path + "/parquet/kuwala.parquet")
 

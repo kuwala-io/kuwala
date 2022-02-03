@@ -1,6 +1,5 @@
 import json
 
-from thefuzz import fuzz
 import h3
 from pyspark.sql.functions import udf
 from pyspark.sql.types import (
@@ -13,6 +12,7 @@ from pyspark.sql.types import (
     StructType,
 )
 from shapely.geometry import shape
+from thefuzz import fuzz
 
 DEFAULT_RESOLUTION = 11
 

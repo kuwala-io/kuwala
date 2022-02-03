@@ -3,7 +3,6 @@ import os
 from time import sleep
 import urllib.error
 
-from thefuzz import fuzz
 from hdx.data.dataset import Dataset
 from hdx.data.organization import Organization
 from hdx.hdx_configuration import Configuration
@@ -12,6 +11,7 @@ import pycountry_convert as pcc
 from pyquery import PyQuery
 import questionary
 import requests.exceptions
+from thefuzz import fuzz
 
 CONTINENTS = [
     {"code": "af", "name": "Africa", "geofabrik": "africa"},
@@ -27,7 +27,7 @@ CONTINENTS = [
 
 def select_local_country(directory):
     continents = os.listdir(directory)
-    continents.remove('brand_names.csv')
+    continents.remove("brand_names.csv")
     continent_names = list(
         map(
             lambda c: pcc.convert_continent_code_to_continent_name(c.upper()),

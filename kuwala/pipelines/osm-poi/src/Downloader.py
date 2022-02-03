@@ -1,13 +1,14 @@
+import json
+import logging as log
 import os
-
-from python_utils.src.FileDownloader import download_file
-from python_utils.src.FileSelector import select_osm_file
+import shutil
 import urllib.request as req
 import zipfile
-import json
+
 import pandas as pd
-import shutil
-import logging as log
+from python_utils.src.FileDownloader import download_file
+from python_utils.src.FileSelector import select_osm_file
+
 
 class Downloader:
     @staticmethod
@@ -35,46 +36,52 @@ class Downloader:
 
     @staticmethod
     def download_names():
-        temp_files_dir='../../../tmp/kuwala/osm_files/'
+        temp_files_dir = "../../../tmp/kuwala/osm_files/"
         # here, instead of cloning the repository that recommended using extra library,
         # we download the whole repo in zip, then extract it.
-        if not os.path.exists(temp_files_dir+'name-suggestion-index-main'):
+        if not os.path.exists(temp_files_dir + "name-suggestion-index-main"):
             log.info("Downloading brand and operator name reference...")
-            download_link='https://github.com/osmlab/name-suggestion-index/archive/refs/heads/main.zip'
-            req.urlretrieve(download_link, temp_files_dir+"main.zip")
-            with zipfile.ZipFile(temp_files_dir+'main.zip', 'r') as zip_ref:
+            download_link = "https://github.com/osmlab/name-suggestion-index/archive/refs/heads/main.zip"
+            req.urlretrieve(download_link, temp_files_dir + "main.zip")
+            with zipfile.ZipFile(temp_files_dir + "main.zip", "r") as zip_ref:
                 zip_ref.extractall(temp_files_dir)
-            os.remove(temp_files_dir+'main.zip')
+            os.remove(temp_files_dir + "main.zip")
 
-
-        file_paths=[temp_files_dir+'name-suggestion-index-main/data/brands',temp_files_dir+'name-suggestion-index-main/data/operators']
-        data = {'id': [], 'display_name': [], 'wiki_data': []}
+        file_paths = [
+            temp_files_dir + "name-suggestion-index-main/data/brands",
+            temp_files_dir + "name-suggestion-index-main/data/operators",
+        ]
+        data = {"id": [], "display_name": [], "wiki_data": []}
         log.info("Composing brand and operator name list...")
         for file_path in file_paths:
             for folder in os.listdir(file_path):
-                if os.path.isdir(os.path.join(file_path,folder)):
-                    for file in os.listdir(os.path.join(file_path,folder)):
-                        with open(os.path.join(file_path,folder,file)) as f:
-                            file_content=json.load(f)
-                        for item in file_content['items'] :
-                            wiki_data=id=display_name=None
-                            if ('id' in item.keys()):
-                                id=(dict(item)['id'])
-                            if ('displayName' in item.keys()):
-                                display_name=(dict(item)['displayName'])
-                            if ("tags" in item.keys()):
-                                if ('brand:wikidata' in list(item['tags'].keys())):
-                                    wiki_data=(dict(item["tags"].items())['brand:wikidata'])
-                                elif ('operator:wikidata' in list(item['tags'].keys())):
-                                    wiki_data=(dict(item["tags"].items())['operator:wikidata'])
-                            if str(id) != 'nan':
-                                data['id'].append(id)
-                                data['display_name'].append(display_name)
-                                data['wiki_data'].append(wiki_data)
+                if os.path.isdir(os.path.join(file_path, folder)):
+                    for file in os.listdir(os.path.join(file_path, folder)):
+                        with open(os.path.join(file_path, folder, file)) as f:
+                            file_content = json.load(f)
+                        for item in file_content["items"]:
+                            wiki_data = id = display_name = None
+                            if "id" in item.keys():
+                                id = dict(item)["id"]
+                            if "displayName" in item.keys():
+                                display_name = dict(item)["displayName"]
+                            if "tags" in item.keys():
+                                if "brand:wikidata" in list(item["tags"].keys()):
+                                    wiki_data = dict(item["tags"].items())[
+                                        "brand:wikidata"
+                                    ]
+                                elif "operator:wikidata" in list(item["tags"].keys()):
+                                    wiki_data = dict(item["tags"].items())[
+                                        "operator:wikidata"
+                                    ]
+                            if str(id) != "nan":
+                                data["id"].append(id)
+                                data["display_name"].append(display_name)
+                                data["wiki_data"].append(wiki_data)
 
-        shutil.rmtree(temp_files_dir+'name-suggestion-index-main')
-        df=pd.DataFrame(data)
-        df.drop_duplicates(subset=['display_name','wiki_data'])
-        df=df.sort_values('id')
-        df.to_csv(temp_files_dir+'brand_names.csv',index=False)
+        shutil.rmtree(temp_files_dir + "name-suggestion-index-main")
+        df = pd.DataFrame(data)
+        df.drop_duplicates(subset=["display_name", "wiki_data"])
+        df = df.sort_values("id")
+        df.to_csv(temp_files_dir + "brand_names.csv", index=False)
         log.info("Done!")
