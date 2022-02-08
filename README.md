@@ -1,11 +1,11 @@
 [![Slack](https://img.shields.io/badge/slack-chat-orange.svg)](https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-pXKFBjbnl7_P3nXtwca5ag)
 ![License](https://img.shields.io/github/license/kuwala-io/kuwala)
 
-<img src="./docs/images/slack_join_button_github.png" width="100" style="background-color: white" />
+<img src="./docs/images/kuwala_header_github.png" width="100%" style="background-color: white" />
 
-<p float="middle">
-  <img src="./docs/images/slack_join_button_github.png" width="100" />
-  <img src="./docs/images/roadmap_button_github.png" width="100" /> 
+<p float="center">
+  <img src="./docs/images/slack_join_button_github.png" />
+  <img src="./docs/images/roadmap_button_github.png" /> 
 </p>
 
 Kuwala is the no-code data platform for BI analysts and engineers enabling you to build powerful analytics workflows. We 
@@ -28,7 +28,7 @@ data project within scope while having fun again.
 - **The node-based editor enables analyst** to build advanced data workflows with many data sources and transformations through simple drag-and-drop
 - **With models-as-a-block** the BI analyst can launch advanced Marketing Mix Models and attributions without knowing R or Python
 
-<img src="./docs/images/tool_description_github.png" width="100" style="background-color: white" />
+<img src="./docs/images/tool_description_github.png" width="100%" style="background-color: white" />
 
 ### Extract and Load with Airbyte
 
@@ -42,8 +42,8 @@ can easily create dbt models and make them reusable to the frontend.
 
 ### Run a Data Science Model
 
-We are going to include open-source data science and AI models (e.g., Meta's 
-[Robyn Marketing Mix Modeling](https://github.com/facebookexperimental/Robyn)).
+We are going to include open-source data science and AI models (e.g., [
+Meta's Robyn Marketing Mix Modeling](https://github.com/facebookexperimental/Robyn)).
 
 ### Report
 
@@ -108,6 +108,13 @@ To run the pipelines yourself, please follow the instructions for the
 
 ---
 
+# Use cases
+
+- [How to build an Uber-like analytics system with Kuwala](https://kuwala.io/data-pipelines/how-to-build-an-uber-like-intelligence-system-for-your-new-mobility-startup-without-a-big-data-team/)
+- [Perform location analytics for a grocery store with Kuwala](https://kuwala.io/case-studies/why-instant-grocery-delivery-should-follow-a-data-driven-path-like-uber-to-survive-part-1/)
+- [Querying the most granular demographics data set with Kuwala](https://kuwala.io/data-pipelines/querying-the-most-granular-demographics-dataset/)
+
+---
 
 # How can I contribute?
 
@@ -134,3 +141,15 @@ to [community@kuwala.io](mailto:community@kuwala.io).
 2. Format your code before committing: `make format`
 3. Run linter on your code before committing: `make lint`
 4. If no exception then you're good to go
+
+---
+
+# Get more content about Kuwala
+  Link  | Description    
+-------------|-------------
+[Blog](https://kuwala.io/blog/) | Read all our Blog articles related to the stuff we are doing here. 
+[Join Slack](https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-pXKFBjbnl7_P3nXtwca5ag) | Our Slack channel with over 170 Data Engineers and many discussions.
+[Jupyter notebook - Popularity correlation](https://mybinder.org/v2/gh/kuwala-io/kuwala_examples/1def41ded01dbb67ecada9dc227c834cd93d0721?urlpath=lab%2Ftree%2Fnotebooks%2F1.%20Popularity%20Correlation.ipynb) | Open a Jupyter Notebook on Binder and merge external popularity data with Uber traversals by making use of convenient dbt functions. 
+[Podcast](https://anchor.fm/kuwala-io) | Listen to our community podcast and maybe join us on the next show.
+[Digital coffee break](https://calendly.com/kuwala_io/kuwala-community-chat?month=2022-02) | Are you looking for new inspiring tech talks? Book a digital coffee chit-chat with one member of the core team.
+[Our roadmap](https://github.com/orgs/kuwala-io/projects/3/views/6) | See our upcoming milestones and sprint planing.
