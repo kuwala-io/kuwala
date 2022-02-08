@@ -1,27 +1,53 @@
 [![Slack](https://img.shields.io/badge/slack-chat-orange.svg)](https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-pXKFBjbnl7_P3nXtwca5ag)
 ![License](https://img.shields.io/github/license/kuwala-io/kuwala)
 
-# What is Kuwala?
+<img src="./docs/images/slack_join_button_github.png" width="100" style="background-color: white" />
+
+<p float="middle">
+  <img src="./docs/images/slack_join_button_github.png" width="100" />
+  <img src="./docs/images/roadmap_button_github.png" width="100" /> 
+</p>
 
 Kuwala is the no-code data platform for BI analysts and engineers enabling you to build powerful analytics workflows. We 
-are set out to bring state-of-the-art data engineering tools you love, such as [
-Airbyte](https://github.com/airbytehq/airbyte), [dbt](https://github.com/dbt-labs/dbt-core), or 
-[Great Expectations](https://github.com/great-expectations/great_expectations), together in one intuitive interface built with [React Flow](https://github.com/wbkd/react-flow).
+are set out to bring state-of-the-art data engineering tools you love, such as 
+[Airbyte](https://github.com/airbytehq/airbyte), [dbt](https://github.com/dbt-labs/dbt-core), or 
+[Great Expectations](https://github.com/great-expectations/great_expectations) together in one intuitive interface built 
+with [React Flow](https://github.com/wbkd/react-flow).
 
-### Extract and Load
+Do you want to discuss your first contribution, want to learn more in general, or discuss your specific use-case for 
+Kuwala? Just book a digital coffee session with the core team [here](https://calendly.com/kuwala_io/kuwala-community-chat).
+
+![Collaboration between BI analysts and engineers](./docs/images/kuwala_collaborative_cycle.png)
+
+Kuwala stands for **extendability, reproducibility, and enablement**. Small data teams build data products fastly and 
+collaboratively. Analysts and engineers stay with their strengths. Kuwala  is the tool that makes it possible to keep a 
+data project within scope while having fun again.
+
+- **Kuwala Canvas runs directly on a data warehouse** = Maximum flexibility and no lock-in effect
+- **Engineers enable their analysts** by adding transformations and models via dbt or new data sources through Airbyte
+- **The node-based editor enables analyst** to build advanced data workflows with many data sources and transformations through simple drag-and-drop
+- **With models-as-a-block** the BI analyst can launch advanced Marketing Mix Models and attributions without knowing R or Python
+
+<img src="./docs/images/tool_description_github.png" width="100" style="background-color: white" />
+
+### Extract and Load with Airbyte
 
 For connecting and loading all your tooling data into a data warehouse, we are integrating with Airbyte connectors. For
 everything related to third-party data, such as POI and demographics data, we are building separate data pipelines.
 
-### Transform
+### Transform with dbt
 
-To apply transformations on your data, we are integrating dbt which is running on top of your data warehouses.
+To apply transformations on your data, we are integrating dbt which is running on top of your data warehouses. Engineers 
+can easily create dbt models and make them reusable to the frontend.
+
+### Run a Data Science Model
+
+We are going to include open-source data science and AI models (e.g., Meta's 
+[Robyn Marketing Mix Modeling](https://github.com/facebookexperimental/Robyn)).
 
 ### Report
 
-We are going to include open-source AI models (e.g., Meta's 
-[Robyn Marketing Mix Modeling](https://github.com/facebookexperimental/Robyn)) and make the results exportable to Google
-Sheets and later on available in a Medium-style markdown editor.
+We make the results exportable to Google Sheets and in the future also available in a Medium-style markdown editor.
 
 ---
 
