@@ -1,11 +1,11 @@
 [![Slack](https://img.shields.io/badge/slack-chat-orange.svg)](https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-pXKFBjbnl7_P3nXtwca5ag)
 ![License](https://img.shields.io/github/license/kuwala-io/kuwala)
 
-<img src="./docs/images/kuwala_header_github.png" width="100%" style="background-color: white" />
+<img src="./docs/images/kuwala_header_github.png" width="100%" />
 
-<p float="center">
-  <img src="./docs/images/slack_join_button_github.png" />
-  <img src="./docs/images/roadmap_button_github.png" /> 
+<p align="center">
+  <a href="https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-pXKFBjbnl7_P3nXtwca5ag"><img src="./docs/images/slack_join_button_github.png" height="96" /></a>
+  <a href="https://github.com/orgs/kuwala-io/projects/3/views/6"><img src="./docs/images/roadmap_button_github.png" height="96" /></a>
 </p>
 
 Kuwala is the no-code data platform for BI analysts and engineers enabling you to build powerful analytics workflows. We 
