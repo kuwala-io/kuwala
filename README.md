@@ -8,14 +8,15 @@
   <a href="https://github.com/orgs/kuwala-io/projects/3/views/6"><img src="./docs/images/roadmap_button_github.png" height="96" /></a>
 </p>
 
-Kuwala is the no-code data platform for BI analysts and engineers enabling you to build powerful analytics workflows. We 
-are set out to bring state-of-the-art data engineering tools you love, such as 
+Kuwala is **the no-code data platform for BI analysts and engineers enabling you to build powerful analytics workflows.** 
+We are set out to bring **state-of-the-art data engineering tools** you love, such as 
 [Airbyte](https://github.com/airbytehq/airbyte), [dbt](https://github.com/dbt-labs/dbt-core), or 
 [Great Expectations](https://github.com/great-expectations/great_expectations) together in one intuitive interface built 
 with [React Flow](https://github.com/wbkd/react-flow).
 
-Do you want to discuss your first contribution, want to learn more in general, or discuss your specific use-case for 
-Kuwala? Just book a digital coffee session with the core team [here](https://calendly.com/kuwala_io/kuwala-community-chat).
+Do you want to **discuss your first contribution**, want to **learn more in general**, or 
+**discuss your specific use-case** for Kuwala? Just **book a digital coffee session** with the core team 
+[here](https://calendly.com/kuwala_io/kuwala-community-chat).
 
 ![Collaboration between BI analysts and engineers](./docs/images/kuwala_collaborative_cycle.png)
 
@@ -147,9 +148,9 @@ to [community@kuwala.io](mailto:community@kuwala.io).
 # Get more content about Kuwala
   Link  | Description    
 -------------|-------------
-[Blog](https://kuwala.io/blog/) | Read all our Blog articles related to the stuff we are doing here. 
-[Join Slack](https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-pXKFBjbnl7_P3nXtwca5ag) | Our Slack channel with over 170 Data Engineers and many discussions.
-[Jupyter notebook - Popularity correlation](https://mybinder.org/v2/gh/kuwala-io/kuwala_examples/1def41ded01dbb67ecada9dc227c834cd93d0721?urlpath=lab%2Ftree%2Fnotebooks%2F1.%20Popularity%20Correlation.ipynb) | Open a Jupyter Notebook on Binder and merge external popularity data with Uber traversals by making use of convenient dbt functions. 
+[Blog](https://kuwala.io/blog/) | Read all our blog articles related to the stuff we are doing here. 
+[Join Slack](https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-pXKFBjbnl7_P3nXtwca5ag) | Our Slack channel with over 170 data engineers and many discussions.
+[Jupyter notebook - Popularity correlation](https://mybinder.org/v2/gh/kuwala-io/kuwala_examples/1def41ded01dbb67ecada9dc227c834cd93d0721?urlpath=lab%2Ftree%2Fnotebooks%2F1.%20Popularity%20Correlation.ipynb) | Open a Jupyter notebook on Binder and merge external popularity data with Uber traversals by making use of convenient dbt functions. 
 [Podcast](https://anchor.fm/kuwala-io) | Listen to our community podcast and maybe join us on the next show.
 [Digital coffee break](https://calendly.com/kuwala_io/kuwala-community-chat?month=2022-02) | Are you looking for new inspiring tech talks? Book a digital coffee chit-chat with one member of the core team.
 [Our roadmap](https://github.com/orgs/kuwala-io/projects/3/views/6) | See our upcoming milestones and sprint planing.
