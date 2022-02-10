@@ -130,18 +130,7 @@ There we discuss everything related to our roadmap, development, and support.
 
 ## Contribute to the project
 
-If you have a feature request, observed a bug, or just want to get involved please check out our 
-[open issues](https://github.com/kuwala-io/kuwala/issues). We are also happy to set up a call with you. Just email us 
-to [community@kuwala.io](mailto:community@kuwala.io).
-
-***Note: To submit a pull request, please fork the project and then submit a PR to the base repo.***
-
-***Note: For Python contributors, please install these linters/formatters listed below***
-
-1. Install prerequisites: `pip install poetry && poetry install`
-2. Format your code before committing: `make format`
-3. Run linter on your code before committing: `make lint`
-4. If no exception then you're good to go
+Please refer to our [contribution guidelines](https://github.com/kuwala-io/kuwala/tree/master/CONTRIBUTING.md) for further information on how to get involved.
 
 ---
 
@@ -154,3 +143,4 @@ to [community@kuwala.io](mailto:community@kuwala.io).
 [Podcast](https://anchor.fm/kuwala-io) | Listen to our community podcast and maybe join us on the next show.
 [Digital coffee break](https://calendly.com/kuwala_io/kuwala-community-chat?month=2022-02) | Are you looking for new inspiring tech talks? Book a digital coffee chit-chat with one member of the core team.
 [Our roadmap](https://github.com/orgs/kuwala-io/projects/3/views/6) | See our upcoming milestones and sprint planing.
+[Contribution guidelines](https://github.com/kuwala-io/kuwala/tree/master/CONTRIBUTING.md) | Further information on how to get involved.
