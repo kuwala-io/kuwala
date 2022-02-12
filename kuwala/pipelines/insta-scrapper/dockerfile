@@ -1,0 +1,9 @@
+FROM python:3.9.5
+
+COPY ./pipelines/insta-scrapper /opt/app/pipelines/insta-scrapper
+
+WORKDIR /opt/app/pipelines/insta-scrapper
+RUN pip install --no-cache-dir -r requirements.txt
+
+WORKDIR /opt/app/pipelines/insta-scrapper/src
+ENTRYPOINT [ "python", "main.py"]

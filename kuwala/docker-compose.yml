@@ -195,3 +195,18 @@ services:
       - ./tmp/kuwala/population_files:/opt/app/tmp/kuwala/population_files
     profiles:
       - network
+
+  # docker-compose run insta-scrapper
+  # Example Options : docker-compose run insta-scrapper --location_id=1313809508724705 --type=locations
+  insta-scrapper:
+    container_name: insta-scrapper
+    build:
+      context: .
+      dockerfile: ./pipelines/insta-scrapper/dockerfile
+    restart: always
+    volumes:
+      - ./tmp/kuwala/insta_pipelines:/opt/app/tmp/kuwala/insta_pipelines
+    ports:
+      - '3016:3016'
+    profiles:
+      - network
