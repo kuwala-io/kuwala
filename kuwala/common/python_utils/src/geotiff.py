@@ -1,5 +1,6 @@
-import rasterio
 import concurrent.futures
+
+import rasterio
 
 
 def process_geotiff(path: str):
@@ -18,7 +19,9 @@ def process_geotiff(path: str):
                 if pixels[x, y] > 0:
                     coords = (x, y) * transform
 
-                    data.append({'lat': coords[1], 'lng': coords[0], 'value': pixels[x, y]})
+                    data.append(
+                        {"lat": coords[1], "lng": coords[0], "value": pixels[x, y]}
+                    )
 
         return data
 

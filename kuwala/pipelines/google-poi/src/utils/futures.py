@@ -1,4 +1,5 @@
 import asyncio
+
 from quart import jsonify
 
 
@@ -15,4 +16,4 @@ def execute_futures(items, execute, parse):
     for result in results:
         parsed.append(parse(result))
 
-    return jsonify({'success': True, 'data': parsed})
+    return jsonify({"success": True, "data": parsed})
