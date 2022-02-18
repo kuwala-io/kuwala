@@ -8,3 +8,4 @@ sshtunnel
 unfolded.data-sdk
 unfolded.map-sdk
 uuid
+ipynbname
