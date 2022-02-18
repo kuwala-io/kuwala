@@ -1,7 +1,7 @@
 import logging
 import os
 
-from fuzzywuzzy import fuzz
+from thefuzz import fuzz
 import pycountry
 from pyspark.sql.functions import col, concat_ws, lit
 

@@ -1,6 +1,6 @@
 import json
 
-from fuzzywuzzy import fuzz
+from thefuzz import fuzz
 import h3
 from pyspark.sql.functions import udf
 from pyspark.sql.types import (

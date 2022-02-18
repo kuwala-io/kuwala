@@ -2,6 +2,8 @@ import logging
 import sys
 import webbrowser
 
+sys.path.insert(0, "../../../common/")
+
 from InputController import (
     select_demo,
     select_demographic_groups,

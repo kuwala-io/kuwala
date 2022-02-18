@@ -3,10 +3,10 @@ import os
 from time import sleep
 import urllib.error
 
-from fuzzywuzzy import fuzz
+from thefuzz import fuzz
 from hdx.data.dataset import Dataset
 from hdx.data.organization import Organization
-from hdx.hdx_configuration import Configuration
+from hdx.api.configuration import Configuration
 import pycountry
 import pycountry_convert as pcc
 from pyquery import PyQuery

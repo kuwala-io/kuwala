@@ -15,12 +15,19 @@ services:
       - google-poi-scraper
       - proxy
 
+  cli:
+    container_name: cli
+    build:
+      context: .
+      dockerfile: ./core/cli/dockerfile
+    restart: always
+    profiles:
+      - network
+
   # docker-compose --profile database up
   postgres:
     container_name: postgres
-    build:
-      context: .
-      dockerfile: ./core/database/dockerfile
+    image: kuwala/core:postgis-h3-0.2.0-alpha
     shm_size: 16g
     restart: always
     environment:
@@ -39,9 +46,7 @@ services:
   # docker-compose run database-importer --continent=<> --country=<> --country_region=<>
   database-importer:
     container_name: database-importer
-    build:
-      context: .
-      dockerfile: ./core/database/importer/dockerfile
+    image: kuwala/core:database-importer-0.2.0-alpha
     restart: always
     environment:
       - DATABASE_HOST=postgres
@@ -56,9 +61,7 @@ services:
   # docker-compose run database-transformer
   database-transformer:
     container_name: database-transformer
-    build:
-      context: .
-      dockerfile: ./core/database/transformer/dockerfile
+    image: kuwala/core:database-transformer-0.2.0-alpha
     restart: always
     environment:
       - DBT_HOST=postgres
@@ -68,9 +71,7 @@ services:
   # docker-compose run --service-ports jupyter
   jupyter:
     container_name: jupyter
-    build:
-      context: .
-      dockerfile: core/jupyter/dockerfile
+    image: kuwala/core:jupyter-0.2.0-alpha
     restart: always
     environment: 
       - JUPYTER_ENABLE_LAB=yes
@@ -89,11 +90,9 @@ services:
   # docker-compose run admin-boundaries --continent=<> --country=<> --country_region=<>
   admin-boundaries:
     container_name: admin-boundaries
+    image: kuwala/data-pipelines:admin-boundaries-0.2.0-alpha
     environment:
       - SPARK_MEMORY=16g
-    build:
-      context: .
-      dockerfile: ./pipelines/admin-boundaries/dockerfile
     volumes:
       - ./tmp/kuwala/osm_files:/opt/tmp/kuwala/osm_files
       - ./tmp/kuwala/admin_boundary_files:/opt/tmp/kuwala/admin_boundary_files
@@ -105,12 +104,10 @@ services:
   # docker-compose --profile google-poi-scraper up
   google-poi-api:
     container_name: google-poi-api
+    image: kuwala/data-pipelines:google-poi-api-0.2.0-alpha
     environment:
       - PROXY_ADDRESS=socks5://torproxy:9050
       - QUART_DEBUG=False
-    build:
-      context: .
-      dockerfile: ./pipelines/google-poi/dockerfile
     volumes:
       - ./pipelines/google-poi/resources/categories.json:/opt/app/pipelines/google-poi/resources/categories.json
     restart: always
@@ -124,12 +121,10 @@ services:
   # docker-compose run google-poi-pipeline --continent=<> --country=<> --country_region=<> --polygon_coords=<> --polygon_resolution=<> --search_string_basis=<>
   google-poi-pipeline:
     container_name: google-poi-pipeline
+    image: kuwala/data-pipelines:google-poi-pipeline-0.2.0-alpha
     environment:
       - GOOGLE_POI_API_HOST=google-poi-api
       - SPARK_MEMORY=16g
-    build:
-      context: .
-      dockerfile: ./pipelines/google-poi/src/pipeline/dockerfile
     volumes:
       - ./tmp/kuwala/google_files:/opt/app/tmp/kuwala/google_files
       - ./tmp/kuwala/osm_files:/opt/app/tmp/kuwala/osm_files
@@ -140,11 +135,9 @@ services:
   # docker-compose run google-trends --continent=<> --country=<> --country_region=<> --keyword=<>
   google-trends:
     container_name: google-trends
+    image: kuwala/data-pipelines:google-trends-0.2.0-alpha
     environment:
       - PROXY_ADDRESS=socks5://torproxy:9050
-    build:
-      context: .
-      dockerfile: ./pipelines/google-trends/dockerfile
     volumes:
       - ./tmp/kuwala/admin_boundary_files:/opt/tmp/kuwala/admin_boundary_files
       - ./tmp/kuwala/google_trends_files:/opt/tmp/kuwala/google_trends_files
@@ -156,9 +149,7 @@ services:
   # docker-compose run osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar --continent=<> --country=<> --country_region=<>
   osm-parquetizer:
     container_name: osm-parquetizer
-    build:
-      context: .
-      dockerfile: ./pipelines/osm-poi/osm-parquetizer/dockerfile
+    image: kuwala/data-pipelines:osm-parquetizer-0.2.0-alpha
     restart: always
     volumes:
       - ./tmp/kuwala/osm_files:/opt/app/tmp/kuwala/osm_files
@@ -168,9 +159,7 @@ services:
   # docker-compose run osm-poi
   osm-poi:
     container_name: osm-poi
-    build:
-      context: .
-      dockerfile: ./pipelines/osm-poi/dockerfile
+    image: kuwala/data-pipelines:osm-poi-0.2.0-alpha
     environment:
       - SPARK_MEMORY=16g
       - PROXY_ADDRESS=socks5://torproxy:9050
@@ -185,9 +174,7 @@ services:
   # docker-compose run  population-density
   population-density:
     container_name: population-density
-    build:
-      context: .
-      dockerfile: ./pipelines/population-density/dockerfile
+    image: kuwala/data-pipelines:population-density-0.2.0-alpha
     environment:
       - SPARK_MEMORY=16g
     restart: always

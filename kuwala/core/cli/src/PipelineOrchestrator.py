@@ -3,7 +3,7 @@ import subprocess
 from threading import Thread
 import zipfile
 
-from kuwala.common.python_utils.src.FileDownloader import download_file
+from python_utils.src.FileDownloader import download_file
 
 
 def download_demo():

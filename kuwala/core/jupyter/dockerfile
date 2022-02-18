@@ -1,4 +1,11 @@
-FROM jupyter/pyspark-notebook:2021-11-20
+FROM jupyter/pyspark-notebook:spark-3.2.1
+
+USER root
+
+RUN apt-get update && \
+    apt-get install --no-install-recommends build-essential=\* -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir "pandas-profiling[notebook]==3.1.0"
 

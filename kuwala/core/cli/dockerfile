@@ -1,6 +1,6 @@
 FROM python:3.9.5
 
-COPY ./common/python_utils /opt/app/pipelines/common/python_utils
+COPY ./common/python_utils /opt/app/common/python_utils
 COPY ./core/cli /opt/app/core/cli
 
 WORKDIR /opt/app/core/cli

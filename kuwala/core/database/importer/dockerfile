@@ -1,4 +1,19 @@
-FROM rappdw/docker-java-python:zulu11.43-python3.7.9
+ARG IMAGE_VARIANT=slim-buster
+ARG OPENJDK_VERSION=8
+ARG PYTHON_VERSION=3.9.5
+
+# We need to emulate on M1 macs currently because of a bug in libpg which is installed by the psycopg2-binary.
+# See SO: https://stackoverflow.com/a/70238851/13097240
+
+FROM --platform=linux/amd64 python:${PYTHON_VERSION}-${IMAGE_VARIANT} AS py3
+FROM openjdk:${OPENJDK_VERSION}-${IMAGE_VARIANT}
+
+COPY --from=py3 / /
+
+RUN apt-get update && \
+    apt-get install --no-install-recommends build-essential=12.6 -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY ./core/database/importer /opt/core/database/importer
 

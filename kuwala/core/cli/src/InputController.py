@@ -5,7 +5,7 @@ import os
 from hdx.data.dataset import Dataset
 import questionary
 
-import kuwala.common.python_utils.src.FileSelector as FileSelector
+import python_utils.src.FileSelector as FileSelector
 
 
 def select_demo():
