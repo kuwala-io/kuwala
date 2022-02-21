@@ -84,7 +84,7 @@ def scale_spark_columns(df, columns):
 
 def standardize_colname(df):
     for c in df.columns:
-        df = df.withColumnRenamed(c, re.sub("[^a-zA-Z0-9\n\.]", "_", c))
+        df = df.withColumnRenamed(c, re.sub("[^a-zA-Z0-9.]", "_", c))
     return df
 
 
