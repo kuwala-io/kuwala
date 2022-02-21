@@ -1,5 +1,6 @@
 import os
 import re
+
 import geojson
 import h3
 from pyspark.ml import Pipeline
@@ -83,14 +84,14 @@ def scale_spark_columns(df, columns):
 
 def standardize_colname(df):
     for c in df.columns:
-        df = df.withColumnRenamed(c, re.sub('[^a-zA-Z0-9\n\.]', '_', c))
-    return df 
+        df = df.withColumnRenamed(c, re.sub("[^a-zA-Z0-9\n\.]", "_", c))
+    return df
 
 
 def to_json(df, nb_name):
     df = standardize_colname(df)
     path = f"../notebooks/output/{nb_name}/result.json"
-    df.write.format('json').save(path)    
+    df.write.format("json").save(path)
 
 
 def to_csv(df, nb_name, header=True):
