@@ -36,13 +36,6 @@ This score can also be over 100 if the number of visitors is extraordinarily hig
 
 ## Usage
 
-To make sure you are running the latest version of the pipeline, build the Docker image from inside the `kuwala` 
-directory by running:
-
-```zsh
-docker-compose build google-poi-api google-poi-pipeline
-```
-
 ### Start the scraping api
 
 ```zsh

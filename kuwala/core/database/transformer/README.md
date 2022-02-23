@@ -5,13 +5,6 @@ warehouse. When using dbt, you write "models" which can be seen as components fo
 
 ## Usage
 
-To make sure you are running the latest version of the transformer, build the Docker image from inside the `kuwala` 
-directory by running:
-
-```zsh
-docker-compose build database-transformer
-```
-
 First you need to start the Postgres instance by running:
 
 ```zsh

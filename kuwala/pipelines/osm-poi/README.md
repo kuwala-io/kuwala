@@ -19,28 +19,7 @@ we also consolidate the OSM tags into separate objects.
 
 ## Usage
 
-To transform the standard `pbf` files, which is the file format of the OSM data, we are using the OSM-parquetizer. The 
-OSM-parquetizer is based on a Git submodule which needs to be initialized first. To initialize the submodule, run from 
-inside the root directory:
-
-Linux/Mac:
-
-```zsh
-cd kuwala/scripts && sh initialize_git_submodules.sh
-```
-
-Windows:
-
-```zsh
-cd kuwala/scripts && sh initialize_windows.sh && cd windows && sh initialize_git_submodules.sh
-```
-
-To make sure you are running the latest version of the pipeline, build the Docker images from inside the `kuwala` 
-directory by running:
-
-```zsh
-docker-compose build osm-poi osm-parquetizer
-```
+To transform the standard `pbf` files, which is the file format of the OSM data, we are using the [OSM-parquetizer](https://github.com/kuwala-io/osm-parquetizer).
 
 Those are the command line parameters for setting the geographic scope:
 
@@ -48,7 +27,7 @@ Those are the command line parameters for setting the geographic scope:
 - `--country` (optional)
 - `--country_region` (optional)
 
-Do set directly whether to download or to process files you can pass `--action` (options: "download", "process") as a 
+To set directly whether to download or to process files you can pass `--action` (options: "download", "process") as a 
 command line argument.
 
 You can also provide a direct download url from Geofabrik by passing it with the `--url` command line parameter.

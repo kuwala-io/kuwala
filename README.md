@@ -93,19 +93,21 @@ You could either use the deployed example on Binder using the badge above or run
 simply uses Pandas dataframes and is not connecting to a data warehouse. \
 To run the demo locally, launch Docker in the background and from inside the root directory run:
 
-Linux/Mac:
-```zsh 
-cd kuwala/scripts && sh initialize_core_components.sh && sh run_cli.sh
-```
-and for Windows (Please use PowerShell or any Docker integrated terminal):
-```PS
-cd kuwala/scripts && sh initialize_windows.sh && cd windows && sh initialize_core_components.sh && sh run_cli.sh
+***Hint:*** For Windows, please use PowerShell or any Docker integrated terminal
+
+```zsh
+docker-compose run cli
 ```
 
-#### Run the data pipelines yourself
+To use the demo data, select `"Use demo data for Portugal"`:
 
-To run the pipelines yourself, please follow the instructions for the 
-[CLI](https://github.com/kuwala-io/kuwala/tree/master/kuwala/core/cli/README.md).
+```
+? Do you want to run and select the pipelines yourself or do you want to use a preprocessed demo with data for Portugal? (Use arrow keys)
+   Run pipelines myself
+ » Use demo data for Portugal
+```
+
+To run the pipelines individually for selected countries, simply select the first option `"Run pipelines myself`.
 
 ---
 

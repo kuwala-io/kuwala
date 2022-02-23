@@ -1,6 +1,7 @@
-# We need to emulate on M1 macs currently because of a bug in libpg which is installed by the dbt package.
+# We need to emulate on M1 macs currently because of a bug in libpq which is installed by the dbt package.
 # See SO: https://stackoverflow.com/a/70238851/13097240
 
+# hadolint ignore=DL3029
 FROM --platform=linux/amd64 python:3.9.5-slim-buster
 
 COPY ./core/database/transformer /opt/app/core/database/transformer

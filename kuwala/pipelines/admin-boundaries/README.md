@@ -12,13 +12,6 @@ and the goal would be to include them as well in the future.
 
 ## Usage
 
-To make sure you are running the latest version of the pipeline, build the Docker image from inside the `kuwala` 
-directory by running:
-
-```zsh
-docker-compose build admin-boundaries
-```
-
 We are building the admin boundaries based on the pre-processed OSM files. So first, you need to run the 
 [OSM-pipeline](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/osm-poi) for the country you are 
 interested in. With this pipeline, we retrieve the admin boundaries and build a harmonized hierarchy.

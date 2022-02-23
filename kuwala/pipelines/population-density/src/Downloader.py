@@ -5,9 +5,9 @@ from pathlib import Path
 import time
 import zipfile
 
+from hdx.api.configuration import Configuration
 from hdx.data.dataset import Dataset
 from hdx.data.resource import Resource
-from hdx.api.configuration import Configuration
 from python_utils.src.FileSelector import (
     get_countries_with_population_data,
     select_demographic_groups,

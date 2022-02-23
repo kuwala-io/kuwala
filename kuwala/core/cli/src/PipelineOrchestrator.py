@@ -1,171 +1,209 @@
+import json
+import logging
 import os
-import subprocess
-from threading import Thread
+import shutil
+import sys
+from time import sleep
 import zipfile
 
+import psycopg2
+from python_on_whales import DockerClient, docker
 from python_utils.src.FileDownloader import download_file
+import requests
 
 
 def download_demo():
     script_dir = os.path.dirname(__file__)
     file_path = os.path.join(script_dir, "../../../tmp/kuwala/db/postgres.zip")
+
+    if os.path.exists(file_path.replace(".zip", "/14")):
+        return
+
     download_file(
         url="https://kuwala-demo.s3.eu-central-1.amazonaws.com/postgres.zip",
         path=file_path,
     )
 
+    logging.info("Preparing demo data…")
+
     with zipfile.ZipFile(file_path, "r") as zip_ref:
         zip_ref.extractall(file_path.split("/postgres.zip")[0])
 
     os.remove(file_path)
-
-
-def run_command(command: [str], exit_keyword=None):
-    process = subprocess.Popen(
-        command,
-        bufsize=1,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        universal_newlines=True,
-        shell=True,
-    )
-    thread_result = dict(hit_exit_keyword=False)
-
-    def print_std(std, result):
-        while True:
-            line = std.readline()
-
-            if len(line.strip()) > 0:
-                print(
-                    line if "Stage" not in line and "%" not in line else line.strip(),
-                    end="\r",
-                )
-
-            if exit_keyword is not None and exit_keyword in line:
-                result["hit_exit_keyword"] = True
-
-                break
-
-            return_code = process.poll()
-
-            if return_code is not None:
-                if return_code != 0:
-                    return RuntimeError()
-
-                break
-
-    stdout_thread = Thread(
-        target=print_std,
-        args=(
-            process.stdout,
-            thread_result,
-        ),
-        daemon=True,
-    )
-    stderr_thread = Thread(
-        target=print_std,
-        args=(
-            process.stderr,
-            thread_result,
-        ),
-        daemon=True,
-    )
-
-    stdout_thread.start()
-    stderr_thread.start()
-
-    while stdout_thread.is_alive() and stderr_thread.is_alive():
-        pass
-
-    if thread_result["hit_exit_keyword"]:
-        return process
+    shutil.rmtree(file_path.replace("postgres.zip", "__MACOSX"))
 
 
 def run_osm_poi_pipeline(url, continent, country, country_region):
-    continent_arg = f"--continent={continent}" if continent else ""
-    country_arg = f"--country={country}" if country else ""
-    country_region_arg = f"--country_region={country_region}" if country_region else ""
-
-    run_command(
-        [
-            f"docker-compose run --rm osm-poi --action=download --url={url} {continent_arg} {country_arg} "
-            f"{country_region_arg}"
-        ]
+    print(
+        docker.compose.run(
+            service="osm-poi",
+            remove=True,
+            command=[
+                "--action",
+                "download",
+                "--url",
+                url,
+                "--continent",
+                continent,
+                "--country",
+                country,
+                "--country_region",
+                country_region,
+            ],
+        )
     )
-    run_command(
-        [
-            f"docker-compose run --rm osm-parquetizer java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar "
-            f"{continent_arg} {country_arg} {country_region_arg}"
-        ]
+    print(
+        docker.compose.run(
+            service="osm-parquetizer",
+            remove=True,
+            command=[
+                "java",
+                "-jar",
+                "target/osm-parquetizer-1.0.1-SNAPSHOT.jar",
+                "--continent",
+                continent,
+                "--country",
+                country,
+                "--country_region",
+                country_region,
+            ],
+        )
     )
-    run_command(
-        [
-            f"docker-compose run --rm osm-poi --action=process {continent_arg} {country_arg} "
-            f"{country_region_arg}"
-        ]
+    print(
+        docker.compose.run(
+            service="osm-poi",
+            remove=True,
+            command=[
+                "--action",
+                "process",
+                "--continent",
+                continent,
+                "--country",
+                country,
+                "--country_region",
+                country_region,
+            ],
+        )
     )
 
 
 def run_google_poi_pipeline(continent, country, country_region):
-    continent_arg = f"--continent={continent}" if continent else ""
-    country_arg = f"--country={country}" if country else ""
-    country_region_arg = f"--country_region={country_region}" if country_region else ""
-    scraping_api_process = run_command(
-        "docker-compose --profile google-poi-scraper up", exit_keyword="Running"
-    )
+    google_poi_scraper_profile = DockerClient(compose_profiles=["google-poi-scraper"])
 
-    run_command(
-        [
-            f"docker-compose run --rm google-poi-pipeline {continent_arg} {country_arg} {country_region_arg}"
-        ]
+    logging.info("Launching Google scraper…")
+    google_poi_scraper_profile.compose.up(detach=True)
+
+    launched_scraper = False
+    max_retries = 120
+    sleep_time = 5
+    current_attempt = 1
+
+    while not launched_scraper and current_attempt <= max_retries:
+        # noinspection PyBroadException
+        try:
+            test_request = requests.get("http://localhost:3003")
+
+            launched_scraper = test_request.status_code
+        except Exception:
+            current_attempt += 1
+            sleep(sleep_time)
+
+    if not launched_scraper:
+        logging.error("Couldn't launch Google scraper!")
+
+        return
+
+    print(
+        docker.compose.run(
+            service="google-poi-pipeline",
+            remove=True,
+            command=[
+                "--continent",
+                continent,
+                "--country",
+                country,
+                "--country_region",
+                country_region,
+            ],
+        )
     )
-    scraping_api_process.terminate()
+    google_poi_scraper_profile.compose.stop()
 
 
 def run_population_density_pipeline(continent, country, demographic_groups):
-    continent_arg = f"--continent={continent}" if continent else ""
-    country_arg = f"--country={country}" if country else ""
-    demographic_groups_arg = (
-        f"--demographic_groups={demographic_groups}" if demographic_groups else ""
-    )
-
-    run_command(
-        [
-            f"docker-compose run --rm population-density {continent_arg} {country_arg} {demographic_groups_arg}"
-        ]
+    print(
+        docker.compose.run(
+            service="population-density",
+            remove=True,
+            command=[
+                "--continent",
+                continent,
+                "--country",
+                country,
+                "--demographic_groups",
+                json.loads(demographic_groups),
+            ],
+        )
     )
 
 
 def run_database_importer(
     continent, country, country_region, population_density_update_date
 ):
-    continent_arg = f"--continent={continent}" if continent else ""
-    country_arg = f"--country={country}" if country else ""
-    country_region_arg = f"--country_region={country_region}" if country_region else ""
-    population_density_update_date_arg = (
-        f"--population_density_date={population_density_update_date}"
-        if population_density_update_date
-        else ""
+    database_profile = DockerClient(compose_profiles=["database"])
+    connected_to_db = False
+    max_retries = 120
+    sleep_time = 5
+    current_attempt = 1
+
+    database_profile.compose.up(detach=True)
+
+    while not connected_to_db and current_attempt <= max_retries:
+        # noinspection PyBroadException
+        try:
+            db = psycopg2.connect(
+                host="localhost",
+                port=5432,
+                database="kuwala",
+                user="kuwala",
+                password="password",
+            )
+
+            connected_to_db = True
+
+            db.close()
+        except Exception:
+            current_attempt += 1
+            sleep(sleep_time)
+
+    if not connected_to_db:
+        logging.error("Couldn't connect to database.")
+        sys.exit(1)
+
+    print(
+        docker.compose.run(
+            service="database-importer",
+            remove=True,
+            command=[
+                "--continent",
+                continent,
+                "--country",
+                country,
+                "--country_region",
+                country_region,
+                "--population_density_date",
+                population_density_update_date,
+            ],
+        )
     )
-    database_process = run_command(
-        "docker-compose --profile database up",
-        exit_keyword="database system is ready to accept connections",
-    )
 
-    run_command(
-        [
-            f"docker-compose run --rm database-importer {continent_arg} {country_arg} {country_region_arg} "
-            f"{population_density_update_date_arg}"
-        ]
-    )
-
-    return database_process
+    return database_profile
 
 
-def run_database_transformer(database_process):
-    run_command(["docker-compose run database-transformer"])
+def run_database_transformer(database_profile):
+    print(docker.compose.run(service="database-transformer", remove=True))
 
-    database_process.terminate()
+    database_profile.compose.stop()
 
 
 def run_pipelines(pipelines: [str], selected_region: dict):
@@ -187,9 +225,9 @@ def run_pipelines(pipelines: [str], selected_region: dict):
             continent, country, selected_region["demographic_groups"]
         )
 
-    database_process = run_database_importer(
+    database_profile = run_database_importer(
         continent, country, country_region, population_density_update_date
     )
 
-    run_database_transformer(database_process)
-    run_command(["docker-compose down --remove-orphans"])
+    run_database_transformer(database_profile)
+    docker.compose.down(remove_orphans=True)

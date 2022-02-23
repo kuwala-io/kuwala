@@ -18,22 +18,8 @@ The following pipelines can currently be selected through the CLI:
 
 ## Usage
 
-To make sure you are running the latest version of all pipelines, run from inside the root directory:
-
-Linux/Mac:
+To start the CLI, run the following command from inside the root directory and follow the instructions:
 
 ```zsh
-cd kuwala/scripts && sh initialize_all_components.sh
-```
-
-Windows:
-
-```zsh
-cd kuwala/scripts && sh initialize_windows.sh && cd windows && sh initialize_all_components.sh
-```
-
-To start the CLI, run the following script from inside the `kuwala/scripts` directory and follow the instructions:
-
-```zsh
-sh run_cli.sh
+docker-compose run cli
 ```

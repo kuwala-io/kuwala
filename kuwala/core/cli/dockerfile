@@ -1,10 +1,25 @@
-FROM python:3.9.5
+# We need to emulate on M1 macs currently because of a bug in libpq which is installed by the psycopg2-binary.
+# See SO: https://stackoverflow.com/a/70238851/13097240
 
-COPY ./common/python_utils /opt/app/common/python_utils
-COPY ./core/cli /opt/app/core/cli
+# hadolint ignore=DL3029
+FROM --platform=linux/amd64 python:3.10.2-slim-buster
 
-WORKDIR /opt/app/core/cli
+RUN apt-get update && \
+    apt-get install --no-install-recommends wget=\* build-essential=12.6 -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir python-on-whales==0.37.0 && \
+    python-on-whales download-cli && \
+    mkdir -p ~/.docker/cli-plugins/ && \
+    wget --progress=dot:giga https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -O ~/.docker/cli-plugins/docker-compose && \
+    chmod a+x  ~/.docker/cli-plugins/docker-compose
+
+COPY ./common/python_utils /var/app/kuwala/common/python_utils
+COPY ./core/cli /var/app/kuwala/core/cli
+
+WORKDIR /var/app/kuwala/core/cli
 RUN pip install --no-cache-dir -r requirements.txt
 
-WORKDIR /opt/app/core/cli/src
+WORKDIR /var/app/kuwala/core/cli/src
 ENTRYPOINT [ "python", "main.py" ]

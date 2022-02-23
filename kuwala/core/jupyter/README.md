@@ -19,12 +19,6 @@ the population indicating how high the density of the POI category is in a speci
 
 ## Usage
 
-To make sure you are running the latest version of the Jupyter environment, run from inside the root directory:
-
-```zsh
-docker-compose build jupyter
-```
-
 First you need to start the Postgres instance by running:
 
 ```zsh

@@ -2,9 +2,10 @@ ARG IMAGE_VARIANT=slim-buster
 ARG OPENJDK_VERSION=8
 ARG PYTHON_VERSION=3.9.5
 
-# We need to emulate on M1 macs currently because of a bug in libpg which is installed by the psycopg2-binary.
+# We need to emulate on M1 macs currently because of a bug in libpq which is installed by the psycopg2-binary.
 # See SO: https://stackoverflow.com/a/70238851/13097240
 
+# hadolint ignore=DL3029
 FROM --platform=linux/amd64 python:${PYTHON_VERSION}-${IMAGE_VARIANT} AS py3
 FROM openjdk:${OPENJDK_VERSION}-${IMAGE_VARIANT}
 
