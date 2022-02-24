@@ -1,10 +1,12 @@
 import React from "react";
 
-import ExampleConnector from "./DataConnectors/ExampleConnector";
+import ExampleDataSource from "./DataConnectors/ExampleDataSource";
+import ExampleProcessorNode from "./DataConnectors/ExampleProcessorNode";
+import ExampleOutputNode from "./DataConnectors/ExampleOutputNode";
 
-export default ({sidebar, toggleSidebar}) => {
-    const onDragStart = (event, nodeType) => {
-        event.dataTransfer.setData('application/reactflow', nodeType);
+export default ({sidebar, toggleSidebar, onClickAddNode}) => {
+    const onDragStart = (event, {type, data}) => {
+        event.dataTransfer.setData('application/reactflow', JSON.stringify({type, data}));
         event.dataTransfer.effectAllowed = 'move';
     };
 
@@ -34,22 +36,24 @@ export default ({sidebar, toggleSidebar}) => {
                     }
                 >
                     {/* Header and Toggle */}
-                    <div className={`flex items-center justify-between flex-shrink-0 p-2`}>
-                        <span className={`p-2 text-xl font-semibold leading-8 tracking-wider uppercase whitespace-nowrap`}>
-                            <span>Data Sources</span>
-
-                            {/* CONNECTOR CONTAINERS */}
-                            <div className={'mt-4'}>
-                                <ExampleConnector onDragStart={onDragStart}/>
-                            </div>
+                    <div className={`flex items-center justify-center flex-shrink-0 p-2`}>
+                        <span className={`p-2 text-xl font-semibold tracking-wider whitespace-nowrap`}>
+                            <span>DATA SOURCES</span>
                         </span>
+                    </div>
+
+                    {/* CONNECTOR CONTAINERS */}
+                    <div className={'flex flex-col p-2 pr-8 pl-8 space-y-4'}>
+                        <ExampleDataSource onDragStart={onDragStart} onClickAddNode={onClickAddNode}/>
+                        <ExampleProcessorNode onDragStart={onDragStart} onClickAddNode={onClickAddNode}/>
+                        <ExampleOutputNode onDragStart={onDragStart} onClickAddNode={onClickAddNode}/>
                     </div>
                 </aside>
             </div>
 
             <div className={'relative'}>
                 <button
-                    onClick={toggleSidebar}
+                    onClick={()=>alert('Will show modal')}
                     className={`
                             ml-4
                             mt-4
@@ -57,15 +61,35 @@ export default ({sidebar, toggleSidebar}) => {
                             h-12
                             rounded-lg 
                             absolute
-                            text-2xl
+                            text-xl
                             font-bold
-                            border-4
+                            border-2
                             border-kuwala-red
                             bg-white
                             text-kuwala-red
                         `}
                 >
-                    {sidebar ? '-' : '+'}
+                    +
+                </button>
+
+                <button
+                    onClick={toggleSidebar}
+                    className={`
+                            ml-4
+                            mt-20
+                            w-12
+                            h-12
+                            rounded-lg 
+                            absolute
+                            text-xl
+                            font-bold
+                            border-2
+                            border-kuwala-green
+                            bg-white
+                            text-kuwala-green
+                        `}
+                >
+                    {sidebar ? '>' : '<'}
                 </button>
             </div>
         </div>

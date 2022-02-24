@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import ReactFlow, {
     ReactFlowProvider,
     addEdge,
@@ -8,34 +8,14 @@ import ReactFlow, {
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import NotificationPanel from "../components/NotificationPanel";
+import DataView from "../components/DataView";
 
-const initialElements = [
-    {
-        id: '1',
-        type: 'input', // input node
-        data: { label: 'Input Node' },
-        position: { x: 250, y: 25 },
-    },
-    // default node
-    {
-        id: '2',
-        // you can also pass a React component as a label
-        data: { label: <div>Default Node</div> },
-        position: { x: 100, y: 125 },
-    },
-    {
-        id: '3',
-        type: 'output', // output node
-        data: { label: 'Output Node' },
-        position: { x: 250, y: 250 },
-    },
-    // animated edge
-    { id: 'e1-2', source: '1', target: '2', animated: true },
-    { id: 'e2-3', source: '2', target: '3' },
-];
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+}
 
 export default function () {
-    const [sidebar, setSidebar] = useState(true);
+    const [sidebar, setSidebar] = useState(false);
     const toggleSidebar = () => {
         setSidebar(!sidebar)
     }
@@ -44,15 +24,16 @@ export default function () {
         setNotification(!isNotificationOpen);
     }
 
-    let id = 0;
-    const getId = () => `dndnode_${id++}`;
+    const [selectedElement, setSelectedElement] = useState(null);
 
     const reactFlowWrapper = useRef(null);
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
-    const [elements, setElements] = useState(initialElements);
+    const [elements, setElements] = useState([]);
     const onConnect = (params) => setElements((els) => addEdge(params, els));
-    const onElementsRemove = (elementsToRemove) =>
+    const onElementsRemove = (elementsToRemove) => {
+        setSelectedElement(null)
         setElements((els) => removeElements(elementsToRemove, els));
+    }
 
     const onLoad = (_reactFlowInstance) =>
         setReactFlowInstance(_reactFlowInstance);
@@ -66,20 +47,41 @@ export default function () {
         event.preventDefault();
 
         const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
-        const type = event.dataTransfer.getData('application/reactflow');
+        const {type, data} = JSON.parse(event.dataTransfer.getData('application/reactflow'));
+        console.log(type, data)
         const position = reactFlowInstance.project({
             x: event.clientX - reactFlowBounds.left,
             y: event.clientY - reactFlowBounds.top,
         });
+
         const newNode = {
-            id: Math.random(),
+            id: getRandomInt(1000).toString(),
             type,
             position,
-            data: { label: `${type} node` },
+            data: { label: `${data}` },
         };
 
-        setElements((es) => es.concat(newNode));
+        setElements(prevState => {
+            return [...prevState, newNode]
+        });
     }
+
+    const onClickAddNode = ({type, data}) => {
+        const newNode = {
+            id: getRandomInt(1000).toString(),
+            type: type,
+            data: { label: data },
+            position: {
+                x: -100,
+                y: Math.random() * window.innerHeight/2,
+            },
+        };
+        setElements((els) => els.concat(newNode));
+    }
+
+    useEffect(()=>{
+
+    }, [selectedElement])
 
     return (
         <div className={`flex flex-col h-screen overflow-y-hidden antialiased text-gray-900 bg-white`}>
@@ -92,22 +94,40 @@ export default function () {
                         <Sidebar
                             sidebar={sidebar}
                             toggleSidebar={toggleSidebar}
+                            onClickAddNode={onClickAddNode}
+
                         />
                         <main
-                            className='flex-1 h-full max-h-full w-full overflow-hidden overflow-y-scroll'
+                            className='flexh-full w-full'
                             ref={reactFlowWrapper}
                         >
                             <ReactFlow
                                 elements={elements}
                                 onConnect={onConnect}
                                 onElementsRemove={onElementsRemove}
+                                onElementClick={(event, elements) => {
+                                    setSelectedElement(elements)
+                                }}
+                                onPaneClick={()=>{
+                                    setSelectedElement(null)
+                                }}
+                                selectNodesOnDrag={false}
                                 onLoad={onLoad}
                                 onDrop={onDrop}
                                 onDragOver={onDragOver}
-                            />
+                                defaultPosition={[500,150]}
+                            >
+                                <Controls
+                                    style={{right: 10, left: 'auto'}}
+                                />
+                            </ReactFlow>
                         </main>
                     </ReactFlowProvider>
                 </div>
+
+                <DataView
+                    isDataTableHidden={selectedElement == null}
+                />
 
                 <NotificationPanel
                     isNotificationOpen={isNotificationOpen}
