@@ -2,12 +2,24 @@ import React, { DragEvent } from 'react';
 
 export default ({onDragStart, onClickAddNode}) => {
     const type = 'default'
+    const rows = ['First Name','Second First Name','Last Name','First Name','Second First Name','Last Name']
+    const dataRows = [
+        ['Elijah','Elijah','Talloe','Elijah','Elijah','Talloe'],
+        ['Theo','Theo','Ditts','Theo','Theo','Ditts'],
+        ['Lauretta','Lauretta','Duncanson','Lauretta','Lauretta','Duncanson'],
+        ['Alikee','Alikee','Bartke','Alikee','Alikee','Bartke'],
+        ['Ethelind','Ethelind','Soule','Ethelind','Ethelind','Soule'],
+        ['Lucian','Lucian','Rastall','Lucian','Lucian','Rastall'],
+        ['Fabian','Fabian','Cumming','Fabian','Fabian','Cumming'],
+        ['Bartie','Bartie','Deverill','Bartie','Bartie','Deverill'],
+        ['Jedidiah','Jedidiah','Oldford','Jedidiah','Jedidiah','Oldford'],
+        ['Tod','Tod','Mugg','Tod','Tod','Mugg'],
+    ]
     const data = {
-        label: 'Processor Node'
+        label: 'Processor Node',
+        rows,
+        dataRows
     }
-
-
-
     return (
         <div
             className={`

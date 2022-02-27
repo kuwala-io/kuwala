@@ -29,6 +29,7 @@ const elementStoreModel =  {
     }),
     setSelectedElement: action((state, selectedNode) => {
         state.selectedElement = selectedNode
+        console.log(selectedNode)
     }),
     setNewNodeInfo: action((state, newNodeInfo) => {
         state.newNodeInfo = newNodeInfo

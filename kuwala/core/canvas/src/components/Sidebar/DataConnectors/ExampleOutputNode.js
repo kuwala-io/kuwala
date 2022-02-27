@@ -2,8 +2,23 @@ import React, { DragEvent } from 'react';
 
 export default ({onDragStart, onClickAddNode}) => {
     const type = 'output'
+    const rows = ['First Name','Last Name']
+    const dataRows = [
+        ['Elijah','Talloe'],
+        ['Theo','Ditts'],
+        ['Lauretta','Duncanson'],
+        ['Alikee','Bartke'],
+        ['Ethelind','Soule'],
+        ['Lucian','Rastall'],
+        ['Fabian','Cumming'],
+        ['Bartie','Deverill'],
+        ['Jedidiah','Oldford'],
+        ['Tod','Mugg'],
+    ]
     const data = {
-        label: 'Output Node'
+        label: 'Output Node',
+        rows,
+        dataRows
     }
     return (
         <div

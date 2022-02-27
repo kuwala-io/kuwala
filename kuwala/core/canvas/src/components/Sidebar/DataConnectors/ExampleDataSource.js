@@ -2,17 +2,31 @@ import React, { DragEvent } from 'react';
 
 export default ({onDragStart, onClickAddNode}) => {
     const type = 'input'
+    const rows = ['First Name','Second First Name','Last Name']
+    const dataRows = [
+        ['Elijah','Elijah','Talloe'],
+        ['Theo','Theo','Ditts'],
+        ['Lauretta','Lauretta','Duncanson'],
+        ['Alikee','Alikee','Bartke'],
+        ['Ethelind','Ethelind','Soule'],
+        ['Lucian','Lucian','Rastall'],
+        ['Fabian','Fabian','Cumming'],
+        ['Bartie','Bartie','Deverill'],
+        ['Jedidiah','Jedidiah','Oldford'],
+        ['Tod','Tod','Mugg'],
+    ]
     const data = {
-        label: <h1>INPUT NODE</h1>
+        label: 'Input Node',
+        rows,
+        dataRows
     }
-    const nodeName = 'Input Node'
 
+    const nodeName = 'Input Node'
     const nodeInfo = {
         type,
         rows: ['a'],
         data
     }
-
 
     return (
         <div

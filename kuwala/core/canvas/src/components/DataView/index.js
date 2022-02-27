@@ -8,6 +8,30 @@ export default () => {
         selectedElement: state.selectedElement,
     }));
 
+    const renderHeader = () => {
+        if(selectedElement !== null) {
+            return selectedElement.data.rows.map((e,i)=> (<th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}>{e}</th>))
+        } else {
+            return <></>
+        }
+    }
+
+    const renderBody = () => {
+        if(selectedElement !== null) {
+            return selectedElement.data.dataRows.map((e,i) => (
+                <tr className={'bg-white border-2 text-center'}>
+                    {e.map((e,i)=> (<td className={'py-6'}>{e}</td>))}
+                </tr>
+            ))
+        }else {
+            return <></>
+        }
+
+
+
+    }
+
+
     return (
         // Table Wrapper
         <div
@@ -50,31 +74,11 @@ export default () => {
                 <table className="table-auto w-full rounded-t-md">
                     <thead className={'rounded-t-md uppercase'}>
                     <tr>
-                        <th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}>Date</th>
-                        <th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}>Campaign Start</th>
-                        <th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}>Campaign End</th>
-                        <th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}>Revenue Total</th>
-                        <th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}>Revenue Campaign</th>
-                        <th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}>Units</th>
-                        <th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}>Avg Unit Price</th>
-                        <th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}>Longitude</th>
-                        <th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}>Latitude</th>
+                        {renderHeader()}
                     </tr>
                     </thead>
                     <tbody className={''}>
-                        {[...Array(100)].map((e,i) => (
-                            <tr className={'bg-white border-2 text-center'}>
-                                <td className={'py-6'}>11/01/2021</td>
-                                <td className={'py-6'}>01.01.2021</td>
-                                <td className={'py-6'}>01.12.2021</td>
-                                <td className={'py-6'}>70,078</td>
-                                <td className={'py-6'}>10,028</td>
-                                <td className={'py-6'}>203</td>
-                                <td className={'py-6'}>50,78</td>
-                                <td className={'py-6'}>123,456</td>
-                                <td className={'py-6'}>456,789</td>
-                            </tr>
-                        ))}
+                        {renderBody()}
                     </tbody>
                 </table>
             </div>
