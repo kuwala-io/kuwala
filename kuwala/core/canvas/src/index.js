@@ -4,9 +4,16 @@ import './pages/styles.css';
 import App from './pages/App';
 import reportWebVitals from './reportWebVitals';
 
+import {createStore, StoreProvider} from "easy-peasy";
+import elements from "./store/elementStore";
+
+const elementStore = createStore(elements)
+
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <StoreProvider store={elementStore}>
+        <App />
+    </StoreProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

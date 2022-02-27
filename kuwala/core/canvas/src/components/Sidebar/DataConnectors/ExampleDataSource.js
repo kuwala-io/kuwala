@@ -2,7 +2,18 @@ import React, { DragEvent } from 'react';
 
 export default ({onDragStart, onClickAddNode}) => {
     const type = 'input'
-    const data = 'Input Node'
+    const data = {
+        label: <h1>INPUT NODE</h1>
+    }
+    const nodeName = 'Input Node'
+
+    const nodeInfo = {
+        type,
+        rows: ['a'],
+        data
+    }
+
+
     return (
         <div
             className={`
@@ -13,11 +24,11 @@ export default ({onDragStart, onClickAddNode}) => {
                     border-2
                     rounded-lg
             `}
-            onDragStart={(event: DragEvent) => onDragStart(event, {type, data})}
-            onClick={() => onClickAddNode({type, data})}
+            onDragStart={(event: DragEvent) => onDragStart(event, nodeInfo)}
+            onClick={() => onClickAddNode(nodeInfo)}
             draggable
         >
-            Input Node
+            { nodeName }
         </div>
     )
 }

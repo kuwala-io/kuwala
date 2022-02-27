@@ -3,12 +3,28 @@ import React from "react";
 import ExampleDataSource from "./DataConnectors/ExampleDataSource";
 import ExampleProcessorNode from "./DataConnectors/ExampleProcessorNode";
 import ExampleOutputNode from "./DataConnectors/ExampleOutputNode";
+import {useStoreActions, useStoreState} from "easy-peasy";
 
-export default ({sidebar, toggleSidebar, onClickAddNode}) => {
-    const onDragStart = (event, {type, data}) => {
-        event.dataTransfer.setData('application/reactflow', JSON.stringify({type, data}));
+export default ({sidebar, toggleSidebar}) => {
+    const {addNode, setNewNodeInfo} = useStoreActions(actions => ({
+        addNode: actions.addNode,
+        setNewNodeInfo: actions.setNewNodeInfo
+    }))
+
+    const onDragStart = (event, newNodeInfo) => {
+        setNewNodeInfo(newNodeInfo)
         event.dataTransfer.effectAllowed = 'move';
     };
+
+    const onClickAddNode = (newNodeInfo) => {
+        addNode({
+            ...newNodeInfo,
+            position: {
+                x: -100,
+                y: Math.random() * window.innerHeight/2,
+            },
+        })
+    }
 
     return (
         <div className={`

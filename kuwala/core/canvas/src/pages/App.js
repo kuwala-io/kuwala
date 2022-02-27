@@ -9,34 +9,31 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import NotificationPanel from "../components/NotificationPanel";
 import DataView from "../components/DataView";
-
-function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
-}
+import {useStoreActions, useStoreState} from 'easy-peasy';
 
 export default function () {
     const [sidebar, setSidebar] = useState(false);
-    const toggleSidebar = () => {
-        setSidebar(!sidebar)
-    }
+    const toggleSidebar = () => setSidebar(!sidebar);
     const [isNotificationOpen, setNotification] = useState(false);
-    const toggleNotification = () => {
-        setNotification(!isNotificationOpen);
-    }
-
-    const [selectedElement, setSelectedElement] = useState(null);
-
+    const toggleNotification = () => setNotification(!isNotificationOpen);
     const reactFlowWrapper = useRef(null);
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
-    const [elements, setElements] = useState([]);
-    const onConnect = (params) => setElements((els) => addEdge(params, els));
-    const onElementsRemove = (elementsToRemove) => {
-        setSelectedElement(null)
-        setElements((els) => removeElements(elementsToRemove, els));
-    }
 
-    const onLoad = (_reactFlowInstance) =>
-        setReactFlowInstance(_reactFlowInstance);
+    const {elements, selectedElement, newNodeInfo} = useStoreState(state => ({
+        elements: state.elements,
+        selectedElement: state.selectedElement,
+        newNodeInfo: state.newNodeInfo,
+    }));
+    const {addNode, setSelectedElement, removeNode, connectNodes} = useStoreActions(actions => ({
+        addNode: actions.addNode,
+        setSelectedElement: actions.setSelectedElement,
+        removeNode: actions.removeNode,
+        connectNodes: actions.connectNodes,
+    }))
+
+    const onConnect = (params) => connectNodes(params)
+    const onElementsRemove = (elementsToRemove) => removeNode(elementsToRemove)
+    const onLoad = (_reactFlowInstance) => setReactFlowInstance(_reactFlowInstance);
 
     const onDragOver = (event) => {
         event.preventDefault();
@@ -45,43 +42,16 @@ export default function () {
 
     const onDrop = (event) => {
         event.preventDefault();
-
         const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
-        const {type, data} = JSON.parse(event.dataTransfer.getData('application/reactflow'));
-        console.log(type, data)
         const position = reactFlowInstance.project({
             x: event.clientX - reactFlowBounds.left,
             y: event.clientY - reactFlowBounds.top,
         });
-
-        const newNode = {
-            id: getRandomInt(1000).toString(),
-            type,
-            position,
-            data: { label: `${data}` },
-        };
-
-        setElements(prevState => {
-            return [...prevState, newNode]
-        });
+        addNode({
+            ...newNodeInfo,
+            position
+        })
     }
-
-    const onClickAddNode = ({type, data}) => {
-        const newNode = {
-            id: getRandomInt(1000).toString(),
-            type: type,
-            data: { label: data },
-            position: {
-                x: -100,
-                y: Math.random() * window.innerHeight/2,
-            },
-        };
-        setElements((els) => els.concat(newNode));
-    }
-
-    useEffect(()=>{
-
-    }, [selectedElement])
 
     return (
         <div className={`flex flex-col h-screen overflow-y-hidden antialiased text-gray-900 bg-white`}>
@@ -94,8 +64,6 @@ export default function () {
                         <Sidebar
                             sidebar={sidebar}
                             toggleSidebar={toggleSidebar}
-                            onClickAddNode={onClickAddNode}
-
                         />
                         <main
                             className='flexh-full w-full'
@@ -105,12 +73,8 @@ export default function () {
                                 elements={elements}
                                 onConnect={onConnect}
                                 onElementsRemove={onElementsRemove}
-                                onElementClick={(event, elements) => {
-                                    setSelectedElement(elements)
-                                }}
-                                onPaneClick={()=>{
-                                    setSelectedElement(null)
-                                }}
+                                onElementClick={(event, elements) => setSelectedElement(elements)}
+                                onPaneClick={()=> setSelectedElement(null)}
                                 selectNodesOnDrag={false}
                                 onLoad={onLoad}
                                 onDrop={onDrop}

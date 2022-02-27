@@ -1,10 +1,13 @@
 import React, {useState} from "react";
+import {useStore, useStoreState} from "easy-peasy";
 
 
 
-export default ({isDataTableHidden=true}) => {
-    const [dataView, setDataView] = useState('data')
-    console.log(isDataTableHidden)
+export default () => {
+    const {selectedElement} = useStoreState(state => ({
+        selectedElement: state.selectedElement,
+    }));
+
     return (
         // Table Wrapper
         <div
@@ -18,7 +21,7 @@ export default ({isDataTableHidden=true}) => {
                 -translate-x-1/2 
                 h-2/6
                 w-8/12
-                ${isDataTableHidden ? 'hidden' : ''}
+                ${selectedElement === null ? 'hidden' : ''}
                 z-40
                 `
             }
@@ -43,7 +46,7 @@ export default ({isDataTableHidden=true}) => {
                     </div>
                 </div>
             </div>
-            <div className={'relative w-full flex-1 overflow-y-scroll'}>
+            <div className={'relative w-full flex-1 overflow-y-scroll overflow-x-hidden'}>
                 <table className="table-auto w-full rounded-t-md">
                     <thead className={'rounded-t-md uppercase'}>
                     <tr>

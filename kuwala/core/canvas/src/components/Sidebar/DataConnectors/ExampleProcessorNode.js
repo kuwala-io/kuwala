@@ -2,7 +2,12 @@ import React, { DragEvent } from 'react';
 
 export default ({onDragStart, onClickAddNode}) => {
     const type = 'default'
-    const data = 'Processor Node'
+    const data = {
+        label: 'Processor Node'
+    }
+
+
+
     return (
         <div
             className={`

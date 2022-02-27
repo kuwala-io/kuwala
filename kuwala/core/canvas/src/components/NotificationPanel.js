@@ -15,6 +15,7 @@ export default ({isNotificationOpen, toggleNotification}) => {
                       shadow-lg
                       w-80
                       p-4
+                      z-40
                       ${isNotificationOpen ? 'static' : 'hidden'}
                     `}
 

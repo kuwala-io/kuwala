@@ -2,7 +2,9 @@ import React, { DragEvent } from 'react';
 
 export default ({onDragStart, onClickAddNode}) => {
     const type = 'output'
-    const data = 'Output Node'
+    const data = {
+        label: 'Output Node'
+    }
     return (
         <div
             className={`
