@@ -150,6 +150,8 @@ def run_population_density_pipeline(continent, country, demographic_groups):
 def run_database_importer(
     continent, country, country_region, population_density_update_date
 ):
+    logging.info("Starting database…")
+
     database_profile = DockerClient(compose_profiles=["database"])
     connected_to_db = False
     max_retries = 120

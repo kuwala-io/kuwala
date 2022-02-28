@@ -1,5 +1,7 @@
 h3==3.7.3
 hdx-python-api==5.5.3
+hdx-python-country==3.0.8
+hdx-python-utilities==3.0.8
 pycountry==22.1.10
 pycountry-convert==0.7.2
 pyquery==1.4.3

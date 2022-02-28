@@ -79,26 +79,6 @@ services:
       - network
       - jupyter
 
-  cli:
-    container_name: cli
-    build:
-      context: kuwala
-      dockerfile: ./core/cli/dockerfile
-    environment:
-      - DATABASE_HOST=postgres
-      - JUPYTER_HOST=jupyter
-    restart: always
-    profiles:
-      - network
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./docker-compose.yml:/var/app/docker-compose.yml
-      - ./kuwala/tmp/kuwala:/var/app/kuwala/tmp/kuwala
-      - ./kuwala/core/jupyter/modules:/var/app/kuwala/core/jupyter/modules
-      - ./kuwala/core/database/transformer:/var/app/kuwala/core/database/transformer
-      - ./kuwala/core/jupyter/notebooks:/var/app/kuwala/core/jupyter/notebooks
-      - ./kuwala/core/jupyter/resources:/var/app/kuwala/core/jupyter/resources
-      - ./kuwala/tmp/kuwala/transformer:/var/app/kuwala/tmp/kuwala/transformer
 
   # docker-compose run admin-boundaries --continent=<> --country=<> --country_region=<>
   admin-boundaries:
