@@ -18,7 +18,7 @@ export default ({onDragStart, onClickAddNode}) => {
     const nodeInfo = {
         type,
         data: {
-            label: 'Input Node',
+            label: 'Processor Node',
             columns,
             rows
         }
