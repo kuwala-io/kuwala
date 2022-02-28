@@ -2,18 +2,18 @@ import React, { DragEvent } from 'react';
 
 export default ({onDragStart, onClickAddNode}) => {
     const type = 'default'
-    const rows = ['First Name','Second First Name','Last Name','First Name','Second First Name','Last Name']
+    const rows = ['compay_name','lat','log','unique_customer','returning_customer','domain']
     const dataRows = [
-        ['Elijah','Elijah','Talloe','Elijah','Elijah','Talloe'],
-        ['Theo','Theo','Ditts','Theo','Theo','Ditts'],
-        ['Lauretta','Lauretta','Duncanson','Lauretta','Lauretta','Duncanson'],
-        ['Alikee','Alikee','Bartke','Alikee','Alikee','Bartke'],
-        ['Ethelind','Ethelind','Soule','Ethelind','Ethelind','Soule'],
-        ['Lucian','Lucian','Rastall','Lucian','Lucian','Rastall'],
-        ['Fabian','Fabian','Cumming','Fabian','Fabian','Cumming'],
-        ['Bartie','Bartie','Deverill','Bartie','Bartie','Deverill'],
-        ['Jedidiah','Jedidiah','Oldford','Jedidiah','Jedidiah','Oldford'],
-        ['Tod','Tod','Mugg','Tod','Tod','Mugg'],
+        ['Quire','-18.6248754','-43.058341','8463','2994','nsw.gov.au'],
+        ['Topiczoom','-38.956431','-68.23127','6771','2687','multiply.com'],
+        ['Zoombox','43.5161759','68.5090258','6058','1457','technorati.com'],
+        ['Meevee','-12.7398884','-60.1422676','5070','1918','upenn.edu'],
+        ['Twitterwire','30.475663','-87.193563','4738','2951','nps.gov'],
+        ['Topiclounge','10.3764175','119.1852645','6369','1274','globo.com'],
+        ['Devcast','47.236015','127.114832','3700','1890','ovh.net'],
+        ['Devpulse','52.20307','17.48955','8757','1321','live.com'],
+        ['Plajo','59.5448264','13.5422638','5122','1528','chicagotribune.com'],
+        ['Zoomdog','34.440727','134.9171616','7576','2907','webnode.com'],
     ]
     const data = {
         label: 'Processor Node',

@@ -1,15 +1,18 @@
-import React from "react";
+import React, {useState} from "react";
 
 import ExampleDataSource from "./DataConnectors/ExampleDataSource";
 import ExampleProcessorNode from "./DataConnectors/ExampleProcessorNode";
 import ExampleOutputNode from "./DataConnectors/ExampleOutputNode";
 import {useStoreActions, useStoreState} from "easy-peasy";
 
-export default ({sidebar, toggleSidebar}) => {
+export default () => {
     const {addNode, setNewNodeInfo} = useStoreActions(actions => ({
         addNode: actions.addNode,
         setNewNodeInfo: actions.setNewNodeInfo
     }))
+
+    const [sidebar, setSidebar] = useState(false);
+    const toggleSidebar = () => setSidebar(!sidebar);
 
     const onDragStart = (event, newNodeInfo) => {
         setNewNodeInfo(newNodeInfo)
@@ -28,14 +31,14 @@ export default ({sidebar, toggleSidebar}) => {
 
     return (
         <div className={`
-                            absolute
-                            z-10
-                            flex
-                            flex-row
-                            transition-all
-                            transform
-                            h-full
-                            ${sidebar ? '-translate-x-full' : ''}`}
+            absolute
+            z-10
+            flex
+            flex-row
+            transition-all
+            transform
+            h-full
+            ${sidebar ? '-translate-x-full' : ''}`}
         >
             <div className={'relative w-64'}>
                 <aside
@@ -103,6 +106,7 @@ export default ({sidebar, toggleSidebar}) => {
                             border-kuwala-green
                             bg-white
                             text-kuwala-green
+                            hidden
                         `}
                 >
                     {sidebar ? '>' : '<'}

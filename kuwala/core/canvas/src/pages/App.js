@@ -12,8 +12,6 @@ import DataView from "../components/DataView";
 import {useStoreActions, useStoreState} from 'easy-peasy';
 
 export default function () {
-    const [sidebar, setSidebar] = useState(false);
-    const toggleSidebar = () => setSidebar(!sidebar);
     const [isNotificationOpen, setNotification] = useState(false);
     const toggleNotification = () => setNotification(!isNotificationOpen);
     const reactFlowWrapper = useRef(null);
@@ -57,14 +55,10 @@ export default function () {
         <div className={`flex flex-col h-screen overflow-y-hidden antialiased text-gray-900 bg-white`}>
             <div className='flex flex-col h-full overflow-hidden w-full'>
                 <Header toggleNotification={toggleNotification}/>
-
                 {/* MAIN CONTENT CONTAINER */}
                 <div className={'flex flex-row h-full max-h-screen relative'}>
                     <ReactFlowProvider>
-                        <Sidebar
-                            sidebar={sidebar}
-                            toggleSidebar={toggleSidebar}
-                        />
+                        <Sidebar />
                         <main
                             className='flexh-full w-full'
                             ref={reactFlowWrapper}

@@ -9,8 +9,8 @@ export default ({toggleNotification}) => {
                 <div className='flex items-center'>
                     {/* COMPANY TITLE */}
                     <span className="p-4 text-xl font-semibold tracking-wider uppercase">
-                                <img src={KuwalaLogo} alt={"Kuwala Logo"}/>
-                            </span>
+                        <img src={KuwalaLogo} alt={"Kuwala Logo"}/>
+                    </span>
                 </div>
 
                 {/* RIGHT BUTTONS */}
