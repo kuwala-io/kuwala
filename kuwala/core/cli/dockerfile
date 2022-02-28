@@ -1,14 +1,10 @@
 # This is a draft dockerfile. The dockerization doesn't work properly because mounting the volumes from one docker to
 # another is not working as expected.
 
-# We need to emulate on M1 macs currently because of a bug in libpq which is installed by the psycopg2-binary.
-# See SO: https://stackoverflow.com/a/70238851/13097240
-
-# hadolint ignore=DL3029
-FROM --platform=linux/amd64 python:3.10.2-slim-buster
+FROM python:3.10.2-slim-buster
 
 RUN apt-get update && \
-    apt-get install --no-install-recommends wget=\* build-essential=12.6 -y && \
+    apt-get install --no-install-recommends wget=\* build-essential=12.6 libpq-dev=\* -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

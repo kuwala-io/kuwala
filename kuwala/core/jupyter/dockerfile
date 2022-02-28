@@ -1,20 +1,16 @@
-# We need to emulate on M1 macs currently because of a bug in libpq which is installed by the dbt package.
-# See SO: https://stackoverflow.com/a/70238851/13097240
-
-# hadolint ignore=DL3029
-FROM --platform=linux/amd64 jupyter/pyspark-notebook:spark-3.2.1
+FROM jupyter/pyspark-notebook:spark-3.2.1
 
 USER root
 
 RUN apt-get update && \
-    apt-get install --no-install-recommends build-essential=\* -y && \
+    apt-get install --no-install-recommends build-essential=\* libpq-dev=\* -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir "pandas-profiling[notebook]==3.1.0"
 
 COPY ./core/jupyter/requirements.txt /opt/requirements.txt
-RUN pip install --no-cache-dir -r /opt/requirements.txt
+RUN DBT_PSYCOPG2_NAME=psycopg2 pip install --no-cache-dir -r /opt/requirements.txt --no-binary dbt-postgres
 
 # Setup work directory for backward-compatibility
 RUN rmdir "/home/jovyan/work" && \
@@ -27,5 +23,7 @@ RUN rmdir "/home/jovyan/work" && \
     fix-permissions "/home/jovyan"
 
 ENV PYTHONPATH="/home/jovyan/"
+
+USER jovyan
 
 CMD ["start.sh", "jupyter", "lab", "--ServerApp.token=''"]

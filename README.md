@@ -66,10 +66,10 @@ We currently have five pipelines for different third-party data sources which ca
 database. The following pipelines are integrated:
 
  - [Admin Boundaries](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/admin-boundaries/README.md)
-  - [Google POIs](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/google-poi/README.md)
-  - [Google Trends](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/google-trends/README.md)
-  - [OSM POIs](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/osm-poi/README.md)
-  - [Population Density](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/population-density/README.md)
+ - [Google POIs](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/google-poi/README.md)
+ - [Google Trends](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/google-trends/README.md)
+ - [OSM POIs](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/osm-poi/README.md)
+ - [Population Density](https://github.com/kuwala-io/kuwala/tree/master/kuwala/pipelines/population-density/README.md)
 
 ### Jupyter environment & CLI
 
@@ -90,24 +90,42 @@ score. In the demo, we have preprocessed popularity data and a test dataset with
 #### Run the demo
 
 You could either use the deployed example on Binder using the badge above or run everything locally. The Binder example
-simply uses Pandas dataframes and is not connecting to a data warehouse. \
-To run the demo locally, launch Docker in the background and from inside the root directory run:
+simply uses Pandas dataframes and is not connecting to a data warehouse. 
 
-***Hint:*** For Windows, please use PowerShell or any Docker integrated terminal
+<details>
+    <summary>Setting up and running the CLI</summary><br/>
+
+#### Prerequisites
+
+1. Installed version of `Docker` and `docker-compose v2`.
+   - We recommend using the latest version of [`Docker Desktop`](https://www.docker.com/products/docker-desktop).
+2. Installed version of `Python3`.
+   - We recommend using version `3.9.5` or higher.
+   - To check your current version run `python3 --version`.
+3. Installed version of `libpq`.
+   - For Mac, you can use brew: `brew install libpq`
+
+#### Setup
+
+1. Change your directory to `kuwala/core/cli`.
+2. Create a virtual environment.
+   - For instructions on how to set up a `venv` on different system see [here](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/).
+3. Install dependencies by running `pip3 install --no-cache-dir -r requirements.txt`
+
+#### Run
+
+To start the CLI, run the following command from inside the `kuwala/core/cli/src` directory and follow the instructions:
 
 ```zsh
-docker-compose run cli
+python3 main.py
 ```
 
-To use the demo data, select `"Use demo data for Portugal"`:
+</details>
 
-```
-? Do you want to run and select the pipelines yourself or do you want to use a preprocessed demo with data for Portugal? (Use arrow keys)
-   Run pipelines myself
- » Use demo data for Portugal
-```
+### Using Kuwala components individually
 
-To run the pipelines individually for selected countries, simply select the first option `"Run pipelines myself`.
+To use Kuwala's components, such as the data pipelines or the Jupyter environment, individually, please refer to the
+[instructions under `/kuwala`](https://github.com/kuwala-io/kuwala/blob/master/kuwala/README.md).
 
 ---
 

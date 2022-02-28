@@ -1,12 +1,13 @@
-# We need to emulate on M1 macs currently because of a bug in libpq which is installed by the dbt package.
-# See SO: https://stackoverflow.com/a/70238851/13097240
+FROM python:3.9.5-slim-buster
 
-# hadolint ignore=DL3029
-FROM --platform=linux/amd64 python:3.9.5-slim-buster
+RUN apt-get update && \
+    apt-get install --no-install-recommends build-essential=12.6 libpq-dev=\* -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY ./core/database/transformer /opt/app/core/database/transformer
 
 WORKDIR /opt/app/core/database/transformer
-RUN pip install --no-cache-dir -r requirements.txt
+RUN DBT_PSYCOPG2_NAME=psycopg2 pip install --no-cache-dir -r requirements.txt --no-binary dbt-postgres
 
 ENTRYPOINT [ "python", "main.py" ]
