@@ -1,7 +1,5 @@
 import React, {useState} from "react";
-import {useStore, useStoreState} from "easy-peasy";
-
-
+import {useStoreState} from "easy-peasy";
 
 export default () => {
     const {selectedElement} = useStoreState(state => ({
@@ -9,16 +7,17 @@ export default () => {
     }));
 
     const renderHeader = () => {
-        if(selectedElement !== null) {
-            return selectedElement.data.rows.map((e,i)=> (<th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}>{e}</th>))
+        if(selectedElement) {
+            console.log(selectedElement)
+            return selectedElement.data.columns.map((e,i)=> (<th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}>{e}</th>))
         } else {
             return <></>
         }
     }
 
     const renderBody = () => {
-        if(selectedElement !== null) {
-            return selectedElement.data.dataRows.map((e,i) => (
+        if(selectedElement) {
+            return selectedElement.data.rows.map((e,i) => (
                 <tr className={'bg-white border-2 text-center'}>
                     {e.map((e,i)=> (<td className={'py-6'}>{e}</td>))}
                 </tr>
@@ -26,9 +25,6 @@ export default () => {
         }else {
             return <></>
         }
-
-
-
     }
 
 
@@ -38,15 +34,12 @@ export default () => {
             className={`
                 flex
                 flex-col
-                absolute 
-                left-1/2 
                 bottom-0
-                transform
-                -translate-x-1/2 
-                h-2/6
-                w-8/12
+                h-2/5
+                w-full
+                z-10
+                absolute
                 ${selectedElement === null ? 'hidden' : ''}
-                z-40
                 `
             }
         >

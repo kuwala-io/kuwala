@@ -2,8 +2,8 @@ import React, { DragEvent } from 'react';
 
 export default ({onDragStart, onClickAddNode}) => {
     const type = 'input'
-    const rows = ['compay_name','lat','log','unique_customer']
-    const dataRows = [
+    const columns = ['compay_name','lat','log','unique_customer']
+    const rows = [
         ['Dabfeed','47.7787755','27.8884238','8390'],
         ['Leenti','40.284979','117.134151','9882'],
         ['Shufflebeat','12.0375095','-61.6676857','1593'],
@@ -15,17 +15,13 @@ export default ({onDragStart, onClickAddNode}) => {
         ['Tagtune','18.4458276','-96.3598367','3945'],
         ['Feedspan','-6.766979','105.9053689','3131'],
     ]
-    const data = {
-        label: 'Input Node',
-        rows,
-        dataRows
-    }
-
-    const nodeName = 'Input Node'
     const nodeInfo = {
         type,
-        rows: ['a'],
-        data
+        data: {
+            label: 'Input Node',
+            columns,
+            rows
+        }
     }
 
     return (
@@ -42,7 +38,7 @@ export default ({onDragStart, onClickAddNode}) => {
             onClick={() => onClickAddNode(nodeInfo)}
             draggable
         >
-            { nodeName }
+            Input Node
         </div>
     )
 }

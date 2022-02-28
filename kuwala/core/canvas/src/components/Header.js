@@ -9,7 +9,10 @@ export default ({toggleNotification}) => {
                 <div className='flex items-center'>
                     {/* COMPANY TITLE */}
                     <span className="p-4 text-xl font-semibold tracking-wider uppercase">
-                        <img src={KuwalaLogo} alt={"Kuwala Logo"}/>
+                        <img
+                            src={KuwalaLogo} alt={"Kuwala Logo"}
+                            style={{height: 40}}
+                        />
                     </span>
                 </div>
 

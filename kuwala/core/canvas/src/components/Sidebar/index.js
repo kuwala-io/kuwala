@@ -11,9 +11,6 @@ export default () => {
         setNewNodeInfo: actions.setNewNodeInfo
     }))
 
-    const [sidebar, setSidebar] = useState(false);
-    const toggleSidebar = () => setSidebar(!sidebar);
-
     const onDragStart = (event, newNodeInfo) => {
         setNewNodeInfo(newNodeInfo)
         event.dataTransfer.effectAllowed = 'move';
@@ -31,27 +28,28 @@ export default () => {
 
     return (
         <div className={`
-            absolute
-            z-10
             flex
             flex-row
             transition-all
             transform
             h-full
-            ${sidebar ? '-translate-x-full' : ''}`}
+            w-64
+            lg:w-80
+            z-10
+            `}
         >
-            <div className={'relative w-64'}>
+            <div className={'w-full'}>
                 <aside
                     className={`
-                            inset-y-0
-                            flex flex-col flex-shrink-0
-                            w-64
-                            overflow-hidden
-                            bg-white
-                            border-r
-                            h-full
-                            shadow-sm
-                            top-0`
+                        inset-y-0
+                        flex flex-col flex-shrink-0
+                        w-full
+                        overflow-hidden
+                        bg-white
+                        border-r
+                        h-full
+                        shadow-sm
+                        top-0`
                     }
                 >
                     {/* Header and Toggle */}
@@ -89,27 +87,6 @@ export default () => {
                         `}
                 >
                     +
-                </button>
-
-                <button
-                    onClick={toggleSidebar}
-                    className={`
-                            ml-4
-                            mt-20
-                            w-12
-                            h-12
-                            rounded-lg 
-                            absolute
-                            text-xl
-                            font-bold
-                            border-2
-                            border-kuwala-green
-                            bg-white
-                            text-kuwala-green
-                            hidden
-                        `}
-                >
-                    {sidebar ? '>' : '<'}
                 </button>
             </div>
         </div>

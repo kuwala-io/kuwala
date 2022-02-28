@@ -18,7 +18,6 @@ export default ({isNotificationOpen, toggleNotification}) => {
                       z-40
                       ${isNotificationOpen ? 'static' : 'hidden'}
                     `}
-
         >
             {/* NOTIFICATION HEADER */}
             <div className='flex items-center justify-between flex-shrink-0'>
@@ -54,14 +53,11 @@ export default ({isNotificationOpen, toggleNotification}) => {
             </div>
 
             {/* NOTIFICATION BODY */}
-            <div className='mt-4 md:mt-8 flex flex-col overflow-y-scroll'>
+            <div className='mt-4 flex flex-col'>
                 {/* NOTIFICATION ITEM */}
-                {[...Array(dummyNotification)].map((e,i) => (
-                    <div className='p-2 border-b flex flex-col'>
-                        <span className='text-sm font-semibold'>Notification Title</span>
-                        <span className='text-sm'>Created a new short url</span>
-                    </div>
-                ))}
+                <div className='p-2 border-b flex flex-col'>
+                    <span>There are no new notifications!</span>
+                </div>
             </div>
         </div>
     )

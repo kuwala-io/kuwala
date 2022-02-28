@@ -53,14 +53,14 @@ export default function () {
 
     return (
         <div className={`flex flex-col h-screen overflow-y-hidden antialiased text-gray-900 bg-white`}>
-            <div className='flex flex-col h-full overflow-hidden w-full'>
+            <div className='flex flex-col h-full w-full'>
                 <Header toggleNotification={toggleNotification}/>
                 {/* MAIN CONTENT CONTAINER */}
                 <div className={'flex flex-row h-full max-h-screen relative'}>
                     <ReactFlowProvider>
                         <Sidebar />
                         <main
-                            className='flexh-full w-full'
+                            className='flex h-full w-full flex-col max-h-screen relative'
                             ref={reactFlowWrapper}
                         >
                             <ReactFlow
@@ -79,13 +79,11 @@ export default function () {
                                     style={{right: 10, left: 'auto'}}
                                 />
                             </ReactFlow>
+
+                            <DataView/>
                         </main>
                     </ReactFlowProvider>
                 </div>
-
-                <DataView
-                    isDataTableHidden={selectedElement == null}
-                />
 
                 <NotificationPanel
                     isNotificationOpen={isNotificationOpen}
