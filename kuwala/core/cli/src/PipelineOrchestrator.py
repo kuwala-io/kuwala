@@ -34,55 +34,66 @@ def download_demo():
 
 
 def run_osm_poi_pipeline(url, continent, country, country_region):
+    command_download = [
+        "--action",
+        "download",
+        "--url",
+        url,
+        "--continent",
+        continent,
+        "--country",
+        country,
+    ]
+
+    if country_region:
+        command_download += ["--country_region", country_region]
+
     print(
         docker.compose.run(
             service="osm-poi",
             remove=True,
-            command=[
-                "--action",
-                "download",
-                "--url",
-                url,
-                "--continent",
-                continent,
-                "--country",
-                country,
-                "--country_region",
-                country_region,
-            ],
+            command=command_download,
         )
     )
+
+    command_parse = [
+        "java",
+        "-jar",
+        "target/osm-parquetizer-1.0.1-SNAPSHOT.jar",
+        "--continent",
+        continent,
+        "--country",
+        country,
+    ]
+
+    if country_region:
+        command_parse += ["--country_region", country_region]
+
     print(
         docker.compose.run(
             service="osm-parquetizer",
             remove=True,
-            command=[
-                "java",
-                "-jar",
-                "target/osm-parquetizer-1.0.1-SNAPSHOT.jar",
-                "--continent",
-                continent,
-                "--country",
-                country,
-                "--country_region",
-                country_region,
-            ],
+            command=command_parse,
         )
     )
+
+    command_process = [
+        "--action",
+        "process",
+        "--continent",
+        continent,
+        "--country",
+        country,
+    ]
+
+    if country_region:
+        command_process += ["--country_region", country_region]
+
     print(
         docker.compose.run(
             service="osm-poi",
             remove=True,
-            command=[
-                "--action",
-                "process",
-                "--continent",
-                continent,
-                "--country",
-                country,
-                "--country_region",
-                country_region,
-            ],
+            command=command_process,
         )
     )
 
@@ -113,18 +124,21 @@ def run_google_poi_pipeline(continent, country, country_region):
 
         return
 
+    command = [
+        "--continent",
+        continent,
+        "--country",
+        country,
+    ]
+
+    if country_region:
+        command += ["--country_region", country_region]
+
     print(
         docker.compose.run(
             service="google-poi-pipeline",
             remove=True,
-            command=[
-                "--continent",
-                continent,
-                "--country",
-                country,
-                "--country_region",
-                country_region,
-            ],
+            command=command,
         )
     )
     google_poi_scraper_profile.compose.stop()
@@ -182,20 +196,23 @@ def run_database_importer(
         logging.error("Couldn't connect to database.")
         sys.exit(1)
 
+    command = [
+        "--continent",
+        continent,
+        "--country",
+        country,
+        "--population_density_date",
+        population_density_update_date,
+    ]
+
+    if country_region:
+        command += ["--country_region", country_region]
+
     print(
         docker.compose.run(
             service="database-importer",
             remove=True,
-            command=[
-                "--continent",
-                continent,
-                "--country",
-                country,
-                "--country_region",
-                country_region,
-                "--population_density_date",
-                population_density_update_date,
-            ],
+            command=command,
         )
     )
 
