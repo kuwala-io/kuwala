@@ -594,7 +594,13 @@
             "pharmaceutical_lab",
             "pet_friendly_accommodation",
             "group_accommodation",
-            "stylist"
+            "stylist",
+            "hawaiian_restaurant",
+            "sushi_takeaway",
+            "gas_cylinders_supplier",
+            "bar_pmu",
+            "rest_stop",
+            "electric_vehicle_charging_station"
         ]
     },
     "office": {
