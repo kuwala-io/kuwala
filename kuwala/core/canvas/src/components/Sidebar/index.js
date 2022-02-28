@@ -1,8 +1,8 @@
 import React, {useState} from "react";
 
-import ExampleDataSource from "./DataConnectors/ExampleDataSource";
-import ExampleProcessorNode from "./DataConnectors/ExampleProcessorNode";
-import ExampleOutputNode from "./DataConnectors/ExampleOutputNode";
+import DataSourceHandler from "./NodeHandlers/DataSourceHandler";
+import TransformationHandler from "./NodeHandlers/TransformationHandler";
+import VisualizationHandler from "./NodeHandlers/VisualizationHandler";
 import {useStoreActions, useStoreState} from "easy-peasy";
 
 export default () => {
@@ -61,9 +61,9 @@ export default () => {
 
                     {/* CONNECTOR CONTAINERS */}
                     <div className={'flex flex-col p-2 pr-8 pl-8 space-y-4'}>
-                        <ExampleDataSource onDragStart={onDragStart} onClickAddNode={onClickAddNode}/>
-                        <ExampleProcessorNode onDragStart={onDragStart} onClickAddNode={onClickAddNode}/>
-                        <ExampleOutputNode onDragStart={onDragStart} onClickAddNode={onClickAddNode}/>
+                        <DataSourceHandler onDragStart={onDragStart} onClickAddNode={onClickAddNode}/>
+                        <TransformationHandler onDragStart={onDragStart} onClickAddNode={onClickAddNode}/>
+                        <VisualizationHandler onDragStart={onDragStart} onClickAddNode={onClickAddNode}/>
                     </div>
                 </aside>
             </div>

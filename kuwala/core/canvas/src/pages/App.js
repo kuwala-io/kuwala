@@ -10,6 +10,9 @@ import Header from "../components/Header";
 import NotificationPanel from "../components/NotificationPanel";
 import DataView from "../components/DataView";
 import {useStoreActions, useStoreState} from 'easy-peasy';
+import DataSourceNode from "../components/Nodes/DataSourceNode";
+import TransformationNode from "../components/Nodes/TransformationNode";
+import VisualizationNode from "../components/Nodes/VisualizationNode";
 
 export default function () {
     const [isNotificationOpen, setNotification] = useState(false);
@@ -22,12 +25,7 @@ export default function () {
         selectedElement: state.selectedElement,
         newNodeInfo: state.newNodeInfo,
     }));
-    const {addNode, setSelectedElement, removeNode, connectNodes} = useStoreActions(actions => ({
-        addNode: actions.addNode,
-        setSelectedElement: actions.setSelectedElement,
-        removeNode: actions.removeNode,
-        connectNodes: actions.connectNodes,
-    }))
+    const {addNode, setSelectedElement, removeNode, connectNodes, setOpenDataView} = useStoreActions(actions => actions)
 
     const onConnect = (params) => connectNodes(params)
     const onElementsRemove = (elementsToRemove) => removeNode(elementsToRemove)
@@ -67,8 +65,19 @@ export default function () {
                                 elements={elements}
                                 onConnect={onConnect}
                                 onElementsRemove={onElementsRemove}
-                                onElementClick={(event, elements) => setSelectedElement(elements)}
-                                onPaneClick={()=> setSelectedElement(null)}
+                                onElementClick={(event, elements) => {
+                                    setOpenDataView(false)
+                                    setSelectedElement(elements)
+                                }}
+                                onPaneClick={()=> {
+                                    setSelectedElement(null)
+                                    setOpenDataView(false)
+                                }}
+                                nodeTypes={{
+                                    dataSource: DataSourceNode,
+                                    transformation: TransformationNode,
+                                    visualization: VisualizationNode,
+                                }}
                                 selectNodesOnDrag={false}
                                 onLoad={onLoad}
                                 onDrop={onDrop}
@@ -76,10 +85,14 @@ export default function () {
                                 defaultPosition={[500,150]}
                             >
                                 <Controls
-                                    style={{right: 10, left: 'auto'}}
+                                    style={{
+                                        right: 20,
+                                        left: 'auto',
+                                        zIndex: 20,
+                                        bottom: selectedElement ?'calc(34% + 10px)' : 20,
+                                    }}
                                 />
                             </ReactFlow>
-
                             <DataView/>
                         </main>
                     </ReactFlowProvider>

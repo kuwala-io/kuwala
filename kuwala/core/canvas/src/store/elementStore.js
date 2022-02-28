@@ -6,14 +6,13 @@ const elementStoreModel =  {
     elements: [],
     selectedElement: null,
     newNodeInfo: {},
+    openDataView: false,
 
     // Actions
     addNode: action((state, nodeInfo) => {
         const newNode = {
             id: v4(),
-            type: nodeInfo.type,
-            position: nodeInfo.position,
-            data: nodeInfo.data,
+            ...nodeInfo
         };
         state.elements.push(newNode)
     }),
@@ -29,10 +28,12 @@ const elementStoreModel =  {
     }),
     setSelectedElement: action((state, selectedNode) => {
         state.selectedElement = selectedNode
-        console.log(selectedNode)
     }),
     setNewNodeInfo: action((state, newNodeInfo) => {
         state.newNodeInfo = newNodeInfo
+    }),
+    setOpenDataView: action((state, openDataView) => {
+        state.openDataView = openDataView
     })
 }
 

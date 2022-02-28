@@ -2,6 +2,8 @@ import React from "react";
 import KuwalaLogo from "../icons/kuwala_logo.png";
 
 export default ({toggleNotification}) => {
+
+    const notifications = 0;
     return (
         <header className='flex-shrink-0 border-b'>
             {/* HEADER BAR CONTAINER */}
@@ -21,8 +23,12 @@ export default ({toggleNotification}) => {
                     {/* Notification */}
                     <div className='relative'>
                         {/* Red Dot */}
-                        <div className="absolute right-0 p-1 bg-red-400 rounded-full animate-ping"></div>
-                        <div className="absolute right-0 p-1 bg-red-400 border rounded-full"></div>
+                        {notifications > 0 ? (
+                            <>
+                                <div className="absolute right-0 p-1 bg-red-400 rounded-full animate-ping"></div>
+                                <div className="absolute right-0 p-1 bg-red-400 border rounded-full"></div>
+                            </>
+                        ) : ''}
                         <button
                             onClick={toggleNotification}
                             className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 focus:outline-none focus:ring"

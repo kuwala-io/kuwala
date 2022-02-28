@@ -8,7 +8,6 @@ export default () => {
 
     const renderHeader = () => {
         if(selectedElement) {
-            console.log(selectedElement)
             return selectedElement.data.columns.map((e,i)=> (<th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}>{e}</th>))
         } else {
             return <></>
@@ -39,7 +38,7 @@ export default () => {
                 w-full
                 z-10
                 absolute
-                ${selectedElement === null ? 'hidden' : ''}
+                ${selectedElement ? '' : 'hidden'}
                 `
             }
         >

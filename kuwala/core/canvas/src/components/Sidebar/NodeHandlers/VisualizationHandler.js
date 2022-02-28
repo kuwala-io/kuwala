@@ -1,7 +1,7 @@
 import React, { DragEvent } from 'react';
 
 export default ({onDragStart, onClickAddNode}) => {
-    const type = 'input'
+    const type = 'visualization'
     const columns = ['compay_name','lat','log','unique_customer']
     const rows = [
         ['Dabfeed','47.7787755','27.8884238','8390'],
@@ -18,16 +18,16 @@ export default ({onDragStart, onClickAddNode}) => {
     const nodeInfo = {
         type,
         data: {
-            label: 'Input Node',
+            label: 'Output Node',
             columns,
             rows
-        }
+        },
+        targetPosition: 'left',
     }
-
     return (
         <div
             className={`
-                    border-blue-500 
+                    border-kuwala-red
                     text-xs
                     p-4
                     m-0
@@ -38,7 +38,7 @@ export default ({onDragStart, onClickAddNode}) => {
             onClick={() => onClickAddNode(nodeInfo)}
             draggable
         >
-            Input Node
+            Visualization
         </div>
     )
 }

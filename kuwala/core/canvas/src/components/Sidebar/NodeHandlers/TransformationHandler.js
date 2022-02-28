@@ -1,7 +1,7 @@
 import React, { DragEvent } from 'react';
 
 export default ({onDragStart, onClickAddNode}) => {
-    const type = 'default'
+    const type = 'transformation'
     const columns = ['compay_name','lat','log','unique_customer','returning_customer','domain']
     const rows = [
         ['Quire','-18.6248754','-43.058341','8463','2994','nsw.gov.au'],
@@ -18,10 +18,12 @@ export default ({onDragStart, onClickAddNode}) => {
     const nodeInfo = {
         type,
         data: {
-            label: 'Processor Node',
+            label: 'Transfrmation Node',
             columns,
             rows
-        }
+        },
+        sourcePosition: 'right',
+        targetPosition: 'left',
     }
     return (
         <div
@@ -37,7 +39,7 @@ export default ({onDragStart, onClickAddNode}) => {
             onClick={() => onClickAddNode(nodeInfo)}
             draggable
         >
-            Processor Node
+            Transformation Node
         </div>
     )
 }
