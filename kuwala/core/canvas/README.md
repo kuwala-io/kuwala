@@ -9,3 +9,7 @@ To Run the Project:
 2. npm ci
 3. npm start
 4. navigate to `localhost:3000` in your browser
+
+## Data Sources
+
+- Postgres
