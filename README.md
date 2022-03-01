@@ -99,11 +99,13 @@ simply uses Pandas dataframes and is not connecting to a data warehouse.
 
 1. Installed version of `Docker` and `docker-compose v2`.
    - We recommend using the latest version of [`Docker Desktop`](https://www.docker.com/products/docker-desktop).
-2. Installed version of `Python3`.
+2. Installed version of `Python3` and *latest* `pip, setuptools, and wheel` version.
    - We recommend using version `3.9.5` or higher.
    - To check your current version run `python3 --version`.
 3. Installed version of `libpq`.
    - For Mac, you can use brew: `brew install libpq`
+4. Installed version of `postgresql`.
+   - For Mac, you can use brew: `brew install postgresql`
 
 #### Setup
 
