@@ -3,13 +3,12 @@ import logging
 import os
 
 from hdx.data.dataset import Dataset
+import python_utils.src.FileSelector as FileSelector
 import questionary
-
-import kuwala.common.python_utils.src.FileSelector as FileSelector
 
 
 def select_demo():
-    choices = ["Run Pipelines myself", "Use demo data for Portugal"]
+    choices = ["Run pipelines myself", "Use demo data for Portugal"]
     choice = questionary.select(
         "Do you want to run and select the pipelines yourself or do you want to use a "
         "preprocessed demo with data for Portugal?",

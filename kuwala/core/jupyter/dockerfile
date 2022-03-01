@@ -1,9 +1,18 @@
-FROM jupyter/pyspark-notebook:2021-11-20
+FROM jupyter/pyspark-notebook:spark-3.2.1
 
+USER root
+
+RUN apt-get update && \
+    apt-get install --no-install-recommends build-essential=\* libpq-dev=\* -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Jupyter image specific dependency
 RUN pip install --no-cache-dir "pandas-profiling[notebook]==3.1.0"
 
 COPY ./core/jupyter/requirements.txt /opt/requirements.txt
-RUN pip install --no-cache-dir -r /opt/requirements.txt
+
+RUN DBT_PSYCOPG2_NAME=psycopg2 pip install --no-cache-dir -r /opt/requirements.txt --no-binary dbt-postgres
 
 # Setup work directory for backward-compatibility
 RUN rmdir "/home/jovyan/work" && \
@@ -16,5 +25,7 @@ RUN rmdir "/home/jovyan/work" && \
     fix-permissions "/home/jovyan"
 
 ENV PYTHONPATH="/home/jovyan/"
+
+USER jovyan
 
 CMD ["start.sh", "jupyter", "lab", "--ServerApp.token=''"]

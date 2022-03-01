@@ -1,9 +1,9 @@
 import logging
 import os
 
-from fuzzywuzzy import fuzz
 import pycountry
 from pyspark.sql.functions import col, concat_ws, lit
+from thefuzz import fuzz
 
 
 def get_keyword_by_region(sp, continent, country, country_region, keyword):

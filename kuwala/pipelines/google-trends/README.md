@@ -13,13 +13,6 @@ Google Trends.
 
 ## Usage
 
-To make sure you are running the latest version of the pipeline, build the Docker image from inside the `kuwala` 
-directory by running:
-
-```zsh
-docker-compose build google-trends
-```
-
 ### Parameters
 
 The current pipeline retrieves the trend score for a search term per admin boundary in a given region by combining it

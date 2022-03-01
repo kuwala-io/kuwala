@@ -7,18 +7,26 @@ import requests
 
 
 def get_geo_json_by_id(df_ids):
+    proxy = os.environ.get("PROXY_ADDRESS")
+    proxies = dict(http=proxy, https=proxy)
+
+    test_request = requests.get("https://api.ipify.org?format=json", proxies=proxies)
+
+    if test_request.ok:
+        logging.info("Successfully connected to proxy")
+    else:
+        logging.info("Couldn't connect to proxy.")
+
     for index, row in df_ids.iterrows():
-        geo_json = get_geo_json(row.osm_id)
+        geo_json = get_geo_json(row.osm_id, proxies=proxies)
         df_ids.at[index, "geo_json"] = json.dumps(geo_json)
 
     return df_ids
 
 
-def get_geo_json(relation_id):
+def get_geo_json(relation_id, proxies):
     max_sleep_time = 120
     sleep_time = 1
-    proxy = os.environ.get("PROXY_ADDRESS")
-    proxies = dict(http=proxy, https=proxy)
     geo_json = None
 
     while not geo_json and (sleep_time < max_sleep_time):

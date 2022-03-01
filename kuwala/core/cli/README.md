@@ -18,22 +18,29 @@ The following pipelines can currently be selected through the CLI:
 
 ## Usage
 
-To make sure you are running the latest version of all pipelines, run from inside the root directory:
+### Prerequisites
 
-Linux/Mac:
+1. Installed version of `Docker` and `docker-compose v2`.
+   - We recommend using the latest version of [`Docker Desktop`](https://www.docker.com/products/docker-desktop).
+2. Installed version of `Python3` and *latest* `pip, setuptools, and wheel` version.
+   - We recommend using version `3.9.5` or higher.
+   - To check your current version run `python3 --version`.
+3. Installed version of `libpq`.
+   - For Mac, you can use brew: `brew install libpq`
+4. Installed version of `postgresql`.
+   - For Mac, you can use brew: `brew install postgresql`
+
+### Setup
+
+1. Change your directory to `kuwala/core/cli`.
+2. Create a virtual environment.
+   - For instructions on how to set up a `venv` on different system see [here](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/).
+3. Install dependencies by running `pip3 install --no-cache-dir -r requirements.txt`
+
+### Run
+
+To start the CLI, run the following command from inside the `kuwala/core/cli/src` directory and follow the instructions:
 
 ```zsh
-cd kuwala/scripts && sh initialize_all_components.sh
-```
-
-Windows:
-
-```zsh
-cd kuwala/scripts && sh initialize_windows.sh && cd windows && sh initialize_all_components.sh
-```
-
-To start the CLI, run the following script from inside the `kuwala/scripts` directory and follow the instructions:
-
-```zsh
-sh run_cli.sh
+python3 main.py
 ```

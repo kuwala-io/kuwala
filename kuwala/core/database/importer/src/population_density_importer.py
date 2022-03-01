@@ -11,7 +11,7 @@ def import_population_density(
     database_properties,
     continent,
     country,
-    population_density_date,
+    population_density_date="",
 ):
     start_time = time.time()
 
