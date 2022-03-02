@@ -1,6 +1,9 @@
 import argparse
 import json
+import logging
 import os
+import sys
+from time import sleep
 
 from database.crud import data_catalog as data_catalog_crud
 from database.database import Engine, get_db
@@ -8,9 +11,8 @@ from database.models import data_catalog as data_catalog_models
 from database.schemas import data_catalog as data_catalog_schemas
 from fastapi import FastAPI
 from routers import data_catalog
+import sqlalchemy.exc
 import uvicorn
-
-data_catalog_models.Base.metadata.create_all(bind=Engine)
 
 app = FastAPI(title="Kuwala Backend", version="0.2.0-alpha")
 
@@ -18,6 +20,24 @@ app.include_router(data_catalog.router)
 
 
 def populate_db():
+    connected_to_db = False
+    current_try = 0
+    max_retries = 60
+    sleep_time = 2
+
+    while not connected_to_db and current_try <= max_retries:
+        try:
+            data_catalog_models.Base.metadata.create_all(bind=Engine)
+
+            connected_to_db = True
+        except sqlalchemy.exc.OperationalError:
+            current_try += 1
+            sleep(sleep_time)
+
+    if not connected_to_db:
+        logging.error("Failed to connect to database.")
+        sys.exit(1)
+
     db = next(get_db())
 
     script_dir = os.path.dirname(__file__)
