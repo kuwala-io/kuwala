@@ -15,6 +15,20 @@ services:
       - google-poi-scraper
       - proxy
 
+  backend_database:
+    container_name: backend_database
+    image: postgres:14.2
+    environment:
+      - POSTGRES_USER=kuwala
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=kuwala
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./kuwala/tmp/kuwala/backend/db/postgresql/data:/var/lib/postgresql/data
+    profiles:
+      - backend_database
+
   # docker-compose --profile database up
   postgres:
     container_name: postgres
