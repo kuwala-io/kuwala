@@ -1,0 +1,4 @@
+fastapi==0.74.1
+psycopg2==2.9.3
+SQLAlchemy==1.4.31
+uvicorn[standard]==0.17.5
