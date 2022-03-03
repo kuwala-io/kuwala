@@ -2,12 +2,16 @@ import { action, thunk } from "easy-peasy";
 import {v4} from "uuid";
 import {removeElements, addEdge} from 'react-flow-renderer'
 
+import {getAllDataCatalog} from '../../api/DataCatalogApi'
+
 const CanvasModel =  {
     elements: [],
     selectedElement: null,
     newNodeInfo: {},
     openDataView: false,
     dataSource: [],
+    availableDataSource: [],
+    selectedDataSource: [],
 
     // Elements
     addNode: action((state, nodeInfo) => {
@@ -40,6 +44,21 @@ const CanvasModel =  {
     // Data Sources
     addDataSource: action((state, dataSource) => {
         state.dataSource.push(dataSource)
+    }),
+
+    // Available Data Sources
+    setAvailableDataSource: action((state, newAvailableSource) => {
+        state.availableDataSource = newAvailableSource
+    }),
+
+    getAvailableDataSource: thunk(async (actions) => {
+        const newAvailableDataSources = await getAllDataCatalog();
+        actions.setAvailableDataSource(newAvailableDataSources)
+    }),
+
+    // Selected Data Sources
+    setSelectedSources: action((state, newSelectedSources) => {
+        state.selectedDataSource = newSelectedSources
     }),
 }
 

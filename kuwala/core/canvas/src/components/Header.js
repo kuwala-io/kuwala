@@ -9,6 +9,15 @@ export default () => {
     const [currentPage] = useState(useLocation().pathname)
 
     const notifications = 0;
+
+    const checkDataCatalog = () => {
+        return [
+            '/data-pipeline-management',
+            '/data-source-config',
+            '/data-catalog',
+        ].includes(currentPage)
+    }
+
     return (
     <>
         <header className='flex-shrink-0 border-b'>
@@ -32,7 +41,7 @@ export default () => {
                     >
                         <div
                             className={`
-                                ${currentPage === '/data-catalog' ? 'bg-kuwala-green' : 'bg-gray-300'}
+                                ${checkDataCatalog() ? 'bg-kuwala-green' : 'bg-gray-300'}
                                 border 
                                 rounded-full
                             `}
