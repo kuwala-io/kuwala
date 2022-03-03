@@ -56,6 +56,7 @@ def populate_db():
                     id=data_catalog_item["id"],
                     name=data_catalog_item["name"],
                     logo=data_catalog_item["logo"],
+                    connection_parameters=json.dumps(data_catalog_item["connection_parameters"])
                 ),
             )
 

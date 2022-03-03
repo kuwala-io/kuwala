@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String
+from sqlalchemy import Column, JSON, String
 
 from ..database import Base
 
@@ -9,3 +9,4 @@ class DataCatalogItem(Base):
     id = Column(String, primary_key=True, index=True)
     name = Column(String)
     logo = Column(String)
+    connection_parameters = Column(JSON)
