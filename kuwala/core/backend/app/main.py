@@ -8,6 +8,7 @@ from time import sleep
 from database.crud import data_catalog as data_catalog_crud
 from database.database import Engine, get_db
 from database.models import data_catalog as data_catalog_models
+from database.models import data_source as data_source_models
 from database.schemas import data_catalog as data_catalog_schemas
 from fastapi import FastAPI
 from routers import data_catalog
@@ -19,6 +20,7 @@ app = FastAPI(title="Kuwala Backend", version="0.2.0-alpha")
 app.include_router(data_catalog.router)
 
 
+# Cannot be placed under `database/database.py` as it would create a circular import
 def populate_db():
     connected_to_db = False
     current_try = 0
@@ -28,6 +30,7 @@ def populate_db():
     while not connected_to_db and current_try <= max_retries:
         try:
             data_catalog_models.Base.metadata.create_all(bind=Engine)
+            data_source_models.Base.metadata.create_all(bind=Engine)
 
             connected_to_db = True
         except sqlalchemy.exc.OperationalError:

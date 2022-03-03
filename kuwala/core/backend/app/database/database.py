@@ -2,7 +2,7 @@ import os
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
 DATABASE_USER = os.getenv("DATABASE_USER")
 DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
@@ -24,3 +24,9 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+def add_and_commit_to_db(db: Session, model: Base):
+    db.add(model)
+    db.commit()
+    db.refresh(model)
