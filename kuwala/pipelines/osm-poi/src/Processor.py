@@ -392,7 +392,9 @@ class Processor:
             .select("osm_id", "geo_json")
             .toPandas()
         )
+
         nominatim_controller.get_geo_json_by_id(geo_jsons_to_fetch)
+
         geo_jsons_to_fetch = spark.createDataFrame(geo_jsons_to_fetch)
         df_relation = df_relation.join(geo_jsons_to_fetch, "osm_id", "left")
         df_way = Processor.get_geo_json_center(df_way)

@@ -3,15 +3,15 @@ import os
 from time import sleep
 import urllib.error
 
-from fuzzywuzzy import fuzz
+from hdx.api.configuration import Configuration
 from hdx.data.dataset import Dataset
 from hdx.data.organization import Organization
-from hdx.hdx_configuration import Configuration
 import pycountry
 import pycountry_convert as pcc
 from pyquery import PyQuery
 import questionary
 import requests.exceptions
+from thefuzz import fuzz
 
 CONTINENTS = [
     {"code": "af", "name": "Africa", "geofabrik": "africa"},

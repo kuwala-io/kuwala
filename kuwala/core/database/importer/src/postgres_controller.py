@@ -1,4 +1,5 @@
 import logging
+from time import sleep
 
 import psycopg2
 from sshtunnel import SSHTunnelForwarder
@@ -14,6 +15,43 @@ def establish_ssh_connection(ssh_host, ssh_user, ssh_pkey):
     ssh_tunnel.start()
 
     return ssh_tunnel.local_bind_port
+
+
+def establish_connection_to_db(
+    database_host,
+    database_port,
+    database_name,
+    database_user,
+    database_password,
+):
+    db = None
+    connected = False
+    max_retries = 120
+    sleep_time = 5
+    current_attempt = 1
+
+    logging.info("Trying to connect to database...")
+
+    while not connected and current_attempt <= max_retries:
+        # noinspection PyBroadException
+        try:
+            db = psycopg2.connect(
+                host=database_host,
+                port=database_port,
+                database=database_name,
+                user=database_user,
+                password=database_password,
+            )
+
+            connected = True
+        except Exception:
+            current_attempt += 1
+            sleep(sleep_time)
+
+    if db is not None:
+        db.close()
+
+    return connected
 
 
 def send_query(

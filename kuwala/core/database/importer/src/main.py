@@ -9,7 +9,11 @@ from google_poi_importer import import_google_pois
 from google_poi_matcher import import_google_poi_matching_data
 from osm_poi_importer import import_osm_pois
 from population_density_importer import import_population_density
-from postgres_controller import establish_ssh_connection, send_query
+from postgres_controller import (
+    establish_connection_to_db,
+    establish_ssh_connection,
+    send_query,
+)
 from pyspark.sql import SparkSession
 
 if __name__ == "__main__":
@@ -70,6 +74,20 @@ if __name__ == "__main__":
         )
         database_url = database_url.replace(str(database_port), str(ssh_bind_port))
         database_port = ssh_bind_port
+
+    established_connection = establish_connection_to_db(
+        database_host=database_host,
+        database_port=database_port,
+        database_name=database_name,
+        database_user=database_user,
+        database_password=database_password,
+    )
+
+    if not established_connection:
+        logging.error("Couldn't establish connection to database.")
+        sys.exit(1)
+    else:
+        logging.info("Successfully established connection to database.")
 
     send_query(
         database_host=database_host,

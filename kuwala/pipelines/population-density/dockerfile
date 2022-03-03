@@ -1,4 +1,4 @@
-FROM rappdw/docker-java-python:zulu11.43-python3.7.9
+FROM kuwala/base-images:python-java-0.2.0-alpha
 
 COPY ./common/python_utils /opt/app/common/python_utils
 COPY ./pipelines/population-density /opt/app/pipelines/population-density
