@@ -2,13 +2,14 @@ import { action, thunk } from "easy-peasy";
 import {v4} from "uuid";
 import {removeElements, addEdge} from 'react-flow-renderer'
 
-const elementStoreModel =  {
+const CanvasModel =  {
     elements: [],
     selectedElement: null,
     newNodeInfo: {},
     openDataView: false,
+    dataSource: [],
 
-    // Actions
+    // Elements
     addNode: action((state, nodeInfo) => {
         const newNode = {
             id: v4(),
@@ -34,7 +35,12 @@ const elementStoreModel =  {
     }),
     setOpenDataView: action((state, openDataView) => {
         state.openDataView = openDataView
-    })
+    }),
+
+    // Data Sources
+    addDataSource: action((state, dataSource) => {
+        state.dataSource.push(dataSource)
+    }),
 }
 
-export default elementStoreModel;
+export default CanvasModel;

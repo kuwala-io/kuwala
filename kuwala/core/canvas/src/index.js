@@ -2,18 +2,27 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './pages/styles.css';
 import App from './pages/App';
+import DataCatalog from './pages/DataCatalog';
 import reportWebVitals from './reportWebVitals';
+import {
+    BrowserRouter,
+    Route,
+    Routes,
+} from "react-router-dom";
 
-import {createStore, StoreProvider} from "easy-peasy";
-import elements from "./store/elementStore";
-
-const elementStore = createStore(elements)
+import { StoreProvider } from "easy-peasy";
+import Store from "./state/Store";
 
 ReactDOM.render(
   <React.StrictMode>
-    <StoreProvider store={elementStore}>
-        <App />
-    </StoreProvider>
+    <BrowserRouter>
+        <StoreProvider store={Store}>
+            <Routes>
+                <Route path={'/'} element={<App />}/>
+                <Route path={'/data-catalog'} element={<DataCatalog />}/>
+            </Routes>
+        </StoreProvider>
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')
 );
