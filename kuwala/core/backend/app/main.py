@@ -11,13 +11,14 @@ from database.models import data_catalog as data_catalog_models
 from database.models import data_source as data_source_models
 from database.schemas import data_catalog as data_catalog_schemas
 from fastapi import FastAPI
-from routers import data_catalog
+from routers import data_catalog, data_source
 import sqlalchemy.exc
 import uvicorn
 
 app = FastAPI(title="Kuwala Backend", version="0.2.0-alpha")
 
 app.include_router(data_catalog.router)
+app.include_router(data_source.router)
 
 
 # Cannot be placed under `database/database.py` as it would create a circular import
