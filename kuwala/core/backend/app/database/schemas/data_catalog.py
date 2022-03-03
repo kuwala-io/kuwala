@@ -1,3 +1,5 @@
+from typing import List
+
 from pydantic import BaseModel, Json
 
 
@@ -15,3 +17,7 @@ class DataCatalogItemCreate(DataCatalogItemBase):
 class DataCatalogItem(DataCatalogItemBase):
     class Config:
         orm_mode = True
+
+
+class DataCatalogSelect(BaseModel):
+    item_ids: List[str]

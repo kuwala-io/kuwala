@@ -1,3 +1,4 @@
+import database.database as database
 from sqlalchemy.orm import Session
 
 from ..models import data_catalog as models
@@ -26,8 +27,6 @@ def create_data_catalog_item(
         connection_parameters=data_catalog_item.connection_parameters,
     )
 
-    db.add(db_data_catalog_item)
-    db.commit()
-    db.refresh(db_data_catalog_item)
+    database.add_and_commit_to_db(db=db, model=db_data_catalog_item)
 
     return db_data_catalog_item
