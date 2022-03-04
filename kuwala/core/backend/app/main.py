@@ -11,12 +11,30 @@ from database.models import data_catalog as data_catalog_models
 from database.models import data_source as data_source_models
 from database.schemas import data_catalog as data_catalog_schemas
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from routers import data_catalog, data_source
 import sqlalchemy.exc
 import uvicorn
 
 app = FastAPI(title="Kuwala Backend", version="0.2.0-alpha")
 
+# Set up middlewares
+origins = [
+    "http://localhost",
+    "https://localhost",
+    "http://localhost:8000",
+    "https://localhost:8000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Set up routers
 app.include_router(data_catalog.router)
 app.include_router(data_source.router)
 
@@ -84,4 +102,4 @@ if __name__ == "__main__":
     if args.dev:
         reload = True
 
-    uvicorn.run("__main__:app", host="0.0.0.0", port=8000, reload=reload)
+    uvicorn.run("__main__:app", host="localhost", port=8000, reload=reload)

@@ -15,3 +15,11 @@ class DataSourceCreate(DataSourceBase):
 class DataSource(DataSourceBase):
     class Config:
         orm_mode = True
+
+
+class ConnectionParameters(BaseModel):
+    host: str | None = None
+    port: int | None = None
+    user: str | None = None
+    password: str | None = None
+    database: str | None = None

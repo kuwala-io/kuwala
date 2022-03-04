@@ -5,7 +5,9 @@ from ..models import data_catalog as models
 from ..schemas import data_catalog as schemas
 
 
-def get_data_catalog_item(db: Session, data_catalog_item_id: str):
+def get_data_catalog_item(
+    db: Session, data_catalog_item_id: str
+) -> models.DataCatalogItem:
     return (
         db.query(models.DataCatalogItem)
         .filter(models.DataCatalogItem.id == data_catalog_item_id)
@@ -13,13 +15,13 @@ def get_data_catalog_item(db: Session, data_catalog_item_id: str):
     )
 
 
-def get_data_catalog_items(db: Session):
+def get_data_catalog_items(db: Session) -> [models.DataCatalogItem]:
     return db.query(models.DataCatalogItem).all()
 
 
 def create_data_catalog_item(
     db: Session, data_catalog_item: schemas.DataCatalogItemCreate
-):
+) -> models.DataCatalogItem:
     db_data_catalog_item = models.DataCatalogItem(
         id=data_catalog_item.id,
         name=data_catalog_item.name,

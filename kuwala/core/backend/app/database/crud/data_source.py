@@ -5,11 +5,21 @@ from ..models import data_source as models
 from ..schemas import data_source as schemas
 
 
-def get_data_sources(db: Session):
+def get_data_source(db: Session, data_source_id: str) -> models.DataSource:
+    return (
+        db.query(models.DataSource)
+        .filter(models.DataSource.id == data_source_id)
+        .first()
+    )
+
+
+def get_data_sources(db: Session) -> [models.DataSource]:
     return db.query(models.DataSource).all()
 
 
-def create_data_source(db: Session, data_source: schemas.DataSourceCreate):
+def create_data_source(
+    db: Session, data_source: schemas.DataSourceCreate
+) -> models.DataSource:
     db_data_source = models.DataSource(
         id=data_source.id,
         data_catalog_item_id=data_source.data_catalog_item_id,
