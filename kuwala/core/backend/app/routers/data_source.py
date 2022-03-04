@@ -1,9 +1,13 @@
-import controller.postgres as postgres_controller
-from database.crud.data_source import get_data_source, get_data_sources
+import controller.data_source.data_source as data_source_controller
+from database.crud.data_source import get_data_sources, update_connection_parameters
 from database.database import get_db
-from database.schemas.data_source import ConnectionParameters, DataSource
+from database.schemas.data_source import (
+    ConnectionParameters,
+    DataSource,
+    DataSourceConnection,
+)
 from database.utils.encoder import list_props_to_json_props
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 router = APIRouter(
@@ -34,26 +38,26 @@ def test_connection(
     connection_parameters: ConnectionParameters,
     db: Session = Depends(get_db),
 ):
-    data_source = get_data_source(db=db, data_source_id=data_source_id)
-
-    if not data_source:
-        raise HTTPException(
-            status_code=404, detail=f"No data source found with ID {data_source_id}."
+    return dict(
+        connected=data_source_controller.test_connection(
+            data_source_id=data_source_id,
+            connection_parameters=connection_parameters,
+            db=db,
         )
+    )
 
-    data_catalog_item_id = data_source.data_catalog_item_id
 
-    if data_catalog_item_id == "postgres":
-        connected = postgres_controller.test_connection(
-            connection_parameters=connection_parameters
-        )
+@router.put("/{data_source_id}/connection")
+def save_connection(
+    data_source_id: str,
+    connection_parameters: ConnectionParameters,
+    db: Session = Depends(get_db),
+):
+    data_source_updated_connection = DataSourceConnection(
+        id=data_source_id, connection_parameters=connection_parameters.json()
+    )
+    data_source = update_connection_parameters(
+        db=db, data_source_updated_connection=data_source_updated_connection
+    )
 
-        if not connected:
-            return {"connected": False}
-
-        return {"connected": True}
-    else:
-        raise HTTPException(
-            status_code=404,
-            detail=f"No matching data catalog item found for data source {data_catalog_item_id}",
-        )
+    return data_source

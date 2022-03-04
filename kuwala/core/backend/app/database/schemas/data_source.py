@@ -12,6 +12,11 @@ class DataSourceCreate(DataSourceBase):
     pass
 
 
+class DataSourceConnection(BaseModel):
+    id: str
+    connection_parameters: Json
+
+
 class DataSource(DataSourceBase):
     class Config:
         orm_mode = True
