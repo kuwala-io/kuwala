@@ -37,9 +37,7 @@ services:
   backend:
     container_name: backend
     depends_on: [ backend_database ]
-    build:
-      context: kuwala
-      dockerfile: ./core/backend/dockerfile
+    image: kuwala/core:backend-0.2.0-alpha
     ports:
       - '8000:8000'
     environment:
