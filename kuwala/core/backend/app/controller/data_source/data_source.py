@@ -1,8 +1,8 @@
+import controller.data_source.postgres as postgres_controller
 import database.crud.data_source as crud_data_source
 from database.database import get_db
 from database.schemas.data_source import ConnectionParameters
 from fastapi import Depends, HTTPException
-import postgres as postgres_controller
 from sqlalchemy.orm import Session
 
 

@@ -24,19 +24,22 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=kuwala
     ports:
-      - '5433:5432'
+      - '5433:5433'
     volumes:
       - ./kuwala/tmp/kuwala/backend/db/postgresql/data:/var/lib/postgresql/data
     profiles:
       - network
       - backend
       - backend_database
+    command: -p 5433
 
   # docker-compose --profile backend up
   backend:
     container_name: backend
     depends_on: [ backend_database ]
-    image: kuwala/core:backend-0.2.0-alpha
+    build:
+      context: kuwala
+      dockerfile: ./core/backend/dockerfile
     ports:
       - '8000:8000'
     environment:

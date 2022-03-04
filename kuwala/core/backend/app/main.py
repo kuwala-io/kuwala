@@ -46,6 +46,7 @@ def populate_db():
     current_try = 0
     max_retries = 60
     sleep_time = 2
+    error = None
 
     while not connected_to_db and current_try <= max_retries:
         try:
@@ -53,11 +54,14 @@ def populate_db():
             data_source_models.Base.metadata.create_all(bind=Engine)
 
             connected_to_db = True
-        except sqlalchemy.exc.OperationalError:
+        except sqlalchemy.exc.OperationalError as e:
+            error = e
             current_try += 1
+
             sleep(sleep_time)
 
     if not connected_to_db:
+        logging.error(error)
         logging.error("Failed to connect to database.")
         sys.exit(1)
 
@@ -104,4 +108,4 @@ if __name__ == "__main__":
     if args.dev:
         reload = True
 
-    uvicorn.run("__main__:app", host="localhost", port=8000, reload=reload)
+    uvicorn.run("__main__:app", host="0.0.0.0", port=8000, reload=reload)
