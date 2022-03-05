@@ -113,6 +113,32 @@ def get_schema(connection_parameters: ConnectionParameters):
     return schemas
 
 
+def get_keys(
+    table_name: str, key_type: str, connection_parameters: ConnectionParameters
+):
+    query = f"""
+        SELECT c.column_name
+        FROM information_schema.key_column_usage AS c
+        LEFT JOIN information_schema.table_constraints AS t
+        ON t.constraint_name = c.constraint_name
+        WHERE t.table_name = '{table_name}' AND t.constraint_type = '{key_type} KEY';
+    """
+
+    return list(
+        dict.fromkeys(
+            list(
+                map(
+                    lambda k: k[0],
+                    send_query(
+                        connection_parameters=connection_parameters,
+                        query=query,
+                    )[1:],
+                )
+            )
+        )
+    )
+
+
 def get_table_preview(
     connection_parameters: ConnectionParameters,
     schema_name: str,
@@ -144,5 +170,17 @@ def get_table_preview(
     """
     rows = send_query(connection_parameters=connection_parameters, query=rows_query)
     columns = rows.pop(0)
+    primary_keys = get_keys(
+        table_name=table_name,
+        key_type="PRIMARY",
+        connection_parameters=connection_parameters,
+    )
+    foreign_keys = get_keys(
+        table_name=table_name,
+        key_type="FOREIGN",
+        connection_parameters=connection_parameters,
+    )
 
-    return dict(columns=columns, rows=rows)
+    return dict(
+        columns=columns, primary_keys=primary_keys, foreign_keys=foreign_keys, rows=rows
+    )
