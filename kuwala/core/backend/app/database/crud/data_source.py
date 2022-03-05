@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from ..database import add_and_commit_to_db
 from ..models import data_source as models
 from ..schemas import data_source as schemas
+from ..utils.encoder import list_of_dicts_to_dict
 
 
 def get_data_source(db: Session, data_source_id: str) -> models.DataSource:
@@ -56,8 +57,8 @@ def update_connection_parameters(
     setattr(data_source, "connection_parameters", updated_connection_parameters)
 
     # Test connection
-    dict_connection_parameters = dict(
-        map(lambda p: (p["id"], p["value"]), updated_connection_parameters)
+    dict_connection_parameters = list_of_dicts_to_dict(
+        list_of_dicts=updated_connection_parameters, key="id", value="value"
     )
     connected = data_source_controller.test_connection(
         data_source_id=data_source_id,

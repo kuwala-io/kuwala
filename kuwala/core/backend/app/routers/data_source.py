@@ -61,3 +61,8 @@ def save_connection(
     )
 
     return data_source
+
+
+@router.get("/{data_source_id}/schema")
+def get_data_source_schema(data_source_id: str, db: Session = Depends(get_db)):
+    return data_source_controller.get_schema(data_source_id=data_source_id, db=db)
