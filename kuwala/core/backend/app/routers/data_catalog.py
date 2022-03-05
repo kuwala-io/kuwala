@@ -6,9 +6,9 @@ from database.crud.data_source import create_data_source
 from database.database import get_db
 from database.schemas.data_catalog import DataCatalogItem, DataCatalogSelect
 from database.schemas.data_source import DataSource, DataSourceCreate
+from database.utils.encoder import list_props_to_json_props
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from utils.encoder import list_props_to_json_props
 
 router = APIRouter(
     prefix="/data-catalog",
