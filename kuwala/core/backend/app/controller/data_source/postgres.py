@@ -1,3 +1,4 @@
+import functools
 import os
 
 from database.schemas.data_source import ConnectionParameters
@@ -30,18 +31,25 @@ def get_connection(connection_parameters: ConnectionParameters):
     )
 
 
-def send_query(connection_parameters: ConnectionParameters, path_to_query_file):
+def send_query(
+    connection_parameters: ConnectionParameters,
+    query: str = None,
+    path_to_query_file: str = None,
+) -> list:
     connection = get_connection(connection_parameters=connection_parameters)
     cursor = connection.cursor()
 
-    with open(path_to_query_file, "r") as f:
-        query = f.read()
+    if path_to_query_file:
+        with open(path_to_query_file, "r") as f:
+            query = f.read()
 
-        f.close()
+            f.close()
 
     cursor.execute(query)
 
     result = cursor.fetchall()
+    header = tuple([desc[0] for desc in cursor.description])
+    result = [header] + result
 
     cursor.close()
     connection.close()
@@ -103,3 +111,38 @@ def get_schema(connection_parameters: ConnectionParameters):
                 )
 
     return schemas
+
+
+def get_table_preview(
+    connection_parameters: ConnectionParameters,
+    schema_name: str,
+    table_name: str,
+    limit_columns: int,
+    limit_rows: int,
+) -> dict:
+    if not limit_columns:
+        limit_columns = 200
+
+    if not limit_rows:
+        limit_rows = 300
+
+    columns_query = f"""
+        SELECT *
+        FROM {schema_name}.{table_name}
+        LIMIT 0
+    """
+    columns = send_query(
+        connection_parameters=connection_parameters, query=columns_query
+    )
+    columns_string = functools.reduce(
+        lambda c1, c2: f"{c1}, {c2}", columns[0][0:limit_columns]
+    )
+    rows_query = f"""
+        SELECT {columns_string}
+        FROM {schema_name}.{table_name}
+        LIMIT {limit_rows}
+    """
+    rows = send_query(connection_parameters=connection_parameters, query=rows_query)
+    columns = rows.pop(0)
+
+    return dict(columns=columns, rows=rows)

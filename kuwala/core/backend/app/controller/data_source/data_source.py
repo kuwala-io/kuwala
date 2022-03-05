@@ -70,3 +70,29 @@ def get_schema(data_source_id: str, db: Session = Depends(get_db)):
         )
 
     return schema
+
+
+def get_table_preview(
+    data_source_id: str,
+    schema_name: str,
+    table_name: str,
+    limit_columns: int,
+    limit_rows: int,
+    db: Session = Depends(get_db),
+):
+    data_source, data_catalog_item_id = get_data_source_and_data_catalog_item_id(
+        db=db, data_source_id=data_source_id
+    )
+    connection_parameters = get_connection_parameters(data_source)
+    data = None
+
+    if data_catalog_item_id == "postgres":
+        data = postgres_controller.get_table_preview(
+            connection_parameters=connection_parameters,
+            schema_name=schema_name,
+            table_name=table_name,
+            limit_columns=limit_columns,
+            limit_rows=limit_rows,
+        )
+
+    return data
