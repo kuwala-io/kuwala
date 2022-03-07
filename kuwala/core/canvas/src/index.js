@@ -14,6 +14,7 @@ import { StoreProvider } from "easy-peasy";
 import Store from "./state/Store";
 import DataPipelineManagement from "./pages/DataPipelineManagement";
 import DataSourceConfiguration from "./pages/DataSourceConfiguration";
+import DataSourcePreview from "./pages/DataSourcePreview";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -24,6 +25,7 @@ ReactDOM.render(
                 <Route path={'/data-catalog'} element={<DataCatalog />}/>
                 <Route path={'/data-pipeline-management'} element={<DataPipelineManagement />}/>
                 <Route path={'/data-source-config'} element={<DataSourceConfiguration />}/>
+                <Route path={'/data-source-preview'} element={<DataSourcePreview />}/>
             </Routes>
         </StoreProvider>
     </BrowserRouter>

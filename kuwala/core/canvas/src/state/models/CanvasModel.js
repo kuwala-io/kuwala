@@ -2,7 +2,8 @@ import { action, thunk } from "easy-peasy";
 import {v4} from "uuid";
 import {removeElements, addEdge} from 'react-flow-renderer'
 
-import {getAllDataCatalog} from '../../api/DataCatalogApi'
+import {getAllDataCatalog, saveSelectedSources} from '../../api/DataCatalogApi';
+import {getDataSource} from '../../api/DataSourceApi';
 
 const CanvasModel =  {
     elements: [],
@@ -43,22 +44,61 @@ const CanvasModel =  {
 
     // Data Sources
     addDataSource: action((state, dataSource) => {
-        state.dataSource.push(dataSource)
+        state.dataSource = [...state.dataSource, ...dataSource]
+    }),
+    setDataSource: action((state, dataSource) => {
+        state.dataSource = dataSource
+    }),
+    getDataSources: thunk(async (actions, params, {getState}) => {
+        const result = await getDataSource();
+        await actions.getAvailableDataSource();
+        const dataCatalog = getState().availableDataSource;
+        const populatedDataSource = result.data.map((e,i)=> {
+            const data_catalog_item_id = e.data_catalog_item_id;
+            const index = dataCatalog.findIndex((e, i) => {
+                if(e.id === data_catalog_item_id) return true
+            });
+            return {
+                ...e,
+                logo: dataCatalog[index].logo,
+                name: dataCatalog[index].name,
+            }
+        });
+        actions.setDataSource(populatedDataSource)
     }),
 
-    // Available Data Sources
+    // Data Catalog
     setAvailableDataSource: action((state, newAvailableSource) => {
         state.availableDataSource = newAvailableSource
     }),
 
     getAvailableDataSource: thunk(async (actions) => {
-        const newAvailableDataSources = await getAllDataCatalog();
-        actions.setAvailableDataSource(newAvailableDataSources)
+        const response = await getAllDataCatalog();
+        if (response.status === 200){
+            const data = response.data
+            actions.setAvailableDataSource(data)
+        }else {
+            actions.setAvailableDataSource([])
+        }
     }),
+
 
     // Selected Data Sources
     setSelectedSources: action((state, newSelectedSources) => {
         state.selectedDataSource = newSelectedSources
+    }),
+    saveSelectedSources: thunk(async (actions, params, {getState}) => {
+        const selectedSource = getState().selectedDataSource;
+
+        if(selectedSource.length <= 0) {
+            console.log("Selected source is empty")
+            return;
+        }
+        const idList = selectedSource.map((el)=> el.id);
+        const response = await saveSelectedSources({
+            item_ids: idList
+        });
+        actions.getDataSources()
     }),
 }
 

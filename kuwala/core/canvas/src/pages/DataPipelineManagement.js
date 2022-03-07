@@ -1,22 +1,21 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import Header from "../components/Header";
 import {useNavigate, Link} from "react-router-dom";
 import {useStoreActions, useStoreState} from "easy-peasy";
+import "./styles/data-pipeline-management.style.css";
 import {data} from "autoprefixer";
 
 export default () => {
     const navigate = useNavigate()
-    const { selectedDataSource, dataSource } = useStoreState((state) => state.canvas)
-    const { addDataSource } = useStoreActions((actions) => actions.canvas)
+    const { dataSource } = useStoreState((state) => state.canvas)
+    const { getDataSources } = useStoreActions((actions) => actions.canvas)
 
     useEffect(()=> {
-        if(selectedDataSource.length > 0){
-            addDataSource(...selectedDataSource)
-        }
+        getDataSources()
     }, [])
 
     const renderPipelineManager = () => {
-        if(selectedDataSource.length <= 0 && dataSource.length <= 0) {
+        if(dataSource.length <= 0) {
             return (
                 <div>
                     No data source is selected, please add a new data source from the <Link to={'/data-catalog'} className={'text-kuwala-green'}>Data Catalog</Link>
@@ -24,7 +23,7 @@ export default () => {
             )
         } else if (dataSource.length > 0){
             return (
-                <table className="table-fixed w-full whitespace-nowrap rounded-t-md">
+                <table className="table-fixed w-full">
                     <thead className={'rounded-t-md uppercase'}>
                     <tr>
                         <th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}>Name</th>
@@ -33,36 +32,50 @@ export default () => {
                     </tr>
                     </thead>
                     <tbody>
-                        {dataSource.map((e, i)=>{
-                            return (
-                                <tr
-                                    key={i} className={'bg-white border-2 text-center py-1'}
-                                    // style={{height: 64, width: 64}}
-                                >
-                                    <td className="px-4 py-4">Intro to CSS</td>
-                                    <td className="px-4 py-4">Adam</td>
-                                    <td className="px-4 py-4">858</td>
-                                    {/*<td className={'py-1'}>*/}
-                                    {/*    <div className={'flex flex-row'}>*/}
-                                    {/*        <img*/}
-                                    {/*            src={e.logo}*/}
-                                    {/*            style={{height: 48, width: 48}}*/}
-                                    {/*        />*/}
-                                    {/*        <label>{e.name}</label>*/}
-                                    {/*    </div>*/}
-                                    {/*</td>*/}
-                                    {/*<td className={'py-1'}>Active</td>*/}
-                                    {/*<td className={'py-1 space-x-2'}>*/}
-                                    {/*    <button className={'bg-kuwala-green px-2 py-1 text-white rounded-md'}>*/}
-                                    {/*        Configure*/}
-                                    {/*    </button>*/}
-                                    {/*    <button className={'bg-kuwala-green px-2 py-1 text-white rounded-md'}>*/}
-                                    {/*        Preview Data*/}
-                                    {/*    </button>*/}
-                                    {/*</td>*/}
-                                </tr>
-                            )
-                        })}
+                    {dataSource.map((e, i)=>{
+                        return (
+                            <tr
+                                key={i} className={'bg-white border-2 text-center'}
+                            >
+                                <td className={'py-6'}>
+                                    <div className={'flex flex-row ml-8 items-center'}>
+                                        <img
+                                            src={e.logo}
+                                            style={{height: 48, width: 48}}
+                                        />
+                                        <label className={'ml-10 text-lg font-medium'}>{e.name}</label>
+                                    </div>
+                                </td>
+                                <td className={'py-6'}>
+                                    <span
+                                        className={'px-4 py-2 rounded-xl bg-red-400 text-white font-semibold'}
+                                    >
+                                        Inactive
+                                    </span>
+                                </td>
+                                <td className={'py-6 space-x-2'}>
+                                    <Link
+                                        to={'/data-source-config'}
+                                        state={{
+                                            index: i,
+                                        }}
+                                        className={'bg-white px-4 py-2 text-white rounded-md border-2 border-kuwala-green hover:bg-kuwala-bg-gray'}
+                                    >
+                                        <span className={'text-kuwala-green font-semibold'}>Configure</span>
+                                    </Link>
+                                    <Link
+                                        to={'/data-source-preview'}
+                                        state={{
+                                            index: i,
+                                        }}
+                                        className={'bg-white text-kuwala-green px-4 py-2 text-white rounded-md border-2 border-kuwala-green hover:bg-kuwala-bg-gray'}
+                                    >
+                                        <span className={'text-kuwala-green font-semibold'}>Preview Data</span>
+                                    </Link>
+                                </td>
+                            </tr>
+                        )
+                    })}
                     </tbody>
                 </table>
             )
@@ -81,7 +94,7 @@ export default () => {
                 </span>
 
                 {/* Data Sources Container*/}
-                <div className={'mt-10 h-5/6 space-x-8 flex flex-row'}>
+                <div className={'mt-10 h-5/6 space-x-8 overflow-x-hidden'}>
                     {renderPipelineManager()}
                 </div>
 

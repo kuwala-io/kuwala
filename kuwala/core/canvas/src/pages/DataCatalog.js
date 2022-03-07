@@ -6,7 +6,7 @@ import {useStoreActions, useStoreState} from "easy-peasy";
 export default () => {
     // TODO: Move this to state store
     const { availableDataSource } = useStoreState((state) => state.canvas)
-    const {setAvailableDataSource, getAvailableDataSource, setSelectedSources} = useStoreActions((actions) => actions.canvas)
+    const {setAvailableDataSource, getAvailableDataSource, setSelectedSources, saveSelectedSources} = useStoreActions((actions) => actions.canvas)
     const navigate = useNavigate();
 
     useEffect(()=>{
@@ -19,10 +19,11 @@ export default () => {
         setAvailableDataSource(newDS)
     }
 
-    const generateSelectedArray = () => {
+    const saveSelectedSource = () => {
         // TODO: Set the selected & create state store
         const newSelectedAvailableSource = availableDataSource.filter((e) => e.isSelected)
         setSelectedSources(newSelectedAvailableSource)
+        saveSelectedSources()
     }
 
     const renderDataSources = () => {
@@ -81,12 +82,12 @@ export default () => {
                     <button
                         className={'bg-kuwala-green text-white rounded-md px-4 py-2 mt-4 hover:text-stone-300'}
                         onClick={()=>{
-                            generateSelectedArray()
+                            saveSelectedSource()
                             getAvailableDataSource() // Will reset the settings
                             navigate('/data-pipeline-management')
                         }}
                     >
-                        Next
+                        Save Selected
                     </button>
                 </div>
             </main>
