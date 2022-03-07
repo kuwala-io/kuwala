@@ -61,3 +61,27 @@ def save_connection(
     )
 
     return data_source
+
+
+@router.get("/{data_source_id}/schema")
+def get_data_source_schema(data_source_id: str, db: Session = Depends(get_db)):
+    return data_source_controller.get_schema(data_source_id=data_source_id, db=db)
+
+
+@router.get("/{data_source_id}/table/preview")
+def get_table_preview(
+    data_source_id: str,
+    schema_name: str,
+    table_name: str,
+    limit_columns: int = None,
+    limit_rows: int = None,
+    db: Session = Depends(get_db),
+):
+    return data_source_controller.get_table_preview(
+        data_source_id=data_source_id,
+        schema_name=schema_name,
+        table_name=table_name,
+        limit_columns=limit_columns,
+        limit_rows=limit_rows,
+        db=db,
+    )

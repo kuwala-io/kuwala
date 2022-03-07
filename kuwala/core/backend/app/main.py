@@ -23,7 +23,9 @@ app = FastAPI(title="Kuwala Backend", version="0.2.0-alpha")
 origins = [
     "http://localhost",
     "https://localhost",
+    "http://localhost:3000",
     "http://localhost:8000",
+    "https://localhost:3000",
     "https://localhost:8000",
 ]
 
