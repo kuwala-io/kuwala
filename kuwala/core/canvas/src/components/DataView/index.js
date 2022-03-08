@@ -2,9 +2,7 @@ import React, {useState} from "react";
 import {useStoreState} from "easy-peasy";
 
 export default () => {
-    const {selectedElement} = useStoreState(state => ({
-        selectedElement: state.selectedElement,
-    }));
+    const {selectedElement} = useStoreState(state => state.canvas );
 
     const renderHeader = () => {
         if(selectedElement) {
@@ -25,7 +23,6 @@ export default () => {
             return <></>
         }
     }
-
 
     return (
         // Table Wrapper

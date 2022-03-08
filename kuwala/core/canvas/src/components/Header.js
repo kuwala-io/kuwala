@@ -1,10 +1,25 @@
-import React from "react";
+import React, {useState} from "react";
 import KuwalaLogo from "../icons/kuwala_logo.png";
+import {Link, useLocation} from "react-router-dom";
+import {useStoreActions} from "easy-peasy";
+import NotificationPanel from "./NotificationPanel";
 
-export default ({toggleNotification}) => {
+export default () => {
+    const { toggleNotification } = useStoreActions(actions => actions.common)
+    const [currentPage] = useState(useLocation().pathname)
 
     const notifications = 0;
+
+    const checkDataCatalog = () => {
+        return [
+            '/data-pipeline-management',
+            '/data-source-config',
+            '/data-catalog',
+        ].includes(currentPage)
+    }
+
     return (
+    <>
         <header className='flex-shrink-0 border-b'>
             {/* HEADER BAR CONTAINER */}
             <div className='flex items-center justify-between p-2'>
@@ -16,6 +31,38 @@ export default ({toggleNotification}) => {
                             style={{height: 40}}
                         />
                     </span>
+                </div>
+
+                {/* TOP NAVIGATION */}
+                <div className={'flex flex-row space-x-64'}>
+                    <Link
+                        className={'flex flex-col items-center'}
+                        to={"/data-catalog"}
+                    >
+                        <div
+                            className={`
+                                ${checkDataCatalog() ? 'bg-kuwala-green' : 'bg-gray-300'}
+                                border 
+                                rounded-full
+                            `}
+                             style={{height: 44, width: 44}}
+                        />
+                        <label className={'mt-2'}>Data Overview</label>
+                    </Link>
+
+                    <Link
+                        className={'flex flex-col items-center'}
+                        to={"/"}
+                    >
+                        <div
+                            className={`
+                                ${currentPage === '/' ? 'bg-kuwala-green' : 'bg-gray-300'}
+                                border 
+                                rounded-full`}
+                            style={{height: 44, width: 44}}
+                        />
+                        <label className={'mt-2'}>Canvas</label>
+                    </Link>
                 </div>
 
                 {/* RIGHT BUTTONS */}
@@ -71,9 +118,10 @@ export default ({toggleNotification}) => {
                             </svg>
                         </button>
                     </div>
-
                 </div>
             </div>
         </header>
+        <NotificationPanel />
+    </>
     )
 }
