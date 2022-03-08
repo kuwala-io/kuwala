@@ -20,12 +20,7 @@ import uvicorn
 app = FastAPI(title="Kuwala Backend", version="0.2.0-alpha")
 
 # Set up middlewares
-origins = [
-    "http://localhost",
-    "https://localhost",
-    "http://localhost:8000",
-    "https://localhost:8000",
-]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,

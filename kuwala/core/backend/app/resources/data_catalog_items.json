@@ -2,7 +2,7 @@
   {
     "id": "postgres",
     "name": "Postgres",
-    "logo": "https://wiki.postgresql.org/images/9/9a/PostgreSQL_logo.3colors.540x557.png",
+    "logo": "https://commons.wikimedia.org/wiki/File:Postgresql_elephant.svg",
     "connection_parameters":[
       {
         "id": "host",
@@ -28,6 +28,28 @@
         "id": "database",
         "name": "Database",
         "type": "string"
+      }
+    ]
+  }, {
+    "id": "bigquery",
+    "name": "BigQuery",
+    "logo": "https://kuwala-public.s3.amazonaws.com/logos/google-bigquery-logo.svg",
+    "connection_parameters": [
+      {
+        "id": "credentials_json",
+        "name": "Credentials JSON",
+        "type": {
+          "type": "string",
+          "project_id": "string",
+          "private_key_id": "string",
+          "private_key": "string",
+          "client_email": "string",
+          "client_id": "string",
+          "auth_uri": "string",
+          "token_uri": "string",
+          "auth_provider_x509_cert_url": "string",
+          "client_x509_cert_url": "string"
+        }
       }
     ]
   }

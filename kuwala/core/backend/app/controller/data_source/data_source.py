@@ -1,3 +1,4 @@
+import controller.data_source.bigquery as bigquery_controller
 import controller.data_source.postgres as postgres_controller
 import database.crud.data_source as crud_data_source
 from database.database import get_db
@@ -20,7 +21,9 @@ def get_data_source_and_data_catalog_item_id(
             status_code=404, detail=f"No data source found with ID {data_source_id}."
         )
 
-    if not data_catalog_item_id or data_catalog_item_id != "postgres":
+    if not data_catalog_item_id or (
+        data_catalog_item_id != "postgres" and data_catalog_item_id != "bigquery"
+    ):
         raise HTTPException(
             status_code=404,
             detail=f"No matching data catalog item found for data source {data_catalog_item_id}",
@@ -42,6 +45,7 @@ def test_connection(
     connection_parameters: ConnectionParameters,
     db: Session = Depends(get_db),
 ) -> bool:
+    connected = False
     data_source, data_catalog_item_id = get_data_source_and_data_catalog_item_id(
         data_source_id=data_source_id, db=db
     )
@@ -50,11 +54,15 @@ def test_connection(
         connected = postgres_controller.test_connection(
             connection_parameters=connection_parameters
         )
+    elif data_catalog_item_id == "bigquery":
+        connected = bigquery_controller.test_connection(
+            connection_parameters=connection_parameters
+        )
 
-        if not connected:
-            return False
+    if not connected:
+        return False
 
-        return True
+    return True
 
 
 def get_schema(data_source_id: str, db: Session = Depends(get_db)):
