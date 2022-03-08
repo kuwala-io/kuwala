@@ -28,7 +28,7 @@ export default () => {
                     <tr>
                         <th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}>Name</th>
                         <th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}>Status</th>
-                        <th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}>Action</th>
+                        <th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}/>
                     </tr>
                     </thead>
                     <tbody>
@@ -64,11 +64,15 @@ export default () => {
                                         <span className={'text-kuwala-green font-semibold'}>Configure</span>
                                     </Link>
                                     <Link
+                                        disabled={e.connected}
                                         to={'/data-source-preview'}
                                         state={{
                                             index: i,
                                         }}
-                                        className={'bg-white text-kuwala-green px-4 py-2 text-white rounded-md border-2 border-kuwala-green hover:bg-kuwala-bg-gray'}
+                                        className={`
+                                            bg-white text-kuwala-green px-4 py-2 text-white rounded-md border-2 border-kuwala-green hover:bg-kuwala-bg-gray
+                                            ${e.connected ? '' : 'hidden'}
+                                        `}
                                     >
                                         <span className={'text-kuwala-green font-semibold'}>Preview Data</span>
                                     </Link>
@@ -90,7 +94,7 @@ export default () => {
                     Data Pipeline Management
                 </span>
                 <span className={'font-light text-xl mt-3'}>
-                    Configure and manage your selected data sources here
+                    Configure and manage your selected data sources
                 </span>
 
                 {/* Data Sources Container*/}
@@ -105,7 +109,7 @@ export default () => {
                             navigate('/')
                         }}
                     >
-                        Go To Canvas
+                        Go to canvas
                     </button>
                 </div>
             </main>

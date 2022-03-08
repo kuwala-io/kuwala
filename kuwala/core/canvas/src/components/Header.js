@@ -47,7 +47,7 @@ export default () => {
                             `}
                              style={{height: 44, width: 44}}
                         />
-                        <label className={'mt-2'}>Data Catalog</label>
+                        <label className={'mt-2'}>Data Overview</label>
                     </Link>
 
                     <Link

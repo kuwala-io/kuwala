@@ -48,7 +48,7 @@ export default () => {
                             style={{height: 80, width: 80}}
                             alt={'data-source'}
                         />
-                        <label className={'mt-4 cursor-pointer'}>Add Data Sources</label>
+                        <label className={'mt-4 cursor-pointer'}>Add data source</label>
                     </div>
                 </Link>
             )
@@ -84,7 +84,7 @@ export default () => {
                     {/* Header and Toggle */}
                     <div className={`flex items-center justify-center flex-shrink-0 p-2 ${dataSource.length > 0 ? '' : 'hidden'}`}>
                         <span className={`p-2 text-xl font-semibold tracking-wider whitespace-nowrap`}>
-                            <span>DATA SOURCES</span>
+                            <span>Data Sources</span>
                         </span>
                     </div>
 

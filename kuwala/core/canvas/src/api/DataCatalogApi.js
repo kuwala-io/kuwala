@@ -4,10 +4,10 @@ import {
     DATA_CATALOG, SELECT_DATA_CATALOG
 } from "../constants/api"
 
-export function getAllDataCatalog (){
+export function getAllDataCatalogItems (){
     return baseAxios.get(DATA_CATALOG);
 }
 
-export function saveSelectedSources (data) {
+export function saveSelectedDataCatalogItems (data) {
     return baseAxios.post(SELECT_DATA_CATALOG, data);
 }

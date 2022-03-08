@@ -14,7 +14,7 @@ export default () => {
     const { dataSource } = useStoreState((state) => state.canvas);
     const selectedSource = dataSource[dataIndex]
 
-    const renderDataSourceConfig = () => {
+    const renderDataPreview = () => {
         if(!selectedSource) {
             return (
                 <div>
@@ -167,7 +167,7 @@ export default () => {
 
                     <div className={`flex flex-col ${selectedSource ? 'ml-12 justify-center' : ''}`}>
                         <span className={'font-semibold text-3xl'}>
-                            Data Source Preview
+                            Data Pipeline Preview
                         </span>
                         <span className={'font-light text-xl mt-3'}>
                             Explore the data
@@ -177,7 +177,7 @@ export default () => {
 
                 {/* Data Sources Container*/}
                 <div className={'mt-6 h-4/6 space-x-8 overflow-x-hidden'}>
-                    {renderDataSourceConfig()}
+                    {renderDataPreview()}
                 </div>
 
                 <div className={'flex'}>
@@ -185,7 +185,7 @@ export default () => {
                         className={'bg-kuwala-green text-white rounded-md px-4 py-2 mt-4 hover:text-stone-300'}
                         to={'/data-pipeline-management'}
                     >
-                        Back to Pipeline Manager
+                        Back
                     </Link>
                 </div>
             </main>

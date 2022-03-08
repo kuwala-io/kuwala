@@ -7,6 +7,7 @@ export default () => {
     // TODO: Move this to state store
     const { availableDataSource } = useStoreState((state) => state.canvas)
     const {setAvailableDataSource, getAvailableDataSource, setSelectedSources, saveSelectedSources} = useStoreActions((actions) => actions.canvas)
+    const [isItemSelected, setIsItemSelected] = useState(false)
     const navigate = useNavigate();
 
     useEffect(()=>{
@@ -17,6 +18,7 @@ export default () => {
         const newDS = [...availableDataSource]
         newDS[index].isSelected = !newDS[index].isSelected;
         setAvailableDataSource(newDS)
+        setIsItemSelected(scanSelected())
     }
 
     const saveSelectedSource = () => {
@@ -26,11 +28,24 @@ export default () => {
         saveSelectedSources()
     }
 
+    const scanSelected = () => {
+        let selected = false;
+        for (let elements of availableDataSource) {
+            if (elements.isSelected) {
+                selected = true;
+                break;
+            }
+        }
+        return selected
+    }
+
+
+
     const renderDataSources = () => {
         if(availableDataSource.length <= 0){
             return (
                 <div>
-                    No Data Sources Available
+                    No data sources available
                 </div>
             )
         }
@@ -67,7 +82,7 @@ export default () => {
             <Header />
             <main className={'flex flex-col h-full w-full bg-kuwala-bg-gray py-12 px-20'}>
                 <span className={'font-semibold text-3xl'}>
-                    Data Sources
+                    Data Catalog
                 </span>
                 <span className={'font-light text-xl mt-3'}>
                     Select the data source you want to connect
@@ -80,14 +95,18 @@ export default () => {
 
                 <div className={'flex flex-row-reverse'}>
                     <button
-                        className={'bg-kuwala-green text-white rounded-md px-4 py-2 mt-4 hover:text-stone-300'}
+                        className={`
+                            text-white rounded-md px-4 py-2 mt-4
+                            ${isItemSelected ? 'bg-kuwala-green cursor-pointer hover:text-stone-300' : 'bg-stone-300 cursor-default'}
+                            `}
+                        disabled={!isItemSelected}
                         onClick={()=>{
                             saveSelectedSource()
                             getAvailableDataSource() // Will reset the settings
                             navigate('/data-pipeline-management')
                         }}
                     >
-                        Save Selected
+                        Next
                     </button>
                 </div>
             </main>

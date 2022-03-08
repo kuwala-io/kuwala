@@ -2,7 +2,7 @@ import { action, thunk } from "easy-peasy";
 import {v4} from "uuid";
 import {removeElements, addEdge} from 'react-flow-renderer'
 
-import {getAllDataCatalog, saveSelectedSources} from '../../api/DataCatalogApi';
+import {getAllDataCatalogItems, saveSelectedDataCatalogItems} from '../../api/DataCatalogApi';
 import {getDataSource} from '../../api/DataSourceApi';
 
 const CanvasModel =  {
@@ -73,7 +73,7 @@ const CanvasModel =  {
     }),
 
     getAvailableDataSource: thunk(async (actions) => {
-        const response = await getAllDataCatalog();
+        const response = await getAllDataCatalogItems();
         if (response.status === 200){
             const data = response.data
             actions.setAvailableDataSource(data)
@@ -95,7 +95,7 @@ const CanvasModel =  {
             return;
         }
         const idList = selectedSource.map((el)=> el.id);
-        const response = await saveSelectedSources({
+        const response = await saveSelectedDataCatalogItems({
             item_ids: idList
         });
         actions.getDataSources()

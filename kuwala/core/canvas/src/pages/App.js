@@ -92,7 +92,7 @@ export default function () {
                         To work with data on the canvas,
                     </span>
                     <span className={'indent-2 text-xl'}>
-                        click on <Link to={'/data-catalog'}  className={'text-kuwala-green '}>Add Data Sources</Link>
+                        click on <Link to={'/data-catalog'}  className={'text-kuwala-green '}>Add data source</Link>
                     </span>
                 </div>
             )
