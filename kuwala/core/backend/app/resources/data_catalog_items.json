@@ -2,7 +2,7 @@
   {
     "id": "postgres",
     "name": "Postgres",
-    "logo": "https://commons.wikimedia.org/wiki/File:Postgresql_elephant.svg",
+    "logo": "https://wiki.postgresql.org/images/a/a4/PostgreSQL_logo.3colors.svg",
     "connection_parameters":[
       {
         "id": "host",

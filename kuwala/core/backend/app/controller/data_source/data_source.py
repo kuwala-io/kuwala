@@ -76,6 +76,10 @@ def get_schema(data_source_id: str, db: Session = Depends(get_db)):
         schema = postgres_controller.get_schema(
             connection_parameters=connection_parameters
         )
+    elif data_catalog_item_id == "bigquery":
+        schema = bigquery_controller.get_schema(
+            connection_parameters=connection_parameters
+        )
 
     return schema
 
