@@ -1,3 +1,5 @@
+import functools
+
 from database.schemas.data_source import ConnectionParameters
 from google.cloud import bigquery
 from google.oauth2 import service_account
@@ -52,3 +54,40 @@ def get_schema(connection_parameters: ConnectionParameters):
     client.close()
 
     return schema
+
+
+def get_table_preview(
+    connection_parameters: ConnectionParameters,
+    project_name: str,
+    dataset_name: str,
+    table_name: str,
+    limit_columns: int = 200,
+    limit_rows: int = 300,
+) -> dict:
+    if not limit_columns:
+        limit_columns = 200
+
+    if not limit_rows:
+        limit_rows = 300
+
+    credentials = get_credentials(connection_parameters=connection_parameters)
+    client = bigquery.Client(credentials=credentials)
+    table_ref = f"{project_name}.{dataset_name}.{table_name}"
+    table = client.get_table(table=table_ref)
+    columns = list(map(lambda s: s.name, table.schema))
+    columns_string = functools.reduce(
+        lambda c1, c2: f"{c1}, {c2}", columns[0:limit_columns]
+    )
+    rows_query = f"""
+        SELECT {columns_string}
+        FROM {table_ref}
+        LIMIT {limit_rows}
+    """
+    query_job = client.query(rows_query)
+    rows_iterator = query_job.result()
+    rows = []
+
+    for row in rows_iterator:
+        rows.append(list(row))
+
+    return dict(columns=columns, rows=rows)

@@ -87,6 +87,8 @@ def get_schema(data_source_id: str, db: Session = Depends(get_db)):
 def get_table_preview(
     data_source_id: str,
     schema_name: str,
+    project_name: str,
+    dataset_name: str,
     table_name: str,
     limit_columns: int,
     limit_rows: int,
@@ -102,6 +104,15 @@ def get_table_preview(
         data = postgres_controller.get_table_preview(
             connection_parameters=connection_parameters,
             schema_name=schema_name,
+            table_name=table_name,
+            limit_columns=limit_columns,
+            limit_rows=limit_rows,
+        )
+    elif data_catalog_item_id == "bigquery":
+        data = bigquery_controller.get_table_preview(
+            connection_parameters=connection_parameters,
+            project_name=project_name,
+            dataset_name=dataset_name,
             table_name=table_name,
             limit_columns=limit_columns,
             limit_rows=limit_rows,
