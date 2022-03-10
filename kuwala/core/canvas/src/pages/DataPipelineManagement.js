@@ -48,9 +48,12 @@ export default () => {
                                 </td>
                                 <td className={'py-6'}>
                                     <span
-                                        className={'px-4 py-2 rounded-xl bg-red-400 text-white font-semibold'}
+                                        className={`
+                                            px-4 py-2 rounded-xl text-white font-semibold
+                                            ${e.connected ? 'bg-kuwala-green' : 'bg-red-400'}
+                                        `}
                                     >
-                                        Inactive
+                                        {e.connected ? 'Active' : 'Inactive'}
                                     </span>
                                 </td>
                                 <td className={'py-6 space-x-2'}>

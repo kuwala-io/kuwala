@@ -1,57 +1,115 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Header from "../components/Header";
 import {useLocation, Link} from "react-router-dom";
-import {useStoreState} from "easy-peasy";
+import {useStoreActions, useStoreState} from "easy-peasy";
+import { Formik, Field, Form, ErrorMessage, FieldArray } from "formik"
+import {testConnections} from "../api/DataSourceApi";
 
 export default () => {
 
     const location = useLocation()
     const dataIndex = location.state.index
     const { dataSource } = useStoreState((state) => state.canvas);
+    const { saveDataSourceConfig } = useStoreActions((actions) => actions.canvas);
     const selectedSource = dataSource[dataIndex]
+    const initialConnectionParameters = selectedSource ? selectedSource.connection_parameters : []
+    const [isConnected, setIsConnected] = useState(false)
 
-    const renderDataSourceConfig = () => {
-        if(!selectedSource) {
+    useEffect(()=>{
+        if(selectedSource){
+            setIsConnected(typeof selectedSource.connected === 'undefined' ? false : selectedSource.connected)
+        }
+    }, [selectedSource])
+
+    const testConfigConnection = async ({dataSourceId, config}) => {
+        const res = await testConnections({
+            id: dataSourceId,
+            config: parseArrayIntoConfig(config)
+        });
+
+        if(res.status === 200){
+            const connected = res.data.connected;
+            setIsConnected(connected)
+        }
+    }
+
+    const parseArrayIntoConfig = (arr) => {
+        return {
+            "host": getValue(arr,'host'),
+            "port": parseInt(getValue(arr,'port')),
+            "user": getValue(arr,'user'),
+            "password": getValue(arr,'password'),
+            "database": getValue(arr,'database')
+        }
+    }
+
+    const getValue = (arr, key) => {
+        return arr.filter((item) => item.id === key)[0].value
+    }
+
+    const renderDataSourceConfigForm = ({values}) => {
+        if(!selectedSource || !values.connection_parameters) {
             return (
                 <div>
                     Undefined data source, something is wrong.
                 </div>
             )
         }else {
-            console.log(selectedSource)
             return (
-                <div className={'flex flex-col bg-white px-8 py-4 rounded-lg h-full'}>
-                    {selectedSource.connection_parameters.map((e,i) => {
-                        return (
-                            <div className={'flex flex-row h-full w-full items-center'}>
-                                <div className={'w-1/6'}>
-                                    <span className={'text-lg capitalize font-bold'}>
-                                        {e.id}
-                                    </span>
+                <Form>
+                    <FieldArray name={'connection_parameters'}
+                        render={arrayHelpers => {
+                            return (
+                                <div className={'flex flex-col bg-white px-8 py-4 rounded-lg h-full'}>
+                                    {values.connection_parameters.map((conParams,i) => {
+                                        return (
+                                            <div className={'flex flex-row h-full w-full items-center space-y-8'}
+                                                key={conParams.id}
+                                            >
+                                                <div className={'w-1/6'}>
+                                                    <span className={'text-lg capitalize font-bold'}>
+                                                        {conParams.id}
+                                                    </span>
+                                                </div>
+                                                <div className={'w-5/6'}>
+                                                    <Field
+                                                        name={`connection_parameters[${i}].value`}
+                                                        type={conParams.id === 'password' ? 'password' : 'text'}
+                                                        className={'w-full px-4 py-2 border-2 border-kuwala-green text-gray-800 rounded-lg focus:outline-none'}
+                                                        placeholder={conParams.id}
+                                                        key={conParams.id}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )
+                                    })}
+                                    <div className={'flex flex-row justify-between mt-6'}>
+                                        <button
+                                            className={'bg-white border-2 border-kuwala-green rounded-md px-3 py-2 mt-4 hover:text-stone-300 hover:bg-kuwala-bg-gray'}
+                                            onClick={async ()=> {
+                                                await testConfigConnection({
+                                                    dataSourceId: selectedSource.id,
+                                                    config: values.connection_parameters
+                                                })
+                                            }}
+                                            type={'button'}
+                                        >
+                                            <span className={'text-kuwala-green'}>
+                                                Test connection
+                                            </span>
+                                        </button>
+                                        <button
+                                            className={'bg-kuwala-green rounded-md px-3 py-2 mt-4'}
+                                            type={'submit'}
+                                        >
+                                            <span className={'text-white hover:text-stone-300'}>Save</span>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div className={'w-5/6'}>
-                                    <input
-                                        type="search"
-                                        className="w-full px-4 py-2 border-2 border-kuwala-green text-gray-800 capitalize rounded-lg focus:outline-none"
-                                        placeholder={e.id}
-                                    />
-                                </div>
-                            </div>
-                        )
-                    })}
-                    <div className={'flex flex-row justify-between mt-6'}>
-                        <button
-                            className={'bg-white border-2 border-kuwala-green rounded-md px-3 py-2 mt-4 hover:text-stone-300'}
-                        >
-                            <span className={'text-kuwala-green'}>Test connection</span>
-                        </button>
-                        <button
-                            className={'bg-kuwala-green rounded-md px-3 py-2 mt-4 hover:text-stone-300'}
-                        >
-                            <span className={'text-white'}>Save</span>
-                        </button>
-                    </div>
-                </div>
+                            )
+                        }}
+                    />
+                </Form>
             )
         }
     }
@@ -62,7 +120,7 @@ export default () => {
         }else {
             return (
                 <div
-                    className={'flex flex-col justify-center items-center bg-white rounded-xl drop-shadow-lg'}
+                    className={'flex flex-col justify-center items-center bg-white rounded-xl drop-shadow-lg relative'}
                     style={{width: 148, height:148}}
                 >
                     <img
@@ -70,6 +128,12 @@ export default () => {
                         style={{height: 72, width: 72}}
                     />
                     <span className={'mt-1'}>{selectedSource.name}</span>
+                    <div
+                        className={`
+                            absolute right-0 top-0 p-1 border rounded-full w-7 h-7 -mr-2 -mt-2
+                            ${isConnected ? "bg-kuwala-green" : "bg-red-400"}
+                            `}
+                    />
                 </div>
             )
 
@@ -95,7 +159,19 @@ export default () => {
 
                 {/* Data Sources Container*/}
                 <div className={'mt-6 h-4/6 space-x-8 overflow-x-hidden'}>
-                    {renderDataSourceConfig()}
+                    <Formik
+                        initialValues={{
+                            connection_parameters: initialConnectionParameters
+                        }}
+                        onSubmit={(values)=>{
+                            saveDataSourceConfig({
+                                index: dataIndex,
+                                id: selectedSource.id,
+                                config: parseArrayIntoConfig(values.connection_parameters)
+                            })
+                        }}
+                        children={renderDataSourceConfigForm}
+                    />
                 </div>
 
                 <div className={'flex'}>
