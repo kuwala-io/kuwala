@@ -1,4 +1,4 @@
-# Backend
+# Backend [EXPERIMENTAL]
 
 ## Launching the API
 
@@ -59,3 +59,53 @@ DATABASE_HOST=localhost
 
 To see a complete documentation of all available API routes, launch the API and open `http://0.0.0.0:8000/docs` in your 
 browser.
+
+
+## Data Sources
+
+We are using dbt for doing transformations on top of data warehouses, so we are providing the following connectors:
+
+<details>
+    <summary>Postgres</summary>
+
+#### Connection parameters
+
+- host
+- port
+- user
+- password
+- database
+
+#### Table parameters
+
+- data_source_id
+- schema_name
+- table_name
+
+</details>
+
+<details>
+    <summary>BigQuery</summary>
+
+#### Connection parameters
+
+- credentials_json
+  - type
+  - project_id
+  - private_key_id
+  - private_key
+  - client_email
+  - client_id
+  - auth_uri
+  - token_uri
+  - auth_provider_x509_cert_url
+  - client_x509_cert_url
+
+#### Table parameters
+
+- data_source_id
+- project_name
+- dataset_name
+- table_name
+
+</details>

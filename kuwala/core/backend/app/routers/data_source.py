@@ -71,8 +71,10 @@ def get_data_source_schema(data_source_id: str, db: Session = Depends(get_db)):
 @router.get("/{data_source_id}/table/preview")
 def get_table_preview(
     data_source_id: str,
-    schema_name: str,
     table_name: str,
+    schema_name: str = None,
+    project_name: str = None,
+    dataset_name: str = None,
     limit_columns: int = None,
     limit_rows: int = None,
     db: Session = Depends(get_db),
@@ -80,6 +82,8 @@ def get_table_preview(
     return data_source_controller.get_table_preview(
         data_source_id=data_source_id,
         schema_name=schema_name,
+        project_name=project_name,
+        dataset_name=dataset_name,
         table_name=table_name,
         limit_columns=limit_columns,
         limit_rows=limit_rows,
