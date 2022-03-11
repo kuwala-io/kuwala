@@ -1,19 +1,22 @@
 import React, {useEffect, useState} from "react";
 import Header from "../components/Header";
-import {useLocation, Link} from "react-router-dom";
+import {useLocation, Link, useNavigate} from "react-router-dom";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import { Formik, Field, Form, ErrorMessage, FieldArray } from "formik"
-import {testConnections} from "../api/DataSourceApi";
+import { testConnection } from "../api/DataSourceApi";
 
 export default () => {
-
+    const navigate = useNavigate()
     const location = useLocation()
     const dataIndex = location.state.index
     const { dataSource } = useStoreState((state) => state.canvas);
     const { saveDataSourceConfig } = useStoreActions((actions) => actions.canvas);
-    const selectedSource = dataSource[dataIndex]
+    const selectedSource = dataSource.filter((el) => el.id === dataIndex)[0]
     const initialConnectionParameters = selectedSource ? selectedSource.connection_parameters : []
     const [isConnected, setIsConnected] = useState(false)
+    const [isTestConnectionLoading, setIsTestConnectionLoading] = useState(false)
+    const [isSaveLoading, setIsSaveLoading] = useState(false)
+    const [testConnectionClicked, setTestConnectionClicked] = useState(false)
 
     useEffect(()=>{
         if(selectedSource){
@@ -22,7 +25,8 @@ export default () => {
     }, [selectedSource])
 
     const testConfigConnection = async ({dataSourceId, config}) => {
-        const res = await testConnections({
+        setIsTestConnectionLoading(true)
+        const res = await testConnection({
             id: dataSourceId,
             config: parseArrayIntoConfig(config)
         });
@@ -31,6 +35,8 @@ export default () => {
             const connected = res.data.connected;
             setIsConnected(connected)
         }
+        setIsTestConnectionLoading(false)
+        setTestConnectionClicked(true)
     }
 
     const parseArrayIntoConfig = (arr) => {
@@ -84,25 +90,58 @@ export default () => {
                                         )
                                     })}
                                     <div className={'flex flex-row justify-between mt-6'}>
-                                        <button
-                                            className={'bg-white border-2 border-kuwala-green rounded-md px-3 py-2 mt-4 hover:text-stone-300 hover:bg-kuwala-bg-gray'}
-                                            onClick={async ()=> {
-                                                await testConfigConnection({
-                                                    dataSourceId: selectedSource.id,
-                                                    config: values.connection_parameters
-                                                })
-                                            }}
-                                            type={'button'}
-                                        >
-                                            <span className={'text-kuwala-green'}>
-                                                Test connection
+                                        <div className={'flex flex-row align-middle items-center justify-center mt-4'}>
+                                            <button
+                                                className={`bg-white border-2 border-kuwala-green rounded-md px-3 w-48 py-2 hover:text-stone-300 hover:bg-kuwala-bg-gray`}
+                                                onClick={async ()=> {
+                                                    setIsTestConnectionLoading(true)
+                                                    await testConfigConnection({
+                                                        dataSourceId: selectedSource.id,
+                                                        config: values.connection_parameters
+                                                    })
+                                                }}
+                                                type={'button'}
+                                                disabled={isTestConnectionLoading}
+                                            >
+                                            <span className={'text-kuwala-green w-full py-2'}>
+                                                {isTestConnectionLoading ?
+                                                    <div className="flex justify-center items-center">
+                                                        <div
+                                                            className="spinner-border animate-spin inline-block w-6 h-6 border-4 rounded-full"
+                                                            role="status">
+                                                            <span className="visually-hidden">Loading...</span>
+                                                        </div>
+                                                    </div>
+                                                    :
+                                                    'Test Connection'
+                                                }
                                             </span>
-                                        </button>
+                                            </button>
+                                            <span className={`ml-8 text-md font-semibold
+                                                ${isConnected ? 'text-kuwala-green' : 'text-kuwala-red'}
+                                                ${testConnectionClicked ? '' : 'hidden'}
+                                            `}>
+                                                {isConnected ? 'Success!' : 'Failed'}
+                                            </span>
+                                        </div>
                                         <button
-                                            className={'bg-kuwala-green rounded-md px-3 py-2 mt-4'}
+                                            className={'bg-kuwala-green rounded-md px-3 w-24 py-2 mt-4'}
                                             type={'submit'}
+                                            disabled={isSaveLoading}
                                         >
-                                            <span className={'text-white hover:text-stone-300'}>Save</span>
+                                            <span className={'text-white hover:text-stone-300 w-full py-2'}>
+                                                {isSaveLoading ?
+                                                    <div className="flex justify-center items-center">
+                                                        <div
+                                                            className="spinner-border animate-spin inline-block w-6 h-6 border-4 text-white rounded-full"
+                                                            role="status">
+                                                            <span className="visually-hidden">Loading...</span>
+                                                        </div>
+                                                    </div>
+                                                    :
+                                                    'Save'
+                                                }
+                                            </span>
                                         </button>
                                     </div>
                                 </div>
@@ -163,12 +202,15 @@ export default () => {
                         initialValues={{
                             connection_parameters: initialConnectionParameters
                         }}
-                        onSubmit={(values)=>{
-                            saveDataSourceConfig({
-                                index: dataIndex,
+                        onSubmit={async (values)=>{
+                            console.log(parseArrayIntoConfig(values.connection_parameters))
+                            setIsSaveLoading(true)
+                            await saveDataSourceConfig({
                                 id: selectedSource.id,
                                 config: parseArrayIntoConfig(values.connection_parameters)
                             })
+                            setIsSaveLoading(false)
+                            setTestConnectionClicked(true)
                         }}
                         children={renderDataSourceConfigForm}
                     />

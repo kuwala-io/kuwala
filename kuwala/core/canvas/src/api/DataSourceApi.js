@@ -8,16 +8,18 @@ export function getDataSource() {
     return baseAxios.get(DATA_SOURCE)
 }
 
-export function testConnections(data) {
+export function testConnection(data) {
     return baseAxios.post(
-        DATA_SOURCE+`/${data.id}/connection/test`,
+        `${DATA_SOURCE}/${data.id}/connection/test`,
         data.config
     )
 }
 
 export function saveConnection(data) {
+    console.log(`SAVE CONNECTION CALLED WITH URL`)
+    console.log(`${DATA_SOURCE}/${data.id}/connection`)
     return baseAxios.put(
-        DATA_SOURCE+`/${data.id}/connection`,
+        `${DATA_SOURCE}/${data.id}/connection`,
         data.config
     )
 }
