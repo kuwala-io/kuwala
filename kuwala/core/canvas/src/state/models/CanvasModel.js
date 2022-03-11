@@ -100,18 +100,6 @@ const CanvasModel =  {
         });
         actions.getDataSources()
     }),
-
-    // Data Configuration
-    saveDataSourceConfig: thunk(async (actions, payload, {getState}) => {
-        const res = await saveConnection({
-            id: payload.id,
-            config: payload.config
-        })
-
-        if(res.status === 200){
-            actions.getDataSources()
-        }
-    })
 }
 
 export default CanvasModel;

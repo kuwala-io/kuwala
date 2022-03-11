@@ -3,14 +3,14 @@ import Header from "../components/Header";
 import {useLocation, Link, useNavigate} from "react-router-dom";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import { Formik, Field, Form, ErrorMessage, FieldArray } from "formik"
-import { testConnection } from "../api/DataSourceApi";
+import {saveConnection, testConnection} from "../api/DataSourceApi";
 
 export default () => {
     const navigate = useNavigate()
     const location = useLocation()
     const dataIndex = location.state.index
     const { dataSource } = useStoreState((state) => state.canvas);
-    const { saveDataSourceConfig } = useStoreActions((actions) => actions.canvas);
+    const { getDataSources } = useStoreActions((actions) => actions.canvas);
     const selectedSource = dataSource.filter((el) => el.id === dataIndex)[0]
     const initialConnectionParameters = selectedSource ? selectedSource.connection_parameters : []
     const [isConnected, setIsConnected] = useState(false)
@@ -23,6 +23,24 @@ export default () => {
             setIsConnected(typeof selectedSource.connected === 'undefined' ? false : selectedSource.connected)
         }
     }, [selectedSource])
+
+    const saveConfiguration = async ({dataSourceId, config}) => {
+        setIsSaveLoading(true)
+        const res = await saveConnection({
+            id: dataSourceId,
+            config: config
+        })
+
+        setIsSaveLoading(false)
+        setTestConnectionClicked(true)
+
+        if(res.status === 200) {
+            await getDataSources() // Refresh
+            navigate('/data-pipeline-management')
+        } else if (res.status === 400){
+            alert('Request failed')
+        }
+    }
 
     const testConfigConnection = async ({dataSourceId, config}) => {
         setIsTestConnectionLoading(true)
@@ -203,14 +221,10 @@ export default () => {
                             connection_parameters: initialConnectionParameters
                         }}
                         onSubmit={async (values)=>{
-                            console.log(parseArrayIntoConfig(values.connection_parameters))
-                            setIsSaveLoading(true)
-                            await saveDataSourceConfig({
-                                id: selectedSource.id,
+                            await saveConfiguration({
+                                dataSourceId: selectedSource.id,
                                 config: parseArrayIntoConfig(values.connection_parameters)
                             })
-                            setIsSaveLoading(false)
-                            setTestConnectionClicked(true)
                         }}
                         children={renderDataSourceConfigForm}
                     />
