@@ -3,7 +3,7 @@ import {v4} from "uuid";
 import {removeElements, addEdge} from 'react-flow-renderer'
 
 import {getAllDataCatalogItems, saveSelectedDataCatalogItems} from '../../api/DataCatalogApi';
-import {getDataSource} from '../../api/DataSourceApi';
+import {getDataSource, saveConnection} from '../../api/DataSourceApi';
 
 const CanvasModel =  {
     elements: [],

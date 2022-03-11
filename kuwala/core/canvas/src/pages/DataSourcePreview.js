@@ -12,7 +12,7 @@ export default () => {
     const location = useLocation()
     const dataIndex = location.state.index
     const { dataSource } = useStoreState((state) => state.canvas);
-    const selectedSource = dataSource[dataIndex]
+    const selectedSource = dataSource.filter((el) => el.id === dataIndex)[0];
 
     const renderDataPreview = () => {
         if(!selectedSource) {

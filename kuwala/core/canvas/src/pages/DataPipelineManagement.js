@@ -23,15 +23,15 @@ export default () => {
             )
         } else if (dataSource.length > 0){
             return (
-                <table className="table-fixed w-full">
-                    <thead className={'rounded-t-md uppercase'}>
+                <table className="table-fixed w-full rounded-table">
+                    <thead className={'rounded-t-md uppercase rounded-header'}>
                     <tr>
-                        <th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}>Name</th>
-                        <th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}>Status</th>
+                        <th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green text-left capitalize'}>Name</th>
+                        <th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green capitalize'}>Status</th>
                         <th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}/>
                     </tr>
                     </thead>
-                    <tbody>
+                    <tbody className={'rounded-body'}>
                     {dataSource.map((e, i)=>{
                         return (
                             <tr
@@ -47,35 +47,40 @@ export default () => {
                                     </div>
                                 </td>
                                 <td className={'py-6'}>
-                                    <span
-                                        className={'px-4 py-2 rounded-xl bg-red-400 text-white font-semibold'}
-                                    >
-                                        Inactive
-                                    </span>
+                                <span
+                                    className={`
+                                        px-4 py-2 rounded-xl text-white font-semibold
+                                        ${e.connected ? 'bg-kuwala-green' : 'bg-red-400'}
+                                    `}
+                                >
+                                    {e.connected ? 'Active' : 'Inactive'}
+                                </span>
                                 </td>
                                 <td className={'py-6 space-x-2'}>
-                                    <Link
-                                        to={'/data-source-config'}
-                                        state={{
-                                            index: i,
-                                        }}
-                                        className={'bg-white px-4 py-2 text-white rounded-md border-2 border-kuwala-green hover:bg-kuwala-bg-gray'}
-                                    >
-                                        <span className={'text-kuwala-green font-semibold'}>Configure</span>
-                                    </Link>
-                                    <Link
-                                        disabled={e.connected}
-                                        to={'/data-source-preview'}
-                                        state={{
-                                            index: i,
-                                        }}
-                                        className={`
-                                            bg-white text-kuwala-green px-4 py-2 text-white rounded-md border-2 border-kuwala-green hover:bg-kuwala-bg-gray
-                                            ${e.connected ? '' : 'hidden'}
-                                        `}
-                                    >
-                                        <span className={'text-kuwala-green font-semibold'}>Preview Data</span>
-                                    </Link>
+                                    <div className={'flex flex-row justify-end space-x-4 px-8'}>
+                                        <Link
+                                            to={'/data-source-config'}
+                                            state={{
+                                                index: e.id,
+                                            }}
+                                            className={'bg-white px-4 py-2 text-white rounded-md border-2 border-kuwala-green hover:bg-kuwala-bg-gray'}
+                                        >
+                                            <span className={'text-kuwala-green font-semibold'}>Configure</span>
+                                        </Link>
+                                        <Link
+                                            disabled={e.connected}
+                                            to={'/data-source-preview'}
+                                            state={{
+                                                index: e.id,
+                                            }}
+                                            className={`
+                                        bg-white text-kuwala-green px-4 py-2 text-white rounded-md border-2 border-kuwala-green hover:bg-kuwala-bg-gray
+                                        ${e.connected ? '' : 'hidden'}
+                                    `}
+                                        >
+                                            <span className={'text-kuwala-green font-semibold'}>Preview Data</span>
+                                        </Link>
+                                    </div>
                                 </td>
                             </tr>
                         )
