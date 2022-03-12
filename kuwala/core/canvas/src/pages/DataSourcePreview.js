@@ -266,13 +266,13 @@ export default () => {
                 <span className={'mr-4'}>
                     <img
                         src={schemaObject.isOpen ? ArrowDown : ArrowRight}
-                        style={{width: 16, height: 16}}
+                        style={{minWidth: 16, height: 16}}
                     />
                 </span>
                 <span className={'mr-4'}>
                     <img
                         src={ListSVG}
-                        style={{width: 16, height: 16}}
+                        style={{minWidth: 16, height: 16}}
                     />
                 </span>
                 <span className={'font-semibold text-md'}>
@@ -300,14 +300,13 @@ export default () => {
                         <span className={'mr-4 cursor-pointer'}>
                             <img
                                 src={el.isOpen ? ArrowDown : ArrowRight}
-                                style={{width: 16, height: 16}}
-                                style={{width: 16, height: 16}}
+                                style={{minWidth: 16, height: 16}}
                             />
                         </span>
                             <span className={'mr-4'}>
                             <img
                                 src={FolderSVG}
-                                style={{width: 16, height: 16}}
+                                style={{minWidth: 16, height: 16}}
                             />
                         </span>
                             <span className={'font-semibold text-md'}>
@@ -331,6 +330,7 @@ export default () => {
                 className={`
                     flex flex-row items-center pl-20 py-2
                     cursor-pointer
+                    min-w-full
                     ${tableKey === selectedTable ? `bg-kuwala-green text-white` : `bg-white text-black`}
                 `}
                 key={tableKey}
@@ -339,9 +339,9 @@ export default () => {
                 }}
             >
                 <span className={'mr-4'}>
-                    <imgs
+                    <img
                         src={TableSVG}
-                        style={{width: 16, height: 16}}
+                        style={{minWidth: 16, minHeight: 16}}
                     />
                 </span>
                 <span className={'font-semibold text-md'}>

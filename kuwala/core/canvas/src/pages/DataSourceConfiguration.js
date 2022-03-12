@@ -4,7 +4,6 @@ import {useLocation, Link, useNavigate} from "react-router-dom";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import { Formik, Field, Form, ErrorMessage, FieldArray } from "formik"
 import {saveConnection, testConnection} from "../api/DataSourceApi";
-import TextAreaInput from "../components/InputField/TextAreaInput";
 
 export default () => {
     const navigate = useNavigate()
@@ -59,6 +58,24 @@ export default () => {
         }
         setIsTestConnectionLoading(false)
         setTestConnectionClicked(true)
+    }
+
+    const preProcessConnectionParameters = (connectionParameters) => {
+        switch (selectedSource.data_catalog_item_id) {
+            case 'postgres':
+                return connectionParameters
+            case 'bigquery':
+                return connectionParameters.map((el) => {
+                    return {
+                        ...el,
+                        value: JSON.stringify(el.value)
+                    }
+                })
+                break;
+            default:
+                return connectionParameters
+        }
+
     }
 
     const generateConfig = (type, config) => {
@@ -264,7 +281,7 @@ export default () => {
                 <div className={'mt-6 h-4/6 space-x-8 overflow-x-hidden'}>
                     <Formik
                         initialValues={{
-                            connection_parameters: initialConnectionParameters
+                            connection_parameters: preProcessConnectionParameters(initialConnectionParameters)
                         }}
                         onSubmit={async (values)=>{
                             await saveConfiguration({
