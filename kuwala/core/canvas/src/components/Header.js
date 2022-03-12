@@ -15,6 +15,7 @@ export default () => {
             '/data-pipeline-management',
             '/data-source-config',
             '/data-catalog',
+            '/data-source-preview'
         ].includes(currentPage)
     }
 
@@ -72,8 +73,8 @@ export default () => {
                         {/* Red Dot */}
                         {notifications > 0 ? (
                             <>
-                                <div className="absolute right-0 p-1 bg-red-400 rounded-full animate-ping"></div>
-                                <div className="absolute right-0 p-1 bg-red-400 border rounded-full"></div>
+                                <div className="absolute right-0 p-1 bg-red-400 rounded-full animate-ping"/>
+                                <div className="absolute right-0 p-1 bg-red-400 border rounded-full"/>
                             </>
                         ) : ''}
                         <button

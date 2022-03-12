@@ -19,7 +19,11 @@ export default function () {
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
 
     const {elements, selectedElement, newNodeInfo, dataSource} = useStoreState(state => state.canvas);
-    const {addNode, setSelectedElement, removeNode, connectNodes, setOpenDataView} = useStoreActions(actions => actions.canvas)
+    const {addNode, setSelectedElement, removeNode, connectNodes, setOpenDataView, getDataSources} = useStoreActions(actions => actions.canvas)
+
+    useEffect(()=> {
+       if (dataSource.length <= 0) getDataSources()
+    }, [])
 
     const onConnect = (params) => connectNodes(params)
     const onElementsRemove = (elementsToRemove) => removeNode(elementsToRemove)
