@@ -29,7 +29,6 @@ export function getSchema(id) {
 }
 
 export function getTablePreview({id, params}){
-    console.log(params)
     return baseAxios.get(
         `${DATA_SOURCE}/${id}/table/preview`,
         {params}

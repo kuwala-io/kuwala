@@ -9,6 +9,7 @@ import ArrowDown from "../icons/arrow-down-solid.svg"
 import FolderSVG from "../icons/folder-solid.svg"
 import TableSVG from "../icons/table-solid.svg"
 import {getSchema, getTablePreview} from "../api/DataSourceApi";
+import {data} from "autoprefixer";
 
 export default () => {
     const location = useLocation()
@@ -17,6 +18,8 @@ export default () => {
     const selectedSource = dataSource.filter((el) => el.id === dataIndex)[0];
     const [schemaList, setSchema] = useState([])
     const [selectedTable, setSelectedTable] = useState(null)
+    const [isTableDataPreviewLoading, setIsTableDataPreviewLoading] = useState(false)
+    const [isSchemaLoading, setIsSchemaLoading] = useState(false)
     const [tableDataPreview, setTableDataPreview] = useState({
         columns: [],
         rows: []
@@ -27,54 +30,76 @@ export default () => {
     }, [])
 
     async function fetchSchema() {
+        setIsSchemaLoading(true)
         const res = await getSchema(dataIndex);
         if(res.status === 200) {
             const populatedSchema = populateSchema(res.data);
             setSchema(populatedSchema)
         }
+        setIsSchemaLoading(false)
     }
 
     const populateSchema = (rawSchema) => {
-        return rawSchema.map((schema) => {
-            return {
-                ...schema,
-                isOpen: false,
-                categories: schema.categories.map((category)=>{
+        switch (selectedSource.data_catalog_item_id) {
+            case 'postgres':
+                return rawSchema.map((schema) => {
                     return {
-                        ...category,
-                        isOpen: false
+                        ...schema,
+                        isOpen: false,
+                        categories: schema.categories.map((category)=>{
+                            return {
+                                ...category,
+                                isOpen: false
+                            }
+                        })
                     }
                 })
-            }
-        })
+            case 'bigquery':
+                return rawSchema.map((schema) => {
+                    return {
+                        ...schema,
+                        schema: schema.project,
+                        isOpen: false,
+                        categories: schema.datasets.map((data)=>{
+                            return {
+                                ...data,
+                                category: data.dataset,
+                                isOpen: false
+                            }
+                        })
+                    }
+                })
+            default:
+                return rawSchema
+        }
     }
 
-    const renderTableDataPreview = () => {
+    const renderTableDataPreview = (columns, rows) => {
         return (
             <table className={'bg-white'}>
                 <thead>
                     <tr>
-                        {renderTableDataPreviewHead()}
+                        {renderTableDataPreviewHead(columns)}
                     </tr>
                 </thead>
                 <tbody>
-                    {renderTableDataPreviewBody()}
+                        {renderTableDataPreviewBody(rows)}
                 </tbody>
             </table>
         )
     }
 
-    const renderTableDataPreviewHead = () => {
-        if(tableDataPreview) {
-            return tableDataPreview.columns.map((e,i)=> (<th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}>{e}</th>))
+    const renderTableDataPreviewHead = (columns) => {
+        if(columns) {
+            return columns.map((e,i)=> (<th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}>{e}</th>))
         } else {
             return <></>
         }
     }
 
-    const renderTableDataPreviewBody = () => {
-        if(tableDataPreview) {
-            return tableDataPreview.rows.map((e,i) => (
+    const renderTableDataPreviewBody = (rows) => {
+        if(rows) {
+            return rows.map((e,i) => (
                 <tr className={'bg-white border-2 text-center'}>
                     {e.map((e,i)=> (<td className={'text-left px-4 py-2 border border-kuwala-green'}>{
                         JSON.stringify(e).trim()
@@ -88,7 +113,8 @@ export default () => {
 
     const tableSelectionOnlick = async (addressString) => {
         setSelectedTable(addressString)
-        const params = generateParamsFromAddressString(addressString)
+        setIsTableDataPreviewLoading(true)
+        const params = generateParamsByDataSourceType(selectedSource.data_catalog_item_id, addressString)
         const res = await getTablePreview({
             id: dataIndex,
             params
@@ -97,16 +123,28 @@ export default () => {
         if(res.status === 200) {
             setTableDataPreview(res.data)
         }
+        setIsTableDataPreviewLoading(false)
     }
 
-    const generateParamsFromAddressString = (addressString) => {
+    const generateParamsByDataSourceType = (type, addressString) => {
         const arr = addressString.split('@')
-        console.log(arr);
-        return {
-            schema_name: arr[0],
-            table_name: arr[2],
-            limit_columns: 100,
-            limit_rows: 100,
+        switch (type){
+            case "postgres":
+                return {
+                    schema_name: arr[0],
+                    table_name: arr[2],
+                    limit_columns: 100,
+                    limit_rows: 100,
+                }
+            case "bigquery":
+                return {
+                    project_name: arr[0],
+                    dataset_name: arr[1],
+                    table_name: arr[2],
+                    limit_columns: 100,
+                    limit_rows: 100,
+                }
+            default: return ""
         }
     }
 
@@ -125,11 +163,40 @@ export default () => {
                             Database: Kuwala
                         </div>
                         <div className={'bg-red overflow-y-scroll overflow-x-auto h-full'}>
-                            {schemaList.map(el => renderSchemaBlock(el))}
+                            {isSchemaLoading
+                                ?
+                                    <div className="flex flex-col w-full h-full justify-center items-center">
+                                        <div
+                                            className="spinner-border animate-spin inline-block w-16 h-16 border-4 text-kuwala-green rounded-full"
+                                            role="status">
+                                            <span className="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                :
+                                    schemaList.map(el => renderSchemaBlock(el))
+                            }
                         </div>
                     </div>
                     <div className={'flex flex-col bg-white w-9/12 overflow-auto'}>
-                        {renderTableDataPreview()}
+                        {selectedTable
+                            ?
+                                isTableDataPreviewLoading
+                                    ?
+                                        <div className="flex flex-col w-full h-full justify-center items-center">
+                                            <div
+                                                className="spinner-border animate-spin inline-block w-24 h-24 border-4 text-kuwala-green rounded-full"
+                                                role="status">
+                                                <span className="visually-hidden">Loading...</span>
+                                            </div>
+                                        </div>
+                                    :
+                                        renderTableDataPreview(tableDataPreview.columns, tableDataPreview.rows)
+                            :
+                            <div className="flex flex-col w-full h-full text-xl font-light justify-center items-center">
+                                <p>Select a table from the <span className={'text-kuwala-green'}>left</span></p>
+                                <p>to preview the data</p>
+                            </div>
+                        }
                     </div>
                 </div>
             )
@@ -264,7 +331,7 @@ export default () => {
                 className={`
                     flex flex-row items-center pl-20 py-2
                     cursor-pointer
-                    ${tableKey === selectedTable ? `bg-kuwala-green` : `bg-white`}
+                    ${tableKey === selectedTable ? `bg-kuwala-green text-white` : `bg-white text-black`}
                 `}
                 key={tableKey}
                 onClick={()=>{
@@ -272,7 +339,7 @@ export default () => {
                 }}
             >
                 <span className={'mr-4'}>
-                    <img
+                    <imgs
                         src={TableSVG}
                         style={{width: 16, height: 16}}
                     />

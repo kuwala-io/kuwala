@@ -4,6 +4,7 @@ import {useLocation, Link, useNavigate} from "react-router-dom";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import { Formik, Field, Form, ErrorMessage, FieldArray } from "formik"
 import {saveConnection, testConnection} from "../api/DataSourceApi";
+import TextAreaInput from "../components/InputField/TextAreaInput";
 
 export default () => {
     const navigate = useNavigate()
@@ -26,35 +27,51 @@ export default () => {
 
     const saveConfiguration = async ({dataSourceId, config}) => {
         setIsSaveLoading(true)
-        const res = await saveConnection({
-            id: dataSourceId,
-            config: config
-        })
-
+        try {
+            const res = await saveConnection({
+                id: dataSourceId,
+                config: generateConfig(selectedSource.data_catalog_item_id, config)
+            })
+            if(res.status === 200) {
+                await getDataSources() // Refresh
+            }
+        } catch (e) {
+            alert("Failed to save configuration")
+        }
         setIsSaveLoading(false)
         setTestConnectionClicked(true)
-
-        if(res.status === 200) {
-            await getDataSources() // Refresh
-            navigate('/data-pipeline-management')
-        } else if (res.status === 400){
-            alert('Request failed')
-        }
+        navigate('/data-pipeline-management')
     }
 
     const testConfigConnection = async ({dataSourceId, config}) => {
         setIsTestConnectionLoading(true)
-        const res = await testConnection({
-            id: dataSourceId,
-            config: parseArrayIntoConfig(config)
-        });
-
-        if(res.status === 200){
-            const connected = res.data.connected;
-            setIsConnected(connected)
+        try {
+            const res = await testConnection({
+                id: dataSourceId,
+                config: generateConfig(selectedSource.data_catalog_item_id, config)
+            });
+            if(res.status === 200){
+                const connected = res.data.connected;
+                setIsConnected(connected)
+            }
+        } catch (e) {
+            alert("Failed to test connection")
         }
         setIsTestConnectionLoading(false)
         setTestConnectionClicked(true)
+    }
+
+    const generateConfig = (type, config) => {
+        switch (type){
+            case 'bigquery':
+                return {
+                    credentials_json: JSON.parse(getValue(config,'credentials_json'))
+                }
+            case 'postgres':
+                return parseArrayIntoConfig(config)
+            default:
+                return null;
+        }
     }
 
     const parseArrayIntoConfig = (arr) => {
@@ -90,25 +107,54 @@ export default () => {
                                             <div className={'flex flex-row h-full w-full items-center space-y-8'}
                                                 key={conParams.id}
                                             >
-                                                <div className={'w-1/6'}>
-                                                    <span className={'text-lg capitalize font-bold'}>
-                                                        {conParams.id}
-                                                    </span>
-                                                </div>
-                                                <div className={'w-5/6'}>
-                                                    <Field
-                                                        name={`connection_parameters[${i}].value`}
-                                                        type={conParams.id === 'password' ? 'password' : 'text'}
-                                                        className={'w-full px-4 py-2 border-2 border-kuwala-green text-gray-800 rounded-lg focus:outline-none'}
-                                                        placeholder={conParams.id}
-                                                        key={conParams.id}
-                                                    />
-                                                </div>
+                                                {selectedSource.data_catalog_item_id === 'bigquery' ?
+                                                    (
+                                                        <div className={'flex flex-col w-full'}>
+                                                            <span className={'text-lg capitalize font-semibold'}>
+                                                                Credentials JSON :
+                                                            </span>
+                                                            <span className={'text-md font-normal'}>
+                                                                Checkout the <a className={'text-kuwala-green'} target={"_blank"} href={"https://cloud.google.com/iam/docs/creating-managing-service-account-keys#iam-service-account-keys-create-gcloud"}>docs</a> for more information to obtain this file
+                                                            </span>
+                                                            <Field
+                                                                name={`connection_parameters[${i}].value`}
+                                                                type={'textField'}
+                                                                className={`
+                                                                    w-full px-4 py-2 border-2 border-kuwala-green text-gray-800 rounded-lg focus:outline-none mt-4 w-full
+                                                                `}
+                                                                style={{maxHeight: 320, minHeight: 160}}
+                                                                placeholder={conParams.id}
+                                                                component={'textarea'}
+                                                                key={conParams.id}
+                                                            />
+                                                        </div>
+                                                    )
+                                                    :
+                                                    (
+                                                        <>
+                                                            <div className={'w-1/6'}>
+                                                                <span className={'text-lg capitalize font-bold'}>
+                                                                    {conParams.id}
+                                                                </span>
+                                                            </div>
+                                                            <div className={'w-5/6'}>
+                                                                <Field
+                                                                    name={`connection_parameters[${i}].value`}
+                                                                    type={conParams.id === 'password' ? 'password' : 'text'}
+                                                                    className={'w-full px-4 py-2 border-2 border-kuwala-green text-gray-800 rounded-lg focus:outline-none'}
+                                                                    placeholder={conParams.id}
+                                                                    key={conParams.id}
+                                                                />
+                                                            </div>
+                                                        </>
+                                                    )
+                                                }
+
                                             </div>
                                         )
                                     })}
-                                    <div className={'flex flex-row justify-between mt-6'}>
-                                        <div className={'flex flex-row align-middle items-center justify-center mt-4'}>
+                                    <div className={'flex flex-row justify-between'}>
+                                        <div className={'flex flex-row align-middle items-center justify-center mt-6'}>
                                             <button
                                                 className={`bg-white border-2 border-kuwala-green rounded-md px-3 w-48 py-2 hover:text-stone-300 hover:bg-kuwala-bg-gray`}
                                                 onClick={async ()=> {
@@ -223,7 +269,7 @@ export default () => {
                         onSubmit={async (values)=>{
                             await saveConfiguration({
                                 dataSourceId: selectedSource.id,
-                                config: parseArrayIntoConfig(values.connection_parameters)
+                                config: values.connection_parameters
                             })
                         }}
                         children={renderDataSourceConfigForm}
