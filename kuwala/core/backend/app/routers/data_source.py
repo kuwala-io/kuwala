@@ -1,3 +1,5 @@
+from typing import Optional
+
 import controller.data_source.data_source as data_source_controller
 from database.crud.data_source import get_data_sources, update_connection_parameters
 from database.database import get_db
@@ -7,7 +9,7 @@ from database.schemas.data_source import (
     DataSourceConnection,
 )
 from database.utils.encoder import list_props_to_json_props
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 router = APIRouter(
@@ -68,6 +70,25 @@ def get_data_source_schema(data_source_id: str, db: Session = Depends(get_db)):
     return data_source_controller.get_schema(data_source_id=data_source_id, db=db)
 
 
+@router.get("/{data_source_id}/table/columns")
+def get_data_source_table_columns(
+    data_source_id: str,
+    table_name: str,
+    schema_name: str = None,
+    project_name: str = None,
+    dataset_name: str = None,
+    db: Session = Depends(get_db),
+):
+    return data_source_controller.get_columns(
+        data_source_id=data_source_id,
+        table_name=table_name,
+        schema_name=schema_name,
+        project_name=project_name,
+        dataset_name=dataset_name,
+        db=db,
+    )
+
+
 @router.get("/{data_source_id}/table/preview")
 def get_table_preview(
     data_source_id: str,
@@ -75,6 +96,7 @@ def get_table_preview(
     schema_name: str = None,
     project_name: str = None,
     dataset_name: str = None,
+    columns: Optional[list[str]] = Query(None),
     limit_columns: int = None,
     limit_rows: int = None,
     db: Session = Depends(get_db),
@@ -85,6 +107,7 @@ def get_table_preview(
         project_name=project_name,
         dataset_name=dataset_name,
         table_name=table_name,
+        columns=columns,
         limit_columns=limit_columns,
         limit_rows=limit_rows,
         db=db,

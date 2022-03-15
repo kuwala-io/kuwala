@@ -86,12 +86,44 @@ def get_schema(data_source_id: str, db: Session = Depends(get_db)):
     return schema
 
 
+def get_columns(
+    data_source_id: str,
+    schema_name: str,
+    project_name: str,
+    dataset_name: str,
+    table_name: str,
+    db: Session = Depends(get_db),
+):
+    columns = None
+    data_source, data_catalog_item_id = get_data_source_and_data_catalog_item_id(
+        db=db, data_source_id=data_source_id
+    )
+    connection_parameters = get_connection_parameters(data_source)
+
+    if data_catalog_item_id == "postgres":
+        columns = postgres_controller.get_columns(
+            connection_parameters=connection_parameters,
+            schema_name=schema_name,
+            table_name=table_name,
+        )
+    elif data_catalog_item_id == "bigquery":
+        columns = bigquery_controller.get_columns(
+            connection_parameters=connection_parameters,
+            project_name=project_name,
+            dataset_name=dataset_name,
+            table_name=table_name,
+        )
+
+    return columns
+
+
 def get_table_preview(
     data_source_id: str,
     schema_name: str,
     project_name: str,
     dataset_name: str,
     table_name: str,
+    columns: list[str],
     limit_columns: int,
     limit_rows: int,
     db: Session = Depends(get_db),
@@ -107,6 +139,7 @@ def get_table_preview(
             connection_parameters=connection_parameters,
             schema_name=schema_name,
             table_name=table_name,
+            columns=columns,
             limit_columns=limit_columns,
             limit_rows=limit_rows,
         )
@@ -116,6 +149,7 @@ def get_table_preview(
             project_name=project_name,
             dataset_name=dataset_name,
             table_name=table_name,
+            columns=columns,
             limit_columns=limit_columns,
             limit_rows=limit_rows,
         )
