@@ -123,6 +123,7 @@ def get_table_preview(
     project_name: str,
     dataset_name: str,
     table_name: str,
+    columns: list[str],
     limit_columns: int,
     limit_rows: int,
     db: Session = Depends(get_db),
@@ -138,6 +139,7 @@ def get_table_preview(
             connection_parameters=connection_parameters,
             schema_name=schema_name,
             table_name=table_name,
+            columns=columns,
             limit_columns=limit_columns,
             limit_rows=limit_rows,
         )
@@ -147,6 +149,7 @@ def get_table_preview(
             project_name=project_name,
             dataset_name=dataset_name,
             table_name=table_name,
+            columns=columns,
             limit_columns=limit_columns,
             limit_rows=limit_rows,
         )

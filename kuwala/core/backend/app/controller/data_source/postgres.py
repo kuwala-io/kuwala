@@ -159,26 +159,39 @@ def get_table_preview(
     connection_parameters: ConnectionParameters,
     schema_name: str,
     table_name: str,
+    columns: list[str],
     limit_columns: int,
     limit_rows: int,
 ) -> dict:
+    if not schema_name:
+        raise HTTPException(
+            status_code=400, detail="Missing query parameter: 'schema_name'"
+        )
+
     if not limit_columns:
         limit_columns = 200
 
     if not limit_rows:
         limit_rows = 300
 
-    columns_query = f"""
-        SELECT *
-        FROM {schema_name}.{table_name}
-        LIMIT 0
-    """
-    columns = send_query(
-        connection_parameters=connection_parameters, query=columns_query
-    )
-    columns_string = functools.reduce(
-        lambda c1, c2: f"{c1}, {c2}", columns[0][0:limit_columns]
-    )
+    if not columns:
+        columns_query = f"""
+            SELECT *
+            FROM {schema_name}.{table_name}
+            LIMIT 0
+        """
+        columns = send_query(
+            connection_parameters=connection_parameters, query=columns_query
+        )
+
+        columns_string = functools.reduce(
+            lambda c1, c2: f"{c1}, {c2}", columns[0][0:limit_columns]
+        )
+    else:
+        columns_string = functools.reduce(
+            lambda c1, c2: f"{c1}, {c2}", columns[0:limit_columns]
+        )
+
     rows_query = f"""
         SELECT {columns_string}
         FROM {schema_name}.{table_name}
