@@ -213,3 +213,17 @@ def get_table_preview(
     return dict(
         columns=columns, primary_keys=primary_keys, foreign_keys=foreign_keys, rows=rows
     )
+
+
+def update_dbt_connection_parameters(
+    profile_yaml: dict, connection_parameters: ConnectionParameters
+) -> dict:
+    dev_profile = profile_yaml["kuwala"]["outputs"]["dev"]
+    dev_profile["host"] = connection_parameters.host
+    dev_profile["user"] = connection_parameters.user
+    dev_profile["pass"] = connection_parameters.password
+    dev_profile["port"] = connection_parameters.port
+    dev_profile["dbname"] = connection_parameters.database
+    dev_profile["schema"] = "dbt_kuwala"
+
+    return profile_yaml

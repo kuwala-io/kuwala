@@ -1,6 +1,12 @@
+colorama==0.4.4
+dbt-bigquery==1.0.0
+dbt-init==0.2.7
+dbt-postgres==1.0.3
 fastapi==0.74.1
 google-cloud-bigquery==2.34.1
+oyaml==1.0
 pandas==1.4.1
 psycopg2==2.9.3
 SQLAlchemy==1.4.31
+typing-extensions==3.10
 uvicorn[standard]==0.17.5

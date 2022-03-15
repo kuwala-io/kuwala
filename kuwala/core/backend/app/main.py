@@ -5,19 +5,25 @@ import os
 import sys
 from time import sleep
 
-from database.crud import data_catalog as data_catalog_crud
+from database.crud.common import get_object_by_id
+from database.crud.data_catalog import create_data_catalog_item
 from database.database import Engine, get_db
+from database.models import data_block as data_block_models
 from database.models import data_catalog as data_catalog_models
 from database.models import data_source as data_source_models
 from database.schemas import data_catalog as data_catalog_schemas
 from fastapi import FastAPI
 import fastapi.exceptions
 from fastapi.middleware.cors import CORSMiddleware
-from routers import data_catalog, data_source
+from routers import data_block, data_catalog, data_source
 import sqlalchemy.exc
 import uvicorn
 
-app = FastAPI(title="Kuwala Backend", version="0.2.0-alpha")
+app = FastAPI(
+    title="Kuwala Backend",
+    version="0.2.0-alpha",
+    responses={400: {"description": "Bad request"}, 404: {"description": "Not found"}},
+)
 
 # Set up middlewares
 origins = ["*"]
@@ -31,6 +37,7 @@ app.add_middleware(
 )
 
 # Set up routers
+app.include_router(data_block.router)
 app.include_router(data_catalog.router)
 app.include_router(data_source.router)
 
@@ -45,6 +52,7 @@ def populate_db():
 
     while not connected_to_db and current_try <= max_retries:
         try:
+            data_block_models.Base.metadata.create_all(bind=Engine)
             data_catalog_models.Base.metadata.create_all(bind=Engine)
             data_source_models.Base.metadata.create_all(bind=Engine)
 
@@ -68,12 +76,14 @@ def populate_db():
 
     for data_catalog_item in data_catalog_items:
         try:
-            data_catalog_crud.get_data_catalog_item(
-                db=db, data_catalog_item_id=data_catalog_item["id"]
+            get_object_by_id(
+                db=db,
+                model=data_catalog_models.DataCatalogItem,
+                object_id=data_catalog_item["id"],
             )
         except fastapi.exceptions.HTTPException as e:
             if e.status_code == 404:
-                data_catalog_crud.create_data_catalog_item(
+                create_data_catalog_item(
                     db=db,
                     data_catalog_item=data_catalog_schemas.DataCatalogItemCreate(
                         id=data_catalog_item["id"],
