@@ -1,11 +1,13 @@
 import json
-import uuid
+import os
 
-from database.crud.data_catalog import get_data_catalog_item, get_data_catalog_items
+from controller.dbt_controller import create_empty_dbt_project
+from database.crud.common import get_all_objects, get_object_by_id
 from database.crud.data_source import create_data_source
 from database.database import get_db
-from database.schemas.data_catalog import DataCatalogItem, DataCatalogSelect
-from database.schemas.data_source import DataSource, DataSourceCreate
+import database.models.data_catalog as models
+import database.schemas.data_catalog as schemas_data_catalog
+import database.schemas.data_source as schemas_data_source
 from database.utils.encoder import list_props_to_json_props
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
@@ -16,9 +18,9 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=list[DataCatalogItem])
+@router.get("/", response_model=list[schemas_data_catalog.DataCatalogItem])
 def get_all_items(db: Session = Depends(get_db)):
-    items = get_data_catalog_items(db)
+    items = get_all_objects(db=db, model=models.DataCatalogItem)
     items = list(
         map(
             lambda item: list_props_to_json_props(
@@ -31,12 +33,16 @@ def get_all_items(db: Session = Depends(get_db)):
     return items
 
 
-@router.post("/select", response_model=list[DataSource])
-def select_items(items: DataCatalogSelect, db: Session = Depends(get_db)):
+@router.post("/select", response_model=list[schemas_data_source.DataSource])
+def select_items(
+    items: schemas_data_catalog.DataCatalogSelect, db: Session = Depends(get_db)
+):
     data_sources = list()
 
     for item_id in items.item_ids:
-        data_catalog_item = get_data_catalog_item(db=db, data_catalog_item_id=item_id)
+        data_catalog_item = get_object_by_id(
+            db=db, model=models.DataCatalogItem, object_id=item_id
+        )
         connection_parameters = json.dumps(
             list(
                 map(
@@ -47,8 +53,7 @@ def select_items(items: DataCatalogSelect, db: Session = Depends(get_db)):
         )
         data_source = create_data_source(
             db=db,
-            data_source=DataSourceCreate(
-                id=str(uuid.uuid4()),
+            data_source=schemas_data_source.DataSourceCreate(
                 data_catalog_item_id=item_id,
                 connection_parameters=connection_parameters,
                 connected=False,
@@ -60,5 +65,13 @@ def select_items(items: DataCatalogSelect, db: Session = Depends(get_db)):
                 base_object=data_source, list_parameters=["connection_parameters"]
             )
         )
+
+        if item_id == "postgres" or item_id == "bigquery":
+            script_dir = os.path.dirname(__file__)
+            target_dir = os.path.join(script_dir, "../../../../tmp/kuwala/backend/dbt")
+
+            create_empty_dbt_project(
+                data_source_id=data_source.id, warehouse=item_id, target_dir=target_dir
+            )
 
     return data_sources

@@ -10,18 +10,20 @@ class DataSourceBase(BaseModel):
     connected: bool
 
 
-class DataSourceCreate(DataSourceBase):
-    pass
+class DataSource(DataSourceBase):
+    class Config:
+        orm_mode = True
+
+
+class DataSourceCreate(BaseModel):
+    data_catalog_item_id: str
+    connection_parameters: Json
+    connected: bool
 
 
 class DataSourceConnection(BaseModel):
     id: str
     connection_parameters: Json
-
-
-class DataSource(DataSourceBase):
-    class Config:
-        orm_mode = True
 
 
 class CredentialsJson(BaseModel):

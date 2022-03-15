@@ -7,6 +7,6 @@ class DataCatalogItem(Base):
     __tablename__ = "data_catalog_items"
 
     id = Column(String, primary_key=True, index=True)
-    name = Column(String)
-    logo = Column(String)
-    connection_parameters = Column(JSON)
+    name = Column(String, nullable=False)
+    logo = Column(String, nullable=False)
+    connection_parameters = Column(JSON, nullable=False)
