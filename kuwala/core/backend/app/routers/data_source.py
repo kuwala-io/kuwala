@@ -68,6 +68,25 @@ def get_data_source_schema(data_source_id: str, db: Session = Depends(get_db)):
     return data_source_controller.get_schema(data_source_id=data_source_id, db=db)
 
 
+@router.get("/{data_source_id}/table/columns")
+def get_data_source_table_columns(
+    data_source_id: str,
+    table_name: str,
+    schema_name: str = None,
+    project_name: str = None,
+    dataset_name: str = None,
+    db: Session = Depends(get_db),
+):
+    return data_source_controller.get_columns(
+        data_source_id=data_source_id,
+        table_name=table_name,
+        schema_name=schema_name,
+        project_name=project_name,
+        dataset_name=dataset_name,
+        db=db,
+    )
+
+
 @router.get("/{data_source_id}/table/preview")
 def get_table_preview(
     data_source_id: str,

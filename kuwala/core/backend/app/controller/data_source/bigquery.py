@@ -56,6 +56,23 @@ def get_schema(connection_parameters: ConnectionParameters):
     return schema
 
 
+def get_columns(
+    connection_parameters: ConnectionParameters,
+    project_name: str,
+    dataset_name: str,
+    table_name: str,
+):
+    credentials = get_credentials(connection_parameters=connection_parameters)
+    client = bigquery.Client(credentials=credentials)
+    table_ref = f"{project_name}.{dataset_name}.{table_name}"
+    table = client.get_table(table=table_ref)
+    columns = list(
+        map(lambda sf: dict(column=sf.name, type=sf.field_type.upper()), table.schema)
+    )
+
+    return columns
+
+
 def get_table_preview(
     connection_parameters: ConnectionParameters,
     project_name: str,

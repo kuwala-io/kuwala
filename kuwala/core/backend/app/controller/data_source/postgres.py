@@ -139,6 +139,22 @@ def get_keys(
     )
 
 
+def get_columns(
+    connection_parameters: ConnectionParameters, schema_name: str, table_name: str
+):
+    columns_query = f"""
+            SELECT column_name, data_type
+            FROM information_schema.columns
+            WHERE table_schema = '{schema_name}' AND table_name = '{table_name}'
+    """
+    columns = send_query(
+        connection_parameters=connection_parameters, query=columns_query
+    )[1:]
+    columns = list(map(lambda c: dict(column=c[0], type=c[1].upper()), columns))
+
+    return columns
+
+
 def get_table_preview(
     connection_parameters: ConnectionParameters,
     schema_name: str,
