@@ -27,10 +27,10 @@ const Table = ({columns, data}) => {
             data={memoizedRows}
             columns={memoizedCols}
             defaultPageSize={20}
-            showPagination={false}
+            showPagination={true}
             showPaginationTop={false}
-            showPaginationBottom={false}
-            showPageSizeOptions={false}
+            showPaginationBottom={true}
+            showPageSizeOptions={true}
             style={{
                 height: "100%",
                 overFlowX: 'hidden',
@@ -134,7 +134,7 @@ export default () => {
                 filterable: false,
                 width: 50,
                 Cell: (row) => {
-                    return <div>{row.index}</div>;
+                    return <div>{row.index+1}</div>;
                 }
             }, ...cols]
 

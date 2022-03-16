@@ -31,5 +31,5 @@
 }
 
 .ReactTable .rt-thead::-webkit-scrollbar {
-    background: transparent;
+    background: #99DDD8;
 }
