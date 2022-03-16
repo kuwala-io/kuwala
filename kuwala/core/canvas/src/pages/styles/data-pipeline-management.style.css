@@ -20,3 +20,7 @@
 .rounded-table {
     border-radius: 12px;
 }
+
+.table-spacing-0 {
+    border-spacing: 0;
+}

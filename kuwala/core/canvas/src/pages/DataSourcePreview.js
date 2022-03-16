@@ -2,6 +2,8 @@ import React, {useEffect, useState} from "react";
 import Header from "../components/Header";
 import {useLocation, Link} from "react-router-dom";
 import {useStoreState} from "easy-peasy";
+import ReactTable from "react-table";
+
 
 import ListSVG from "../icons/list.svg"
 import ArrowRight from "../icons/arrow-right-solid.svg"
@@ -76,22 +78,25 @@ export default () => {
 
     const renderTableDataPreview = (columns, rows) => {
         return (
-            <table className={'bg-white'}>
-                <thead>
-                    <tr>
-                        {renderTableDataPreviewHead(columns)}
-                    </tr>
-                </thead>
-                <tbody>
+            <div className={'overflow-x-auto'}>
+                <table className={'bg-white'}>
+                    <thead>
+                        <tr>
+                            <th className={'sticky top-0 px-4 py-2 text-white bg-kuwala-light-green'}>#</th>
+                            {renderTableDataPreviewHead(columns)}
+                        </tr>
+                    </thead>
+                    <tbody className={'overflow-y-auto flex flex-col'}>
                         {renderTableDataPreviewBody(rows)}
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         )
     }
 
     const renderTableDataPreviewHead = (columns) => {
         if(columns) {
-            return columns.map((e,i)=> (<th className={'sticky top-0 px-6 py-3 text-white bg-kuwala-green'}>{e}</th>))
+            return columns.map((e,i)=> (<th className={'sticky top-0 px-4 py-2 text-white bg-kuwala-light-green'}>{e}</th>))
         } else {
             return <></>
         }
@@ -99,13 +104,16 @@ export default () => {
 
     const renderTableDataPreviewBody = (rows) => {
         if(rows) {
-            return rows.map((e,i) => (
-                <tr className={'bg-white border-2 text-center'}>
-                    {e.map((e,i)=> (<td className={'text-left px-4 py-2 border border-kuwala-green'}>{
-                        JSON.stringify(e).trim()
-                    }</td>))}
-                </tr>
-            ))
+            return rows.map((e,i) =>{
+                e = [i+1, ...e]
+                return  (
+                    <tr className={'bg-white border-2 text-center'}>
+                        {e.map((e,i)=> (<td className={'text-left px-4 py-2 border border-kuwala-green'}>{
+                            JSON.stringify(e).trim()
+                        }</td>))}
+                    </tr>
+                )
+            })
         } else {
             return <></>
         }
@@ -133,19 +141,69 @@ export default () => {
                 return {
                     schema_name: arr[0],
                     table_name: arr[2],
-                    limit_columns: 100,
-                    limit_rows: 100,
+                    limit_columns: 200,
+                    limit_rows: 300,
                 }
             case "bigquery":
                 return {
                     project_name: arr[0],
                     dataset_name: arr[1],
                     table_name: arr[2],
-                    limit_columns: 100,
-                    limit_rows: 100,
+                    limit_columns: 200,
+                    limit_rows: 300,
                 }
             default: return ""
         }
+    }
+
+    const renderDataPreviewHeader = () => {
+        return (
+            <>
+                <div className={'bg-kuwala-green w-full pl-4 py-2 text-white font-semibold'}>
+                    Database: Kuwala
+                </div>
+                <div className={'overflow-y-scroll overflow-x-auto h-full'}>
+                    {isSchemaLoading
+                        ?
+                        <div className="flex flex-col w-full h-full justify-center items-center">
+                            <div
+                                className="spinner-border animate-spin inline-block w-16 h-16 border-4 text-kuwala-green rounded-full"
+                                role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        :
+                        schemaList.map(el => renderSchemaBlock(el))
+                    }
+                </div>
+            </>
+        )
+    }
+
+    const renderDataPreviewBody = () => {
+        return (
+            <>
+                {selectedTable
+                    ?
+                    isTableDataPreviewLoading
+                        ?
+                        <div className="flex flex-col w-full h-full justify-center items-center">
+                            <div
+                                className="spinner-border animate-spin inline-block w-24 h-24 border-4 text-kuwala-green rounded-full"
+                                role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        :
+                        renderTableDataPreview(tableDataPreview.columns, tableDataPreview.rows)
+                    :
+                    <div className="flex flex-col w-full h-full text-xl font-light justify-center items-center">
+                        <p>Select a table from the <span className={'text-kuwala-green'}>left</span></p>
+                        <p>to preview the data</p>
+                    </div>
+                }
+            </>
+        )
     }
 
     const renderDataPreview = () => {
@@ -158,45 +216,44 @@ export default () => {
         } else {
             return (
                 <div className={'flex flex-row bg-white border-2 border-kuwala-green rounded-lg h-full w-full'}>
-                    <div className={'flex flex-col bg-white w-3/12 border-2 border-kuwala-green'}>
-                        <div className={'bg-kuwala-green w-full pl-4 py-2 text-white font-semibold'}>
-                            Database: Kuwala
-                        </div>
-                        <div className={'bg-red overflow-y-scroll overflow-x-auto h-full'}>
-                            {isSchemaLoading
-                                ?
-                                    <div className="flex flex-col w-full h-full justify-center items-center">
-                                        <div
-                                            className="spinner-border animate-spin inline-block w-16 h-16 border-4 text-kuwala-green rounded-full"
-                                            role="status">
-                                            <span className="visually-hidden">Loading...</span>
-                                        </div>
-                                    </div>
-                                :
-                                    schemaList.map(el => renderSchemaBlock(el))
-                            }
-                        </div>
+                    <div className={'flex flex-col bg-white w-3/12 border border-kuwala-green'}>
+                        {renderDataPreviewHeader()}
                     </div>
-                    <div className={'flex flex-col bg-white w-9/12 overflow-auto'}>
-                        {selectedTable
-                            ?
-                                isTableDataPreviewLoading
-                                    ?
-                                        <div className="flex flex-col w-full h-full justify-center items-center">
-                                            <div
-                                                className="spinner-border animate-spin inline-block w-24 h-24 border-4 text-kuwala-green rounded-full"
-                                                role="status">
-                                                <span className="visually-hidden">Loading...</span>
-                                            </div>
-                                        </div>
-                                    :
-                                        renderTableDataPreview(tableDataPreview.columns, tableDataPreview.rows)
-                            :
-                            <div className="flex flex-col w-full h-full text-xl font-light justify-center items-center">
-                                <p>Select a table from the <span className={'text-kuwala-green'}>left</span></p>
-                                <p>to preview the data</p>
-                            </div>
-                        }
+                    <div className={'flex flex-col bg-white w-9/12'}>
+                        {/*<ReactTable*/}
+                        {/*    data={tableDataPreview.rows}*/}
+                        {/*    columns={[*/}
+                        {/*        {*/}
+                        {/*            Header: "Name",*/}
+                        {/*            columns: [*/}
+                        {/*                {*/}
+                        {/*                    Header: "First Name",*/}
+                        {/*                    accessor: "firstName"*/}
+                        {/*                },*/}
+                        {/*                {*/}
+                        {/*                    Header: "Last Name",*/}
+                        {/*                    id: "lastName",*/}
+                        {/*                    accessor: d => d.lastName*/}
+                        {/*                }*/}
+                        {/*            ]*/}
+                        {/*        },*/}
+                        {/*        {*/}
+                        {/*            Header: "Info",*/}
+                        {/*            columns: [*/}
+                        {/*                {*/}
+                        {/*                    Header: "Age",*/}
+                        {/*                    accessor: "age"*/}
+                        {/*                }*/}
+                        {/*            ]*/}
+                        {/*        }*/}
+                        {/*    ]}*/}
+                        {/*    defaultPageSize={20}*/}
+                        {/*    style={{*/}
+                        {/*        height: "400px" // This will force the table body to overflow and scroll, since there is not enough room*/}
+                        {/*    }}*/}
+                        {/*    className="-striped -highlight"*/}
+                        {/*/>*/}
+                        {renderDataPreviewBody()}
                     </div>
                 </div>
             )
@@ -365,36 +422,41 @@ export default () => {
                         style={{height: 72, width: 72}}
                     />
                     <span className={'mt-1'}>{selectedSource.name}</span>
+                    <div
+                        className={`
+                            absolute right-0 top-0 p-1 border rounded-full w-7 h-7 -mr-2 -mt-2
+                            ${selectedSource.connected ? "bg-kuwala-green" : "bg-red-400"}
+                            `}
+                    />
                 </div>
             )
         }
     }
 
     return (
-        <div className={`flex flex-col h-screen overflow-y-hidden antialiased text-gray-900`}>
-            <Header/>
-            <main className={'flex flex-col h-full w-full bg-kuwala-bg-gray py-12 px-20'}>
-                <div className={'flex flex-row'}>
+        <div className={`flex flex-col h-screen w-screen antialiased text-gray-900`}>
+            <main className={'flex flex-col h-full w-full bg-kuwala-bg-gray'}>
+                <Header/>
+                <div className={'flex flex-row px-20 mt-12'}>
                     {renderSelectedSourceHeader()}
-
                     <div className={`flex flex-col ${selectedSource ? 'ml-12 justify-center' : ''}`}>
-                        <span className={'font-semibold text-3xl'}>
-                            Data Pipeline Preview
-                        </span>
+                    <span className={'font-semibold text-3xl'}>
+                        Data Pipeline Preview
+                    </span>
                         <span className={'font-light text-xl mt-3'}>
-                            Explore the data
-                        </span>
+                        Explore the data
+                    </span>
                     </div>
                 </div>
 
                 {/* Data Sources Container*/}
-                <div className={'mt-6 h-4/6 space-x-8 overflow-x-hidden'}>
+                <div className={'mt-6 space-x-8 overflow-x-hidden h-6/12 max-h-full px-20'}>
                     {renderDataPreview()}
                 </div>
 
-                <div className={'flex'}>
+                <div className={'flex px-20 mb-8'}>
                     <Link
-                        className={'bg-kuwala-green text-white rounded-md px-4 py-2 mt-4 hover:text-stone-300'}
+                        className={'bg-kuwala-green text-white rounded-md px-4 py-2 mt-4 mb-4 hover:text-stone-300'}
                         to={'/data-pipeline-management'}
                     >
                         Back

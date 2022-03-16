@@ -2,8 +2,9 @@ import React, {useEffect, useState} from "react";
 import Header from "../components/Header";
 import {useLocation, Link, useNavigate} from "react-router-dom";
 import {useStoreActions, useStoreState} from "easy-peasy";
-import { Formik, Field, Form, ErrorMessage, FieldArray } from "formik"
+import { Formik, Field, Form, FieldArray } from "formik"
 import {saveConnection, testConnection} from "../api/DataSourceApi";
+import { BIG_QUERY_PLACEHOLDER } from "../constants/placeholder"
 
 export default () => {
     const navigate = useNavigate()
@@ -35,6 +36,7 @@ export default () => {
                 await getDataSources() // Refresh
             }
         } catch (e) {
+            setIsConnected(false)
             alert("Failed to save configuration")
         }
         setIsSaveLoading(false)
@@ -54,6 +56,7 @@ export default () => {
                 setIsConnected(connected)
             }
         } catch (e) {
+            setIsConnected(false)
             alert("Failed to test connection")
         }
         setIsTestConnectionLoading(false)
@@ -66,9 +69,11 @@ export default () => {
                 return connectionParameters
             case 'bigquery':
                 return connectionParameters.map((el) => {
+                    const stringValue = JSON.stringify(el.value,null, 2)
+                    const newValue = stringValue.length === 2 ? '' : stringValue
                     return {
                         ...el,
-                        value: JSON.stringify(el.value)
+                        value: newValue
                     }
                 })
                 break;
@@ -131,7 +136,7 @@ export default () => {
                                                                 Credentials JSON :
                                                             </span>
                                                             <span className={'text-md font-normal'}>
-                                                                Checkout the <a className={'text-kuwala-green'} target={"_blank"} href={"https://cloud.google.com/iam/docs/creating-managing-service-account-keys#iam-service-account-keys-create-gcloud"}>docs</a> for more information to obtain this file
+                                                                Check out the <a className={'text-kuwala-green'} target={"_blank"} href={"https://cloud.google.com/iam/docs/creating-managing-service-account-keys#iam-service-account-keys-create-gcloud"}>docs</a> for more information on how to obtain this file.
                                                             </span>
                                                             <Field
                                                                 name={`connection_parameters[${i}].value`}
@@ -140,7 +145,7 @@ export default () => {
                                                                     w-full px-4 py-2 border-2 border-kuwala-green text-gray-800 rounded-lg focus:outline-none mt-4 w-full
                                                                 `}
                                                                 style={{maxHeight: 320, minHeight: 160}}
-                                                                placeholder={conParams.id}
+                                                                placeholder={BIG_QUERY_PLACEHOLDER}
                                                                 component={'textarea'}
                                                                 key={conParams.id}
                                                             />
@@ -206,11 +211,11 @@ export default () => {
                                             </span>
                                         </div>
                                         <button
-                                            className={'bg-kuwala-green rounded-md px-3 w-24 py-2 mt-4'}
+                                            className={'bg-kuwala-green rounded-md px-3 w-24 py-2 mt-6'}
                                             type={'submit'}
                                             disabled={isSaveLoading}
                                         >
-                                            <span className={'text-white hover:text-stone-300 w-full py-2'}>
+                                            <span className={'text-white hover:text-stone-300 w-full'}>
                                                 {isSaveLoading ?
                                                     <div className="flex justify-center items-center">
                                                         <div
@@ -261,10 +266,10 @@ export default () => {
     }
 
     return (
-        <div className={`flex flex-col h-screen overflow-y-hidden antialiased text-gray-900`}>
-            <Header />
-            <main className={'flex flex-col h-full w-full bg-kuwala-bg-gray py-12 px-20'}>
-                <div className={'flex flex-row'}>
+        <div className={`flex flex-col h-screen antialiased text-gray-900`}>
+            <main className={'flex flex-col h-full w-full bg-kuwala-bg-gray'}>
+                <Header />
+                <div className={'flex flex-row mt-12 px-20'}>
                     {renderSelectedSource()}
 
                     <div className={`flex flex-col ${selectedSource ? 'ml-12 justify-center' : ''}`}>
@@ -278,7 +283,7 @@ export default () => {
                 </div>
 
                 {/* Data Sources Container*/}
-                <div className={'mt-6 h-4/6 space-x-8 overflow-x-hidden'}>
+                <div className={'mt-6 space-x-8 overflow-y-auto mx-20'}>
                     <Formik
                         initialValues={{
                             connection_parameters: preProcessConnectionParameters(initialConnectionParameters)
@@ -293,7 +298,7 @@ export default () => {
                     />
                 </div>
 
-                <div className={'flex'}>
+                <div className={'flex px-20 mb-8'}>
                     <Link
                         className={'bg-kuwala-green text-white rounded-md px-4 py-2 mt-4 hover:text-stone-300'}
                         to={'/data-pipeline-management'}

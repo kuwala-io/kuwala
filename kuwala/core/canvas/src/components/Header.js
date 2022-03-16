@@ -21,7 +21,7 @@ export default () => {
 
     return (
     <>
-        <header className='flex-shrink-0 border-b'>
+        <header className='flex-shrink-0 border-b h-24'>
             {/* HEADER BAR CONTAINER */}
             <div className='flex items-center justify-between p-2'>
                 <div className='flex items-center'>
@@ -38,7 +38,7 @@ export default () => {
                 <div className={'flex flex-row space-x-64'}>
                     <Link
                         className={'flex flex-col items-center'}
-                        to={"/data-catalog"}
+                        to={"/data-pipeline-management"}
                     >
                         <div
                             className={`
