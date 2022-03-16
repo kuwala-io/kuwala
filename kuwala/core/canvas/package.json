@@ -15,6 +15,7 @@
     "react-router-dom": "^6.2.2",
     "react-scripts": "5.0.0",
     "react-table": "^7.7.0",
+    "react-table-6": "^6.11.0",
     "tw-elements": "^1.0.0-alpha11",
     "uuid": "^8.3.2",
     "web-vitals": "^2.1.4"

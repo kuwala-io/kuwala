@@ -1,0 +1,35 @@
+.ReactTable {
+    border: none;
+}
+
+.ReactTable .rt-tbody {
+    overflow-x: hidden;
+}
+
+.ReactTable .rt-thead .rt-th {
+    padding: 0.7rem 1rem;
+    background: #99DDD8;
+    font-weight: 600;
+    border-right: 1px solid #00A99D;
+    border-bottom: 1px solid #00A99D;
+}
+
+.ReactTable .rt-td {
+    padding: 0.7rem 1rem;
+}
+
+.ReactTable .rt-tbody .rt-td {
+    overflow-x: hidden;
+    padding: 0.7rem 1rem;
+    border-right: 1px solid #00A99D;
+    border-bottom: 1px solid #00A99D;
+}
+
+.ReactTable .rt-thead {
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.ReactTable .rt-thead::-webkit-scrollbar {
+    background: transparent;
+}

@@ -1,9 +1,10 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import Header from "../components/Header";
 import {useLocation, Link} from "react-router-dom";
 import {useStoreState} from "easy-peasy";
-import ReactTable from "react-table";
-
+import ReactTable from 'react-table-6';
+import "react-table-6/react-table.css";
+import "./styles/data-source-preview-table.style.css";
 
 import ListSVG from "../icons/list.svg"
 import ArrowRight from "../icons/arrow-right-solid.svg"
@@ -11,7 +12,33 @@ import ArrowDown from "../icons/arrow-down-solid.svg"
 import FolderSVG from "../icons/folder-solid.svg"
 import TableSVG from "../icons/table-solid.svg"
 import {getSchema, getTablePreview} from "../api/DataSourceApi";
-import {data} from "autoprefixer";
+
+const Table = ({columns, data}) => {
+    const memoizedCols = useMemo(()=> {
+        return columns
+    },[]);
+
+    const memoizedRows = useMemo(()=> {
+        return data
+    },[]);
+
+    return (
+        <ReactTable
+            data={memoizedRows}
+            columns={memoizedCols}
+            defaultPageSize={20}
+            showPagination={false}
+            showPaginationTop={false}
+            showPaginationBottom={false}
+            showPageSizeOptions={false}
+            style={{
+                height: "100%",
+                overFlowX: 'hidden',
+            }}
+            className="-striped -highlight"
+        />
+    )
+}
 
 export default () => {
     const location = useLocation()
@@ -76,47 +103,12 @@ export default () => {
         }
     }
 
-    const renderTableDataPreview = (columns, rows) => {
+    const renderTableDataPreview = () => {
         return (
             <div className={'overflow-x-auto'}>
-                <table className={'bg-white'}>
-                    <thead>
-                        <tr>
-                            <th className={'sticky top-0 px-4 py-2 text-white bg-kuwala-light-green'}>#</th>
-                            {renderTableDataPreviewHead(columns)}
-                        </tr>
-                    </thead>
-                    <tbody className={'overflow-y-auto flex flex-col'}>
-                        {renderTableDataPreviewBody(rows)}
-                    </tbody>
-                </table>
+                <Table columns={tableDataPreview.columns} data={tableDataPreview.rows}/>
             </div>
         )
-    }
-
-    const renderTableDataPreviewHead = (columns) => {
-        if(columns) {
-            return columns.map((e,i)=> (<th className={'sticky top-0 px-4 py-2 text-white bg-kuwala-light-green'}>{e}</th>))
-        } else {
-            return <></>
-        }
-    }
-
-    const renderTableDataPreviewBody = (rows) => {
-        if(rows) {
-            return rows.map((e,i) =>{
-                e = [i+1, ...e]
-                return  (
-                    <tr className={'bg-white border-2 text-center'}>
-                        {e.map((e,i)=> (<td className={'text-left px-4 py-2 border border-kuwala-green'}>{
-                            JSON.stringify(e).trim()
-                        }</td>))}
-                    </tr>
-                )
-            })
-        } else {
-            return <></>
-        }
     }
 
     const tableSelectionOnlick = async (addressString) => {
@@ -129,10 +121,45 @@ export default () => {
         });
 
         if(res.status === 200) {
-            setTableDataPreview(res.data)
+            let cols = res.data.columns.map((el,i)=>{
+                return {
+                    Header: el,
+                    accessor: el,
+                }
+            });
+
+            cols = [{
+                Header: "#",
+                id: "row",
+                filterable: false,
+                width: 50,
+                Cell: (row) => {
+                    return <div>{row.index}</div>;
+                }
+            }, ...cols]
+
+            setTableDataPreview({
+                columns: cols,
+                rows: getDataDictionary(res.data.rows, res.data.columns),
+            });
         }
         setIsTableDataPreviewLoading(false)
     }
+
+    const getDataDictionary = (data, headers) => {
+        let dictionary = [];
+
+        for (let i = 1; i < data.length; i++) {
+            let object = {};
+            for (let j = 0; j < data[i].length; j++) {
+                object[headers[j]] = typeof data[i][j] === 'object' ? JSON.stringify(data[i][j]) : data[i][j];
+            }
+            dictionary.push(object);
+        }
+
+        console.log(dictionary);
+        return dictionary;
+    };
 
     const generateParamsByDataSourceType = (type, addressString) => {
         const arr = addressString.split('@')
@@ -195,7 +222,7 @@ export default () => {
                             </div>
                         </div>
                         :
-                        renderTableDataPreview(tableDataPreview.columns, tableDataPreview.rows)
+                        renderTableDataPreview()
                     :
                     <div className="flex flex-col w-full h-full text-xl font-light justify-center items-center">
                         <p>Select a table from the <span className={'text-kuwala-green'}>left</span></p>
@@ -220,39 +247,6 @@ export default () => {
                         {renderDataPreviewHeader()}
                     </div>
                     <div className={'flex flex-col bg-white w-9/12'}>
-                        {/*<ReactTable*/}
-                        {/*    data={tableDataPreview.rows}*/}
-                        {/*    columns={[*/}
-                        {/*        {*/}
-                        {/*            Header: "Name",*/}
-                        {/*            columns: [*/}
-                        {/*                {*/}
-                        {/*                    Header: "First Name",*/}
-                        {/*                    accessor: "firstName"*/}
-                        {/*                },*/}
-                        {/*                {*/}
-                        {/*                    Header: "Last Name",*/}
-                        {/*                    id: "lastName",*/}
-                        {/*                    accessor: d => d.lastName*/}
-                        {/*                }*/}
-                        {/*            ]*/}
-                        {/*        },*/}
-                        {/*        {*/}
-                        {/*            Header: "Info",*/}
-                        {/*            columns: [*/}
-                        {/*                {*/}
-                        {/*                    Header: "Age",*/}
-                        {/*                    accessor: "age"*/}
-                        {/*                }*/}
-                        {/*            ]*/}
-                        {/*        }*/}
-                        {/*    ]}*/}
-                        {/*    defaultPageSize={20}*/}
-                        {/*    style={{*/}
-                        {/*        height: "400px" // This will force the table body to overflow and scroll, since there is not enough room*/}
-                        {/*    }}*/}
-                        {/*    className="-striped -highlight"*/}
-                        {/*/>*/}
                         {renderDataPreviewBody()}
                     </div>
                 </div>
