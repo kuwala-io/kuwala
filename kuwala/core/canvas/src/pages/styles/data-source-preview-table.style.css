@@ -13,13 +13,10 @@
 }
 
 .ReactTable .rt-tbody::-webkit-scrollbar-track {
-    /*background-color: #00A99D;*/
-    /*border-radius: 8px;*/
-    border: 1px solid #00A99D;
+    border-left: 1px solid #00A99D;
 }
 
 .ReactTable .rt-tbody::-webkit-scrollbar-thumb {
-    /*border-radius: 8px;*/
     background-color: #99DDD8;
 }
 
