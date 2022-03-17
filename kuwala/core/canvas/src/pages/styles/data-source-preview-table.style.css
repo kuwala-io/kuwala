@@ -7,6 +7,21 @@
     overflow-y: scroll;
 }
 
+.ReactTable .rt-tbody::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 8px;
+}
+
+.ReactTable .rt-tbody::-webkit-scrollbar-track {
+    background-color: rgba(57,57,57, .6);
+    border-radius: 8px;
+}
+
+.ReactTable .rt-tbody::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    background-color: rgba(156, 156, 156, .6);
+}
+
 .ReactTable .rt-thead .rt-th {
     padding: 0.7rem 1rem;
     background: #99DDD8;
