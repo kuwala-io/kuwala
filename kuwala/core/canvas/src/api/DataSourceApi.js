@@ -21,3 +21,16 @@ export function saveConnection(data) {
         data.config
     )
 }
+
+export function getSchema(id) {
+    return baseAxios.get(
+        `${DATA_SOURCE}/${id}/schema`
+    )
+}
+
+export function getTablePreview({id, params}){
+    return baseAxios.get(
+        `${DATA_SOURCE}/${id}/table/preview`,
+        {params}
+    )
+}

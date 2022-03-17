@@ -15,12 +15,13 @@ export default () => {
             '/data-pipeline-management',
             '/data-source-config',
             '/data-catalog',
+            '/data-source-preview'
         ].includes(currentPage)
     }
 
     return (
     <>
-        <header className='flex-shrink-0 border-b'>
+        <header className='flex-shrink-0 border-b h-24'>
             {/* HEADER BAR CONTAINER */}
             <div className='flex items-center justify-between p-2'>
                 <div className='flex items-center'>
@@ -37,7 +38,7 @@ export default () => {
                 <div className={'flex flex-row space-x-64'}>
                     <Link
                         className={'flex flex-col items-center'}
-                        to={"/data-catalog"}
+                        to={"/data-pipeline-management"}
                     >
                         <div
                             className={`
@@ -72,8 +73,8 @@ export default () => {
                         {/* Red Dot */}
                         {notifications > 0 ? (
                             <>
-                                <div className="absolute right-0 p-1 bg-red-400 rounded-full animate-ping"></div>
-                                <div className="absolute right-0 p-1 bg-red-400 border rounded-full"></div>
+                                <div className="absolute right-0 p-1 bg-red-400 rounded-full animate-ping"/>
+                                <div className="absolute right-0 p-1 bg-red-400 border rounded-full"/>
                             </>
                         ) : ''}
                         <button
