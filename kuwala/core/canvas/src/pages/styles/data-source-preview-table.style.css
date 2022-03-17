@@ -4,6 +4,7 @@
 
 .ReactTable .rt-tbody {
     overflow-x: hidden;
+    overflow-y: scroll;
 }
 
 .ReactTable .rt-thead .rt-th {
