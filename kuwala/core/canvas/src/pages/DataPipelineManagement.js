@@ -32,7 +32,7 @@ export default () => {
                         </tr>
                     </thead>
                     <tbody
-                        className={`bg-grey-light flex flex-col items-center justify-between overflow-y-scroll w-full`}
+                        className={`bg-grey-light flex flex-col items-center overflow-y-auto w-full`}
                         style={{height: '100rem'}}
                     >
                         {dataSource.map((e, i)=>{
@@ -95,40 +95,44 @@ export default () => {
     }
 
     return (
-        <div className={`flex flex-col h-screen overflow-y-hidden antialiased text-gray-900`}>
+        <div className={`flex flex-col h-screen antialiased text-gray-900`}>
             <Header />
-            <main className={'flex flex-col h-screen w-full bg-kuwala-bg-gray py-12 px-20'}>
-                <span className={'font-semibold text-3xl'}>
-                    Data Pipeline Management
-                </span>
-                <span className={'font-light text-xl mt-3'}>
-                    Configure and manage your selected data sources
-                </span>
-
-                {/* Data Sources Container*/}
-                <div className={'relative mt-10 max-h-100'}>
-                    <div className={'max-h-100 space-x-8 relative'}>
-                        {renderPipelineManager()}
+            <main className={'flex flex-col justify-between h-full w-full bg-kuwala-bg-gray'}>
+                <div className={'px-20'}>
+                    <div className={'flex flex-col mt-8'}>
+                    <span className={'font-semibold text-3xl'}>
+                        Data Pipeline Management
+                    </span>
+                        <span className={'font-light text-xl mt-3'}>
+                        Configure and manage your selected data sources
+                    </span>
                     </div>
-                    <div className={'absolute -bottom-16 -mb-6'}>
-                        <Link
-                            to={'/data-catalog'}
-                        >
-                            <div className={'flex flex-row bg-white items-center px-4 py-4 rounded-lg relative space-x-2 hover:'}>
-                                <img
-                                    src={AddSVG}
-                                    style={{
-                                        height: 36,
-                                        width: 36,
-                                    }}
-                                />
-                                <span className={'text-lg'}>Add a new data source</span>
-                            </div>
-                        </Link>
+
+                    {/* Data Sources Container*/}
+                    <div className={'relative mt-12'}>
+                        <div className={'space-x-8 relative'}>
+                            {renderPipelineManager()}
+                        </div>
+                        <div className={'absolute -bottom-16 -mb-6'}>
+                            <Link
+                                to={'/data-catalog'}
+                            >
+                                <div className={'flex flex-row bg-white items-center px-4 py-4 rounded-lg relative space-x-2 hover:'}>
+                                    <img
+                                        src={AddSVG}
+                                        style={{
+                                            height: 36,
+                                            width: 36,
+                                        }}
+                                    />
+                                    <span className={'text-lg'}>Add a new data source</span>
+                                </div>
+                            </Link>
+                        </div>
                     </div>
                 </div>
 
-                <div className={'flex flex-row-reverse'}>
+                <div className={'flex flex-row-reverse px-20 mb-12'}>
                     <button
                         className={'bg-kuwala-green text-white rounded-md px-4 py-2 mt-8 hover:text-stone-300'}
                         onClick={()=>{

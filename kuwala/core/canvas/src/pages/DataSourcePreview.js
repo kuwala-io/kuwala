@@ -22,11 +22,16 @@ const Table = ({columns, data}) => {
         return data
     },[]);
 
+    let pageSize;
+    if (data.length >= 300) pageSize = 300
+    else if (data.length <= 20) pageSize = 20;
+    else pageSize = data.length
+
     return (
         <ReactTable
             data={memoizedRows}
             columns={memoizedCols}
-            defaultPageSize={20}
+            defaultPageSize={pageSize}
             showPagination={false}
             showPaginationTop={false}
             showPaginationBottom={false}
@@ -148,16 +153,13 @@ export default () => {
 
     const getDataDictionary = (data, headers) => {
         let dictionary = [];
-
-        for (let i = 1; i < data.length; i++) {
-            let object = {};
-            for (let j = 0; j < data[i].length; j++) {
-                object[headers[j]] = typeof data[i][j] === 'object' ? JSON.stringify(data[i][j]) : data[i][j];
-            }
-            dictionary.push(object);
-        }
-
-        console.log(dictionary);
+        data.map((row,i) => {
+            let obj = {};
+            row.map((cell, j) => {
+                obj[headers[j]] = typeof data[i][j] === 'object' ? JSON.stringify(data[i][j]) : data[i][j];
+            })
+            dictionary.push(obj)
+        })
         return dictionary;
     };
 
@@ -189,7 +191,7 @@ export default () => {
                 <div className={'bg-kuwala-green w-full pl-4 py-2 text-white font-semibold'}>
                     Database: Kuwala
                 </div>
-                <div className={'overflow-y-scroll overflow-x-auto h-full'}>
+                <div className={'overflow-y-scroll overflow-x-auto h-full w-full'}>
                     {isSchemaLoading
                         ?
                         <div className="flex flex-col w-full h-full justify-center items-center">
@@ -309,7 +311,7 @@ export default () => {
     const generateSchemaParent = (schemaObject) => {
         return (
             <div
-                className={'flex flex-row items-center pl-4 py-2 cursor-pointer'}
+                className={'flex flex-row items-center pl-4 pr-8 py-2 cursor-pointer w-full'}
                 onClick={() => {
                     toggleTreeItem(schemaObject.schema)
                 }}
@@ -340,10 +342,10 @@ export default () => {
                 return (
                     <div
                         key={currentKey}
-                        className={`cursor-pointer`}
+                        className={`cursor-pointer min-w-max`}
                     >
                         <div
-                            className={'flex flex-row items-center pl-12 py-2 bg-white'}
+                            className={'flex flex-row items-center pl-12 pr-8 py-2 bg-white w-full'}
                              onClick={() => {
                                  toggleTreeItem(currentKey)
                              }}
@@ -379,9 +381,9 @@ export default () => {
         return (
             <div
                 className={`
-                    flex flex-row items-center pl-20 py-2
+                    flex flex-row items-center pl-20 pr-8 py-2
                     cursor-pointer
-                    min-w-full
+                    min-w-max
                     ${tableKey === selectedTable ? `bg-kuwala-green text-white` : `bg-white text-black`}
                 `}
                 key={tableKey}
@@ -395,7 +397,7 @@ export default () => {
                         style={{minWidth: 16, minHeight: 16}}
                     />
                 </span>
-                <span className={'font-semibold text-md'}>
+                <span className={'font-semibold text-md w-full'}>
                     {tableName}
                 </span>
             </div>
@@ -408,7 +410,7 @@ export default () => {
         } else {
             return (
                 <div
-                    className={'flex flex-col justify-center items-center bg-white rounded-xl drop-shadow-lg'}
+                    className={'flex flex-col justify-center items-center bg-white rounded-xl drop-shadow-lg relative'}
                     style={{width: 148, height: 148}}
                 >
                     <img
@@ -443,7 +445,6 @@ export default () => {
                     </div>
                 </div>
 
-                {/* Data Sources Container*/}
                 <div className={'mt-6 space-x-8 overflow-x-hidden h-6/12 max-h-full px-20'}>
                     {renderDataPreview()}
                 </div>
