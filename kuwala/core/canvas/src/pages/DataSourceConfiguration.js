@@ -64,22 +64,25 @@ export default () => {
     }
 
     const preProcessConnectionParameters = (connectionParameters) => {
-        switch (selectedSource.data_catalog_item_id) {
-            case 'postgres':
-                return connectionParameters
-            case 'bigquery':
-                return connectionParameters.map((el) => {
-                    const stringValue = JSON.stringify(el.value,null, 2)
-                    const newValue = stringValue.length === 2 ? '' : stringValue
-                    return {
-                        ...el,
-                        value: newValue
-                    }
-                })
-                break;
-            default:
-                return connectionParameters
+        if(selectedSource) {
+            switch (selectedSource.data_catalog_item_id) {
+                case 'postgres':
+                    return connectionParameters
+                case 'bigquery':
+                    return connectionParameters.map((el) => {
+                        const stringValue = JSON.stringify(el.value,null, 2)
+                        const newValue = stringValue.length === 2 ? '' : stringValue
+                        return {
+                            ...el,
+                            value: newValue
+                        }
+                    })
+                    break;
+                default:
+                    return connectionParameters
+            }
         }
+        return connectionParameters
 
     }
 
@@ -138,17 +141,46 @@ export default () => {
                                                             <span className={'text-md font-normal'}>
                                                                 Check out the <a className={'text-kuwala-green'} target={"_blank"} href={"https://cloud.google.com/iam/docs/creating-managing-service-account-keys#iam-service-account-keys-create-gcloud"}>docs</a> for more information on how to obtain this file.
                                                             </span>
-                                                            <Field
-                                                                name={`connection_parameters[${i}].value`}
-                                                                type={'textField'}
+                                                            <div
                                                                 className={`
-                                                                    w-full px-4 py-2 border-2 border-kuwala-green text-gray-800 rounded-lg focus:outline-none mt-4 w-full
+                                                                    w-full px-4 py-2 border-2 
+                                                                    border-kuwala-green text-gray-800 
+                                                                    rounded-lg mt-4
+                                                                    overflow-y-auto
+                                                                    flex flex-col
                                                                 `}
-                                                                style={{maxHeight: 320, minHeight: 160}}
-                                                                placeholder={BIG_QUERY_PLACEHOLDER}
-                                                                component={'textarea'}
-                                                                key={conParams.id}
-                                                            />
+                                                                style={{maxHeight: 320, minHeight: 200}}
+                                                            >
+                                                                <Field
+                                                                    name={`connection_parameters[${i}].value`}
+                                                                    type={'textField'}
+                                                                    className={` w-full focus:outline-none`}
+                                                                    style={{maxHeight: 320, minHeight: conParams.value ? 280 : 40}}
+                                                                    placeholder={"Copy-paste the content  of your crendential file here"}
+                                                                    component={'textarea'}
+                                                                    key={conParams.id}
+                                                                />
+                                                                <div className={`
+                                                                    w-full
+                                                                    whitespace-pre-line
+                                                                    text-gray-400
+                                                                    ${conParams.value ? 'hidden' : ''}
+                                                                `}>
+                                                                    <p>{`{`}</p>
+                                                                    <p className={'ml-4'}>"type": "",</p>
+                                                                    <p className={'ml-4'}>"project_id": "",</p>
+                                                                    <p className={'ml-4'}>"private_key_id": "",</p>
+                                                                    <p className={'ml-4'}>"private_key": "",</p>
+                                                                    <p className={'ml-4'}>"client_email": "",</p>
+                                                                    <p className={'ml-4'}>"client_id": "",</p>
+                                                                    <p className={'ml-4'}>"auth_uri": "",</p>
+                                                                    <p className={'ml-4'}>"token_uri": "",</p>
+                                                                    <p className={'ml-4'}>"auth_provider_x509_cert_url": "",</p>
+                                                                    <p className={'ml-4'}>"client_x509_cert_url": ""</p>
+                                                                    <p>{`}`}</p>
+                                                                </div>
+                                                            </div>
+
                                                         </div>
                                                     )
                                                     :
