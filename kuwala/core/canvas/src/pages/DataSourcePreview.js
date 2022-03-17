@@ -216,7 +216,7 @@ export default () => {
                     ?
                     isTableDataPreviewLoading
                         ?
-                        <div className="flex flex-col w-full h-full justify-center items-cente rounded-tr-lg">
+                        <div className="flex flex-col w-full h-full justify-center items-center rounded-tr-lg">
                             <div
                                 className="spinner-border animate-spin inline-block w-24 h-24 border-4 text-kuwala-green rounded-full"
                                 role="status">
