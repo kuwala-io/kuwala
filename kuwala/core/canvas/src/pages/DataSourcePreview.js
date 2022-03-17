@@ -216,7 +216,7 @@ export default () => {
                     ?
                     isTableDataPreviewLoading
                         ?
-                        <div className="flex flex-col w-full h-full justify-center items-center">
+                        <div className="flex flex-col w-full h-full justify-center items-cente rounded-tr-lg">
                             <div
                                 className="spinner-border animate-spin inline-block w-24 h-24 border-4 text-kuwala-green rounded-full"
                                 role="status">
@@ -226,7 +226,7 @@ export default () => {
                         :
                         renderTableDataPreview()
                     :
-                    <div className="flex flex-col w-full h-full text-xl font-light justify-center items-center">
+                    <div className="flex flex-col w-full h-full text-xl font-light justify-center items-center rounded-tr-lg">
                         <p>Select a table from the <span className={'text-kuwala-green'}>left</span></p>
                         <p>to preview the data</p>
                     </div>
@@ -244,11 +244,11 @@ export default () => {
             )
         } else {
             return (
-                <div className={'flex flex-row bg-white border-2 border-kuwala-green rounded-lg h-full w-full'}>
+                <div className={'flex flex-row bg-white border-2 border-kuwala-green rounded-t-lg h-full w-full'}>
                     <div className={'flex flex-col bg-white w-3/12 border border-kuwala-green'}>
                         {renderDataPreviewHeader()}
                     </div>
-                    <div className={'flex flex-col bg-white w-9/12'}>
+                    <div className={'flex flex-col bg-white w-9/12 rounded-tr-lg'}>
                         {renderDataPreviewBody()}
                     </div>
                 </div>
