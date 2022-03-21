@@ -1,10 +1,11 @@
-
+import os
 # load data form postgres:
 import psycopg2
 import pandas as pd
 import pandas.io.sql as sqlio
 
 #reconstruct Robyn's demo dataset
+print("Importing demo data...")
 conn = psycopg2.connect("host=localhost dbname=kuwala user=kuwala password=password")
 cursor = conn.cursor()
 query =  '''
@@ -34,3 +35,25 @@ query =  '''
     '''
 #read query result to pandas dataframe
 marketing_data = sqlio.read_sql_query(query, conn, index_col='index')
+temp_dir = '../../../../tmp/robyn/'
+if not os.path.exists(temp_dir):
+    os.makedirs(temp_dir)
+marketing_data.to_csv(temp_dir+"marketing_data.csv")
+
+print("\n loading Robyn...")
+# install.packages("remotes") 
+# Install remotes first if you haven't already
+# remotes::install_github("facebookexperimental/Robyn/R")
+# load robyn [wip]
+import rpy2.robjects as robjects
+import rpy2.robjects.packages as rpackages
+from rpy2.robjects.packages import importr
+from rpy2.robjects import pandas2ri
+
+pandas2ri.activate()
+
+robyn_object=temp_dir+"RobynObject.RDS"
+robyn = importr('Robyn')
+robyn_marketing_data = robjects.r('read.table(file = "{temp_dir}marketing_data.csv", header = T)'.format(temp_dir=temp_dir))
+
+#input_collector = robyn.robyn_inputs()

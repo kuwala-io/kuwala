@@ -3,3 +3,4 @@ google-cloud-bigquery==2.34.1
 psycopg2==2.9.3
 SQLAlchemy==1.4.31
 uvicorn[standard]==0.17.5
+rpy2==3.4.5
