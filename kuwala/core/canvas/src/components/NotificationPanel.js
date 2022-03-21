@@ -1,8 +1,10 @@
 import React from "react";
+import {useStoreActions, useStoreState} from "easy-peasy";
 
-const dummyNotification = 100;
+export default () => {
+    const { notificationOpen } = useStoreState(state => state.common);
+    const { toggleNotification } = useStoreActions(actions => actions.common);
 
-export default ({isNotificationOpen, toggleNotification}) => {
     return (
         <div
             className={`
@@ -16,7 +18,7 @@ export default ({isNotificationOpen, toggleNotification}) => {
                       w-80
                       p-4
                       z-40
-                      ${isNotificationOpen ? 'static' : 'hidden'}
+                      ${notificationOpen ? 'static' : 'hidden'}
                     `}
         >
             {/* NOTIFICATION HEADER */}

@@ -1,11 +1,27 @@
-import React from "react";
+import React, {useState} from "react";
 import KuwalaLogo from "../icons/kuwala_logo.png";
+import {Link, useLocation} from "react-router-dom";
+import {useStoreActions} from "easy-peasy";
+import NotificationPanel from "./NotificationPanel";
 
-export default ({toggleNotification}) => {
+export default () => {
+    const { toggleNotification } = useStoreActions(actions => actions.common)
+    const [currentPage] = useState(useLocation().pathname)
 
     const notifications = 0;
+
+    const checkDataCatalog = () => {
+        return [
+            '/data-pipeline-management',
+            '/data-source-config',
+            '/data-catalog',
+            '/data-source-preview'
+        ].includes(currentPage)
+    }
+
     return (
-        <header className='flex-shrink-0 border-b'>
+    <>
+        <header className='flex-shrink-0 border-b h-24'>
             {/* HEADER BAR CONTAINER */}
             <div className='flex items-center justify-between p-2'>
                 <div className='flex items-center'>
@@ -18,6 +34,38 @@ export default ({toggleNotification}) => {
                     </span>
                 </div>
 
+                {/* TOP NAVIGATION */}
+                <div className={'flex flex-row space-x-64'}>
+                    <Link
+                        className={'flex flex-col items-center'}
+                        to={"/data-pipeline-management"}
+                    >
+                        <div
+                            className={`
+                                ${checkDataCatalog() ? 'bg-kuwala-green' : 'bg-gray-300'}
+                                border 
+                                rounded-full
+                            `}
+                             style={{height: 44, width: 44}}
+                        />
+                        <label className={'mt-2'}>Data Overview</label>
+                    </Link>
+
+                    <Link
+                        className={'flex flex-col items-center'}
+                        to={"/"}
+                    >
+                        <div
+                            className={`
+                                ${currentPage === '/' ? 'bg-kuwala-green' : 'bg-gray-300'}
+                                border 
+                                rounded-full`}
+                            style={{height: 44, width: 44}}
+                        />
+                        <label className={'mt-2'}>Canvas</label>
+                    </Link>
+                </div>
+
                 {/* RIGHT BUTTONS */}
                 <div className='relative flex items-center space-x-3 mr-2'>
                     {/* Notification */}
@@ -25,8 +73,8 @@ export default ({toggleNotification}) => {
                         {/* Red Dot */}
                         {notifications > 0 ? (
                             <>
-                                <div className="absolute right-0 p-1 bg-red-400 rounded-full animate-ping"></div>
-                                <div className="absolute right-0 p-1 bg-red-400 border rounded-full"></div>
+                                <div className="absolute right-0 p-1 bg-red-400 rounded-full animate-ping"/>
+                                <div className="absolute right-0 p-1 bg-red-400 border rounded-full"/>
                             </>
                         ) : ''}
                         <button
@@ -71,9 +119,10 @@ export default ({toggleNotification}) => {
                             </svg>
                         </button>
                     </div>
-
                 </div>
             </div>
         </header>
+        <NotificationPanel />
+    </>
     )
 }

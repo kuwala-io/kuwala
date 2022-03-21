@@ -1,0 +1,26 @@
+/* top-left border-radius */
+.rounded-header tr:first-child th:first-child {
+    border-top-left-radius: 6px;
+}
+
+/* top-right border-radius */
+.rounded-header tr:first-child th:last-child {
+    border-top-right-radius: 6px;
+}
+
+.rounded-body tr:last-child td:first-child {
+    border-bottom-left-radius: 12px;
+}
+
+/* bottom-right border-radius */
+.rounded-body tr:last-child td:last-child {
+    border-bottom-right-radius: 12px;
+}
+
+.rounded-table {
+    border-radius: 12px;
+}
+
+.table-spacing-0 {
+    border-spacing: 0;
+}

@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { Handle } from 'react-flow-renderer';
-import {useStoreActions} from "easy-peasy";
 
 const DataSourceNode = (({ data }) => {
     return (

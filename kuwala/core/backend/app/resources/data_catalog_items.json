@@ -1,0 +1,56 @@
+[
+  {
+    "id": "postgres",
+    "name": "Postgres",
+    "logo": "https://wiki.postgresql.org/images/a/a4/PostgreSQL_logo.3colors.svg",
+    "connection_parameters":[
+      {
+        "id": "host",
+        "name": "Host",
+        "type": "string"
+      },
+      {
+        "id": "port",
+        "name": "Port",
+        "type": "integer"
+      },
+      {
+        "id": "user",
+        "name": "User",
+        "type": "string"
+      },
+      {
+        "id": "password",
+        "name": "Password",
+        "type": "string"
+      },
+      {
+        "id": "database",
+        "name": "Database",
+        "type": "string"
+      }
+    ]
+  }, {
+    "id": "bigquery",
+    "name": "BigQuery",
+    "logo": "https://kuwala-public.s3.amazonaws.com/logos/google-bigquery-logo.svg",
+    "connection_parameters": [
+      {
+        "id": "credentials_json",
+        "name": "Credentials JSON",
+        "type": {
+          "type": "string",
+          "project_id": "string",
+          "private_key_id": "string",
+          "private_key": "string",
+          "client_email": "string",
+          "client_id": "string",
+          "auth_uri": "string",
+          "token_uri": "string",
+          "auth_provider_x509_cert_url": "string",
+          "client_x509_cert_url": "string"
+        }
+      }
+    ]
+  }
+]
