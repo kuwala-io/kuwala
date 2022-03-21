@@ -1,4 +1,5 @@
 import os
+import re
 
 import geojson
 import h3
@@ -79,3 +80,27 @@ def scale_spark_columns(df, columns):
         )
 
     return df
+
+
+def standardize_colname(df):
+    for c in df.columns:
+        df = df.withColumnRenamed(c, re.sub("[^a-zA-Z0-9.]", "_", c))
+    return df
+
+
+def to_json(df, nb_name):
+    df = standardize_colname(df)
+    path = f"../notebooks/output/{nb_name}/result.json"
+    df.write.format("json").save(path)
+
+
+def to_csv(df, nb_name, header=True):
+    df = standardize_colname(df)
+    path = f"../notebooks/output/{nb_name}/result.csv"
+    df.write.csv(path=path, header=header)
+
+
+def to_parquet(df, nb_name):
+    df = standardize_colname(df)
+    path = f"../notebooks/output/{nb_name}/result.parquet"
+    df.write.parquet(path)
