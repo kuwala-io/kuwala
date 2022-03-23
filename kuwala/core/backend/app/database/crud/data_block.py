@@ -1,4 +1,4 @@
-from common import generate_object_id
+from database.crud.common import generate_object_id
 from sqlalchemy.orm import Session
 
 from ..database import add_and_commit_to_db
