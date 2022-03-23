@@ -1,7 +1,7 @@
 import copy
 
-from common import generate_object_id, get_object_by_id
 import controller.data_source.data_source as data_source_controller
+from database.crud.common import generate_object_id, get_object_by_id
 from sqlalchemy.orm import Session
 
 from ..database import add_and_commit_to_db
