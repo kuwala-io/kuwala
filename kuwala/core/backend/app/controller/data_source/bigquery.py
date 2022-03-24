@@ -59,13 +59,12 @@ def get_schema(connection_parameters: ConnectionParameters):
 
 def get_columns(
     connection_parameters: ConnectionParameters,
-    project_name: str,
     dataset_name: str,
     table_name: str,
 ):
     credentials = get_credentials(connection_parameters=connection_parameters)
     client = bigquery.Client(credentials=credentials)
-    table_ref = f"{project_name}.{dataset_name}.{table_name}"
+    table_ref = f"{credentials.project_id}.{dataset_name}.{table_name}"
     table = client.get_table(table=table_ref)
     columns = list(
         map(lambda sf: dict(column=sf.name, type=sf.field_type.upper()), table.schema)
@@ -76,18 +75,12 @@ def get_columns(
 
 def get_table_preview(
     connection_parameters: ConnectionParameters,
-    project_name: str,
     dataset_name: str,
     table_name: str,
     columns: list[str],
     limit_columns: int = 200,
     limit_rows: int = 300,
 ) -> dict:
-    if not project_name:
-        raise HTTPException(
-            status_code=400, detail="Missing query parameter: 'project_name'"
-        )
-
     if not dataset_name:
         raise HTTPException(
             status_code=400, detail="Missing query parameter: 'dataset_name'"
@@ -101,7 +94,7 @@ def get_table_preview(
 
     credentials = get_credentials(connection_parameters=connection_parameters)
     client = bigquery.Client(credentials=credentials)
-    table_ref = f"{project_name}.{dataset_name}.{table_name}"
+    table_ref = f"{credentials.project_id}.{dataset_name}.{table_name}"
 
     if not columns:
         table = client.get_table(table=table_ref)
@@ -122,4 +115,28 @@ def get_table_preview(
     for row in rows_iterator:
         rows.append(list(row))
 
-    return dict(columns=columns, rows=rows)
+    return dict(columns=columns[0:limit_columns], rows=rows)
+
+
+def update_dbt_connection_parameters(
+    profile_yaml: dict, connection_parameters: ConnectionParameters
+) -> dict:
+    credentials_json = connection_parameters.credentials_json
+    dev_profile = profile_yaml["kuwala"]["outputs"]["dev"]
+    dev_profile["dataset"] = "dbt_kuwala"
+    dev_profile["project"] = connection_parameters.credentials_json.project_id
+    dev_profile["method"] = "service-account-json"
+    dev_profile["keyfile_json"] = dict(
+        type=credentials_json.type,
+        project_id=credentials_json.project_id,
+        private_key_id=credentials_json.private_key_id,
+        private_key=credentials_json.private_key,
+        client_email=credentials_json.client_email,
+        client_id=credentials_json.client_id,
+        auth_uri=credentials_json.auth_uri,
+        token_uri=credentials_json.token_uri,
+        auth_provider_x509_cert_url=credentials_json.auth_provider_x509_cert_url,
+        client_x509_cert_url=credentials_json.client_x509_cert_url,
+    )
+
+    return profile_yaml

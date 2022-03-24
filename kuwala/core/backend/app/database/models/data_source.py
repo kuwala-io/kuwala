@@ -9,5 +9,5 @@ class DataSource(Base):
 
     id = Column(String, primary_key=True, index=True)
     data_catalog_item_id = Column(String, ForeignKey("data_catalog_items.id"))
-    connection_parameters = Column(MutableList.as_mutable(JSON))
-    connected = Column(Boolean)
+    connection_parameters = Column(MutableList.as_mutable(JSON), nullable=False)
+    connected = Column(Boolean, nullable=False)

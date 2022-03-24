@@ -10,13 +10,13 @@ class DataCatalogItemBase(BaseModel):
     connection_parameters: Json
 
 
-class DataCatalogItemCreate(DataCatalogItemBase):
-    pass
-
-
 class DataCatalogItem(DataCatalogItemBase):
     class Config:
         orm_mode = True
+
+
+class DataCatalogItemCreate(DataCatalogItemBase):
+    pass
 
 
 class DataCatalogSelect(BaseModel):
