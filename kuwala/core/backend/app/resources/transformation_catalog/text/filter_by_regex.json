@@ -1,0 +1,75 @@
+{
+  "id": "filter_by_regex",
+  "category": "text",
+  "name": "Filter by regex",
+  "icon": "filter",
+  "description": "With this transformation, you can filter a table based on a column that should match a given regular expression.",
+  "required_column_types": ["text"],
+  "optional_column_types": [],
+  "min_number_of_input_blocks": 1,
+  "max_number_of_input_blocks": 1,
+  "macro_parameters": [
+    {
+      "id": "column",
+      "name": "Column",
+      "type": "text"
+    },
+    {
+      "id": "regex",
+      "name": "Keyword",
+      "type": "text"
+    }
+  ],
+  "examples_before": [
+    {
+      "columns": [
+        "first_name",
+        "last_name",
+        "position"
+      ],
+      "rows": [
+        [
+          "John",
+          "Doe",
+          "Frontend engineer"
+        ],
+        [
+          "Laura",
+          "Santos",
+          "Backend engineer"
+        ],
+        [
+          "Marc",
+          "Johnson",
+          "Accountant"
+        ],
+        [
+          "Luisa",
+          "Jacobs",
+          "UX designer"
+        ]
+      ]
+    }
+  ],
+  "examples_after": [
+    {
+      "columns": [
+        "first_name",
+        "last_name",
+        "position"
+      ],
+      "rows": [
+        [
+          "John",
+          "Doe",
+          "Frontend engineer"
+        ],
+        [
+          "Laura",
+          "Santos",
+          "Backend engineer"
+        ]
+      ]
+    }
+  ]
+}

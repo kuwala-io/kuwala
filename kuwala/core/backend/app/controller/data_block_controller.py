@@ -7,22 +7,29 @@ from controller.data_source.data_source import (
     get_table_preview,
 )
 import database.crud.common as crud
-from database.database import get_db
+from database.crud.common import generate_object_id
 import database.models.data_block as models
 from database.schemas.data_block import DataBlockCreate, DataBlockUpdate
-from fastapi import Depends
 import oyaml as yaml
 from sqlalchemy.orm import Session
 
 
-def generate_model_name(name: str):
-    return "_".join(map(lambda n: n.lower(), name.split()))
+def get_dbt_dir(data_source_id: str) -> str:
+    script_dir = os.path.dirname(__file__)
+
+    return os.path.join(
+        script_dir, f"../../../../tmp/kuwala/backend/dbt/{data_source_id}"
+    )
 
 
-def create_source_yaml(dbt_dir: str, schema_name: str):
+def generate_model_name(name: str, data_block_id: str):
+    return f"{'_'.join(map(lambda n: n.lower(), name.split()))}_{data_block_id}"
+
+
+def create_source_yaml(dbt_dir: str, schema_name: str, update_yaml: bool = False):
     dbt_source_model_dir = dbt_dir + f"/models/staging/{schema_name}"
 
-    if os.path.exists(dbt_source_model_dir):
+    if os.path.exists(dbt_source_model_dir) and not update_yaml:
         return
 
     args = dict(
@@ -35,7 +42,7 @@ def create_source_yaml(dbt_dir: str, schema_name: str):
         capture_output=True,
     )
     source_yml = yaml.safe_load(
-        f"version{output.stdout.decode('utf8').split('version')[1][:-5]}"
+        f"version: 2{output.stdout.decode('utf8').split('version: 2')[1][:-5]}"
     )
 
     Path(dbt_source_model_dir).mkdir(parents=True, exist_ok=True)
@@ -73,7 +80,13 @@ def create_base_model(dbt_dir: str, schema_name: str, table_name: str):
 
 
 def create_model(
-    dbt_dir: str, name: str, schema_name: str, table_name: str, columns: list[str]
+    dbt_dir: str,
+    data_block_id: str,
+    name: str,
+    schema_name: str,
+    table_name: str,
+    columns: list[str],
+    generate_name: bool = True,
 ):
     if not columns:
         columns = "*"
@@ -87,8 +100,12 @@ def create_model(
     model = model.replace("columns", columns)
     model = model.replace("schema_name", schema_name)
     model = model.replace("table_name", table_name)
-    model_name = generate_model_name(name=name)
-    model_dir = f"{dbt_dir}/models/marts/{schema_name}"
+    model_name = (
+        generate_model_name(name=name, data_block_id=data_block_id)
+        if generate_name
+        else name
+    )
+    model_dir = f"{dbt_dir}/models/marts/{schema_name}/{table_name}"
 
     Path(model_dir).mkdir(parents=True, exist_ok=True)
 
@@ -99,7 +116,7 @@ def create_model(
     return model_name
 
 
-def create_model_yaml(dbt_dir: str, schema_name: str, model_name: str):
+def create_model_yaml(dbt_dir: str, schema_name: str, table_name: str, model_name: str):
     args = dict(model_name=model_name)
     output = subprocess.run(
         f"dbt run-operation generate_model_yaml --args '{args}' --profiles-dir .",
@@ -108,18 +125,17 @@ def create_model_yaml(dbt_dir: str, schema_name: str, model_name: str):
         capture_output=True,
     )
     source_yml = yaml.safe_load(
-        f"version{output.stdout.decode('utf8').split('version')[1][:-5]}"
+        f"version: 2{output.stdout.decode('utf8').split('version: 2')[1][:-5]}"
     )
 
-    with open(f"{dbt_dir}/models/marts/{schema_name}/{model_name}.yml", "w+") as file:
+    with open(
+        f"{dbt_dir}/models/marts/{schema_name}/{table_name}/{model_name}.yml", "w+"
+    ) as file:
         yaml.safe_dump(source_yml, file, indent=4)
         file.close()
 
 
-def create_data_block(
-    data_block: DataBlockCreate,
-    db: Session = Depends(get_db),
-):
+def create_data_block(data_block: DataBlockCreate, db: Session):
     _, data_catalog_item_id = get_data_source_and_data_catalog_item_id(
         data_source_id=data_block.data_source_id, db=db
     )
@@ -133,18 +149,17 @@ def create_data_block(
         schema_name = data_block.schema_name.lower()
         table_name = data_block.table_name.lower()
 
-    script_dir = os.path.dirname(__file__)
-    dbt_dir = os.path.join(
-        script_dir, f"../../../../tmp/kuwala/backend/dbt/{data_block.data_source_id}"
-    )
+    dbt_dir = get_dbt_dir(data_source_id=data_block.data_source_id)
 
     create_source_yaml(dbt_dir=dbt_dir, schema_name=schema_name)
 
     base_model_name = create_base_model(
         dbt_dir=dbt_dir, schema_name=schema_name, table_name=table_name
     )
+    data_block_id = generate_object_id()
     model_name = create_model(
         dbt_dir=dbt_dir,
+        data_block_id=data_block_id,
         name=data_block.name,
         schema_name=schema_name,
         table_name=table_name,
@@ -156,16 +171,29 @@ def create_data_block(
         cwd=dbt_dir,
         shell=True,
     )
-    create_model_yaml(dbt_dir=dbt_dir, schema_name=schema_name, model_name=model_name)
+    create_model_yaml(
+        dbt_dir=dbt_dir,
+        schema_name=schema_name,
+        table_name=data_block.table_name,
+        model_name=model_name,
+    )
 
-    return model_name
+    return data_block_id, model_name
 
 
 def update_data_block_name(
     db: Session, dbt_dir: str, data_block: models.DataBlock, updated_name: str
 ) -> models.DataBlock:
-    updated_model_name = generate_model_name(updated_name)
-    dbt_model_dir = f"{dbt_dir}/models/marts/{data_block.schema_name}"
+    updated_model_name = generate_model_name(updated_name, data_block_id=data_block.id)
+    _, data_catalog_item_id = get_data_source_and_data_catalog_item_id(
+        data_source_id=data_block.data_source_id, db=db
+    )
+    schema_name = data_block.schema_name
+
+    if data_catalog_item_id == "bigquery":
+        schema_name = data_block.dataset_name
+
+    dbt_model_dir = f"{dbt_dir}/models/marts/{schema_name}/{data_block.table_name}"
     updated_yaml_path = f"{dbt_model_dir}/{updated_model_name}.yml"
 
     # Rename SQL and YAML files
@@ -202,12 +230,22 @@ def update_data_block_name(
 def update_data_block_columns(
     db: Session, dbt_dir: str, data_block: models.DataBlock, updated_columns: [str]
 ):
+    _, data_catalog_item_id = get_data_source_and_data_catalog_item_id(
+        data_source_id=data_block.data_source_id, db=db
+    )
+    schema_name = data_block.schema_name
+
+    if data_catalog_item_id == "bigquery":
+        schema_name = data_block.dataset_name
+
     create_model(
         dbt_dir=dbt_dir,
+        data_block_id=data_block.id,
         name=data_block.dbt_model,
-        schema_name=data_block.schema_name,
+        schema_name=schema_name,
         table_name=data_block.table_name,
         columns=updated_columns,
+        generate_name=False,
     )
     subprocess.call(
         f"dbt run --select {data_block.dbt_model} --profiles-dir .",
@@ -216,8 +254,9 @@ def update_data_block_columns(
     )
     create_model_yaml(
         dbt_dir=dbt_dir,
-        schema_name=data_block.schema_name,
+        schema_name=schema_name,
         model_name=data_block.dbt_model,
+        table_name=data_block.table_name,
     )
 
     return crud.update_attributes(
@@ -227,18 +266,11 @@ def update_data_block_columns(
     )
 
 
-def update_data_block(
-    data_block: DataBlockUpdate,
-    db: Session = Depends(get_db),
-):
-    script_dir = os.path.dirname(__file__)
+def update_data_block(data_block: DataBlockUpdate, db: Session):
     db_data_block = crud.get_object_by_id(
         db=db, model=models.DataBlock, object_id=data_block.id
     )
-    dbt_dir = os.path.join(
-        script_dir,
-        f"../../../../tmp/kuwala/backend/dbt/{db_data_block.data_source_id}",
-    )
+    dbt_dir = get_dbt_dir(data_source_id=db_data_block.data_source_id)
 
     if data_block.name:
         db_data_block = update_data_block_name(
@@ -246,6 +278,12 @@ def update_data_block(
             dbt_dir=dbt_dir,
             data_block=db_data_block,
             updated_name=data_block.name,
+        )
+
+        subprocess.call(
+            f"dbt run --select {db_data_block.dbt_model} --profiles-dir .",
+            cwd=dbt_dir,
+            shell=True,
         )
 
     if data_block.columns:
@@ -261,9 +299,9 @@ def update_data_block(
 
 def get_data_block_preview(
     data_block_id: str,
+    db: Session,
     limit_columns: int = None,
     limit_rows: int = None,
-    db: Session = Depends(get_db),
 ):
     data_block = crud.get_object_by_id(
         db=db, model=models.DataBlock, object_id=data_block_id
@@ -282,3 +320,11 @@ def get_data_block_preview(
         limit_rows=limit_rows,
         db=db,
     )
+
+
+def refresh_sources(data_source_id: str, schema_name: str):
+    dbt_dir = get_dbt_dir(data_source_id=data_source_id)
+
+    create_source_yaml(dbt_dir=dbt_dir, schema_name=schema_name, update_yaml=True)
+
+    return dict(success=True)

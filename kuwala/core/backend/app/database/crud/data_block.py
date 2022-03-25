@@ -1,4 +1,3 @@
-from database.crud.common import generate_object_id
 from sqlalchemy.orm import Session
 
 from ..database import add_and_commit_to_db
@@ -7,10 +6,10 @@ from ..schemas import data_block as schemas
 
 
 def create_data_block(
-    db: Session, data_block: schemas.DataBlockCreate, dbt_model: str
+    db: Session, data_block: schemas.DataBlockCreate, generated_id: str, dbt_model: str
 ) -> models.DataBlock:
     db_data_block = models.DataBlock(
-        id=generate_object_id(),
+        id=generated_id,
         data_source_id=data_block.data_source_id,
         name=data_block.name,
         dbt_model=dbt_model,

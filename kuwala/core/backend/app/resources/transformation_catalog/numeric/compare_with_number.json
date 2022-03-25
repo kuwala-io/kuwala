@@ -1,0 +1,99 @@
+{
+  "id": "compare_with_number",
+  "category": "numeric",
+  "name": "Compare with number",
+  "icon": "greater-than-equal",
+  "description": "With this transformation, you can filter a table by comparing a numeric column with a given value.",
+  "required_column_types": ["numeric"],
+  "optional_column_types": [],
+  "min_number_of_input_blocks": 1,
+  "max_number_of_input_blocks": 1,
+  "macro_parameters": [
+    {
+      "id": "column",
+      "name": "Column",
+      "type": "text"
+    }, {
+      "id": "comparator",
+      "name": "Comparator",
+      "type": "text",
+      "options": [
+        {
+          "id": "equal",
+          "name": "="
+        }, {
+          "id": "not_equal",
+          "name": "!="
+        }, {
+          "id": "less",
+          "name": "<"
+        }, {
+          "id": "greater",
+          "name": ">"
+        }, {
+          "id": "less_or_equal",
+          "name": "<="
+        }, {
+          "id": "greater_or_equal",
+          "name": ">="
+        }
+      ]
+    }, {
+      "id": "comparison_value",
+      "name": "Comparison value",
+      "type": "numeric"
+    }
+  ],
+  "examples_before": [
+    {
+      "columns": [
+        "order_number",
+        "order_value",
+        "address_country"
+      ],
+      "rows": [
+        [
+          "63472",
+          "39.99",
+          "DE"
+        ],
+        [
+          "63473",
+          "74.97",
+          "DE"
+        ],
+        [
+          "63474",
+          "99.99",
+          "US"
+        ],
+        [
+          "63475",
+          "9.99",
+          "DE"
+        ]
+      ]
+    }
+  ],
+  "examples_after": [
+    {
+      "columns": [
+        "order_number",
+        "order_value",
+        "address_country"
+      ],
+      "rows": [
+        [
+          "63473",
+          "74.97",
+          "DE"
+        ],
+        [
+          "63474",
+          "99.99",
+          "US"
+        ]
+      ]
+    }
+  ]
+}

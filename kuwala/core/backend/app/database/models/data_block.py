@@ -8,7 +8,7 @@ class DataBlock(Base):
     __tablename__ = "data_blocks"
 
     id = Column(String, primary_key=True, index=True)
-    data_source_id = Column(String, ForeignKey("data_sources.id"))
+    data_source_id = Column(String, ForeignKey("data_sources.id"), nullable=False)
     name = Column(String, nullable=False)
     dbt_model = Column(String, nullable=False)
     table_name = Column(String, nullable=False)

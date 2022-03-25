@@ -39,7 +39,14 @@ def create_empty_dbt_project(data_source_id: str, warehouse: str, target_dir: st
 
         file.close()
 
-    packages_yaml["packages"] = [dict(package="dbt-labs/codegen", version="0.5.0")]
+    packages_yaml["packages"] = [
+        dict(package="dbt-labs/codegen", version="0.5.0"),
+        dict(
+            local=os.path.join(
+                target_dir, "../../../../core/backend/app/dbt/kuwala_blocks"
+            )
+        ),
+    ]
 
     with open(packages_file_path, "w") as file:
         yaml.safe_dump(packages_yaml, file, indent=4)

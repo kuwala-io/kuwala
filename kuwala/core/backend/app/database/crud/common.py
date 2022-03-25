@@ -1,12 +1,12 @@
-import uuid
-
 from database.database import Base
 from fastapi import HTTPException
+import shortuuid
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import text
 
 
 def generate_object_id() -> str:
-    return str(uuid.uuid4()).replace("-", "")
+    return shortuuid.ShortUUID().random(length=6).lower()
 
 
 def get_object_by_id(db: Session, model: Base, object_id: str) -> Base:
@@ -21,7 +21,10 @@ def get_object_by_id(db: Session, model: Base, object_id: str) -> Base:
     return db_object
 
 
-def get_all_objects(db: Session, model: Base) -> [Base]:
+def get_all_objects(db: Session, model: Base, where: str = None) -> [Base]:
+    if where is not None:
+        return db.query(model).where(text(where)).all()
+
     return db.query(model).all()
 
 

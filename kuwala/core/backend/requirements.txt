@@ -6,6 +6,7 @@ fastapi==0.74.1
 google-cloud-bigquery==2.34.1
 oyaml==1.0
 psycopg2==2.9.3
+shortuuid==1.0.8
 SQLAlchemy==1.4.31
 typing-extensions==3.10
 uvicorn[standard]==0.17.5
