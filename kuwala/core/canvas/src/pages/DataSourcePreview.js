@@ -88,6 +88,19 @@ export default () => {
                         })
                     }
                 })
+            case 'snowflake':
+                return rawSchema.map((schema) => {
+                    return {
+                        ...schema,
+                        isOpen: false,
+                        categories: schema.categories.map((category)=>{
+                            return {
+                                ...category,
+                                isOpen: false
+                            }
+                        })
+                    }
+                }) 
             case 'bigquery':
                 return rawSchema.map((schema) => {
                     return {
@@ -167,6 +180,13 @@ export default () => {
         const arr = addressString.split('@')
         switch (type){
             case "postgres":
+                return {
+                    schema_name: arr[0],
+                    table_name: arr[2],
+                    limit_columns: 200,
+                    limit_rows: 300,
+                }
+            case "snowflake":
                 return {
                     schema_name: arr[0],
                     table_name: arr[2],

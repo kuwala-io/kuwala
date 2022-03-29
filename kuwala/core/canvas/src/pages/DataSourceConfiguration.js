@@ -68,6 +68,8 @@ export default () => {
             switch (selectedSource.data_catalog_item_id) {
                 case 'postgres':
                     return connectionParameters
+                case 'snowflake':
+                    return connectionParameters
                 case 'bigquery':
                     return connectionParameters.map((el) => {
                         const stringValue = JSON.stringify(el.value,null, 2)
@@ -94,6 +96,8 @@ export default () => {
                 }
             case 'postgres':
                 return parseArrayIntoConfig(config)
+            case 'snowflake':
+                return parseFlakeIntoConfig(config)
             default:
                 return null;
         }
@@ -106,6 +110,18 @@ export default () => {
             "user": getValue(arr,'user'),
             "password": getValue(arr,'password'),
             "database": getValue(arr,'database')
+        }
+    }
+
+    const parseFlakeIntoConfig = (arr) => {
+        return {
+            "user": getValue(arr,'user'),
+            "password": getValue(arr,'password'),
+            "role": getValue(arr,'role'),
+            "database": getValue(arr,'database'),
+            "warehouse": getValue(arr, 'warehouse'),
+            "account" : getValue(arr,'account'),
+            "organization" : getValue(arr,'organization')
         }
     }
 
