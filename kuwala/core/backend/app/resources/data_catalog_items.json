@@ -52,5 +52,46 @@
         }
       }
     ]
+  } , {
+    "id": "snowflake",
+    "name": "Snowflake",
+    "logo": "https://kuwala-public.s3.amazonaws.com/logos/snowflake-logo.svg",
+    "connection_parameters":[
+      {
+        "id": "user",
+        "name": "User",
+        "type": "string"
+      },
+      {
+        "id": "password",
+        "name": "Password",
+        "type": "string"
+      },
+      {
+        "id": "role",
+        "name": "Role",
+        "type": "string"
+      },
+      {
+        "id": "database",
+        "name": "Database",
+        "type": "string"
+      },
+      {
+        "id": "warehouse",
+        "name": "Warehouse",
+        "type": "string"
+      },
+      {
+        "id": "account",
+        "name": "Account",
+        "type": "string"
+      },
+      {
+        "id": "organization",
+        "name": "Organization",
+        "type": "string"
+      }
+    ]
   }
 ]

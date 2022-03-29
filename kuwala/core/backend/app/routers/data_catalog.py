@@ -66,7 +66,7 @@ def select_items(
             )
         )
 
-        if item_id == "postgres" or item_id == "bigquery":
+        if item_id == "postgres" or item_id == "bigquery"  or item_id == "snowflake":
             script_dir = os.path.dirname(__file__)
             target_dir = os.path.join(script_dir, "../../../../tmp/kuwala/backend/dbt")
 

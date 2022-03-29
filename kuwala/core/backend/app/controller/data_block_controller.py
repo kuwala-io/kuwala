@@ -124,9 +124,14 @@ def create_data_block(
         data_source_id=data_block.data_source_id, db=db
     )
     schema_name = data_block.schema_name
+    table_name = data_block.table_name
 
     if data_catalog_item_id == "bigquery":
         schema_name = data_block.dataset_name
+
+    if data_catalog_item_id == "snowflake":
+        schema_name = data_block.schema_name.lower()
+        table_name = data_block.table_name.lower()
 
     script_dir = os.path.dirname(__file__)
     dbt_dir = os.path.join(
@@ -136,13 +141,13 @@ def create_data_block(
     create_source_yaml(dbt_dir=dbt_dir, schema_name=schema_name)
 
     base_model_name = create_base_model(
-        dbt_dir=dbt_dir, schema_name=schema_name, table_name=data_block.table_name
+        dbt_dir=dbt_dir, schema_name=schema_name, table_name=table_name
     )
     model_name = create_model(
         dbt_dir=dbt_dir,
         name=data_block.name,
         schema_name=schema_name,
-        table_name=data_block.table_name,
+        table_name=table_name,
         columns=data_block.columns,
     )
 
