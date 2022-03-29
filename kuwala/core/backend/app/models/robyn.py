@@ -71,7 +71,7 @@ factor_vars = robjects.r('c("events")')
 
 robyn_inputs = robyn.robyn_inputs 
 
-# InputCollect_1 = robyn_inputs( 
+# InputCollect = robyn_inputs( 
 #    dt_input = dt_simulated_weekly
 #   ,dt_holidays = dt_prophet_holidays
 #   ,date_var = "date" # date format must be "2020-01-01"
@@ -119,13 +119,10 @@ InputCollect=robjects.r(
 print("The InputCollect contains:")
 print(InputCollect)
 
-adstock = robjects.r.list('geometric') # geometric, weibull_cdf or weibull_pdf. make it same with before
-all_media = robjects.r('c("tv_S","ooh_S","print_S","facebook_S", "search_S", "newsletter")')
-# all_media = paid_media_spedns + organic_vars
-
+# all_media = paid_media_spends + organic_vars
 #hyper_names= robyn.hyper_names(adstock = adstock, all_media = all_media)
 hyper_names = robyn.hyper_names(adstock = robjects.r('InputCollect$adstock'), all_media = robjects.r('InputCollect$all_media'))
-hyper_names = robjects.r ('hyper_names(adstock = InputCollect$adstock, all_media = InputCollect$all_media)')
+hyper_names = robjects.r ('hyper_names(adstock = InputCollect$adstock, all_media = InputCollect$all_media)') # fitting for
 
 robyn.plot_adstock = FALSE
 robyn.plot_stauration = FALSE
@@ -161,56 +158,18 @@ hyperparameters = robjects.r (
     '''
 )
 
-# hyperparameters = robjects.ListVector 
-# ({
-#     'facebook_S_alphas': {0.5,3}, 
-#     'facebook_S_gammas': {0.3,1}, 
-#     'facebook_S_thetas': {0,0.3},
-#     'print_S_alphas': {0.5,3}, 
-#     'print_S_gammas': {0.3,1}, 
-#     'print_S_thetas': {0.1,0.4},
-#     'tv_S_alphas': {0.5,3}, 
-#     'tv_S_gammas': {0.3,1}, 
-#     'tv_S_thetas': {0.3,0.8},
-#     'search_S_alphas': {0.5,3}, 
-#     'search_S_gammas': {0.3,1}, 
-#     'search_S_thetas': {0,0.3},
-#     'ooh_S_alphas': {0.5,3}, 
-#     'ooh_S_gammas': {0.3,1}, 
-#     'ooh_S_thetas': {0.1,0.4},
-#     'newsletter_alphas': {0.5,3}, 
-#     'newsletter_gammas': {0.3,1},
-#     'newsletter_thetas': {0.1,0.4}
-# })
-
-#print(robjects.r('order(names(hyperparameters))'))
-# print(robjects.r.list(InputCollect_1[0]))
-#print(robjects.r('print(hyperparameters)'))
 InputCollect = robyn_inputs(InputCollect = InputCollect, hyperparameters = hyperparameters)
 #InputCollect = robjects.r ('InputCollect <- robyn_inputs(InputCollect = InputCollect, hyperparameters = hyperparameters')
 print(InputCollect)
 robyn_run =  robyn.robyn_run
 
-# OutputModels = robyn_run(
-#     InputCollect = InputCollect # feed in all model specification
-#   #, cores = NULL # default
-#   #, add_penalty_factor = FALSE # Untested feature. Use with caution.
-#   , iterations = 2000 # recommended for the dummy dataset
-#   , trials = 5 # recommended for the dummy dataset
-#   , outputs = FALSE # outputs = FALSE disables direct model output
-# )
+OutputModels = robyn_run(
+    InputCollect = InputCollect # feed in all model specification
+  #, cores = NULL # default
+  #, add_penalty_factor = FALSE # Untested feature. Use with caution.
+  , iterations = 2000 # recommended for the dummy dataset
+  , trials = 5 # recommended for the dummy dataset
+  , outputs = FALSE # outputs = FALSE disables direct model output
+)
 
-OutputModels1= robjects.r (
-    '''
-    InputCollect <- robyn_inputs(InputCollect = InputCollect, hyperparameters = hyperparameters)
-    OutputModels <- robyn_run(
-        InputCollect = InputCollect # feed in all model specification
-        #, cores = NULL # default
-        #, add_penalty_factor = FALSE # Untested feature. Use with caution.
-        , iterations = 2000 # recommended for the dummy dataset
-        , trials = 5 # recommended for the dummy dataset
-        , outputs = FALSE # outputs = FALSE disables direct model output
-)
-'''
-)
-print(OutputModels1)
+print(OutputModels)
