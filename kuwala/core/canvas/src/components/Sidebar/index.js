@@ -1,41 +1,20 @@
-import React, {useState} from "react";
+import React from "react";
 
-import DataSourceHandler from "./NodeHandlers/DataSourceHandler";
-import TransformationHandler from "./NodeHandlers/TransformationHandler";
-import VisualizationHandler from "./NodeHandlers/VisualizationHandler";
-import {useStoreActions, useStoreState} from "easy-peasy";
+import {useStoreState} from "easy-peasy";
 import {Link} from "react-router-dom";
 
+
 import AddSourcesGreen from "../../icons/add_sources_green.png";
+import NodeHandlerContainer from "./NodeHandlerContainer";
 
-export default () => {
-    const {addNode, setNewNodeInfo} = useStoreActions(actions => actions.canvas)
-    const {dataSource} = useStoreState(state => state.canvas)
-
-    const onDragStart = (event, newNodeInfo) => {
-        setNewNodeInfo(newNodeInfo)
-        event.dataTransfer.effectAllowed = 'move';
-    };
-
-    const onClickAddNode = (newNodeInfo) => {
-        addNode({
-            ...newNodeInfo,
-            position: {
-                x: -100,
-                y: Math.random() * window.innerHeight/2,
-            },
-        })
-    }
+export default ({reactFlowWrapper}) => {
+    const { dataSource } = useStoreState(state => state.canvas);
 
     const renderDataSources = () => {
         if(dataSource.length > 0) {
-            return (
-                <>
-                    <DataSourceHandler onDragStart={onDragStart} onClickAddNode={onClickAddNode}/>
-                    <TransformationHandler onDragStart={onDragStart} onClickAddNode={onClickAddNode}/>
-                    <VisualizationHandler onDragStart={onDragStart} onClickAddNode={onClickAddNode}/>
-                </>
-            )
+            return <NodeHandlerContainer
+                reactFlowWrapper={reactFlowWrapper}
+            />
         }else {
             return (
                 <Link

@@ -11,7 +11,7 @@ import {
 } from "react-router-dom";
 
 import { StoreProvider } from "easy-peasy";
-import Store from "./state/Store";
+import Store from "./data/state/Store";
 import DataPipelineManagement from "./pages/DataPipelineManagement";
 import DataSourceConfiguration from "./pages/DataSourceConfiguration";
 import DataSourcePreview from "./pages/DataSourcePreview";

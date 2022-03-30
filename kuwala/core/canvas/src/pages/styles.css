@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-kuwala-green: #00A99D;
+  --color-kuwala-red: #F5989D;
+  --color-kuwala-light-green: #99DDD8;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',

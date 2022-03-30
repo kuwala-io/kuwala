@@ -1,11 +1,12 @@
 import React, {useState} from "react";
 import KuwalaLogo from "../icons/kuwala_logo.png";
 import {Link, useLocation} from "react-router-dom";
-import {useStoreActions} from "easy-peasy";
+import {useStoreActions, useStoreState} from "easy-peasy";
 import NotificationPanel from "./NotificationPanel";
 
 export default () => {
     const { toggleNotification } = useStoreActions(actions => actions.common)
+    const { dataBlocks, elements } = useStoreState(state => state.canvas)
     const [currentPage] = useState(useLocation().pathname)
 
     const notifications = 0;

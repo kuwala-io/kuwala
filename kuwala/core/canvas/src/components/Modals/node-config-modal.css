@@ -1,0 +1,12 @@
+
+@media screen and (min-width: 600px){
+    .override-modal-dialog {
+        max-width: 900px;
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    .override-modal-dialog {
+        max-width: 1140px;
+    }
+}
