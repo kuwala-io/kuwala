@@ -1,19 +1,18 @@
 import React, {useEffect, useState} from "react";
 import Header from "../components/Header";
 import {useLocation, Link, useNavigate} from "react-router-dom";
-import {useStoreActions, useStoreState} from "easy-peasy";
+import {useStoreActions} from "easy-peasy";
 import { Formik, Field, Form, FieldArray } from "formik"
 import {saveConnection, testConnection} from "../api/DataSourceApi";
-import { BIG_QUERY_PLACEHOLDER } from "../constants/placeholder"
+import DataSourceDTO from "../data/dto/DataSourceDTO";
 
 export default () => {
     const navigate = useNavigate()
     const location = useLocation()
-    const dataIndex = location.state.index
-    const { dataSource } = useStoreState((state) => state.canvas);
+    const selectedSource = new DataSourceDTO({...location.state.dataSourceDTO})
     const { getDataSources } = useStoreActions((actions) => actions.canvas);
-    const selectedSource = dataSource.filter((el) => el.id === dataIndex)[0]
-    const initialConnectionParameters = selectedSource ? selectedSource.connection_parameters : []
+
+    const initialConnectionParameters = selectedSource ? selectedSource.connectionParameters : []
     const [isConnected, setIsConnected] = useState(false)
     const [isTestConnectionLoading, setIsTestConnectionLoading] = useState(false)
     const [isSaveLoading, setIsSaveLoading] = useState(false)
@@ -23,14 +22,14 @@ export default () => {
         if(selectedSource){
             setIsConnected(typeof selectedSource.connected === 'undefined' ? false : selectedSource.connected)
         }
-    }, [selectedSource])
+    }, [])
 
     const saveConfiguration = async ({dataSourceId, config}) => {
         setIsSaveLoading(true)
         try {
             const res = await saveConnection({
                 id: dataSourceId,
-                config: generateConfig(selectedSource.data_catalog_item_id, config)
+                config: generateConfig(selectedSource.dataCatalogItemId, config)
             })
             if(res.status === 200) {
                 await getDataSources() // Refresh
@@ -49,7 +48,7 @@ export default () => {
         try {
             const res = await testConnection({
                 id: dataSourceId,
-                config: generateConfig(selectedSource.data_catalog_item_id, config)
+                config: generateConfig(selectedSource.dataCatalogItemId, config)
             });
             if(res.status === 200){
                 const connected = res.data.connected;
@@ -65,7 +64,7 @@ export default () => {
 
     const preProcessConnectionParameters = (connectionParameters) => {
         if(selectedSource) {
-            switch (selectedSource.data_catalog_item_id) {
+            switch (selectedSource.dataCatalogItemId) {
                 case 'postgres':
                     return connectionParameters
                 case 'snowflake':
@@ -130,7 +129,7 @@ export default () => {
     }
 
     const renderDataSourceConfigForm = ({values}) => {
-        if(!selectedSource || !values.connection_parameters) {
+        if(!selectedSource || !values.connectionParameters) {
             return (
                 <div>
                     Undefined data source, something is wrong.
@@ -139,16 +138,16 @@ export default () => {
         }else {
             return (
                 <Form>
-                    <FieldArray name={'connection_parameters'}
+                    <FieldArray name={'connectionParameters'}
                         render={arrayHelpers => {
                             return (
                                 <div className={'flex flex-col bg-white px-8 py-4 rounded-lg h-full'}>
-                                    {values.connection_parameters.map((conParams,i) => {
+                                    {values.connectionParameters.map((conParams,i) => {
                                         return (
                                             <div className={'flex flex-row h-full w-full items-center space-y-8'}
                                                 key={conParams.id}
                                             >
-                                                {selectedSource.data_catalog_item_id === 'bigquery' ?
+                                                {selectedSource.dataCatalogItemId === 'bigquery' ?
                                                     (
                                                         <div className={'flex flex-col w-full'}>
                                                             <span className={'text-lg capitalize font-semibold'}>
@@ -168,7 +167,7 @@ export default () => {
                                                                 style={{maxHeight: 320, minHeight: 200}}
                                                             >
                                                                 <Field
-                                                                    name={`connection_parameters[${i}].value`}
+                                                                    name={`connectionParameters[${i}].value`}
                                                                     type={'textField'}
                                                                     className={` w-full focus:outline-none`}
                                                                     style={{maxHeight: 320, minHeight: conParams.value ? 280 : 40}}
@@ -209,7 +208,7 @@ export default () => {
                                                             </div>
                                                             <div className={'w-5/6'}>
                                                                 <Field
-                                                                    name={`connection_parameters[${i}].value`}
+                                                                    name={`connectionParameters[${i}].value`}
                                                                     type={conParams.id === 'password' ? 'password' : 'text'}
                                                                     className={'w-full px-4 py-2 border-2 border-kuwala-green text-gray-800 rounded-lg focus:outline-none'}
                                                                     placeholder={conParams.id}
@@ -231,7 +230,7 @@ export default () => {
                                                     setIsTestConnectionLoading(true)
                                                     await testConfigConnection({
                                                         dataSourceId: selectedSource.id,
-                                                        config: values.connection_parameters
+                                                        config: values.connectionParameters
                                                     })
                                                 }}
                                                 type={'button'}
@@ -334,12 +333,12 @@ export default () => {
                 <div className={'mt-6 space-x-8 overflow-y-auto mx-20'}>
                     <Formik
                         initialValues={{
-                            connection_parameters: preProcessConnectionParameters(initialConnectionParameters)
+                            connectionParameters: preProcessConnectionParameters(initialConnectionParameters)
                         }}
                         onSubmit={async (values)=>{
                             await saveConfiguration({
                                 dataSourceId: selectedSource.id,
-                                config: values.connection_parameters
+                                config: values.connectionParameters
                             })
                         }}
                         children={renderDataSourceConfigForm}

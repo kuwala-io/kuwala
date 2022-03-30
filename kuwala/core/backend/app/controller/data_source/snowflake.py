@@ -8,7 +8,7 @@ import snowflake.connector
 def map_connection_parameters(connection_parameters: ConnectionParameters):
     user = connection_parameters.user
     password = connection_parameters.password
-    account = connection_parameters.organization + "-" +  connection_parameters.account
+    account = connection_parameters.organization + "-" + connection_parameters.account
     database = connection_parameters.database
     warehouse = connection_parameters.warehouse
     role = connection_parameters.role
@@ -17,18 +17,25 @@ def map_connection_parameters(connection_parameters: ConnectionParameters):
         raise HTTPException(
             status_code=400, detail="Not all required connection parameters are set."
         )
-    
+
     return user, password, account, database, warehouse, role
 
 
 def get_connection(connection_parameters: ConnectionParameters):
-    user, password, account, database, warehouse, role  = map_connection_parameters(
+    user, password, account, database, warehouse, role = map_connection_parameters(
         connection_parameters=connection_parameters
     )
 
     return snowflake.connector.connect(
-        user=user, password=password, account=account, database=database, warehouse=warehouse, role=role, login_timeout=10
+        user=user,
+        password=password,
+        account=account,
+        database=database,
+        warehouse=warehouse,
+        role=role,
+        login_timeout=10,
     )
+
 
 def send_query(
     connection_parameters: ConnectionParameters,
@@ -64,23 +71,23 @@ def get_schema(connection_parameters: ConnectionParameters):
     connection = get_connection(connection_parameters=connection_parameters)
 
     cursor = connection.cursor()
-    schemas, tables, views  = [], [], []
-    
+    schemas, tables, views = [], [], []
+
     try:
         query = "SHOW SCHEMAS"
         cursor.execute(query)
 
         for schema in cursor.fetchall():
-            schemas.append(dict(schema=schema[1], categories = []))
+            schemas.append(dict(schema=schema[1], categories=[]))
 
         for i in range(len(schemas)):
             query = f"SHOW TABLES in {schemas[i]['schema']}"
             cursor.execute(query)
             for table in cursor.fetchall():
                 tables.append(table[1])
-            
+
             if tables:
-                schemas[i]["categories"].append(dict(category='tables', tables=tables))
+                schemas[i]["categories"].append(dict(category="tables", tables=tables))
                 tables = []
 
             query = f"SHOW VIEWS in {schemas[i]['schema']}"
@@ -90,9 +97,9 @@ def get_schema(connection_parameters: ConnectionParameters):
                 views.append(view[1])
 
             if views:
-                schemas[i]['categories'].append(dict(category='views', tables = views ))
+                schemas[i]["categories"].append(dict(category="views", tables=views))
                 views = []
-        
+
     finally:
         cursor.close()
 
@@ -171,11 +178,12 @@ def update_dbt_connection_parameters(
     dev_profile = profile_yaml["kuwala"]["outputs"]["dev"]
     dev_profile["user"] = connection_parameters.user
     dev_profile["password"] = connection_parameters.password
-    dev_profile["account"] = connection_parameters.organization + "-" + connection_parameters.account
+    dev_profile["account"] = (
+        connection_parameters.organization + "-" + connection_parameters.account
+    )
     dev_profile["database"] = connection_parameters.database
     dev_profile["schema"] = "dbt_kuwala"
     dev_profile["warehouse"] = connection_parameters.warehouse
     dev_profile["role"] = connection_parameters.role
-    
 
     return profile_yaml
