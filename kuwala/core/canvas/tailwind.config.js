@@ -13,6 +13,7 @@ module.exports = {
         'kuwala-bg-gray': '#F9F9F9',
         'kuwala-gray': '#BDBDBD',
         'kuwala-light-green': '#99DDD8',
+        'kuwala-purple': '#8B83BA',
       },
       spacing: {
         '92': '26rem',

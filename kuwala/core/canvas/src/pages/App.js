@@ -11,12 +11,13 @@ import TransformationNode from "../components/Nodes/TransformationNode";
 import DataBlock from "../components/Nodes/DataBlock";
 import {Link} from "react-router-dom";
 import NodeConfigModal from "../components/Modals/NodeConfigModal";
+import TransformationCatalogModal from "../components/Modals/TransformationCatalog/TransformationCatalogModal";
 
 export default function () {
     const reactFlowWrapper = useRef(null);
 
-    const {elements, selectedElement, dataSource, openDataView} = useStoreState(state => state.canvas);
-    const {showConfigModal} = useStoreState(state => state.common);
+    const {elements, selectedElement, dataSource, dataBlocks, openDataView} = useStoreState(state => state.canvas);
+    const {showConfigModal, showTransformationCatalogModal} = useStoreState(state => state.common);
     const {
         setSelectedElement, removeNode, connectNodes, setOpenDataView, getDataSources,
         convertDataBlocksIntoElement
@@ -109,6 +110,9 @@ export default function () {
                 <NodeConfigModal
                     isShow={showConfigModal}
                     configData={selectedElement}
+                />
+                <TransformationCatalogModal
+                    isShow={showTransformationCatalogModal}
                 />
             </div>
         </div>
