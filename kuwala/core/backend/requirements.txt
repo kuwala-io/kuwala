@@ -1,6 +1,9 @@
+--upgrade setuptools
+pandas==1.4.1
+numpy==1.22.3
 fastapi==0.74.1
 google-cloud-bigquery==2.34.1
 psycopg2==2.9.3
 SQLAlchemy==1.4.31
+cffi==1.15.0
 uvicorn[standard]==0.17.5
-rpy2==3.3.6
