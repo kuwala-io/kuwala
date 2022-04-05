@@ -1,14 +1,22 @@
 print("Running Robyn Demo file....")
 print("demo file has been modified to comment Rstudio plotting syntax")
+#install robyn
+#remotes::install_github("facebookexperimental/Robyn/R")
+
 library(Robyn)
 print("Robyn Version: ")
 packageVersion("Robyn")
 
 temp_dir <- '../../../../tmp/kuwala/models/robyn/'
-dt_simulated_weekly <- read.csv(paste(temp_dir,'marketing_data.csv',sep=''),stringsAsFactors = F, header=T)
-dt_prophet_holidays <- read.csv(paste(temp_dir,'holiday_data.csv',sep=''), stringsAsFactors = F, header=T)
-data("dt_prophet_holidays")
-data("dt_simulated_weekly")
+
+holiday_data <- read.csv(paste(temp_dir,'holiday_data.csv',sep=''),header=T)
+marketing_data <- read.csv(paste(temp_dir,'marketing_data.csv',sep=''),header=T)
+holiday_data <- holiday_data[ -c(1) ]
+save(marketing_data, file = paste(temp_dir,'dt_simulated_weekly.Rdata',sep='')) 
+save(holiday_data, file = paste(temp_dir,'dt_prophet_holidays.Rdata',sep=''))
+
+load(paste(temp_dir,'dt_simulated_weekly.Rdata',sep=''))
+load(paste(temp_dir,'dt_prophet_holidays.Rdata',sep=''))
 
 print("Holiday data: ")
 head(dt_prophet_holidays)
@@ -37,7 +45,7 @@ InputCollect <- robyn_inputs(
   ,window_end = "2018-08-22"
   ,adstock = "geometric" # geometric, weibull_cdf or weibull_pdf.
 )
-# print(InputCollect)
+print(InputCollect)
 
 hyper_names(adstock = InputCollect$adstock, all_media = InputCollect$all_media)
 
@@ -71,7 +79,7 @@ hyperparameters <- list(
 )
 
 InputCollect <- robyn_inputs(InputCollect = InputCollect, hyperparameters = hyperparameters)
-# print(InputCollect)
+print(InputCollect)
 
 #### Step 3: Build initial model
 

@@ -37,7 +37,6 @@ query =  '''
 print("Loading data... ")
 marketing_data = sqlio.read_sql_query(query, conn, index_col='date')
 holiday_data = sqlio.read_sql_query('SELECT * FROM marketing_holiday_list', conn, index_col='index')
-
 temp_dir = '../../../../tmp/kuwala/models/robyn/'
 if not os.path.exists(temp_dir):
     os.makedirs(temp_dir)
@@ -46,5 +45,6 @@ marketing_data.to_csv(temp_dir+"marketing_data.csv")
 holiday_data.to_csv(temp_dir+'holiday_data.csv')
 
 #run demo 
+print("If install.packages related error occurs: install 'remotes' packages by go to terminal, call R, then install.packages('remote')")
 os.system('Rscript robyn_demo.r')
 
