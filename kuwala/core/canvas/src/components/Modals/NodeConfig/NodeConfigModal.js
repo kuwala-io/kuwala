@@ -1,20 +1,21 @@
 import React, {useEffect, useState} from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
-import {getColumns, getSchema, getTablePreview} from "../../api/DataSourceApi";
+import {getColumns, getSchema, getTablePreview} from "../../../api/DataSourceApi";
 
 import "./node-config-modal.css"
-import {generateParamsByDataSourceType, preCreateSchemaExplorer, getDataDictionary, populateSchema} from '../../utils/SchemaUtils'
+import {generateParamsByDataSourceType, preCreateSchemaExplorer, getDataDictionary, populateSchema} from '../../../utils/SchemaUtils'
 import {
     populateAPIResult,
     columnAddressSplitter,
     tableAddressSplitter,
     prePopulate
-} from "../../utils/TableSelectorUtils";
-import {createNewDataBlock, updateDataBlockEntity} from "../../api/DataBlockApi";
-import DataBlockDTO from "../../data/dto/DataBlockDTO";
-import SchemaExplorer from "../SchemaExplorer";
-import Explorer from "../Explorer";
-import {SELECTOR_DISPLAY, PREVIEW_DISPLAY} from "../../constants/components";
+} from "../../../utils/TableSelectorUtils";
+import {createNewDataBlock, updateDataBlockEntity} from "../../../api/DataBlockApi";
+import DataBlockDTO from "../../../data/dto/DataBlockDTO";
+import SchemaExplorer from "../../SchemaExplorer";
+import Explorer from "../../Explorer";
+import {SELECTOR_DISPLAY, PREVIEW_DISPLAY} from "../../../constants/components";
+import {ModalBase, ModalHeader, ModalBody, ModalFooter, ModalCloseButton} from "../ModalBase";
 
 export default ({isShow}) => {
     const {
@@ -486,96 +487,70 @@ export default ({isShow}) => {
     }
 
     return (
-        <div
-            className={`
-                    modal
-                    ${isShow ? '' : 'hidden'}
-                    fixed 
-                    top-0 left-0 
-                    w-full h-screen outline-none 
-                    overflow-x-hidden overflow-y-auto
-                    bg-black
-                    bg-opacity-50
-                `}
+        <ModalBase
+            isShow={isShow}
         >
-            <div
-                className="modal-dialog modal-dialog-centered modal-xl h-100 relative w-full pointer-events-none override-modal-dialog"
-            >
-                <div
-                    className={`
-                        modal-content
-                        border-none shadow-lg 
-                        relative flex flex-col 
-                        w-full pointer-events-auto 
-                        bg-white bg-clip-padding rounded-md 
-                        outline-none text-current
-                        h-full
-                    `}>
-                    <div
-                        className="modal-header flex flex-col flex-shrink-0 justify-between px-6 py-4 rounded-t-md"
-                    >
-                        <button
-                            type="button"
-                            className="btn-close box-content w-4 h-4 p-1 text-black border-none rounded-none opacity-50 focus:shadow-none focus:outline-none focus:opacity-100 hover:text-black hover:opacity-75 hover:no-underline"
-                            data-bs-dismiss="modal"
-                            aria-label="Close"
-                            onClick={()=> {
-                                toggleConfigModal();
-                                setSelectedTable(null);
-                                setSelectorDisplay(SELECTOR_DISPLAY);
-                            }}
-                        />
-                        <div>
-                            {renderSelectedSourceHeader()}
-                        </div>
-                    </div>
-                    <div className="flex flex-col modal-body overflow-y-scroll relative px-6 pt-2 pb-4">
-                        {renderTableSelector()}
-                    </div>
+            <ModalHeader>
+                <ModalCloseButton
+                    onClick={()=> {
+                        toggleConfigModal();
+                        setSelectedTable(null);
+                        setSelectorDisplay(SELECTOR_DISPLAY);
+                    }}
+                />
 
-                    <div className={'flex flex-row justify-between px-6 pb-4'}>
-                        <div className={'flex flex-row items-center'}>
-                                <span
-                                    className={`
-                                        bg-kuwala-green px-6 py-2 font-semibold text-white rounded-lg cursor-pointer
-                                    `}
-                                    onClick={() => {
-                                        toggleConfigModal();
-                                        setSelectedTable(null);
-                                        setSelectorDisplay(SELECTOR_DISPLAY);
-                                    }}
-                                >Back</span>
-                        </div>
-                        <div className={'flex flex-row items-center'}>
-                                <span
-                                    className={`
-                                        bg-kuwala-green px-6 py-2 font-semibold text-white rounded-lg cursor-pointer
-                                    `}
-                                    onClick={async () => {
-                                        await upsertDataBlock()
-                                    }}
-                                >
-                                    <div className="flex justify-center items-center">
+                <div>
+                    {renderSelectedSourceHeader()}
+                </div>
+            </ModalHeader>
 
-                                        {
-                                            isNodeSaveLoading
+            <ModalBody>
+                {renderTableSelector()}
+            </ModalBody>
+
+            <ModalFooter>
+                <div className={'flex flex-row justify-between px-6 pb-4'}>
+                    <div className={'flex flex-row items-center'}>
+                            <span
+                                className={`
+                                    bg-kuwala-green px-6 py-2 font-semibold text-white rounded-lg cursor-pointer
+                                `}
+                                onClick={() => {
+                                    toggleConfigModal();
+                                    setSelectedTable(null);
+                                    setSelectorDisplay(SELECTOR_DISPLAY);
+                                }}
+                            >Back</span>
+                    </div>
+                    <div className={'flex flex-row items-center'}>
+                            <span
+                                className={`
+                                    bg-kuwala-green px-6 py-2 font-semibold text-white rounded-lg cursor-pointer
+                                `}
+                                onClick={async () => {
+                                    await upsertDataBlock()
+                                }}
+                            >
+                                <div className="flex justify-center items-center">
+
+                                    {
+                                        isNodeSaveLoading
                                             ?
-                                                (
-                                                    <div
-                                                        className="spinner-border animate-spin inline-block w-6 h-6 border-4 rounded-full"
-                                                        role="status">
-                                                        <span className="visually-hidden">Loading...</span>
-                                                    </div>
-                                                )
+                                            (
+                                                <div
+                                                    className="spinner-border animate-spin inline-block w-6 h-6 border-4 rounded-full"
+                                                    role="status">
+                                                    <span className="visually-hidden">Loading...</span>
+                                                </div>
+                                            )
                                             :
-                                                'Save'
-                                        }
-                                    </div>
-                                </span>
-                        </div>
+                                            'Save'
+                                    }
+                                </div>
+                            </span>
                     </div>
                 </div>
-            </div>
-        </div>
+            </ModalFooter>
+        </ModalBase>
     )
 }

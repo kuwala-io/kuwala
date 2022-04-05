@@ -1,6 +1,6 @@
 import React from "react";
 
-import {useStoreState} from "easy-peasy";
+import {useStoreState, useStoreActions} from "easy-peasy";
 import {Link} from "react-router-dom";
 
 
@@ -9,6 +9,7 @@ import NodeHandlerContainer from "./NodeHandlerContainer";
 
 export default ({reactFlowWrapper}) => {
     const { dataSource } = useStoreState(state => state.canvas);
+    const { toggleTransformationCatalogModal } = useStoreActions(actions => actions.common);
 
     const renderDataSources = () => {
         if(dataSource.length > 0) {
@@ -95,6 +96,9 @@ export default ({reactFlowWrapper}) => {
                             text-kuwala-red
                             text-center
                         `}
+                    onClick={() => {
+                        toggleTransformationCatalogModal()
+                    }}
                 >
                     +
                 </button>

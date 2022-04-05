@@ -6,6 +6,7 @@ const CommonModel =  {
     notificationOpen: false,
     showConfigModal: false,
     reactFlowInstance: null,
+    showTransformationCatalogModal: false,
 
     toggleNotification: action((state) => {
         state.notificationOpen = !state.notificationOpen
@@ -19,6 +20,9 @@ const CommonModel =  {
         state.showConfigModal = !state.showConfigModal
     }),
 
+    toggleTransformationCatalogModal: action((state) => {
+        state.showTransformationCatalogModal = !state.showTransformationCatalogModal
+    }),
 
 }
 
