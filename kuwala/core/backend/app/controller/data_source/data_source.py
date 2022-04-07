@@ -3,6 +3,7 @@ from typing import Optional
 
 import controller.data_source.bigquery as bigquery_controller
 import controller.data_source.postgres as postgres_controller
+import controller.data_source.snowflake as snowflake_controller
 from database.crud.common import get_object_by_id
 from database.database import get_db
 import database.models.data_source as models
@@ -20,6 +21,8 @@ def get_controller(data_catalog_item_id: str):
         controller = bigquery_controller
     elif data_catalog_item_id == "postgres":
         controller = postgres_controller
+    elif data_catalog_item_id == "snowflake":
+        controller = snowflake_controller
 
     if not controller:
         raise HTTPException(
@@ -34,7 +37,7 @@ def get_data_source_and_data_catalog_item_id(
     data_source_id: str,
     db: Session = Depends(get_db),
 ) -> tuple[models.DataSource, str]:
-    data_catalog_items = ["bigquery", "postgres"]
+    data_catalog_items = ["bigquery", "postgres", "snowflake"]
     data_source = get_object_by_id(
         db=db, model=models.DataSource, object_id=data_source_id
     )
@@ -110,7 +113,12 @@ def get_columns(
             dataset_name=dataset_name,
             table_name=table_name,
         )
-
+    elif data_catalog_item_id == "snowflake":
+        columns = snowflake_controller.get_columns(
+            connection_parameters=connection_parameters,
+            schema_name=schema_name,
+            table_name=table_name,
+        )
     return columns
 
 
@@ -143,6 +151,15 @@ def get_table_preview(
         data = bigquery_controller.get_table_preview(
             connection_parameters=connection_parameters,
             dataset_name=dataset_name,
+            table_name=table_name,
+            columns=columns,
+            limit_columns=limit_columns,
+            limit_rows=limit_rows,
+        )
+    elif data_catalog_item_id == "snowflake":
+        data = snowflake_controller.get_table_preview(
+            connection_parameters=connection_parameters,
+            schema_name=schema_name,
             table_name=table_name,
             columns=columns,
             limit_columns=limit_columns,

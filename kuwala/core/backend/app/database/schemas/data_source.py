@@ -1,3 +1,4 @@
+from lib2to3.pgen2.token import OP
 from typing import Optional
 
 from pydantic import BaseModel, Json
@@ -43,6 +44,10 @@ class ConnectionParameters(BaseModel):
     host: Optional[str] = None
     port: Optional[int] = None
     user: Optional[str] = None
+    role: Optional[str] = None
     password: Optional[str] = None
     database: Optional[str] = None
+    warehouse: Optional[str] = None
+    organization: Optional[str] = None
+    account: Optional[str] = None
     credentials_json: Optional[CredentialsJson] = None

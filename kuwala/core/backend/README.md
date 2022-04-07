@@ -111,3 +111,22 @@ We are using dbt for doing transformations on top of data warehouses, so we are 
 - table_name
 
 </details>
+
+<details>
+    <summary>Snowflake</summary>
+
+#### Connection parameters
+
+- user
+- password
+- database
+- account
+- organization
+
+#### Table parameters
+
+- data_source_id
+- schema_name
+- table_name
+
+</details>

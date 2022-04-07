@@ -41,6 +41,7 @@ def test_connection(
     connection_parameters: ConnectionParameters,
     db: Session = Depends(get_db),
 ):
+    
     return dict(
         connected=data_source_controller.test_connection(
             data_source_id=data_source_id,
@@ -64,7 +65,7 @@ def save_connection(
     )
     data_catalog_item_id = data_source.data_catalog_item_id
 
-    if data_catalog_item_id == "postgres" or data_catalog_item_id == "bigquery":
+    if data_catalog_item_id == "postgres" or data_catalog_item_id == "bigquery" or data_catalog_item_id == "snowflake":
         data_source_controller.update_dbt_connection_parameters(
             data_source=data_source, connection_parameters=connection_parameters
         )
