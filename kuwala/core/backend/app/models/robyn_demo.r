@@ -2,6 +2,35 @@ print("Running Robyn Demo file....")
 print("demo file has been modified to comment Rstudio plotting syntax")
 #install robyn
 #remotes::install_github("facebookexperimental/Robyn/R")
+# install reticulate for nevergrad
+# install.packages("reticulate") # Install reticulate first if you haven't already
+# library("reticulate") # Load the library
+
+## Option 1: nevergrad installation via PIP (no additional installs)
+# virtualenv_create("r-reticulate")
+# use_virtualenv("r-reticulate", required = TRUE)
+# py_install("nevergrad", pip = TRUE)
+# py_config() # Check your python version and configurations
+## In case nevergrad still can't be installed,
+# Sys.setenv(RETICULATE_PYTHON = "~/.virtualenvs/r-reticulate/bin/python")
+# Reset your R session and re-install Nevergrad with option 1
+
+## Option 2: nevergrad installation via conda (must have conda installed)
+# conda_create("r-reticulate", "Python 3.9") # Only works with <= Python 3.9 sofar
+# use_condaenv("r-reticulate")
+# conda_install("r-reticulate", "nevergrad", pip=TRUE)
+# py_config() # Check your python version and configurations
+## In case nevergrad still can't be installed,
+## please locate your python file and run this line with your path:
+# use_python("~/Library/r-miniconda/envs/r-reticulate/bin/python3.9")
+# Alternatively, force Python path for reticulate with this:
+# Sys.setenv(RETICULATE_PYTHON = "~/Library/r-miniconda/envs/r-reticulate/bin/python3.9")
+# Finally, reset your R session and re-install Nevergrad with option 2
+
+# Check this issue for more ideas to debug your reticulate/nevergrad issues:
+# https://github.com/facebookexperimental/Robyn/issues/189
+library("reticulate")
+use_virtualenv("r-reticulate", required = TRUE)
 
 library(Robyn)
 print("Robyn Version: ")
@@ -9,12 +38,14 @@ packageVersion("Robyn")
 
 temp_dir <- '../../../../tmp/kuwala/models/robyn/'
 
+#read csv and convert them to Rdata
 holiday_data <- read.csv(paste(temp_dir,'holiday_data.csv',sep=''),header=T)
 marketing_data <- read.csv(paste(temp_dir,'marketing_data.csv',sep=''),header=T)
 holiday_data <- holiday_data[ -c(1) ]
 save(marketing_data, file = paste(temp_dir,'dt_simulated_weekly.Rdata',sep='')) 
 save(holiday_data, file = paste(temp_dir,'dt_prophet_holidays.Rdata',sep=''))
 
+#load Rdata
 load(paste(temp_dir,'dt_simulated_weekly.Rdata',sep=''))
 load(paste(temp_dir,'dt_prophet_holidays.Rdata',sep=''))
 
@@ -114,7 +145,7 @@ print(OutputCollect)
 
 #### Step 4: Select and save the initial model
 
-select_model <- "3_241_1" # select one from above
+select_model <- "4_204_2" # select one from above
 print("selected model: ")
 print(select_model)
 ExportedModel <- robyn_save(

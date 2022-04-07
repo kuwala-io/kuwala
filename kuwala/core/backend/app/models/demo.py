@@ -1,7 +1,10 @@
 import os
+from tempfile import tempdir
 import psycopg2
 import pandas as pd
 import pandas.io.sql as sqlio
+from glob import glob
+import csv
 
 
 #reconstruct Robyn's demo dataset
@@ -34,6 +37,7 @@ query =  '''
         INNER JOIN marketing_channel_newsletter ON marketing_revenue.date = marketing_channel_newsletter.date)
     '''
 #read query result to pandas dataframe
+print()
 print("Loading data... ")
 marketing_data = sqlio.read_sql_query(query, conn, index_col='date')
 holiday_data = sqlio.read_sql_query('SELECT * FROM marketing_holiday_list', conn, index_col='index')
@@ -44,7 +48,55 @@ if not os.path.exists(temp_dir):
 marketing_data.to_csv(temp_dir+"marketing_data.csv")
 holiday_data.to_csv(temp_dir+'holiday_data.csv')
 
+
 #run demo 
-print("If install.packages related error occurs: install 'remotes' packages by go to terminal, call R, then install.packages('remote')")
+print()
+print("If install.packages related error occurs: install 'remotes' packages by go to terminal, call R in terminal, then install.packages('remote')")
 os.system('Rscript robyn_demo.r')
 
+#export result to database
+print()
+print("Importing latest fitting result to database...")
+
+create_query = '''
+CREATE TABLE robyn_results (
+    solID char(20) NOT NULL,\
+    channels char(20),\
+    date_min date,\
+    date_max date,\
+    periods char(20),\
+    constr_low float,\
+    constr_up float,\
+    histSpend float,\
+    histSpendTotal float,\
+    initSpendUnitTotal float,\
+    initSpendUnit float,\
+    initSpendShare float,\
+    initResponseUnit float,\
+    initResponseUnitTotal float,\
+    initRoiUnit float,\
+    expSpendTotal float,\
+    expSpendUnitTotal float,\
+    expSpendUnitDelta float,\
+    optmSpendUnit float,\
+    optmSpendUnitDelta float,\
+    optmSpendUnitTotal float,\
+    optmSpendUnitTotalDelta float,\
+    optmSpendShareUnit float,\
+    optmResponseUnit float,\
+    optmResponseUnitTotal float,\
+    optmRoiUnit float,\
+    optmResponseUnitLift float,\
+    optmResponseUnitTotalLift float)
+'''
+cursor.execute(create_query)
+
+os.chdir(temp_dir)
+selected_results = glob(os.getcwd()+'/*init')
+files = glob(selected_results[0]+"/*_reallocated.csv")
+
+with open(files[0], 'r') as f:
+    next(f)
+    cursor.copy_from(f, 'robyn_results', sep=',')
+
+conn.commit()
