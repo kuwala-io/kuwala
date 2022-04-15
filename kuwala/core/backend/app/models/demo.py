@@ -1,5 +1,5 @@
-import os
 from glob import glob
+import os
 
 import pandas.io.sql as sqlio
 import psycopg2
