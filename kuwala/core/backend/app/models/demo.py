@@ -1,11 +1,11 @@
+import csv
 import os
+from glob import glob
 from tempfile import tempdir
-import psycopg2
+
 import pandas as pd
 import pandas.io.sql as sqlio
-from glob import glob
-import csv
-
+import psycopg2
 
 # reconstruct Robyn's demo dataset
 print("Importing demo data...")
