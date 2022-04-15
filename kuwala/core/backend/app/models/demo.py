@@ -1,6 +1,5 @@
 import os
 from glob import glob
-from tempfile import tempdir
 
 import pandas.io.sql as sqlio
 import psycopg2
