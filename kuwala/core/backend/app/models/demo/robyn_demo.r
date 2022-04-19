@@ -36,7 +36,7 @@ library(Robyn)
 print("Robyn Version: ")
 packageVersion("Robyn")
 
-temp_dir <- '../../../../tmp/kuwala/models/robyn/'
+temp_dir <- '../../../../../tmp/kuwala/models/robyn/'
 
 #read csv and convert them to Rdata
 holiday_data <- read.csv(paste(temp_dir,'holiday_data.csv',sep=''),header=T)

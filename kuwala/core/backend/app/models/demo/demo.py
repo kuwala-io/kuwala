@@ -39,7 +39,7 @@ marketing_data = sqlio.read_sql_query(query, conn, index_col="date")
 holiday_data = sqlio.read_sql_query(
     "SELECT * FROM marketing_holiday_list", conn, index_col="index"
 )
-temp_dir = "../../../../tmp/kuwala/models/robyn/"
+temp_dir = "../../../../../tmp/kuwala/models/robyn/"
 if not os.path.exists(temp_dir):
     os.makedirs(temp_dir)
 # saving the data to csv
