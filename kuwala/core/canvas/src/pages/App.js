@@ -1,28 +1,36 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useRef, useEffect} from 'react';
 import ReactFlow, {
     ReactFlowProvider,
-    addEdge,
-    removeElements,
     Controls,
 } from 'react-flow-renderer';
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import DataView from "../components/DataView";
 import {useStoreActions, useStoreState} from 'easy-peasy';
-import DataSourceNode from "../components/Nodes/DataSourceNode";
 import TransformationNode from "../components/Nodes/TransformationNode";
-import VisualizationNode from "../components/Nodes/VisualizationNode";
+import DataBlock from "../components/Nodes/DataBlock";
 import {Link} from "react-router-dom";
+import NodeConfigModal from "../components/Modals/NodeConfigModal";
 
 export default function () {
     const reactFlowWrapper = useRef(null);
-    const [reactFlowInstance, setReactFlowInstance] = useState(null);
 
-    const {elements, selectedElement, newNodeInfo, dataSource} = useStoreState(state => state.canvas);
-    const {addNode, setSelectedElement, removeNode, connectNodes, setOpenDataView, getDataSources} = useStoreActions(actions => actions.canvas)
+    const {elements, selectedElement, dataSource, openDataView} = useStoreState(state => state.canvas);
+    const {showConfigModal} = useStoreState(state => state.common);
+    const {
+        setSelectedElement, removeNode, connectNodes, setOpenDataView, getDataSources,
+        convertDataBlocksIntoElement
+    } = useStoreActions(actions => actions.canvas);
+    const {
+        setReactFlowInstance
+    } = useStoreActions(actions => actions.common)
 
     useEffect(()=> {
-       if (dataSource.length <= 0) getDataSources()
+        if (!dataSource.length)  {
+            getDataSources()
+        } else {
+            convertDataBlocksIntoElement()
+        }
     }, [])
 
     const onConnect = (params) => connectNodes(params)
@@ -33,19 +41,6 @@ export default function () {
         event.preventDefault();
         event.dataTransfer.dropEffect = 'move';
     };
-
-    const onDrop = (event) => {
-        event.preventDefault();
-        const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
-        const position = reactFlowInstance.project({
-            x: event.clientX - reactFlowBounds.left,
-            y: event.clientY - reactFlowBounds.top,
-        });
-        addNode({
-            ...newNodeInfo,
-            position
-        })
-    }
 
     const renderFlow = () => {
         if(dataSource.length > 0) {
@@ -67,13 +62,11 @@ export default function () {
                             setOpenDataView(false)
                         }}
                         nodeTypes={{
-                            dataSource: DataSourceNode,
                             transformation: TransformationNode,
-                            visualization: VisualizationNode,
+                            dataBlock: DataBlock,
                         }}
                         selectNodesOnDrag={false}
                         onLoad={onLoad}
-                        onDrop={onDrop}
                         onDragOver={onDragOver}
                         defaultPosition={[500,150]}
                     >
@@ -82,11 +75,11 @@ export default function () {
                                 right: 20,
                                 left: 'auto',
                                 zIndex: 20,
-                                bottom: selectedElement ?'calc(34% + 10px)' : 20,
+                                bottom: openDataView ?'calc(45% + 10px)' : 20,
                             }}
                         />
                     </ReactFlow>
-                    <DataView/>
+                    {openDataView ? <DataView/> : null}
                 </main>
             </ReactFlowProvider>
         } else {
@@ -107,11 +100,16 @@ export default function () {
         <div className={`flex flex-col h-screen overflow-y-hidden antialiased text-gray-900 bg-white`}>
             <div className='flex flex-col h-full w-full'>
                 <Header />
-                {/* MAIN CONTENT CONTAINER */}
                 <div className={'flex flex-row h-full w-full max-h-screen relative'}>
-                    <Sidebar />
+                    <Sidebar
+                        reactFlowWrapper={reactFlowWrapper}
+                    />
                     {renderFlow()}
                 </div>
+                <NodeConfigModal
+                    isShow={showConfigModal}
+                    configData={selectedElement}
+                />
             </div>
         </div>
     )

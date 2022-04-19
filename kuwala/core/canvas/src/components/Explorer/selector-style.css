@@ -1,0 +1,57 @@
+.selector-explorer {
+    border: none;
+}
+
+.selector-explorer .ReactTable .rt-tbody {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.selector-explorer .ReactTable .rt-thead .rt-th{
+    border: none;
+    padding: 0.5rem 1rem;
+    background: #00A99D;
+    font-weight: 600;
+    color: white;
+}
+
+.selector-explorer .ReactTable .rt-tbody .rt-td {
+    padding: 0.9rem 1rem;
+}
+
+.selector-explorer .ReactTable .rt-tbody::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 8px;
+}
+
+.selector-explorer .ReactTable .rt-tbody::-webkit-scrollbar-track {
+    border-left: 0px solid #00A99D;
+    -webkit-appearance: none;
+}
+
+.selector-explorer .ReactTable .rt-tbody::-webkit-scrollbar-thumb {
+    background-color: #00A99D;
+}
+
+.selector-explorer .ReactTable .rt-thead::-webkit-scrollbar {
+    background-color: #00A99D;
+}
+
+.selector-explorer .ReactTable .rt-thead::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 8px;
+}
+
+.selector-explorer .ReactTable .rt-thead::-webkit-scrollbar-track {
+    border-radius: 0px;
+    border-bottom: 1px solid #00A99D;
+}
+
+.selector-explorer .ReactTable .rt-tbody .rt-td {
+    border-bottom: 1px solid #00A99D;
+    border-right: none;
+}
+
+.selector-explorer .ReactTable .rt-tbody .rt-tr-group {
+    border: none;
+}

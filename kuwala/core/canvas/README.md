@@ -11,5 +11,5 @@ To Run the Project:
 3. npm start
 4. navigate to `localhost:3000` in your browser
 
-To start the backend, follow the instructions in 
+To start the backend, follow the instructions in
 [`kuwala/core/backend/README.md`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/core/backend) for now.

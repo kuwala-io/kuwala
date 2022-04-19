@@ -1,3 +1,5 @@
+
+
 module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
@@ -9,9 +11,11 @@ module.exports = {
         'kuwala-red': '#F5989D',
         'kuwala-green': '#00A99D',
         'kuwala-bg-gray': '#F9F9F9',
+        'kuwala-gray': '#BDBDBD',
         'kuwala-light-green': '#99DDD8',
       },
       spacing: {
+        '92': '26rem',
         '100': '28rem',
         '120': '30rem',
         '128': '32rem',
