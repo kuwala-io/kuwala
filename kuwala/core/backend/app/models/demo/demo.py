@@ -63,7 +63,7 @@ print()
 print("Importing latest fitting result to database...")
 
 create_query = """
-CREATE TABLE robyn_results (
+CREATE TABLE IF NOT EXIST robyn_results (
     solID char(20) NOT NULL,\
     channels char(20),\
     date_min date,\

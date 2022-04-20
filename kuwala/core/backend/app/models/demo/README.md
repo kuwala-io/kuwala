@@ -1,5 +1,5 @@
 # Robyn demo
-[Robyn](https://github.com/facebookexperimental/Robyn) is an experimental, semi-automated and open-sourced Marketing Mix Modeling (MMM) package from Facebook Marketing Science. It uses various machine learning techniques (Ridge regression with cross validation, multi-objective evolutionary algorithm for hyperparameter optimisation, time-series decomposition for trend & season, gradient-based optimisation for budget allocation etc.) to define media channel efficiency and effectivity, explore adstock rates and saturation curves. It's built for granular datasets with many independent variables and therefore especially suitable for digital and direct response advertisers with rich data sources. Originaly Robyn is available on R. `robyn_demo.r` is a modified version of [demo.r](https://github.com/facebookexperimental/Robyn/blob/main/demo/demo.R) for Kuwala purposes. Later, `robyn_demo.r` will be a template to run Marketing Mix Modeling (MMM) using own dataset in Kuwala.  
+[Robyn](https://github.com/facebookexperimental/Robyn) is an experimental, semi-automated and open-sourced Marketing Mix Modeling (MMM) package from Facebook Marketing Science. It uses various machine learning techniques (Ridge regression with cross validation, multi-objective evolutionary algorithm for hyperparameter optimisation, time-series decomposition for trend & season, gradient-based optimisation for budget allocation etc.) to define media channel efficiency and effectivity, explore adstock rates and saturation curves. It's built for granular datasets with many independent variables and therefore especially suitable for digital and direct response advertisers with rich data sources. Originaly Robyn is available on R. `robyn_demo.r` is a modified version of [demo.r](https://github.com/facebookexperimental/Robyn/blob/main/demo/demo.R) for Kuwala purposes. Later, `robyn_demo.r` will be a template to run Marketing Mix Modeling (MMM) using your own datasets in Kuwala.  
 
 
 ## Prerequisites
@@ -45,7 +45,7 @@ pip install -r ../../../requrements.txt
 ``` 
 
 ## Database
-This automation tested by importing Robyn's sample data from database. The sample data exported to separate tables containing each marketing channels. In order to run properly, these tables needed to be exist in the database. Those tables and row names are:
+This automation has been tested by importing Robyn's sample data from database. The sample data was exported to separate tables containing each marketing channels. In order to run properly, these tables need to exist in the database. Those tables and row names are:
 
 * marketing_channel_facebook:
     * index (starts from 1)
@@ -104,7 +104,7 @@ This automation tested by importing Robyn's sample data from database. The sampl
     * search_clicks_P
     * events (`na` or `event1`)
 
-as shown above, table related to Robyn input started with *"marketing"*. Sample data available [here](https://github.com/facebookexperimental/Robyn/tree/main/R/data) as Rdata format, a dataframe-like table used by R. After the modeling finished, results available in `robyn_results` table in the database. 
+as shown above, table related to Robyn input started with *"marketing"*. Sample data available [here](https://github.com/facebookexperimental/Robyn/tree/main/R/data) as Rdata format, a dataframe-like table used by R. After the modeling finished, the results are available in `robyn_results` table in the database. 
 
 ## Demo Script Modifications.
 The original [demo.r](https://github.com/facebookexperimental/Robyn/blob/main/demo/demo.R) designed to be run on Rstudio with some script to do image plotting. Since we are automating the script using R console, plotting syntax has been disabled. Functions and syntax to *save graph and curve images* yet still enabled and available in `tmp/kuwala/models/robyn`.
