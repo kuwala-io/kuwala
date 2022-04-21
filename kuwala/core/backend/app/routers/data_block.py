@@ -16,7 +16,9 @@ def create_data_block(
     data_block: DataBlockCreate,
     db: Session = Depends(get_db),
 ):
-    model_name = data_block_controller.create_data_block(data_block=data_block, db=db)
+    data_block_id, model_name = data_block_controller.create_data_block(
+        data_block=data_block, db=db
+    )
     data_block = crud.create_data_block(
         db=db,
         data_block=DataBlockCreate(
@@ -27,6 +29,7 @@ def create_data_block(
             dataset_name=data_block.dataset_name,
             columns=data_block.columns,
         ),
+        generated_id=data_block_id,
         dbt_model=model_name,
     )
 

@@ -1,0 +1,89 @@
+{
+  "id": "add_columns",
+  "category": "numeric",
+  "name": "Add columns",
+  "icon": "plus",
+  "description": "With this transformation, you can add the values of multiple columns and store the result in a new one.",
+  "required_column_types": ["numeric"],
+  "optional_column_types": [],
+  "min_number_of_input_blocks": 1,
+  "max_number_of_input_blocks": 1,
+  "macro_parameters": [
+    {
+      "id": "columns",
+      "name": "Columns",
+      "type": "list[text]"
+    }, {
+      "id": "result_name",
+      "name": "Result name",
+      "type": "text"
+    }
+  ],
+  "examples_before": [
+    {
+      "columns": [
+        "order_number",
+        "basket_size",
+        "shipping_cost"
+      ],
+      "rows": [
+        [
+          "63472",
+          "39.99",
+          "4.99"
+        ],
+        [
+          "63473",
+          "74.97",
+          "4.99"
+        ],
+        [
+          "63474",
+          "99.99",
+          "4.99"
+        ],
+        [
+          "63475",
+          "9.99",
+          "4.99"
+        ]
+      ]
+    }
+  ],
+  "examples_after": [
+    {
+      "columns": [
+        "order_number",
+        "basket_size",
+        "shipping_cost",
+        "amount_to_pay"
+      ],
+      "rows": [
+        [
+          "63472",
+          "39.99",
+          "4.99",
+          "44.98"
+        ],
+        [
+          "63473",
+          "74.97",
+          "4.99",
+          "79.96"
+        ],
+        [
+          "63474",
+          "99.99",
+          "4.99",
+          "104.98"
+        ],
+        [
+          "63475",
+          "9.99",
+          "4.99",
+          "14.98"
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "id": "union",
+  "category": "merging",
+  "name": "Union",
+  "icon": "link",
+  "description": "With this transformation, you can merge two tables that have the same columns.",
+  "required_column_types": [],
+  "optional_column_types": ["text", "date", "numeric", "boolean"],
+  "min_number_of_input_blocks": 2,
+  "max_number_of_input_blocks": 2,
+  "macro_parameters": [
+    {
+      "id": "left_block",
+      "name": "Left block",
+      "type": "text"
+    }, {
+      "id": "right_block",
+      "name": "Right block",
+      "type": "text"
+    }
+  ],
+  "examples_before": [
+    {
+      "columns": [
+        "order_number",
+        "order_value"
+      ],
+      "rows": [
+        [
+          "63472",
+          "39.99"
+        ],
+        [
+          "63473",
+          "74.97"
+        ]
+      ]
+    }, {
+      "columns": [
+        "order_number",
+        "order_value"
+      ],
+      "rows": [
+        [
+          "23474",
+          "99.99"
+        ],
+        [
+          "23475",
+          "9.99"
+        ]
+      ]
+    }
+  ],
+  "examples_after": [
+    {
+      "columns": [
+        "order_number",
+        "order_value"
+      ],
+      "rows": [
+        [
+          "63472",
+          "39.99"
+        ],
+        [
+          "63473",
+          "74.97"
+        ],
+        [
+          "23474",
+          "99.99"
+        ],
+        [
+          "23475",
+          "9.99"
+        ]
+      ]
+    }
+  ]
+}

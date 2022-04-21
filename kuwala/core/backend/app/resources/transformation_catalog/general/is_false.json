@@ -1,0 +1,75 @@
+{
+  "id": "is_false",
+  "category": "general",
+  "name": "Is false",
+  "icon": "times-circle",
+  "description": "With this transformation, you can filter a table based on a column that should be false.",
+  "required_column_types": ["boolean"],
+  "optional_column_types": [],
+  "min_number_of_input_blocks": 1,
+  "max_number_of_input_blocks": 1,
+  "macro_parameters": [
+    {
+      "id": "column",
+      "name": "Column",
+      "type": "text"
+    }
+  ],
+  "examples_before": [
+    {
+      "columns": [
+        "order_number",
+        "order_value",
+        "cancelled"
+      ],
+      "rows": [
+        [
+          "63472",
+          "39.99",
+          "false"
+        ],
+        [
+          "63473",
+          "74.97",
+          "true"
+        ],
+        [
+          "63474",
+          "99.99",
+          "false"
+        ],
+        [
+          "63475",
+          "9.99",
+          "false"
+        ]
+      ]
+    }
+  ],
+  "examples_after": [
+    {
+      "columns": [
+        "order_number",
+        "order_value",
+        "cancelled"
+      ],
+      "rows": [
+        [
+          "63472",
+          "39.99",
+          "false"
+        ],
+        [
+          "63474",
+          "99.99",
+          "false"
+        ],
+        [
+          "63475",
+          "9.99",
+          "false"
+        ]
+      ]
+    }
+  ]
+}

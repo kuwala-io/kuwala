@@ -1,0 +1,32 @@
+[
+  {
+    "id": "time",
+    "name": "Time",
+    "icon": "clock"
+  },
+  {
+    "id": "text",
+    "name": "Text",
+    "icon": "align-left"
+  },
+  {
+    "id": "numeric",
+    "name": "Numeric",
+    "icon": "calculator"
+  },
+  {
+    "id": "geo",
+    "name": "Geo",
+    "icon": "map-marked-alt"
+  },
+  {
+    "id": "merging",
+    "name": "Merging",
+    "icon": "link"
+  },
+  {
+    "id": "general",
+    "name": "General",
+    "icon": "cogs"
+  }
+]

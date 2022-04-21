@@ -1,0 +1,99 @@
+{
+  "id": "compare_with_date",
+  "category": "time",
+  "name": "Compare with date",
+  "icon": "greater-than-equal",
+  "description": "With this transformation, you can filter a table by comparing a date column with a given date.",
+  "required_column_types": ["date"],
+  "optional_column_types": [],
+  "min_number_of_input_blocks": 1,
+  "max_number_of_input_blocks": 1,
+  "macro_parameters": [
+    {
+      "id": "column",
+      "name": "Column",
+      "type": "text"
+    }, {
+      "id": "comparator",
+      "name": "Comparator",
+      "type": "text",
+      "options": [
+        {
+          "id": "equal",
+          "name": "="
+        }, {
+          "id": "not_equal",
+          "name": "!="
+        }, {
+          "id": "less",
+          "name": "<"
+        }, {
+          "id": "greater",
+          "name": ">"
+        }, {
+          "id": "less_or_equal",
+          "name": "<="
+        }, {
+          "id": "greater_or_equal",
+          "name": ">="
+        }
+      ]
+    }, {
+      "id": "comparison_date",
+      "name": "Comparison date",
+      "type": "date"
+    }
+  ],
+  "examples_before": [
+    {
+      "columns": [
+        "order_number",
+        "order_value",
+        "order_date"
+      ],
+      "rows": [
+        [
+          "63472",
+          "39.99",
+          "2022-02-20"
+        ],
+        [
+          "63473",
+          "74.97",
+          "2022-02-22"
+        ],
+        [
+          "63474",
+          "99.99",
+          "2022-03-09"
+        ],
+        [
+          "63475",
+          "9.99",
+          "2022-03-21"
+        ]
+      ]
+    }
+  ],
+  "examples_after": [
+    {
+      "columns": [
+        "order_number",
+        "order_value",
+        "order_date"
+      ],
+      "rows": [
+        [
+          "63474",
+          "99.99",
+          "2022-03-09"
+        ],
+        [
+          "63475",
+          "9.99",
+          "2022-03-21"
+        ]
+      ]
+    }
+  ]
+}

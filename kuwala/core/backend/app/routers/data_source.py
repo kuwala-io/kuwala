@@ -1,5 +1,6 @@
 from typing import Optional
 
+import controller.data_block_controller as data_block_controller
 import controller.data_source.data_source as data_source_controller
 from database.crud.common import get_all_objects
 from database.crud.data_source import update_connection_parameters
@@ -41,7 +42,6 @@ def test_connection(
     connection_parameters: ConnectionParameters,
     db: Session = Depends(get_db),
 ):
-
     return dict(
         connected=data_source_controller.test_connection(
             data_source_id=data_source_id,
@@ -119,4 +119,11 @@ def get_table_preview(
         limit_columns=limit_columns,
         limit_rows=limit_rows,
         db=db,
+    )
+
+
+@router.put("/{data_source_id}/{schema_name}/sources/refresh")
+def refresh_sources(data_source_id: str, schema_name: str):
+    return data_block_controller.refresh_sources(
+        data_source_id=data_source_id, schema_name=schema_name
     )
