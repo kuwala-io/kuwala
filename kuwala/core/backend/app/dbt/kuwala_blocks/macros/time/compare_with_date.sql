@@ -3,10 +3,11 @@
     {% set rel = '{{ ref("' + dbt_model + '") }}' %}
 
     {% set query %}
-        -- KUWALA TRANSFORMATION
+        -- KUWALA_TRANSFORMATION_START
         SELECT *
         FROM {{ rel }}
         WHERE {{ column }} {{ comparator_value }} '{{ comparison_date }}'
+        -- KUWALA_TRANSFORMATION_END
     {% endset %}
 
     {% if execute %}
