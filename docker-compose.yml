@@ -48,6 +48,8 @@ services:
     profiles:
       - network
       - backend
+    volumes:
+      - ./kuwala/tmp/kuwala/backend/dbt:/opt/tmp/kuwala/backend/dbt
 
   # docker-compose --profile database up
   postgres:

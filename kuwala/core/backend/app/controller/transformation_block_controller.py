@@ -7,6 +7,10 @@ from controller.data_source.data_source import (
     get_data_source_and_data_catalog_item_id,
     get_table_preview,
 )
+from controller.utils.yaml_utils import (
+    terminal_output_to_dbt_model,
+    terminal_output_to_source_yaml,
+)
 from database.crud.common import generate_object_id, get_object_by_id
 from database.database import Base, get_db
 from database.models.data_block import DataBlock
@@ -74,7 +78,7 @@ def create_model(
         capture_output=True,
     )
     dbt_model_dir = f"{dbt_dir}/models/marts/{schema_name}/{table_name}"
-    dbt_model = output.stdout.decode("utf8").split("KUWALA TRANSFORMATION")[1][:-5]
+    dbt_model = terminal_output_to_dbt_model(output=output)
     base_id = (
         base_data_block.id
         if not base_transformation_blocks or len(base_transformation_blocks)
@@ -97,9 +101,7 @@ def create_model_yaml(dbt_dir: str, dbt_model_dir: str, dbt_model_name: str):
         shell=True,
         capture_output=True,
     )
-    source_yml = yaml.safe_load(
-        f"version: 2{output.stdout.decode('utf8').split('version: 2')[1][:-5]}"
-    )
+    source_yml = terminal_output_to_source_yaml(output=output)
 
     with open(f"{dbt_model_dir}/{dbt_model_name}.yml", "w+") as file:
         yaml.safe_dump(source_yml, file, indent=4)

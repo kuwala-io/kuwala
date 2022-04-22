@@ -6,6 +6,10 @@ from controller.data_source.data_source import (
     get_data_source_and_data_catalog_item_id,
     get_table_preview,
 )
+from controller.utils.yaml_utils import (
+    terminal_output_to_base_model,
+    terminal_output_to_source_yaml,
+)
 import database.crud.common as crud
 from database.crud.common import generate_object_id
 import database.models.data_block as models
@@ -41,9 +45,7 @@ def create_source_yaml(dbt_dir: str, schema_name: str, update_yaml: bool = False
         shell=True,
         capture_output=True,
     )
-    source_yml = yaml.safe_load(
-        f"version: 2{output.stdout.decode('utf8').split('version: 2')[1][:-5]}"
-    )
+    source_yml = terminal_output_to_source_yaml(output=output)
 
     Path(dbt_source_model_dir).mkdir(parents=True, exist_ok=True)
 
@@ -68,9 +70,7 @@ def create_base_model(dbt_dir: str, schema_name: str, table_name: str):
         shell=True,
         capture_output=True,
     )
-    base_model = (
-        f"with source{output.stdout.decode('utf8').split('with source')[1][:-5]}"
-    )
+    base_model = terminal_output_to_base_model(output=output)
 
     with open(dbt_base_model_path, "w+") as file:
         file.write(base_model)
@@ -124,9 +124,7 @@ def create_model_yaml(dbt_dir: str, schema_name: str, table_name: str, model_nam
         shell=True,
         capture_output=True,
     )
-    source_yml = yaml.safe_load(
-        f"version: 2{output.stdout.decode('utf8').split('version: 2')[1][:-5]}"
-    )
+    source_yml = terminal_output_to_source_yaml(output=output)
 
     with open(
         f"{dbt_dir}/models/marts/{schema_name}/{table_name}/{model_name}.yml", "w+"

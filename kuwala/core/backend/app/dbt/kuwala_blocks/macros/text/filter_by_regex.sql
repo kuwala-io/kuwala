@@ -2,7 +2,7 @@
     {% set rel = '{{ ref("' + dbt_model + '") }}' %}
 
     {% set query %}
-        -- KUWALA TRANSFORMATION
+        -- KUWALA_TRANSFORMATION_START
         SELECT *
         FROM {{ rel }}
         {% if target.type == 'bigquery' %}
@@ -10,6 +10,7 @@
         {% else %}
             WHERE {{ column }} ~ '{{ regex }}'
         {% endif %}
+        -- KUWALA_TRANSFORMATION_END
     {% endset %}
 
     {% if execute %}

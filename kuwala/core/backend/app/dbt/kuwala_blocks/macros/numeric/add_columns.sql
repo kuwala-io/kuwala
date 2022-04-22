@@ -6,9 +6,10 @@
     {%- endset -%}
 
     {% set query %}
-        -- KUWALA TRANSFORMATION
+        -- KUWALA_TRANSFORMATION_START
         SELECT *, {{ calculation[:-3] }} AS {{ result_name }}
         FROM {{ rel }}
+        -- KUWALA_TRANSFORMATION_END
     {% endset %}
 
     {% if execute %}

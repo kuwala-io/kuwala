@@ -6,10 +6,11 @@
     {%- endset -%}
 
     {% set query %}
-        -- KUWALA TRANSFORMATION
+        -- KUWALA_TRANSFORMATION_START
         SELECT *
         FROM {{ rel }}
         WHERE {{ column }} IN ({{ parsed_keywords[:-1] }})
+        -- KUWALA_TRANSFORMATION_END
     {% endset %}
 
     {% if execute %}

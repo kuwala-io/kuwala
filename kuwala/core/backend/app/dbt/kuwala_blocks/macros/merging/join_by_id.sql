@@ -5,9 +5,10 @@
     {% set rel_right = '{{ ref("' + dbt_model_right + '") }}' %}
 
     {% set query %}
-        -- KUWALA TRANSFORMATION
+        -- KUWALA_TRANSFORMATION_START
         SELECT *
         FROM {{ rel_left }} AS rel1 {{ join_type_value }} {{ rel_right }} AS rel2 {{ join_condition }}
+        -- KUWALA_TRANSFORMATION_END
     {% endset %}
 
     {% if execute %}
