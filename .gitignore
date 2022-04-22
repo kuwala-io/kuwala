@@ -12,6 +12,7 @@ venv/
 !**/.gitkeep
 
 tmp
+logs
 env
 !.env.local
 __pycache__

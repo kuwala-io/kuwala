@@ -1,0 +1,2 @@
+export const SELECTOR_DISPLAY = 'SELECTOR';
+export const PREVIEW_DISPLAY = 'PREVIEW';

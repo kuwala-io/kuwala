@@ -1,0 +1,75 @@
+{
+  "id": "is_true",
+  "category": "general",
+  "name": "Is true",
+  "icon": "check-circle",
+  "description": "With this transformation, you can filter a table based on a column that should be true.",
+  "required_column_types": ["boolean"],
+  "optional_column_types": [],
+  "min_number_of_input_blocks": 1,
+  "max_number_of_input_blocks": 1,
+  "macro_parameters": [
+    {
+      "id": "column",
+      "name": "Column",
+      "type": "text"
+    }
+  ],
+  "examples_before": [
+    {
+      "columns": [
+        "order_number",
+        "order_value",
+        "paid"
+      ],
+      "rows": [
+        [
+          "63472",
+          "39.99",
+          "true"
+        ],
+        [
+          "63473",
+          "74.97",
+          "true"
+        ],
+        [
+          "63474",
+          "99.99",
+          "false"
+        ],
+        [
+          "63475",
+          "9.99",
+          "true"
+        ]
+      ]
+    }
+  ],
+  "examples_after": [
+    {
+      "columns": [
+        "order_number",
+        "order_value",
+        "paid"
+      ],
+      "rows": [
+        [
+          "63472",
+          "39.99",
+          "true"
+        ],
+        [
+          "63473",
+          "74.97",
+          "true"
+        ],
+        [
+          "63475",
+          "9.99",
+          "true"
+        ]
+      ]
+    }
+  ]
+}

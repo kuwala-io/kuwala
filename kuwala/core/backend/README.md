@@ -13,11 +13,14 @@ docker-compose --profile backend up
 
 #### Installation
 
+***Required Python version:** 3.9 (Has to be below 3.10 
+[because of dbt-postgres](https://github.com/dbt-labs/dbt-core/issues/2827#issuecomment-1022860423))*
+
 First, install the dependencies in a new virtual environment by running the following command from inside the 
 `kuwala/core/backend` directory:
 
 ```zsh
-pip install --no-cache-dir -r requirements.txt
+DBT_PSYCOPG2_NAME=psycopg2 pip install --no-cache-dir -r requirements.txt --no-binary dbt-postgres
 ```
 
 To set up a new virtual environment, you can follow the steps outlined 
@@ -104,8 +107,26 @@ We are using dbt for doing transformations on top of data warehouses, so we are 
 #### Table parameters
 
 - data_source_id
-- project_name
 - dataset_name
+- table_name
+
+</details>
+
+<details>
+    <summary>Snowflake</summary>
+
+#### Connection parameters
+
+- user
+- password
+- database
+- account
+- organization
+
+#### Table parameters
+
+- data_source_id
+- schema_name
 - table_name
 
 </details>

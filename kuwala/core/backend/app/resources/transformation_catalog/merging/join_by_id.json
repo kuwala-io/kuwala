@@ -1,0 +1,129 @@
+{
+  "id": "join_by_id",
+  "category": "merging",
+  "name": "Join by ID",
+  "icon": "link",
+  "description": "With this transformation, you can join two tables by ID.",
+  "required_column_types": [],
+  "optional_column_types": ["text", "date", "numeric", "boolean"],
+  "min_number_of_input_blocks": 2,
+  "max_number_of_input_blocks": 2,
+  "macro_parameters": [
+    {
+      "id": "left_block",
+      "name": "Left block",
+      "type": "text"
+    }, {
+      "id": "right_block",
+      "name": "Right block",
+      "type": "text"
+    }, {
+      "id": "column_left",
+      "name": "Column left",
+      "type": "text"
+    }, {
+      "id": "column_right",
+      "name": "Column right",
+      "type": "text"
+    }, {
+      "id": "join_type",
+      "name": "Join type",
+      "type": "text",
+      "options": [
+        {
+          "id": "inner",
+          "name": "INNER JOIN"
+        }, {
+          "id": "left",
+          "name": "LEFT JOIN"
+        }, {
+          "id": "right",
+          "name": "RIGHT JOIN"
+        }, {
+          "id": "full_outer",
+          "name": "FULL OUTER JOIN"
+        }
+      ]
+    }
+  ],
+  "examples_before": [
+    {
+      "columns": [
+        "order_number",
+        "order_value"
+      ],
+      "rows": [
+        [
+          "63472",
+          "39.99"
+        ],
+        [
+          "63473",
+          "74.97"
+        ],
+        [
+          "63474",
+          "99.99"
+        ],
+        [
+          "63475",
+          "9.99"
+        ]
+      ]
+    }, {
+      "columns": [
+        "order_number",
+        "paid"
+      ],
+      "rows": [
+        [
+          "63472",
+          "true"
+        ],
+        [
+          "63473",
+          "true"
+        ],
+        [
+          "63474",
+          "false"
+        ],
+        [
+          "63475",
+          "true"
+        ]
+      ]
+    }
+  ],
+  "examples_after": [
+    {
+      "columns": [
+        "order_number",
+        "order_value",
+        "paid"
+      ],
+      "rows": [
+        [
+          "63472",
+          "39.99",
+          "true"
+        ],
+        [
+          "63473",
+          "74.97",
+          "true"
+        ],
+        [
+          "63474",
+          "99.99",
+          "false"
+        ],
+        [
+          "63475",
+          "9.99",
+          "true"
+        ]
+      ]
+    }
+  ]
+}

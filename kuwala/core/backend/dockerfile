@@ -1,4 +1,4 @@
-FROM python:3.10.2-slim-buster
+FROM python:3.9.5-slim-buster
 
 RUN apt-get update && \
     apt-get install --no-install-recommends build-essential=12.6 libpq-dev=\* -y && \
@@ -9,7 +9,7 @@ COPY ./core/backend /opt/core/backend
 
 WORKDIR /opt/core/backend
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN DBT_PSYCOPG2_NAME=psycopg2 pip install --no-cache-dir -r requirements.txt --no-binary dbt-postgres
 
 WORKDIR /opt/core/backend/app
 
