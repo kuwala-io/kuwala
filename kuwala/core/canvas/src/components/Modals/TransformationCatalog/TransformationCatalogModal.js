@@ -10,8 +10,10 @@ import {getCatalogItemIcon} from "../../../utils/TransformationCatalogUtils";
 import {getDataDictionary} from "../../../utils/SchemaUtils";
 import ReactTable from "react-table-6";
 import "./transformation-example-table.css";
-import {ModalBase, ModalBody, ModalCloseButton, ModalFooter, ModalHeader} from "../../Common/Modal/ModalBase";
+import {ModalBase, ModalBody, ModalCloseButton, ModalFooter, ModalHeader} from "../../Common/Modal";
 import {ButtonBase} from "../../Common/Button";
+import Classes from "./TransformationCatalogStyle";
+import cn from "classnames";
 
 const ExampleTable = ({columns, rows}) => {
     let populatedColumns = columns.map((el,i)=>{
@@ -97,8 +99,8 @@ export default ({isShow}) => {
 
     const CatalogSelector = () => {
         return (
-            <div className={'flex flex-col w-full'}>
-                <div className={'flex flex-row w-64 space-x-4 items-center px-4 py-3 bg-kuwala-green text-white rounded-lg'}>
+            <div className={Classes.CatalogContainer}>
+                <div className={Classes.CatalogContent}>
                     <FontAwesomeIcon
                         icon={faShuffle}
                         className={'h-6 w-6'}
@@ -106,7 +108,7 @@ export default ({isShow}) => {
                     <span className={'font-semibold'}>Transformation Blocks</span>
                 </div>
 
-                <div className={'flex flex-row space-x-4 items-center mt-4'}>
+                <div className={Classes.CatalogListContainer}>
                     {renderCatalogList()}
                 </div>
             </div>
@@ -122,11 +124,7 @@ export default ({isShow}) => {
     const renderCatalogItem = (catalogItem,index) => {
         return (
             <div
-                className={`
-                    px-4 py-2 border rounded-md border-kuwala-red space-x-2
-                    ${selectedTransformationIndex == index ? 'bg-kuwala-red text-white' : 'bg-white text-kuwala-red'} 
-                    hover:bg-kuwala-red hover:text-white cursor-pointer
-                `}
+                className={Classes.CatalogItem(selectedCatalogOption, index)}
                 onClick={()=>{
                     setSelectedCatalogOption(null);
                     setSelectedTransformationIndex(index)
@@ -148,7 +146,7 @@ export default ({isShow}) => {
                     ?
                         <SelectedTransformationCatalog/>
                     :
-                        <div className="flex flex-col w-full h-full text-xl font-light justify-center items-center rounded-tr-lg">
+                        <div className={Classes.CatalogBodyAlertText}>
                             <p>To pick a transformation block,</p>
                             <p>select a transformation <span className={'text-kuwala-red'}>category</span> first</p>
                         </div>
@@ -166,12 +164,12 @@ export default ({isShow}) => {
             )
         } else {
             return (
-                <div className={'flex flex-row bg-white h-full w-full'}>
-                    <div className={'flex flex-col bg-white w-3/12 h-full space-y-3 mr-4'}>
+                <div className={Classes.SelectedTransformationContainer}>
+                    <div className={Classes.TransformationOptionsContainer}>
                         {renderTransformationOptions(catalogOptions)}
                     </div>
-                    <div className={'flex flex-col bg-white w-9/12 rounded-tr-lg'}>
-                        <div className={'flex flex-col w-full h-full'}>
+                    <div className={Classes.SelectedOptionDetailsContainer}>
+                        <div className={Classes.OptionDetailsContainer}>
                             {renderSelectedOptionDetails()}
                         </div>
                     </div>
@@ -187,11 +185,7 @@ export default ({isShow}) => {
     const renderOptionItem = (optionItem, index) => {
         return (
             <div
-                className={`
-                    px-4 py-2 border rounded-md border-kuwala-purple space-x-2
-                    ${selectedCatalogOption === index ? 'bg-kuwala-purple text-white' : 'bg-white text-kuwala-purple'} 
-                    hover:bg-kuwala-purple hover:text-white cursor-pointer
-                `}
+                className={Classes.OptionItem(selectedCatalogOption, index)}
                 onClick={()=>{
                     setSelectedCatalogOption(index)
                 }}
@@ -207,7 +201,7 @@ export default ({isShow}) => {
     const renderSelectedOptionDetails = () => {
         if(selectedCatalogOption === null){
             return (
-                <div className="flex flex-col w-full h-full text-xl font-light justify-center items-center rounded-tr-lg">
+                <div className={Classes.OptionDetailsAlertText}>
                     <p>To see the <span className={'text-kuwala-purple'}>details</span> of a transformation block,</p>
                     <p>select one from the left</p>
                 </div>
@@ -216,7 +210,7 @@ export default ({isShow}) => {
             const optionItem = catalogOptions[selectedCatalogOption];
 
             return (
-                <div className={'flex flex-col w-full h-full border-2 border-kuwala-purple rounded-lg p-6 overflow-y-auto'}>
+                <div className={Classes.OptionDetailsContent}>
                     <div className={'text-kuwala-purple space-x-4'}>
                         {getCatalogItemIcon(optionItem.icon)}
                         <span className={'font-semibold'}>
@@ -226,33 +220,35 @@ export default ({isShow}) => {
                     <p className={'mt-2'}>
                         {optionItem.description}
                     </p>
-                    <div className={'flex flex-row space-x-2 mt-6 items-center'}>
+                    <div className={cn(Classes.RequiredColumnBase, 'mt-6')}>
                         <span>
                             Required column types:
                         </span>
                         {renderBadgeList(optionItem.required_column_types)}
                     </div>
-                    <div className={'flex flex-row space-x-2 mt-2 items-center'}>
+                    <div className={cn(Classes.RequiredColumnBase, 'mt-2')}>
                         <span>
                             Optional column types:
                         </span>
                         {renderBadgeList(optionItem.optional_column_types)}
                     </div>
 
-                    <div className={'flex flex-row mt-4 h-full space-x-6'}>
-                        <div className={'flex flex-col w-2/12'}>
+                    <div className={Classes.OptionDetailsParameterAndExample}>
+
+                        <div className={Classes.OptionDetailsParameterContainer}>
                             <p>Parameters</p>
                             {optionItem.macro_parameters.map((el) => <li>{el.name}</li>)}
                         </div>
-                        <div className={'h-full w-10/12 flex flex-col bg-kuwala-bg-gray rounded-lg p-4 overflow-y-scroll'}>
-                            <span className={'text-kuwala-purple font-semibold mb-2'}>
+
+                        <div className={Classes.OptionDetailsExampleContainer}>
+                            <span className={cn(Classes.ExampleBase,'mb-2')}>
                                Before
                             </span>
                             <ExampleTable
                                 columns={optionItem.examples_before[0].columns}
                                 rows={optionItem.examples_before[0].rows}
                             />
-                            <span className={'text-kuwala-purple font-semibold my-2'}>
+                            <span className={cn(Classes.ExampleBase,'my-2')}>
                                After
                             </span>
                             <ExampleTable
@@ -260,6 +256,7 @@ export default ({isShow}) => {
                                 rows={optionItem.examples_before[0].rows}
                             />
                         </div>
+
                     </div>
 
                 </div>
@@ -271,7 +268,7 @@ export default ({isShow}) => {
         if(typeof badgeStringList === 'undefined' || badgeStringList.length <= 0) return
         return badgeStringList.map((el) => {
             return (
-                <div className={'px-2.5 py-0.5 bg-stone-200 text-gray-400 font-semibold rounded-md text-sm'}>
+                <div className={Classes.BadgeBase}>
                     {el}
                 </div>
             )
@@ -294,7 +291,7 @@ export default ({isShow}) => {
             </ModalBody>
 
             <ModalFooter>
-                <div className={'flex flex-row justify-between items-center px-6 pb-4'}>
+                <div className={Classes.ModalFooterContainer}>
                     <ButtonBase
                         onClick={toggleTransformationCatalogModal}
                     >
