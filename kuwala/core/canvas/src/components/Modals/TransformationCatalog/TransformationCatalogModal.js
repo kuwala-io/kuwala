@@ -10,8 +10,8 @@ import {getCatalogItemIcon} from "../../../utils/TransformationCatalogUtils";
 import {getDataDictionary} from "../../../utils/SchemaUtils";
 import ReactTable from "react-table-6";
 import "./transformation-example-table.css";
-import {ModalBase, ModalBody, ModalCloseButton, ModalFooter, ModalHeader} from "../ModalBase";
-import {ButtonBase} from "../../Button";
+import {ModalBase, ModalBody, ModalCloseButton, ModalFooter, ModalHeader} from "../../Common/Modal/ModalBase";
+import {ButtonBase} from "../../Common/Button";
 
 const ExampleTable = ({columns, rows}) => {
     let populatedColumns = columns.map((el,i)=>{

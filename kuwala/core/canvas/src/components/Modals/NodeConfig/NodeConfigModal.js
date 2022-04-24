@@ -15,7 +15,7 @@ import DataBlockDTO from "../../../data/dto/DataBlockDTO";
 import SchemaExplorer from "../../SchemaExplorer";
 import Explorer from "../../Explorer";
 import {SELECTOR_DISPLAY, PREVIEW_DISPLAY} from "../../../constants/components";
-import {ModalBase, ModalHeader, ModalBody, ModalFooter, ModalCloseButton} from "../ModalBase";
+import {ModalBase, ModalHeader, ModalBody, ModalFooter, ModalCloseButton} from "../../Common/Modal/ModalBase";
 
 export default ({isShow}) => {
     const {
