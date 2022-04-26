@@ -23,7 +23,9 @@ def create_transformation_block(
         input_block_ids=transformation_block.input_block_ids,
         macro_parameters=macro_parameters,
         name=transformation_block.name,
+        columns=["*"],
         dbt_model=dbt_model,
+        materialize_as_table=transformation_block.materialize_as_table,
     )
 
     add_and_commit_to_db(db=db, model=db_data_block)

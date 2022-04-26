@@ -1,4 +1,4 @@
-from sqlalchemy import JSON, Column, ForeignKey, String
+from sqlalchemy import JSON, Boolean, Column, ForeignKey, String
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.mutable import MutableList
 
@@ -16,4 +16,6 @@ class TransformationBlock(Base):
     input_block_ids = Column(ARRAY(String))
     macro_parameters = Column(MutableList.as_mutable(JSON), nullable=False)
     name = Column(String, nullable=False)
+    columns = Column(ARRAY(String), nullable=False)
     dbt_model = Column(String, nullable=False)
+    materialize_as_table = Column(Boolean, default=False)

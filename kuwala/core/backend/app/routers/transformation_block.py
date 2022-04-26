@@ -1,7 +1,10 @@
 import controller.transformation_block_controller as transformation_block_controller
 import database.crud.transformation_block as crud
 from database.database import get_db
-from database.schemas.transformation_block import TransformationBlockCreate
+from database.schemas.transformation_block import (
+    TransformationBlockCreate,
+    TransformationBlockUpdate,
+)
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -34,8 +37,21 @@ def create_transformation_block(
     return transformation_block
 
 
+@router.put("/{transformation_block_id}")
+def update_transformation_block(
+    transformation_block_id: str,
+    transformation_block: TransformationBlockUpdate,
+    db: Session = Depends(get_db),
+):
+    return transformation_block_controller.update_transformation_block(
+        transformation_block_id=transformation_block_id,
+        transformation_block=transformation_block,
+        db=db,
+    )
+
+
 @router.get("/{transformation_block_id}/preview")
-def get_data_block_preview(
+def get_transformation_block_preview(
     transformation_block_id: str,
     limit_columns: int = None,
     limit_rows: int = None,
@@ -46,4 +62,13 @@ def get_data_block_preview(
         limit_columns=limit_columns,
         limit_rows=limit_rows,
         db=db,
+    )
+
+
+@router.put("/{transformation_block_id}/refresh")
+def refresh_transformation_block(
+    transformation_block_id: str, db: Session = Depends(get_db)
+):
+    return transformation_block_controller.refresh_transformation_block(
+        transformation_block_id=transformation_block_id, db=db
     )

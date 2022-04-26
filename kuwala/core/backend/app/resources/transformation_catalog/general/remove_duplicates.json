@@ -1,0 +1,60 @@
+{
+  "id": "remove_duplicates",
+  "category": "general",
+  "name": "Remove duplicates",
+  "icon": "window-restore",
+  "description": "With this transformation, you can remove duplicate rows in a table.",
+  "required_column_types": [],
+  "optional_column_types": ["text", "numeric", "date", "timestamp", "boolean"],
+  "min_number_of_input_blocks": 1,
+  "max_number_of_input_blocks": 1,
+  "macro_parameters": [],
+  "examples_before": [
+    {
+      "columns": [
+        "customer_id",
+        "payment_method"
+      ],
+      "rows": [
+        [
+          "63472",
+          "paypal"
+        ],
+        [
+          "63472",
+          "paypal"
+        ],
+        [
+          "63472",
+          "credit_card"
+        ],
+        [
+          "63475",
+          "crypto"
+        ]
+      ]
+    }
+  ],
+  "examples_after": [
+    {
+      "columns": [
+        "customer_id",
+        "payment_method"
+      ],
+      "rows": [
+        [
+          "63472",
+          "paypal"
+        ],
+        [
+          "63472",
+          "credit_card"
+        ],
+        [
+          "63475",
+          "crypto"
+        ]
+      ]
+    }
+  ]
+}

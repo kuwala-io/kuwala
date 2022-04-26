@@ -1,0 +1,70 @@
+{
+  "id": "get_date",
+  "category": "time",
+  "name": "Get date",
+  "icon": "calendar-day",
+  "description": "With this transformation, you can extract the date of a timestamp and save it in a new column.",
+  "required_column_types": ["timestamp"],
+  "optional_column_types": [],
+  "min_number_of_input_blocks": 1,
+  "max_number_of_input_blocks": 1,
+  "macro_parameters": [
+    {
+      "id": "column",
+      "name": "Column",
+      "type": "text"
+    }, {
+      "id": "result_name",
+      "name": "Result name",
+      "type": "text"
+    }
+  ],
+  "examples_before": [
+    {
+      "columns": [
+        "order_time",
+        "total_value"
+      ],
+      "rows": [
+        [
+          "2021-03-09 15:14:22",
+          "39.99"
+        ],
+        [
+          "2021-03-14 16:17:04",
+          "74.97"
+        ],
+        [
+          "2021-03-16 19:12:43",
+          "99.99"
+        ]
+      ]
+    }
+  ],
+  "examples_after": [
+    {
+      "columns": [
+        "order_time",
+        "total_value",
+        "order_date"
+      ],
+      "rows": [
+        [
+          "2021-03-09 15:14:22",
+          "39.99",
+          "2021-03-09"
+        ],
+        [
+          "2021-03-14 16:17:04",
+          "74.97",
+          "2021-03-14"
+        ],
+        [
+          "2021-03-16 19:12:43",
+          "99.99",
+          "2021-03-16"
+        ]
+      ]
+    }
+  ]
+}
