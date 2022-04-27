@@ -8,14 +8,16 @@ import {
     populateAPIResult,
     columnAddressSplitter,
     tableAddressSplitter,
-    prePopulate
 } from "../../../utils/TableSelectorUtils";
 import {createNewDataBlock, updateDataBlockEntity} from "../../../api/DataBlockApi";
 import DataBlockDTO from "../../../data/dto/DataBlockDTO";
 import SchemaExplorer from "../../SchemaExplorer";
 import Explorer from "../../Explorer";
 import {SELECTOR_DISPLAY, PREVIEW_DISPLAY} from "../../../constants/components";
-import {ModalBase, ModalHeader, ModalBody, ModalFooter, ModalCloseButton} from "../../Common/Modal";
+import Modal, {ModalHeader, ModalFooter, ModalBody} from "../../Common/Modal";
+import Spinner from "../../Common/Spinner"
+import CloseButton from "../../Common/CloseButton";
+import Button from "../../Common/Button";
 
 export default ({isShow}) => {
     const {
@@ -486,17 +488,19 @@ export default ({isShow}) => {
         setIsTableLoading(false)
     }
 
+    const toggleConfigModalWrapper = () => {
+        toggleConfigModal();
+        setSelectedTable(null);
+        setSelectorDisplay(SELECTOR_DISPLAY);
+    }
+
     return (
-        <ModalBase
+        <Modal
             isShow={isShow}
         >
             <ModalHeader>
-                <ModalCloseButton
-                    onClick={()=> {
-                        toggleConfigModal();
-                        setSelectedTable(null);
-                        setSelectorDisplay(SELECTOR_DISPLAY);
-                    }}
+                <CloseButton
+                    onClick={toggleConfigModalWrapper}
                 />
 
                 <div>
@@ -511,16 +515,13 @@ export default ({isShow}) => {
             <ModalFooter>
                 <div className={'flex flex-row justify-between px-6 pb-4'}>
                     <div className={'flex flex-row items-center'}>
-                            <span
-                                className={`
-                                    bg-kuwala-green px-6 py-2 font-semibold text-white rounded-lg cursor-pointer
-                                `}
-                                onClick={() => {
-                                    toggleConfigModal();
-                                    setSelectedTable(null);
-                                    setSelectorDisplay(SELECTOR_DISPLAY);
-                                }}
-                            >Back</span>
+                            <Button
+                                onClick={toggleConfigModalWrapper}
+                            >
+                                <span>
+                                    Back
+                                </span>
+                            </Button>
                     </div>
                     <div className={'flex flex-row items-center'}>
                             <span
@@ -536,21 +537,17 @@ export default ({isShow}) => {
                                     {
                                         isNodeSaveLoading
                                             ?
-                                            (
-                                                <div
-                                                    className="spinner-border animate-spin inline-block w-6 h-6 border-4 rounded-full"
-                                                    role="status">
-                                                    <span className="visually-hidden">Loading...</span>
-                                                </div>
-                                            )
+                                                (
+                                                    <Spinner/>
+                                                )
                                             :
-                                            'Save'
+                                                'Save'
                                     }
                                 </div>
                             </span>
                     </div>
                 </div>
             </ModalFooter>
-        </ModalBase>
+        </Modal>
     )
 }

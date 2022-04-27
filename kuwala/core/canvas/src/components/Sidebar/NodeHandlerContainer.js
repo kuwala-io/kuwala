@@ -1,6 +1,8 @@
 import React from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import DataBlocksHandler from "./NodeHandlers/DataBlocksHandler";
+import AddSourcesGreen from "../../icons/add_sources_green.png";
+import {Link} from "react-router-dom";
 
 export default ({reactFlowWrapper}) => {
     const { dataSource } = useStoreState(state => state.canvas);
@@ -41,6 +43,19 @@ export default ({reactFlowWrapper}) => {
                     return handlerToRender
                 })
             }
+            <Link
+                to={"/data-catalog"}
+                className={`mt-12`}
+            >
+                <div className={`flex flex-col justify-items-center items-center align-items-center`}>
+                    <img
+                        src={AddSourcesGreen}
+                        style={{height: 80, width: 80}}
+                        alt={'data-source'}
+                    />
+                    <label className={'mt-4 cursor-pointer'}>Add data source</label>
+                </div>
+            </Link>
         </div>
     )
 }

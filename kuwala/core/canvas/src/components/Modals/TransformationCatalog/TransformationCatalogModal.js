@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {useStoreActions} from "easy-peasy";
 import {
-    getAllTransformationCatalog,
-    getAllItemsFromTransformationCategories
+    getAllTransformationCatalogCategories,
+    getAllItemsInCategory
 } from "../../../api/TransformationCatalog";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faShuffle} from "@fortawesome/free-solid-svg-icons";
@@ -10,8 +10,9 @@ import {getCatalogItemIcon} from "../../../utils/TransformationCatalogUtils";
 import {getDataDictionary} from "../../../utils/SchemaUtils";
 import ReactTable from "react-table-6";
 import "./transformation-example-table.css";
-import {ModalBase, ModalBody, ModalCloseButton, ModalFooter, ModalHeader} from "../../Common/Modal";
-import {ButtonBase} from "../../Common/Button";
+import Modal, {ModalHeader, ModalFooter, ModalBody} from "../../Common/Modal";
+import Button from "../../Common/Button";
+import CloseButton from "../../Common/CloseButton";
 import Classes from "./TransformationCatalogStyle";
 import cn from "classnames";
 
@@ -65,7 +66,7 @@ export default ({isShow}) => {
     }, [])
 
     useEffect(()=> {
-        if(catalogCategories.length > 0) {
+        if(catalogCategories.length) {
             const tfId = catalogCategories[selectedTransformationIndex].id
             fetchCatalogBodyItems(tfId).then(null);
         }
@@ -73,7 +74,7 @@ export default ({isShow}) => {
 
     const initTransformationCatalogs = async () => {
         try{
-            const res = await getAllTransformationCatalog();
+            const res = await getAllTransformationCatalogCategories();
             if(res.status === 200){
                 setCatalogCategories(res.data);
             } else {
@@ -86,7 +87,7 @@ export default ({isShow}) => {
 
     const fetchCatalogBodyItems = async (transformationId) => {
         try{
-            const res = await getAllItemsFromTransformationCategories(transformationId);
+            const res = await getAllItemsInCategory(transformationId);
             if(res.status === 200){
                 setCatalogOptions(res.data);
             } else {
@@ -116,25 +117,27 @@ export default ({isShow}) => {
     }
 
     const renderCatalogList = () => {
-        if(catalogCategories.length > 0) {
-            return catalogCategories.map((el, index) => renderCatalogItem(el, index))
+        if(catalogCategories.length) {
+            return catalogCategories.map(renderCatalogItem)
         }
     }
 
     const renderCatalogItem = (catalogItem,index) => {
         return (
-            <div
-                className={Classes.CatalogItem(selectedCatalogOption, index)}
+            <Button
                 onClick={()=>{
-                    setSelectedCatalogOption(null);
-                    setSelectedTransformationIndex(index)
-                }}
+                            setSelectedCatalogOption(null);
+                            setSelectedTransformationIndex(index)
+                        }}
+                selected={selectedTransformationIndex === index}
+                solid={false}
+                color={'kuwalaRed'}
             >
                 {getCatalogItemIcon(catalogItem.icon)}
                 <span className={'font-semibold'}>
-                    {catalogItem.name}
+                   {catalogItem.name}
                 </span>
-            </div>
+            </Button>
         )
     }
 
@@ -179,22 +182,25 @@ export default ({isShow}) => {
     }
 
     const renderTransformationOptions = (options) => {
-        return options.map((el, index)=> renderOptionItem(el, index))
+        return options.map(renderOptionItem)
     }
 
     const renderOptionItem = (optionItem, index) => {
         return (
-            <div
-                className={Classes.OptionItem(selectedCatalogOption, index)}
+            <Button
+                solid={false}
+                color={'kuwalaPurple'}
                 onClick={()=>{
                     setSelectedCatalogOption(index)
                 }}
             >
-                {getCatalogItemIcon(optionItem.icon)}
-                <span className={'font-semibold'}>
-                    {optionItem.name}
-                </span>
-            </div>
+                <div className={Classes.WideButtonContainer}>
+                    {getCatalogItemIcon(optionItem.icon)}
+                    <span className={'font-semibold'}>
+                        {optionItem.name}
+                    </span>
+                </div>
+            </Button>
         )
     }
 
@@ -208,7 +214,6 @@ export default ({isShow}) => {
             )
         } else {
             const optionItem = catalogOptions[selectedCatalogOption];
-
             return (
                 <div className={Classes.OptionDetailsContent}>
                     <div className={'text-kuwala-purple space-x-4'}>
@@ -241,20 +246,7 @@ export default ({isShow}) => {
                         </div>
 
                         <div className={Classes.OptionDetailsExampleContainer}>
-                            <span className={cn(Classes.ExampleBase,'mb-2')}>
-                               Before
-                            </span>
-                            <ExampleTable
-                                columns={optionItem.examples_before[0].columns}
-                                rows={optionItem.examples_before[0].rows}
-                            />
-                            <span className={cn(Classes.ExampleBase,'my-2')}>
-                               After
-                            </span>
-                            <ExampleTable
-                                columns={optionItem.examples_before[0].columns}
-                                rows={optionItem.examples_before[0].rows}
-                            />
+                            {renderExampleTableWrapper(optionItem)}
                         </div>
 
                     </div>
@@ -264,8 +256,41 @@ export default ({isShow}) => {
         }
     }
 
+    const renderExampleTableWrapper = (optionItem) => {
+        return (
+            <>
+                {optionItem.examples_before.map((el) =>
+                    renderExampleTable({
+                        examplesData: el,
+                        text: 'Before'
+                    })
+                )}
+                {optionItem.examples_after.map((el) =>
+                    renderExampleTable({
+                        examplesData: el,
+                        text: 'After'
+                    })
+                )}
+            </>
+        )
+    }
+
+    const renderExampleTable = ({examplesData, text}) => {
+        return (
+            <div className={'mb-8'}>
+                <span className={cn(Classes.ExampleBase,'my-2')}>
+                   {text}
+                </span>
+                <ExampleTable
+                    columns={examplesData.columns}
+                    rows={examplesData.rows}
+                />
+            </div>
+        )
+    }
+
     const renderBadgeList = (badgeStringList) => {
-        if(typeof badgeStringList === 'undefined' || badgeStringList.length <= 0) return
+        if(typeof badgeStringList === 'undefined' || !badgeStringList.length) return
         return badgeStringList.map((el) => {
             return (
                 <div className={Classes.BadgeBase}>
@@ -276,11 +301,11 @@ export default ({isShow}) => {
     }
 
     return (
-        <ModalBase
+        <Modal
             isShow={isShow}
         >
             <ModalHeader>
-                <ModalCloseButton
+                <CloseButton
                     onClick={toggleTransformationCatalogModal}
                 />
                 <CatalogSelector/>
@@ -292,13 +317,13 @@ export default ({isShow}) => {
 
             <ModalFooter>
                 <div className={Classes.ModalFooterContainer}>
-                    <ButtonBase
+                    <Button
                         onClick={toggleTransformationCatalogModal}
                     >
-                     Back
-                    </ButtonBase>
+                        <span>Back</span>
+                    </Button>
                 </div>
             </ModalFooter>
-        </ModalBase>
+        </Modal>
     )
 }

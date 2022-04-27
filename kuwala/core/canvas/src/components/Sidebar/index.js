@@ -96,9 +96,7 @@ export default ({reactFlowWrapper}) => {
                             text-kuwala-red
                             text-center
                         `}
-                    onClick={() => {
-                        toggleTransformationCatalogModal()
-                    }}
+                    onClick={toggleTransformationCatalogModal}
                 >
                     +
                 </button>

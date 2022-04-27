@@ -10,7 +10,7 @@
 .transformation-example .ReactTable .rt-thead .rt-th{
     border: none;
     padding: 0.2rem 0.5rem;
-    background: #8B83BA;
+    background: var(--color-kuwala-purple);
     font-weight: 500;
     color: white;
     font-size: 14px;
@@ -51,18 +51,18 @@
 }
 
 .transformation-example .ReactTable .rt-tbody::-webkit-scrollbar-thumb {
-    background-color: #8B83BA;
+    background-color: var(--color-kuwala-purple);
 }
 
 .transformation-example .ReactTable .rt-thead::-webkit-scrollbar {
     -webkit-appearance: none;
-    background-color: #8B83BA;
+    background-color: var(--color-kuwala-red);
     width: 0px;
 }
 
 .transformation-example .ReactTable .rt-thead::-webkit-scrollbar-track {
     border-radius: 0px;
-    border-bottom: 1px solid #8B83BA;
+    border-bottom: 1px solid var(--color-kuwala-purple);
 }
 
 .transformation-example .ReactTable .rt-tbody .rt-td {

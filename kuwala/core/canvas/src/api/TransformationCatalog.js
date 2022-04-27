@@ -1,15 +1,15 @@
 import baseAxios from "./BaseAxios";
 
 import {
-    TRANSFORMATION_CATALOG,
+    TRANSFORMATION_CATALOG, TRANSFORMATION_CATALOG_CATEGORY,
 } from "../constants/api"
 
-export function getAllTransformationCatalog (){
-    return baseAxios.get(TRANSFORMATION_CATALOG);
+export function getAllTransformationCatalogCategories (){
+    return baseAxios.get(TRANSFORMATION_CATALOG_CATEGORY);
 }
 
-export function getAllItemsFromTransformationCategories (transformationId) {
+export function getAllItemsInCategory (transformationId) {
     return baseAxios.get(
-        `${TRANSFORMATION_CATALOG}/${transformationId}/items`
+        `${TRANSFORMATION_CATALOG_CATEGORY}/${transformationId}/items`
     )
 }
