@@ -12,12 +12,13 @@ import DataBlock from "../components/Nodes/DataBlock";
 import {Link} from "react-router-dom";
 import NodeConfigModal from "../components/Modals/NodeConfig/NodeConfigModal";
 import TransformationCatalogModal from "../components/Modals/TransformationCatalog/TransformationCatalogModal";
+import loadIcons from "../utils/IconsLoader";
 
 export default function () {
     const reactFlowWrapper = useRef(null);
 
     const {elements, selectedElement, dataSource, openDataView, dataBlocks} = useStoreState(state => state.canvas);
-    const {showConfigModal, showTransformationCatalogModal} = useStoreState(state => state.common);
+    const {openConfigModal, openTransformationCatalogModal} = useStoreState(state => state.common);
     const {
         setSelectedElement, removeNode, connectNodes, setOpenDataView, getDataSources,
         convertDataBlocksIntoElement
@@ -27,6 +28,7 @@ export default function () {
     } = useStoreActions(actions => actions.common)
 
     useEffect(()=> {
+        loadIcons();
         if (!dataSource.length)  {
             getDataSources()
         } else {
@@ -59,7 +61,7 @@ export default function () {
                             setSelectedElement(elements)
                         }}
                         onPaneClick={()=> {
-                            // setSelectedElement(null)
+                            setSelectedElement(null)
                             setOpenDataView(false)
                         }}
                         nodeTypes={{
@@ -108,11 +110,11 @@ export default function () {
                     {renderFlow()}
                 </div>
                 <NodeConfigModal
-                    isShow={showConfigModal}
+                    isOpen={openConfigModal}
                     configData={selectedElement}
                 />
                 <TransformationCatalogModal
-                    isShow={showTransformationCatalogModal}
+                    isOpen={openTransformationCatalogModal}
                 />
             </div>
         </div>

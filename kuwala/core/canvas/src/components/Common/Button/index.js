@@ -1,5 +1,7 @@
 import React from "react";
 import cn from "classnames"
+import Spinner from "../Spinner";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const baseSize = {
     sm: "px-4 py-1.5 rounded-md",
@@ -47,6 +49,15 @@ const getButtonStylesBySolid = (solid, color, selected) => {
     }
 }
 
+const renderIconIfExists = (icon) => {
+    if(icon) {
+        return <FontAwesomeIcon
+            icon={icon}
+            className={'h-4 w-4'}
+        />
+    }
+}
+
 const Button = ({
         size="base",
         className,
@@ -56,7 +67,9 @@ const Button = ({
         loading=false,
         solid=true,
         selected=false,
-        children=[]
+        alignment='start',
+        icon='',
+        text='',
     }) => {
     return <button
         className={cn(
@@ -72,14 +85,20 @@ const Button = ({
             loading
             ?
                 (
-                    <div
-                        className="spinner-border animate-spin inline-block w-6 h-6 border-4 rounded-full"
-                        role="status">
-                        <span className="visually-hidden">Loading...</span>
-                    </div>
+                    <Spinner/>
                 )
             :
-                children.length > 1 ? children.map((el) => el) : children
+                (
+                    <div className={`
+                        flex flex-row items-center space-x-2
+                        ${alignment ? 'justify-'+alignment : ''}
+                    `}>
+                        {renderIconIfExists(icon)}
+                        <span>
+                            {text}
+                        </span>
+                    </div>
+                )
         }
     </button>
 }

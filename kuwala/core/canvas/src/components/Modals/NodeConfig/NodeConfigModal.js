@@ -14,19 +14,17 @@ import DataBlockDTO from "../../../data/dto/DataBlockDTO";
 import SchemaExplorer from "../../SchemaExplorer";
 import Explorer from "../../Explorer";
 import {SELECTOR_DISPLAY, PREVIEW_DISPLAY} from "../../../constants/components";
-import Modal, {ModalHeader, ModalFooter, ModalBody} from "../../Common/Modal";
-import Spinner from "../../Common/Spinner"
-import CloseButton from "../../Common/CloseButton";
+import Modal from "../../Common/Modal";
 import Button from "../../Common/Button";
 
-export default ({isShow}) => {
+export default ({isOpen}) => {
     const {
         selectAllColumnAddresses,
         updateDataBlock
     } = useStoreActions(actions => actions.canvas);
     const {toggleConfigModal} = useStoreActions(actions => actions.common);
     const {selectedElement, selectedAddressObj} = useStoreState(state => state.canvas);
-    const {showConfigModal} = useStoreState(state => state.common);
+    const {openConfigModal} = useStoreState(state => state.common);
     const [schemaList, setSchema] = useState([])
     const [isSchemaLoading, setIsSchemaLoading] = useState(false);
     const [selectedTable, setSelectedTable] = useState(null);
@@ -45,7 +43,7 @@ export default ({isShow}) => {
 
     useEffect( ()=> {
         initNodeName()
-        if(selectedElement && showConfigModal) {
+        if(selectedElement && openConfigModal) {
             const block = selectedElement.data.dataBlock;
             const selectedAddress = block.selectedAddressString;
             if(!selectedAddress || typeof selectedAddress === 'undefined'){
@@ -56,11 +54,11 @@ export default ({isShow}) => {
 
     useEffect(() => {
         if(selectedElement) {
-            if(showConfigModal){
+            if(openConfigModal){
                 populateConfigByDataBlock().then(null)
             }
         }
-    }, [showConfigModal])
+    }, [openConfigModal])
 
     useEffect(()=>{
         if(selectorDisplay === PREVIEW_DISPLAY && selectedTable !== null){
@@ -255,12 +253,12 @@ export default ({isShow}) => {
         setIsSchemaLoading(false)
     }
 
-    const renderSelectedSourceHeader = () => {
+    const ConfigHeader = () => {
         if (!selectedElement) {
             return <></>
         } else {
             return (
-                <div className={'flex flex-row'}>
+                <div className={'flex flex-row px-6 py-2'}>
                     <div className={'flex flex-col items-center'}>
                         <div
                             className={'flex flex-col justify-center items-center bg-white rounded-xl drop-shadow-lg relative p-4 w-24 h-24'}
@@ -319,7 +317,7 @@ export default ({isShow}) => {
         }
     }
 
-    const renderTableSelector = () => {
+    const ConfigBody = () => {
         if (!selectedElement) {
             return (
                 <div>
@@ -328,34 +326,36 @@ export default ({isShow}) => {
             )
         } else {
             return (
-                <div className={'flex flex-row bg-white border-2 border-kuwala-green rounded-t-lg h-full w-full'}>
-                    <div className={'flex flex-col bg-white w-3/12 border border-kuwala-green h-full'}>
-                        <SchemaExplorer
-                            schemaExplorerType={selectorDisplay}
-                            isSchemaLoading={isSchemaLoading}
-                            schemaList={schemaList}
-                            selectedTable={selectedTable}
-                            setSchema={setSchema}
-                            setSelectedTable={setSelectedTable}
-
-                            setColumnsPreview={setColumnsPreview}
-                            setTableDataPreview={setTableDataPreview}
-
-                            setIsTableLoading={setIsTableLoading}
-
-                            dataSource={selectedElement.data.dataSource}
-                        />
-                    </div>
-                    <div className={'flex flex-col bg-white w-9/12 rounded-tr-lg'}>
-                        <div className={'flex flex-col w-full h-full'}>
-                            {renderDisplaySelector()}
-                            <Explorer
-                                displayType={selectorDisplay}
-                                columnsPreview={columnsPreview}
-                                tableDataPreview={tableDataPreview}
-                                isTableLoading={isTableLoading}
+                <div className={'flex flex-col flex-auto px-6 pt-2 pb-4 h-full'}>
+                    <div className={'flex flex-row bg-white border-2 border-kuwala-green rounded-t-lg h-full w-full'}>
+                        <div className={'flex flex-col bg-white w-3/12 border border-kuwala-green h-full'}>
+                            <SchemaExplorer
+                                schemaExplorerType={selectorDisplay}
+                                isSchemaLoading={isSchemaLoading}
+                                schemaList={schemaList}
                                 selectedTable={selectedTable}
+                                setSchema={setSchema}
+                                setSelectedTable={setSelectedTable}
+
+                                setColumnsPreview={setColumnsPreview}
+                                setTableDataPreview={setTableDataPreview}
+
+                                setIsTableLoading={setIsTableLoading}
+
+                                dataSource={selectedElement.data.dataSource}
                             />
+                        </div>
+                        <div className={'flex flex-col bg-white w-9/12 rounded-tr-lg'}>
+                            <div className={'flex flex-col w-full h-full'}>
+                                {renderDisplaySelector()}
+                                <Explorer
+                                    displayType={selectorDisplay}
+                                    columnsPreview={columnsPreview}
+                                    tableDataPreview={tableDataPreview}
+                                    isTableLoading={isTableLoading}
+                                    selectedTable={selectedTable}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -494,60 +494,32 @@ export default ({isShow}) => {
         setSelectorDisplay(SELECTOR_DISPLAY);
     }
 
+    const ConfigFooter = () => {
+        return (
+            <div className={'flex flex-row justify-between px-6 pb-4'}>
+                <Button
+                    onClick={toggleConfigModalWrapper}
+                    text={'Back'}
+                />
+                <Button
+                    onClick={async () => {
+                        await upsertDataBlock()
+                    }}
+                    loading={isNodeSaveLoading}
+                    text={'Save'}
+                />
+            </div>
+        )
+    }
+
     return (
         <Modal
-            isShow={isShow}
+            isOpen={isOpen}
+            closeModalAction={toggleConfigModalWrapper}
         >
-            <ModalHeader>
-                <CloseButton
-                    onClick={toggleConfigModalWrapper}
-                />
-
-                <div>
-                    {renderSelectedSourceHeader()}
-                </div>
-            </ModalHeader>
-
-            <ModalBody>
-                {renderTableSelector()}
-            </ModalBody>
-
-            <ModalFooter>
-                <div className={'flex flex-row justify-between px-6 pb-4'}>
-                    <div className={'flex flex-row items-center'}>
-                            <Button
-                                onClick={toggleConfigModalWrapper}
-                            >
-                                <span>
-                                    Back
-                                </span>
-                            </Button>
-                    </div>
-                    <div className={'flex flex-row items-center'}>
-                            <span
-                                className={`
-                                    bg-kuwala-green px-6 py-2 font-semibold text-white rounded-lg cursor-pointer
-                                `}
-                                onClick={async () => {
-                                    await upsertDataBlock()
-                                }}
-                            >
-                                <div className="flex justify-center items-center">
-
-                                    {
-                                        isNodeSaveLoading
-                                            ?
-                                                (
-                                                    <Spinner/>
-                                                )
-                                            :
-                                                'Save'
-                                    }
-                                </div>
-                            </span>
-                    </div>
-                </div>
-            </ModalFooter>
+            <ConfigHeader/>
+            <ConfigBody/>
+            <ConfigFooter/>
         </Modal>
     )
 }

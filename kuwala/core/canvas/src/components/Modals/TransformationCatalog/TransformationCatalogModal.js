@@ -10,9 +10,8 @@ import {getCatalogItemIcon} from "../../../utils/TransformationCatalogUtils";
 import {getDataDictionary} from "../../../utils/SchemaUtils";
 import ReactTable from "react-table-6";
 import "./transformation-example-table.css";
-import Modal, {ModalHeader, ModalFooter, ModalBody} from "../../Common/Modal";
+import Modal from "../../Common/Modal";
 import Button from "../../Common/Button";
-import CloseButton from "../../Common/CloseButton";
 import Classes from "./TransformationCatalogStyle";
 import cn from "classnames";
 
@@ -41,7 +40,7 @@ const ExampleTable = ({columns, rows}) => {
             <ReactTable
                 data={populatedRows}
                 columns={populatedColumns}
-                defaultPageSize={3}
+                defaultPageSize={populatedRows.length >= 10 ? 10 : populatedRows.length}
                 showPagination={false}
                 showPaginationTop={false}
                 showPaginationBottom={false}
@@ -54,7 +53,7 @@ const ExampleTable = ({columns, rows}) => {
     )
 }
 
-export default ({isShow}) => {
+export default ({isOpen}) => {
     const { toggleTransformationCatalogModal } = useStoreActions(actions => actions.common);
     const [selectedTransformationIndex, setSelectedTransformationIndex] = useState(null);
     const [catalogCategories, setCatalogCategories] = useState([]);
@@ -132,18 +131,15 @@ export default ({isShow}) => {
                 selected={selectedTransformationIndex === index}
                 solid={false}
                 color={'kuwalaRed'}
-            >
-                {getCatalogItemIcon(catalogItem.icon)}
-                <span className={'font-semibold'}>
-                   {catalogItem.name}
-                </span>
-            </Button>
+                icon={catalogItem.icon}
+                text={catalogItem.name}
+            />
         )
     }
 
     const CatalogBody = () => {
         return (
-            <>
+            <div className={Classes.CatalogBodyContainer}>
                 {
                     selectedTransformationIndex !== null
                     ?
@@ -154,12 +150,12 @@ export default ({isShow}) => {
                             <p>select a transformation <span className={'text-kuwala-red'}>category</span> first</p>
                         </div>
                 }
-            </>
+            </div>
         )
     }
 
     const SelectedTransformationCatalog = () => {
-        if (!selectedTransformationIndex || catalogOptions.length === 0) {
+        if (selectedTransformationIndex === null || catalogOptions.length === 0) {
             return (
                 <div>
                     No <span className={'text-kuwala-red'}>transformation</span> options found.
@@ -193,14 +189,10 @@ export default ({isShow}) => {
                 onClick={()=>{
                     setSelectedCatalogOption(index)
                 }}
-            >
-                <div className={Classes.WideButtonContainer}>
-                    {getCatalogItemIcon(optionItem.icon)}
-                    <span className={'font-semibold'}>
-                        {optionItem.name}
-                    </span>
-                </div>
-            </Button>
+                selected={selectedCatalogOption === index}
+                icon={optionItem.icon}
+                text={optionItem.name}
+            />
         )
     }
 
@@ -225,72 +217,97 @@ export default ({isShow}) => {
                     <p className={'mt-2'}>
                         {optionItem.description}
                     </p>
-                    <div className={cn(Classes.RequiredColumnBase, 'mt-6')}>
-                        <span>
-                            Required column types:
-                        </span>
-                        {renderBadgeList(optionItem.required_column_types)}
-                    </div>
-                    <div className={cn(Classes.RequiredColumnBase, 'mt-2')}>
-                        <span>
-                            Optional column types:
-                        </span>
-                        {renderBadgeList(optionItem.optional_column_types)}
-                    </div>
+
+                    {renderColumnType(
+                        optionItem.required_column_types,
+                        optionItem.optional_column_types)
+                    }
 
                     <div className={Classes.OptionDetailsParameterAndExample}>
-
                         <div className={Classes.OptionDetailsParameterContainer}>
                             <p>Parameters</p>
                             {optionItem.macro_parameters.map((el) => <li>{el.name}</li>)}
                         </div>
-
                         <div className={Classes.OptionDetailsExampleContainer}>
                             {renderExampleTableWrapper(optionItem)}
                         </div>
-
                     </div>
-
                 </div>
             )
         }
     }
 
+    const renderColumnType = (requiredColumnTypesData, optionalColumnTypesData) => {
+        let requiredColumnTypes, optionalColumnTypes;
+
+        if(requiredColumnTypesData.length) {
+            requiredColumnTypes = (
+                <div className={cn(Classes.RequiredColumnBase, 'mt-6')}>
+                        <span>
+                            Required column types:
+                        </span>
+                    {renderBadgeList(requiredColumnTypesData)}
+                </div>
+            )
+        }
+
+        if(optionalColumnTypesData.length) {
+            optionalColumnTypes = (
+                <div className={cn(Classes.RequiredColumnBase, 'mt-2')}>
+                        <span>
+                            Optional column types:
+                        </span>
+                    {renderBadgeList(optionalColumnTypesData)}
+                </div>
+            )
+        }
+
+        return (
+            <div>
+                {requiredColumnTypes}
+                {optionalColumnTypes}
+            </div>
+        )
+
+    }
+
     const renderExampleTableWrapper = (optionItem) => {
         return (
-            <>
-                {optionItem.examples_before.map((el) =>
-                    renderExampleTable({
-                        examplesData: el,
-                        text: 'Before'
-                    })
-                )}
-                {optionItem.examples_after.map((el) =>
-                    renderExampleTable({
-                        examplesData: el,
-                        text: 'After'
-                    })
-                )}
-            </>
+            <div className={'flex flex-col'}>
+                {renderExampleTable({
+                    examplesData: optionItem.examples_before,
+                    text: 'Before'
+                })}
+                {renderExampleTable({
+                    examplesData: optionItem.examples_after,
+                    text: 'After'
+                })}
+            </div>
         )
     }
 
     const renderExampleTable = ({examplesData, text}) => {
         return (
-            <div className={'mb-8'}>
+            <div className={'mb-2'}>
                 <span className={cn(Classes.ExampleBase,'my-2')}>
                    {text}
                 </span>
-                <ExampleTable
-                    columns={examplesData.columns}
-                    rows={examplesData.rows}
-                />
+                {examplesData.map((el) => {
+                    return (
+                        <div className={'flex flex-col mb-2'}>
+                            <ExampleTable
+                                columns={el.columns}
+                                rows={el.rows}
+                            />
+                        </div>
+                    )
+                })}
             </div>
         )
     }
 
     const renderBadgeList = (badgeStringList) => {
-        if(typeof badgeStringList === 'undefined' || !badgeStringList.length) return
+        if(!badgeStringList || !badgeStringList.length) return
         return badgeStringList.map((el) => {
             return (
                 <div className={Classes.BadgeBase}>
@@ -300,30 +317,28 @@ export default ({isShow}) => {
         })
     }
 
+    const CatalogFooter = () => {
+        return (
+            <div className={Classes.ModalFooterContainer}>
+                <Button
+                    onClick={toggleTransformationCatalogModal}
+                    text={'Back'}
+                />
+                <Button
+                    text={'Save'}
+                />
+            </div>
+        )
+    }
+
     return (
         <Modal
-            isShow={isShow}
+            isOpen={isOpen}
+            closeModalAction={toggleTransformationCatalogModal}
         >
-            <ModalHeader>
-                <CloseButton
-                    onClick={toggleTransformationCatalogModal}
-                />
-                <CatalogSelector/>
-            </ModalHeader>
-
-            <ModalBody>
-                <CatalogBody/>
-            </ModalBody>
-
-            <ModalFooter>
-                <div className={Classes.ModalFooterContainer}>
-                    <Button
-                        onClick={toggleTransformationCatalogModal}
-                    >
-                        <span>Back</span>
-                    </Button>
-                </div>
-            </ModalFooter>
+            <CatalogSelector/>
+            <CatalogBody/>
+            <CatalogFooter/>
         </Modal>
     )
 }

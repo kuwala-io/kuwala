@@ -1,9 +1,7 @@
 import React from "react";
-import ModalBody from "./ModalBody";
-import ModalHeader from "./ModalHeader";
-import ModalFooter from "./ModalFooter";
+import CloseButton from "../CloseButton";
 
-const Modal =  ({isShow: isOpen, children}) => {
+const Modal =  ({isOpen, children, closeModalAction}) => {
     return (
         <div
             className={`
@@ -38,6 +36,13 @@ const Modal =  ({isShow: isOpen, children}) => {
                         outline-none text-current
                         h-full
                 `}>
+                    <div
+                        className="flex flex-row items-center justify-end flex-shrink-0 px-6 pt-4 rounded-t-md"
+                    >
+                        <CloseButton
+                            onClick={closeModalAction}
+                        />
+                    </div>
                     {children}
                 </div>
             </div>
@@ -46,8 +51,3 @@ const Modal =  ({isShow: isOpen, children}) => {
 }
 
 export default Modal;
-export {
-    ModalFooter,
-    ModalHeader,
-    ModalBody,
-}

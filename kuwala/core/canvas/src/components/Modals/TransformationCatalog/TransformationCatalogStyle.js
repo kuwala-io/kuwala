@@ -1,7 +1,8 @@
 const classes =  {
-    CatalogContainer: `flex flex-col w-full`,
+    CatalogContainer: `flex flex-col flex-shrink-0 justify-between px-6 py-4 rounded-t-md`,
     CatalogContent: `flex flex-row w-64 space-x-4 items-center px-4 py-3 bg-kuwala-green text-white rounded-lg`,
     CatalogListContainer: `flex flex-row space-x-4 items-center mt-4`,
+    CatalogBodyContainer: `flex flex-col flex-auto overflow-y-scroll relative px-6 pt-2 pb-4`,
     CatalogBodyAlertText: `flex flex-col w-full h-full text-xl font-light justify-center items-center rounded-tr-lg`,
     SelectedTransformationContainer: `flex flex-row bg-white h-full w-full`,
     TransformationOptionsContainer: `flex flex-col bg-white w-3/12 h-full space-y-3 mr-4`,

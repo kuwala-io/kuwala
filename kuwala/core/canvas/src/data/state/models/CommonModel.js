@@ -4,9 +4,9 @@ import {useState} from "react";
 
 const CommonModel =  {
     notificationOpen: false,
-    showConfigModal: false,
+    openConfigModal: false,
     reactFlowInstance: null,
-    showTransformationCatalogModal: false,
+    openTransformationCatalogModal: false,
 
     toggleNotification: action((state) => {
         state.notificationOpen = !state.notificationOpen
@@ -17,11 +17,11 @@ const CommonModel =  {
     }),
 
     toggleConfigModal: action((state) => {
-        state.showConfigModal = !state.showConfigModal
+        state.openConfigModal = !state.openConfigModal
     }),
 
     toggleTransformationCatalogModal: action((state) => {
-        state.showTransformationCatalogModal = !state.showTransformationCatalogModal
+        state.openTransformationCatalogModal = !state.openTransformationCatalogModal
     }),
 
 }
