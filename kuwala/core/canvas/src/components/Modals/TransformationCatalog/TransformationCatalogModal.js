@@ -6,7 +6,6 @@ import {
 } from "../../../api/TransformationCatalog";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faShuffle} from "@fortawesome/free-solid-svg-icons";
-import {getCatalogItemIcon} from "../../../utils/TransformationCatalogUtils";
 import {getDataDictionary} from "../../../utils/SchemaUtils";
 import ReactTable from "react-table-6";
 import "./transformation-example-table.css";
@@ -209,7 +208,7 @@ export default ({isOpen}) => {
             return (
                 <div className={Classes.OptionDetailsContent}>
                     <div className={'text-kuwala-purple space-x-4'}>
-                        {getCatalogItemIcon(optionItem.icon)}
+                        <FontAwesomeIcon icon={optionItem.icon}/>
                         <span className={'font-semibold'}>
                             {optionItem.name}
                         </span>
@@ -325,7 +324,7 @@ export default ({isOpen}) => {
                     text={'Back'}
                 />
                 <Button
-                    text={'Save'}
+                    text={'Add to canvas'}
                 />
             </div>
         )

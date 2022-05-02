@@ -68,8 +68,8 @@ const Button = ({
         solid=true,
         selected=false,
         alignment='start',
-        icon='',
-        text='',
+        icon=undefined,
+        text=undefined,
     }) => {
     return <button
         className={cn(

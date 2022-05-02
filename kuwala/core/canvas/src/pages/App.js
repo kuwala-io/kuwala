@@ -10,7 +10,7 @@ import {useStoreActions, useStoreState} from 'easy-peasy';
 import TransformationNode from "../components/Nodes/TransformationNode";
 import DataBlock from "../components/Nodes/DataBlock";
 import {Link} from "react-router-dom";
-import NodeConfigModal from "../components/Modals/NodeConfig/NodeConfigModal";
+import NodeConfigModal from "../components/Modals/DataBlockConfig/DataBlockConfigModal";
 import TransformationCatalogModal from "../components/Modals/TransformationCatalog/TransformationCatalogModal";
 import loadIcons from "../utils/IconsLoader";
 
