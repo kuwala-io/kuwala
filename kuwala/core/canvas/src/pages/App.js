@@ -10,13 +10,15 @@ import {useStoreActions, useStoreState} from 'easy-peasy';
 import TransformationNode from "../components/Nodes/TransformationNode";
 import DataBlock from "../components/Nodes/DataBlock";
 import {Link} from "react-router-dom";
-import NodeConfigModal from "../components/Modals/NodeConfigModal";
+import NodeConfigModal from "../components/Modals/DataBlockConfig/DataBlockConfigModal";
+import TransformationCatalogModal from "../components/Modals/TransformationCatalog/TransformationCatalogModal";
+import loadIcons from "../utils/IconsLoader";
 
 export default function () {
     const reactFlowWrapper = useRef(null);
 
-    const {elements, selectedElement, dataSource, openDataView} = useStoreState(state => state.canvas);
-    const {showConfigModal} = useStoreState(state => state.common);
+    const {elements, selectedElement, dataSource, openDataView, dataBlocks} = useStoreState(state => state.canvas);
+    const {openConfigModal, openTransformationCatalogModal} = useStoreState(state => state.common);
     const {
         setSelectedElement, removeNode, connectNodes, setOpenDataView, getDataSources,
         convertDataBlocksIntoElement
@@ -26,6 +28,7 @@ export default function () {
     } = useStoreActions(actions => actions.common)
 
     useEffect(()=> {
+        loadIcons();
         if (!dataSource.length)  {
             getDataSources()
         } else {
@@ -58,7 +61,7 @@ export default function () {
                             setSelectedElement(elements)
                         }}
                         onPaneClick={()=> {
-                            // setSelectedElement(null)
+                            setSelectedElement(null)
                             setOpenDataView(false)
                         }}
                         nodeTypes={{
@@ -107,8 +110,11 @@ export default function () {
                     {renderFlow()}
                 </div>
                 <NodeConfigModal
-                    isShow={showConfigModal}
+                    isOpen={openConfigModal}
                     configData={selectedElement}
+                />
+                <TransformationCatalogModal
+                    isOpen={openTransformationCatalogModal}
                 />
             </div>
         </div>

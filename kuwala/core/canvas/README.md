@@ -13,3 +13,14 @@ To Run the Project:
 
 To start the backend, follow the instructions in
 [`kuwala/core/backend/README.md`](https://github.com/kuwala-io/kuwala/tree/master/kuwala/core/backend) for now.
+
+To Add an Icon:
+1. Modify the `IconLoader.js` file at `src/utils/IconsLoader.js`
+2. Import the required icon and also add it into the `library.add()` function call.
+3. To use the icon simply call the icon string name, e.g:
+
+```js
+    <FontAwesomeIcon
+        icon={'clock'}
+    />
+```
