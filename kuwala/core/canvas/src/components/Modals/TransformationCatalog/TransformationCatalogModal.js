@@ -88,8 +88,6 @@ export default ({isOpen}) => {
     }
 
     const addToCanvas = async () => {
-        // Null checking is intended to differ between 0 index and unselected state.
-        if(selectedCatalogOption === null) return;
         const tfCatalogDTO = catalogOptions[selectedCatalogOption];
 
         const tfBlockDTO = new TransformationBlockDTO({
