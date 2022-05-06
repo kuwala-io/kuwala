@@ -4,6 +4,7 @@ import Spinner from "../Spinner";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const baseSize = {
+    longXs: "px-4 py-1 rounded-lg",
     sm: "px-4 py-1.5 rounded-md",
     base: "px-4 py-2 rounded-md",
     lg: "px-8 py-4 rounded-lg"
@@ -49,6 +50,13 @@ const getButtonStylesBySolid = (solid, color, selected) => {
     }
 }
 
+const getStyleForDisabled = (disabled) => {
+    if(disabled) {
+        return 'bg-stone-300 text-white hover:text-white cursor-not-allowed border-none';
+    }
+    return '';
+}
+
 const renderIconIfExists = (icon) => {
     if(icon) {
         return <FontAwesomeIcon
@@ -70,16 +78,18 @@ const Button = ({
         alignment='start',
         icon=undefined,
         text=undefined,
+        draggable=false,
     }) => {
     return <button
         className={cn(
             `font-semibold cursor-pointer`,
             baseSize[size],
-            getButtonStylesBySolid(solid, color, selected),
+            disabled ? getStyleForDisabled(disabled) : getButtonStylesBySolid(solid, color, selected),
             className,
         )}
         disabled={disabled}
         onClick={onClick}
+        draggable={draggable}
     >
         {
             loading

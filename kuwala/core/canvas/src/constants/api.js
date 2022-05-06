@@ -6,3 +6,4 @@ export const DATA_SOURCE = BASE_URL + '/data-source';
 export const DATA_BLOCK = BASE_URL + '/block/data';
 export const TRANSFORMATION_CATALOG = BASE_URL + '/transformation-catalog';
 export const TRANSFORMATION_CATALOG_CATEGORY = TRANSFORMATION_CATALOG + '/category';
+export const TRANSFORMATION_BLOCK = BASE_URL + '/block/transformation';

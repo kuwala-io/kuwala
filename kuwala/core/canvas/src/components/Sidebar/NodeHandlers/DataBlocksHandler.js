@@ -2,6 +2,7 @@ import React, { DragEvent } from 'react';
 import DataBlockDTO from "../../../data/dto/DataBlockDTO";
 import {v4} from "uuid";
 import {useStoreActions, useStoreState} from "easy-peasy";
+import {DATA_BLOCK} from "../../../constants/nodeTypes";
 
 export default ({onDragStart, onClickAddDataBlock, dataSource, reactFlowWrapper}) => {
     const {convertDataBlocksIntoElement, addDataBlock, addNode} = useStoreActions((actions) => actions.canvas)
@@ -36,7 +37,7 @@ export default ({onDragStart, onClickAddDataBlock, dataSource, reactFlowWrapper}
     }
 
     const nodeInfo = {
-        type: 'dataBlock',
+        type: DATA_BLOCK,
         data: {
             label: getLabelByDataCatalogId(dataBlock.dataCatalogType),
             dataSource: dataBlock.dataSourceDTO,

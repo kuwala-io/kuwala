@@ -6,12 +6,12 @@ import {getAllDataCatalogItems, saveSelectedDataCatalogItems} from '../../../api
 import {getDataSource} from '../../../api/DataSourceApi';
 
 import DataSourceDTO from '../../dto/DataSourceDTO';
-import DataBlockDTO from "../../dto/DataBlockDTO";
-import {data} from "autoprefixer";
+import {TRANSFORMATION_BLOCK, DATA_BLOCK} from '../../../constants/nodeTypes';
 
 const CanvasModel =  {
     elements: [],
     selectedElement: null,
+    selectedTransformationBlock: null,
     newNodeInfo: {},
     openDataView: false,
     dataSource: [],
@@ -21,6 +21,7 @@ const CanvasModel =  {
     selectedColumnAddress: [],
     selectedAddressObj: {},
     dataBlocks: [],
+    transformationBlocks: [],
 
     // Elements
     addNode: action((state, nodeInfo) => {
@@ -34,6 +35,7 @@ const CanvasModel =  {
     updateNodePayloadByDataBlock: action( (state, {updatedNodeInfo, dataBlockId}) => {
         const tempElement = state.elements;
         const updatedElements = tempElement.map((el)=> {
+            if (el.type !== DATA_BLOCK) return el
             if(el.data.dataBlock.dataBlockId === dataBlockId) {
                 return {
                     ...el,
@@ -46,6 +48,21 @@ const CanvasModel =  {
         state.elements = updatedElements
     }),
 
+    updateNodePayloadByTransformationBlock: action( (state, {updatedNodeInfo, transformationBlockId}) => {
+        const tempElement = state.elements;
+        const updatedElements = tempElement.map((el)=> {
+            if (el.type !== TRANSFORMATION_BLOCK) return el
+            if(el.data.transformationBlock.transformationBlockId === transformationBlockId) {
+                return {
+                    ...el,
+                    data: updatedNodeInfo.data
+                }
+            } else {
+                return el
+            }
+        })
+        state.elements = updatedElements
+    }),
     convertDataBlocksIntoElement: thunk(async (actions, nodeToRemove, {getState}) => {
         const {dataBlocks, elements} = getState();
         dataBlocks.forEach((block) => {
@@ -53,6 +70,7 @@ const CanvasModel =  {
 
             // Check if Data block already converted into node
             elements.forEach((curEl) => {
+                if(curEl.type !== DATA_BLOCK) return;
                 if(curEl.data.dataBlock.dataBlockId === block.dataBlockId) dupeFlag = true;
             });
 
@@ -64,12 +82,49 @@ const CanvasModel =  {
                     dataBlock: {...block},
                 },
                 sourcePosition: 'right',
-                targetPosition: 'left',
             }
 
             if(dupeFlag) {
                 // If node same node exists -> Update the node info
                 actions.updateNodePayloadByDataBlock({updatedNodeInfo: nodeInfo, dataBlockId: block.dataBlockId})
+            }else {
+                // Else add new node
+                actions.addNode({
+                    ...nodeInfo,
+                    position: {
+                        x: -100,
+                        y: Math.random() * window.innerHeight/2,
+                    },
+                })
+            }
+        });
+    }),
+
+    convertTransformationBlockIntoElement: thunk(async (actions, nodeToRemove, {getState}) => {
+        const {transformationBlocks, elements} = getState();
+        transformationBlocks.forEach((block) => {
+            let dupeFlag = false;
+
+            // Check if Data block already converted into node
+            elements.forEach((curEl) => {
+                if(curEl.type !== TRANSFORMATION_BLOCK) return;
+                if((curEl.data.transformationBlock.transformationBlockId === block.transformationBlockId)) dupeFlag = true;
+            });
+
+            const nodeInfo = {
+                type: getNodeTypeByDataCatalogId('transformation'),
+                data: {
+                    label: block.transformationCatalog.name,
+                    transformationCatalog: block.transformationCatalog,
+                    transformationBlock: {...block},
+                },
+                sourcePosition: 'right',
+                targetPosition: 'left',
+            }
+
+            if(dupeFlag) {
+                // If node same node exists -> Update the node info
+                actions.updateNodePayloadByTransformationBlock({updatedNodeInfo: nodeInfo, transformationBlockId: block.transformationBlockId})
             }else {
                 // Else add new node
                 actions.addNode({
@@ -96,12 +151,22 @@ const CanvasModel =  {
         state.selectedElement = selectedNode
     }),
     setSelectedElementByDataBlockId: action((state, selectedDataBlockId) => {
-        const selectedElement = state.elements.filter((el) => el.data.dataBlock.dataBlockId === selectedDataBlockId);
+        const selectedElement = state.elements.filter((el) => el.type === DATA_BLOCK && (el.data.dataBlock.dataBlockId === selectedDataBlockId));
+        if(!selectedElement.length) return
+        state.selectedElement = selectedElement[0]
+    }),
+    setSelectedElementByTransformationBlockId: action((state, selectedTransformationBlockId) => {
+        const selectedElement = state.elements.filter((el) => el.type === TRANSFORMATION_BLOCK && (el.data.transformationBlock.transformationBlockId === selectedTransformationBlockId));
         if(!selectedElement.length) return
         state.selectedElement = selectedElement[0]
     }),
     setNewNodeInfo: action((state, newNodeInfo) => {
         state.newNodeInfo = newNodeInfo
+    }),
+
+    // TODO: Handle set selected transformation block on click
+    setSelectedTransformationBlock: action ((state , selectedTransformationBlockId) => {
+
     }),
 
     setOpenDataView: action((state, openDataView) => {
@@ -326,6 +391,29 @@ const CanvasModel =  {
         actions.setDataBlocks(blocks);
         actions.convertDataBlocksIntoElement()
     }),
+
+    // Transformation Block
+    addTransformationBlock: action((state, newTransformationBlock)=>{
+        state.transformationBlocks = [...state.transformationBlocks, newTransformationBlock]
+    }),
+
+    setTransformationBlocks: action((state, transformationBlocks) => {
+        state.transformationBlocks = transformationBlocks;
+    }),
+
+    updateTransformationBlock: thunk((actions, updatedBlock,{getState})=> {
+        const {transformationBlocks} = getState();
+        const blocks = transformationBlocks.map((curEl) => {
+            if(curEl.transformationBlockId === updatedBlock.transformationBlockId){
+                return updatedBlock
+            }else {
+                return curEl
+            }
+        });
+        actions.setTransformationBlocks(blocks);
+        actions.convertTransformationBlockIntoElement();
+    }),
+
 }
 
 const columnAddressSplitter = (columnAddress) => {
@@ -343,9 +431,11 @@ const getNodeTypeByDataCatalogId = (catalogId) => {
         case('postgres'):
         case('bigquery'):
         case('snowflake'):
-            return 'dataBlock'
+            return DATA_BLOCK;
+        case('transformation'):
+            return TRANSFORMATION_BLOCK;
         default:
-            return 'transformation'
+            return TRANSFORMATION_BLOCK;
     }
 }
 
