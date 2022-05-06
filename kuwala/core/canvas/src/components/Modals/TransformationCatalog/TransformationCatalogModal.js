@@ -13,6 +13,9 @@ import Modal from "../../Common/Modal";
 import Button from "../../Common/Button";
 import Classes from "./TransformationCatalogStyle";
 import cn from "classnames";
+import TransformationBlockDTO from "../../../data/dto/TransformationBlockDTO";
+import TransformationCatalogDTO from "../../../data/dto/TransformationCatalogDTO";
+import {v4} from "uuid";
 
 const ExampleTable = ({columns, rows}) => {
     let populatedColumns = columns.map((el,i)=>{
@@ -54,6 +57,7 @@ const ExampleTable = ({columns, rows}) => {
 
 export default ({isOpen}) => {
     const { toggleTransformationCatalogModal } = useStoreActions(actions => actions.common);
+    const { convertTransformationBlockIntoElement, addTransformationBlock } = useStoreActions(actions => actions.canvas);
     const [selectedTransformationIndex, setSelectedTransformationIndex] = useState(null);
     const [catalogCategories, setCatalogCategories] = useState([]);
     const [catalogOptions, setCatalogOptions] = useState([]);
@@ -83,17 +87,58 @@ export default ({isOpen}) => {
         }
     }
 
+    const addToCanvas = async () => {
+        const tfCatalogDTO = catalogOptions[selectedCatalogOption];
+
+        const tfBlockDTO = new TransformationBlockDTO({
+            transformationBlockId: v4(),
+            transformationBlockEntityId: null,
+            isConfigured: false,
+            transformationCatalogItemId: tfCatalogDTO.id,
+            transformationCatalog: tfCatalogDTO,
+            inputBlockIds: null,
+            macroParameters: null,
+            name: tfCatalogDTO.name,
+        });
+
+        addTransformationBlock(tfBlockDTO);
+        convertTransformationBlockIntoElement();
+        toggleTransformationCatalogModal();
+    }
+
     const fetchCatalogBodyItems = async (transformationId) => {
         try{
             const res = await getAllItemsInCategory(transformationId);
             if(res.status === 200){
-                setCatalogOptions(res.data);
+                catalogOptionsIntoDTO(res.data);
             } else {
                 setCatalogOptions([]);
             }
         }catch(e) {
             console.error('Failed to get transformation catalog', e);
         }
+    }
+
+    const catalogOptionsIntoDTO = (apiResponse) => {
+        let tempOptions = [];
+        apiResponse.forEach((el) => {
+            const tfCatalogDTO = new TransformationCatalogDTO({
+                id: el.id,
+                category: el.category,
+                name: el.name,
+                icon: el.icon,
+                description: el.description,
+                requiredColumnTypes: el.required_column_types,
+                optionalColumnTypes: el.optional_column_types,
+                minNumberOfInputBlocks: el.min_number_of_input_blocks,
+                maxNumberOfInputBlocks: el.max_number_of_input_blocks,
+                macroParameters: el.macro_parameters,
+                examplesAfter: el.examples_after,
+                examplesBefore: el.examples_before,
+            });
+            tempOptions.push(tfCatalogDTO);
+        });
+        setCatalogOptions(tempOptions);
     }
 
     const CatalogSelector = () => {
@@ -218,14 +263,14 @@ export default ({isOpen}) => {
                     </p>
 
                     {renderColumnType(
-                        optionItem.required_column_types,
-                        optionItem.optional_column_types)
+                        optionItem.requiredColumnTypes,
+                        optionItem.optionalColumnTypes)
                     }
 
                     <div className={Classes.OptionDetailsParameterAndExample}>
                         <div className={Classes.OptionDetailsParameterContainer}>
                             <p>Parameters</p>
-                            {optionItem.macro_parameters.map((el) => <li>{el.name}</li>)}
+                            {optionItem.macroParameters.map((el) => <li>{el.name}</li>)}
                         </div>
                         <div className={Classes.OptionDetailsExampleContainer}>
                             {renderExampleTableWrapper(optionItem)}
@@ -274,11 +319,11 @@ export default ({isOpen}) => {
         return (
             <div className={'flex flex-col'}>
                 {renderExampleTable({
-                    examplesData: optionItem.examples_before,
+                    examplesData: optionItem.examplesBefore,
                     text: 'Before'
                 })}
                 {renderExampleTable({
-                    examplesData: optionItem.examples_after,
+                    examplesData: optionItem.examplesAfter,
                     text: 'After'
                 })}
             </div>
@@ -324,7 +369,9 @@ export default ({isOpen}) => {
                     text={'Back'}
                 />
                 <Button
+                    onClick={addToCanvas}
                     text={'Add to canvas'}
+                    disabled={selectedCatalogOption === null}
                 />
             </div>
         )

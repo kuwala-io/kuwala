@@ -5,11 +5,16 @@ import {useState} from "react";
 const CommonModel =  {
     notificationOpen: false,
     openConfigModal: false,
+    openTransformationConfigModal: false,
     reactFlowInstance: null,
     openTransformationCatalogModal: false,
 
     toggleNotification: action((state) => {
         state.notificationOpen = !state.notificationOpen
+    }),
+
+    toggleTransformationConfigModal: action((state) => {
+        state.openTransformationConfigModal = !state.openTransformationConfigModal;
     }),
 
     setReactFlowInstance: action((state, instance)=> {

@@ -7,18 +7,19 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import DataView from "../components/DataView";
 import {useStoreActions, useStoreState} from 'easy-peasy';
-import TransformationNode from "../components/Nodes/TransformationNode";
 import DataBlock from "../components/Nodes/DataBlock";
+import TransformationBlock from "../components/Nodes/TransformationBlock/TransformationBlock";
 import {Link} from "react-router-dom";
 import NodeConfigModal from "../components/Modals/DataBlockConfig/DataBlockConfigModal";
 import TransformationCatalogModal from "../components/Modals/TransformationCatalog/TransformationCatalogModal";
 import loadIcons from "../utils/IconsLoader";
+import TransformationConfigModal from "../components/Modals/TransformationConfigModal/TransformationConfigModal";
 
 export default function () {
     const reactFlowWrapper = useRef(null);
 
-    const {elements, selectedElement, dataSource, openDataView, dataBlocks} = useStoreState(state => state.canvas);
-    const {openConfigModal, openTransformationCatalogModal} = useStoreState(state => state.common);
+    const {elements, selectedElement, dataSource, openDataView} = useStoreState(state => state.canvas);
+    const {openConfigModal, openTransformationCatalogModal, openTransformationConfigModal} = useStoreState(state => state.common);
     const {
         setSelectedElement, removeNode, connectNodes, setOpenDataView, getDataSources,
         convertDataBlocksIntoElement
@@ -65,8 +66,8 @@ export default function () {
                             setOpenDataView(false)
                         }}
                         nodeTypes={{
-                            transformation: TransformationNode,
-                            dataBlock: DataBlock,
+                            TRANSFORMATION_BLOCK: TransformationBlock,
+                            DATA_BLOCK: DataBlock,
                         }}
                         selectNodesOnDrag={false}
                         onLoad={onLoad}
@@ -115,6 +116,9 @@ export default function () {
                 />
                 <TransformationCatalogModal
                     isOpen={openTransformationCatalogModal}
+                />
+                <TransformationConfigModal
+                    isOpen={openTransformationConfigModal}
                 />
             </div>
         </div>

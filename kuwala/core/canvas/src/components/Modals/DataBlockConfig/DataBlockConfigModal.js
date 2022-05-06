@@ -16,6 +16,7 @@ import Explorer from "../../Explorer";
 import {SELECTOR_DISPLAY, PREVIEW_DISPLAY} from "../../../constants/components";
 import Modal from "../../Common/Modal";
 import Button from "../../Common/Button";
+import {DATA_BLOCK} from "../../../constants/nodeTypes";
 
 export default ({isOpen}) => {
     const {
@@ -43,7 +44,7 @@ export default ({isOpen}) => {
 
     useEffect( ()=> {
         initNodeName()
-        if(selectedElement && openConfigModal) {
+        if(selectedElement && selectedElement.type === DATA_BLOCK && openConfigModal) {
             const block = selectedElement.data.dataBlock;
             const selectedAddress = block.selectedAddressString;
             if(!selectedAddress || typeof selectedAddress === 'undefined'){
@@ -53,7 +54,7 @@ export default ({isOpen}) => {
     }, [selectedElement])
 
     useEffect(() => {
-        if(selectedElement) {
+        if(selectedElement && selectedElement.type === DATA_BLOCK) {
             if(openConfigModal){
                 populateConfigByDataBlock().then(null)
             }
@@ -191,7 +192,7 @@ export default ({isOpen}) => {
     }
 
     const initNodeName = () => {
-        if(selectedElement) {
+        if(selectedElement && selectedElement.type === DATA_BLOCK) {
             setDataBlockName(selectedElement.data.dataBlock.name)
         }else {
             setDataBlockName('');
@@ -326,7 +327,7 @@ export default ({isOpen}) => {
             )
         } else {
             return (
-                <div className={'flex flex-col flex-auto px-6 pt-2 pb-4 h-full'}>
+                <div className={'flex flex-col flex-auto px-6 pt-2 pb-4 h-full overflow-y-auto'}>
                     <div className={'flex flex-row bg-white border-2 border-kuwala-green rounded-t-lg h-full w-full'}>
                         <div className={'flex flex-col bg-white w-3/12 border border-kuwala-green h-full'}>
                             <SchemaExplorer
@@ -517,9 +518,13 @@ export default ({isOpen}) => {
             isOpen={isOpen}
             closeModalAction={toggleConfigModalWrapper}
         >
-            <ConfigHeader/>
-            <ConfigBody/>
-            <ConfigFooter/>
+            {selectedElement && selectedElement.type === DATA_BLOCK ? (
+                <>
+                    <ConfigHeader/>
+                    <ConfigBody/>
+                    <ConfigFooter/>
+                </>
+            ) : <></>}
         </Modal>
     )
 }
