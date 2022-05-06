@@ -1,5 +1,5 @@
 import React from 'react';
-import {useStoreActions, useStoreState} from "easy-peasy";
+import {useStoreActions} from "easy-peasy";
 import Block from "../../Common/Block";
 
 const TransformationBlock = ({data}) => {
@@ -13,13 +13,15 @@ const TransformationBlock = ({data}) => {
             blockColor={'kuwalaPurple'}
             hideLeftHandle={false}
             hideRightHandle={false}
-            primaryButtonActive={true}
-            primaryButtonOnclick={() => {
+
+            primaryButtonDisabled={false}
+            primaryButtonOnClick={() => {
                 toggleTransformationConfigModal();
                 setSelectedElementByTransformationBlockId(data.transformationBlock.transformationBlockId)
             }}
-            secondaryButtonActive={!data.transformationBlock.isConfigured}
-            secondaryButtonOnclick={toggleDataView}
+            secondaryButtonDisabled={!data.transformationBlock.isConfigured}
+            secondaryButtonOnClick={toggleDataView}
+
             title={data.transformationBlock.name}
             data={data}
             icon={data.transformationBlock.transformationCatalog.icon}

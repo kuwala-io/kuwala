@@ -1,24 +1,24 @@
-import {useStoreActions} from "easy-peasy";
 import Classes from "../../Nodes/TransformationBlock/TransformationBlockStyle";
 import Icon from "../Icon";
 import Button from "../Button";
 import {Handle} from "react-flow-renderer";
-import {COLOR_MAP, KUWALA_GRAY, KUWALA_PURPLE} from "../../../constants/styling";
+import {COLOR_MAP, KUWALA_GRAY} from "../../../constants/styling";
 import React from "react";
 
 const Block = ({
-        blockColor='kuwalaGreen',
-        title='Title',
-        primaryButtonActive=true,
-        primaryButtonOnclick,
-        secondaryButtonActive=true,
-        secondaryButtonOnclick,
-        leftHandleActive=true,
-        hideLeftHandle=false,
-        rightHandleActive=true,
-        hideRightHandle=false,
+        blockColor,
+        title,
+        primaryButtonDisabled,
+        primaryButtonOnClick,
+        secondaryButtonDisabled,
+        secondaryButtonOnClick,
+        leftHandleActive,
+        hideLeftHandle,
+        rightHandleActive,
+        hideRightHandle,
         data,
-        icon='cogs'
+        icon,
+        img,
     }) => {
     const renderLeftPane = () => {
         if(!hideLeftHandle) {
@@ -44,7 +44,7 @@ const Block = ({
                 />
             )
         }
-        return <></>
+        return undefined;
     }
 
     const renderRightHandle = () => {
@@ -69,7 +69,32 @@ const Block = ({
                 />
             )
         }
-        return <></>
+        return undefined;
+    }
+
+    const renderImgOrIcon = () => {
+        if(img) {
+            return (
+                <img
+                    src={img}
+                    className={'user-select-none'}
+                    style={{
+                        width: 64,
+                        height: 64,
+                    }}
+                    draggable={false}
+                    alt={'Data source logo'}
+                />
+            )
+        } else {
+            return (
+                <Icon
+                    size={'lg'}
+                    icon={icon}
+                    color={blockColor}
+                />
+            )
+        }
     }
 
     return (
@@ -78,11 +103,7 @@ const Block = ({
         >
             {/* BODY */}
             <div className={Classes.BlockBodyContainer}>
-                <Icon
-                    size={'lg'}
-                    icon={icon}
-                    color={blockColor}
-                />
+                {renderImgOrIcon()}
                 <div className={Classes.BlockContentWrapper}>
                     <div className={Classes.BlockTitle}>
                         <span>{title}</span>
@@ -94,16 +115,16 @@ const Block = ({
                             solid={false}
                             size={'longXs'}
                             text={'Configure'}
-                            onClick={primaryButtonOnclick}
-                            disabled={primaryButtonOnclick}
+                            onClick={primaryButtonOnClick}
+                            disabled={primaryButtonDisabled}
                         />
                         <Button
                             color={blockColor}
-                            solid={false}
+                            solid={true}
                             size={'longXs'}
                             text={'Preview'}
-                            onClick={secondaryButtonOnclick}
-                            disabled={secondaryButtonActive}
+                            onClick={secondaryButtonOnClick}
+                            disabled={secondaryButtonDisabled}
                         />
                     </div>
 
