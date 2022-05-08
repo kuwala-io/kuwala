@@ -63,7 +63,7 @@ export default ({reactFlowWrapper}) => {
                 >
                     {/* Header and Toggle */}
                     <div className={`flex items-center justify-center flex-shrink-0 p-2 ${dataSource.length > 0 ? '' : 'hidden'}`}>
-                        <span className={`p-2 text-xl font-semibold tracking-wider whitespace-nowrap`}>
+                        <span className={`p-2 text-xl font-semibold tracking-wider whitespace-nowrap select-none`}>
                             <span>Data Sources</span>
                         </span>
                     </div>
@@ -95,6 +95,7 @@ export default ({reactFlowWrapper}) => {
                             bg-white
                             text-kuwala-red
                             text-center
+                            select-none
                         `}
                     onClick={toggleTransformationCatalogModal}
                 >

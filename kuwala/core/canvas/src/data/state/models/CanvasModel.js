@@ -6,9 +6,12 @@ import {getAllDataCatalogItems, saveSelectedDataCatalogItems} from '../../../api
 import {getDataSource} from '../../../api/DataSourceApi';
 
 import DataSourceDTO from '../../dto/DataSourceDTO';
-import {TRANSFORMATION_BLOCK, DATA_BLOCK} from '../../../constants/nodeTypes';
+import TransformationBlockDTO from '../../dto/TransformationBlockDTO';
+import DataBlockDTO from '../../dto/DataBlockDTO';
+import {TRANSFORMATION_BLOCK, DATA_BLOCK,} from '../../../constants/nodeTypes';
+import {CONNECTION_EDGE} from '../../../constants/edgeTypes';
 
-const CanvasModel =  {
+const CanvasModel = {
     elements: [],
     selectedElement: null,
     selectedTransformationBlock: null,
@@ -32,11 +35,11 @@ const CanvasModel =  {
         state.elements.push(newNode)
     }),
 
-    updateNodePayloadByDataBlock: action( (state, {updatedNodeInfo, dataBlockId}) => {
+    updateNodePayloadByDataBlock: action((state, {updatedNodeInfo, dataBlockId}) => {
         const tempElement = state.elements;
-        const updatedElements = tempElement.map((el)=> {
+        const updatedElements = tempElement.map((el) => {
             if (el.type !== DATA_BLOCK) return el
-            if(el.data.dataBlock.dataBlockId === dataBlockId) {
+            if (el.data.dataBlock.dataBlockId === dataBlockId) {
                 return {
                     ...el,
                     data: updatedNodeInfo.data
@@ -48,11 +51,11 @@ const CanvasModel =  {
         state.elements = updatedElements
     }),
 
-    updateNodePayloadByTransformationBlock: action( (state, {updatedNodeInfo, transformationBlockId}) => {
+    updateNodePayloadByTransformationBlock: action((state, {updatedNodeInfo, transformationBlockId}) => {
         const tempElement = state.elements;
-        const updatedElements = tempElement.map((el)=> {
+        const updatedElements = tempElement.map((el) => {
             if (el.type !== TRANSFORMATION_BLOCK) return el
-            if(el.data.transformationBlock.transformationBlockId === transformationBlockId) {
+            if (el.data.transformationBlock.transformationBlockId === transformationBlockId) {
                 return {
                     ...el,
                     data: updatedNodeInfo.data
@@ -70,8 +73,8 @@ const CanvasModel =  {
 
             // Check if Data block already converted into node
             elements.forEach((curEl) => {
-                if(curEl.type !== DATA_BLOCK) return;
-                if(curEl.data.dataBlock.dataBlockId === block.dataBlockId) dupeFlag = true;
+                if (curEl.type !== DATA_BLOCK) return;
+                if (curEl.data.dataBlock.dataBlockId === block.dataBlockId) dupeFlag = true;
             });
 
             const nodeInfo = {
@@ -84,16 +87,16 @@ const CanvasModel =  {
                 sourcePosition: 'right',
             }
 
-            if(dupeFlag) {
+            if (dupeFlag) {
                 // If node same node exists -> Update the node info
                 actions.updateNodePayloadByDataBlock({updatedNodeInfo: nodeInfo, dataBlockId: block.dataBlockId})
-            }else {
+            } else {
                 // Else add new node
                 actions.addNode({
                     ...nodeInfo,
                     position: {
                         x: -100,
-                        y: Math.random() * window.innerHeight/2,
+                        y: Math.random() * window.innerHeight / 2,
                     },
                 })
             }
@@ -107,8 +110,8 @@ const CanvasModel =  {
 
             // Check if Data block already converted into node
             elements.forEach((curEl) => {
-                if(curEl.type !== TRANSFORMATION_BLOCK) return;
-                if((curEl.data.transformationBlock.transformationBlockId === block.transformationBlockId)) dupeFlag = true;
+                if (curEl.type !== TRANSFORMATION_BLOCK) return;
+                if ((curEl.data.transformationBlock.transformationBlockId === block.transformationBlockId)) dupeFlag = true;
             });
 
             const nodeInfo = {
@@ -122,42 +125,129 @@ const CanvasModel =  {
                 targetPosition: 'left',
             }
 
-            if(dupeFlag) {
+            if (dupeFlag) {
                 // If node same node exists -> Update the node info
-                actions.updateNodePayloadByTransformationBlock({updatedNodeInfo: nodeInfo, transformationBlockId: block.transformationBlockId})
-            }else {
+                actions.updateNodePayloadByTransformationBlock({
+                    updatedNodeInfo: nodeInfo,
+                    transformationBlockId: block.transformationBlockId
+                })
+            } else {
                 // Else add new node
                 actions.addNode({
                     ...nodeInfo,
                     position: {
                         x: -100,
-                        y: Math.random() * window.innerHeight/2,
+                        y: Math.random() * window.innerHeight / 2,
                     },
                 })
             }
         });
     }),
-    removeNode: thunk((actions, nodeToRemove, {getState}) => {
-        actions.setElements(removeElements(getState().elements, nodeToRemove))
+    removeNode: thunk((actions, nodesToRemove, {getState}) => {
+        actions.setElements(removeElements(nodesToRemove, getState().elements))
+        nodesToRemove.forEach((nodeToRemove) => {
+            if(nodeToRemove.type === DATA_BLOCK) {
+                actions.removeDataBlock(nodeToRemove.data.dataBlock.dataBlockId);
+            } else if(nodeToRemove.type === TRANSFORMATION_BLOCK) {
+                actions.removeTransformationBlock(nodeToRemove.data.transformationBlock.transformationBlockId);
+            } else if(nodeToRemove.type === CONNECTION_EDGE) {
+                actions.removeConnectedEdgeFromBlock({
+                   source: nodeToRemove.source,
+                   target: nodeToRemove.target,
+                });
+            }
+        });
         actions.setSelectedElement(null)
     }),
     connectNodes: thunk((actions, params, {getState}) => {
-        actions.setElements(addEdge(params, getState().elements))
+        const edgeToAdd = {
+            ...params,
+            animated: true,
+            type: CONNECTION_EDGE,
+            id: v4(),
+        }
+        const elements = getState().elements;
+
+        // Check target maximum number of connections
+        const target = getElementById(elements, params.target);
+        if(target && target.type === TRANSFORMATION_BLOCK ) {
+            if(target.data.transformationBlock.connectedSourceNodeIds.length < target.data.transformationCatalog.maxNumberOfInputBlocks) {
+                actions.addConnectedEdgeToBlock({
+                    source: params.source,
+                    target: params.target
+                });
+
+                actions.setElements(addEdge(edgeToAdd, elements));
+            } else {
+                alert('Maximum number of connections reached!');
+            }
+        }
     }),
+
+    addConnectedEdgeToBlock: thunk((actions, {source, target}, {getState}) => {
+        const sourceElement = getElementById(getState().elements, source);
+        const targetElement = getElementById(getState().elements, target);
+
+        let sourceDTO, targetDTO;
+        if(sourceElement.type === DATA_BLOCK) {
+            sourceDTO = sourceElement.data.dataBlock;
+        } else if (sourceElement.type === TRANSFORMATION_BLOCK) {
+            sourceDTO = sourceElement.data.transformationBlock;
+        }
+        sourceDTO.connectedTargetNodeIds.push(target);
+        actions.updateDataBlock(sourceDTO);
+
+        if(targetElement.type === DATA_BLOCK) {
+            targetDTO = targetElement.data.dataBlock;
+        } else if (targetElement.type === TRANSFORMATION_BLOCK) {
+            targetDTO = targetElement.data.transformationBlock;
+        }
+        targetDTO.connectedSourceNodeIds.push(source);
+        actions.updateDataBlock(targetDTO);
+    }),
+
+    removeConnectedEdgeFromBlock: thunk((actions, {source, target}, {getState}) => {
+        const sourceElement = getElementById(getState().elements, source);
+        const targetElement = getElementById(getState().elements, target);
+        let sourceDTO, targetDTO;
+
+        // Removing the targeted dto from source block
+        if(sourceElement) {
+            if(sourceElement.type === DATA_BLOCK) {
+                sourceDTO = sourceElement.data.dataBlock;
+            } else if (sourceElement.type === TRANSFORMATION_BLOCK) {
+                sourceDTO = sourceElement.data.transformationBlock;
+            }
+            sourceDTO.connectedTargetNodeIds = sourceDTO.connectedTargetNodeIds.filter((el) => el !== target);
+            actions.updateDataBlock(sourceDTO);
+        }
+
+        // Removing the source dto from target block
+        if(targetElement) {
+            if(targetElement.type === DATA_BLOCK) {
+                targetDTO = targetElement.data.dataBlock;
+            } else if (targetElement.type === TRANSFORMATION_BLOCK) {
+                targetDTO = targetElement.data.transformationBlock;
+            }
+            targetDTO.connectedSourceNodeIds = targetDTO.connectedSourceNodeIds.filter((el) => el !== source);
+            actions.updateDataBlock(targetDTO);
+        }
+    }),
+
     setElements: action((state, elements) => {
-       state.elements = elements
+        state.elements = elements
     }),
     setSelectedElement: action((state, selectedNode) => {
         state.selectedElement = selectedNode
     }),
     setSelectedElementByDataBlockId: action((state, selectedDataBlockId) => {
         const selectedElement = state.elements.filter((el) => el.type === DATA_BLOCK && (el.data.dataBlock.dataBlockId === selectedDataBlockId));
-        if(!selectedElement.length) return
+        if (!selectedElement.length) return
         state.selectedElement = selectedElement[0]
     }),
     setSelectedElementByTransformationBlockId: action((state, selectedTransformationBlockId) => {
         const selectedElement = state.elements.filter((el) => el.type === TRANSFORMATION_BLOCK && (el.data.transformationBlock.transformationBlockId === selectedTransformationBlockId));
-        if(!selectedElement.length) return
+        if (!selectedElement.length) return
         state.selectedElement = selectedElement[0]
     }),
     setNewNodeInfo: action((state, newNodeInfo) => {
@@ -165,7 +255,7 @@ const CanvasModel =  {
     }),
 
     // TODO: Handle set selected transformation block on click
-    setSelectedTransformationBlock: action ((state , selectedTransformationBlockId) => {
+    setSelectedTransformationBlock: action((state, selectedTransformationBlockId) => {
 
     }),
 
@@ -173,7 +263,7 @@ const CanvasModel =  {
         state.openDataView = openDataView
     }),
     toggleDataView: action((state, dataView) => {
-       state.openDataView =  !state.openDataView
+        state.openDataView = !state.openDataView
     }),
 
     // Data Sources
@@ -190,10 +280,10 @@ const CanvasModel =  {
 
         const DTOs = [];
 
-        result.data.forEach((e,i)=> {
+        result.data.forEach((e, i) => {
             const data_catalog_item_id = e.data_catalog_item_id;
             const index = dataCatalog.findIndex((e, i) => {
-                if(e.id === data_catalog_item_id) return true
+                if (e.id === data_catalog_item_id) return true
             });
             const dto = new DataSourceDTO({
                 id: e.id,
@@ -216,10 +306,10 @@ const CanvasModel =  {
 
     getAvailableDataSource: thunk(async (actions) => {
         const response = await getAllDataCatalogItems();
-        if (response.status === 200){
+        if (response.status === 200) {
             const data = response.data
             actions.setAvailableDataSource(data)
-        }else {
+        } else {
             actions.setAvailableDataSource([])
         }
     }),
@@ -232,11 +322,11 @@ const CanvasModel =  {
     saveSelectedSources: thunk(async (actions, params, {getState}) => {
         const selectedSource = getState().selectedDataSource;
 
-        if(!selectedSource.length) {
+        if (!selectedSource.length) {
             console.error("Selected source is empty")
             return;
         }
-        const idList = selectedSource.map((el)=> el.id);
+        const idList = selectedSource.map((el) => el.id);
         await saveSelectedDataCatalogItems({
             item_ids: idList
         });
@@ -250,7 +340,7 @@ const CanvasModel =  {
             if (el.id === selectedDataSource.id) dupe = true;
         })
 
-        if(dupe) return
+        if (dupe) return
 
         state.canvasSelectedDataSource = [...state.canvasSelectedDataSource, selectedDataSource]
 
@@ -266,28 +356,28 @@ const CanvasModel =  {
 
         let tempState = state.selectedAddressObj;
 
-        if(typeof tempState[dataBlockId] === 'undefined') {
+        if (typeof tempState[dataBlockId] === 'undefined') {
             tempState[dataBlockId] = {
-                    [schema]: {
-                        [category]: {
-                            [table]: [column]
-                        }
+                [schema]: {
+                    [category]: {
+                        [table]: [column]
+                    }
                 }
             }
-        } else if(typeof tempState[dataBlockId][schema] === 'undefined') {
+        } else if (typeof tempState[dataBlockId][schema] === 'undefined') {
             tempState[dataBlockId][schema] = {
                 [category]: {
                     [table]: [column]
                 }
             }
-        } else if (typeof tempState[dataBlockId][schema][category] === 'undefined'){
+        } else if (typeof tempState[dataBlockId][schema][category] === 'undefined') {
             tempState[dataBlockId][schema][category] = {
-                    [table]: [column]
+                [table]: [column]
             }
         } else if (typeof tempState[dataBlockId][schema][category][table] === 'undefined') {
             tempState[dataBlockId][schema][category][table] = [column]
         } else {
-            if (!tempState[dataBlockId][schema][category][table].includes(column)){
+            if (!tempState[dataBlockId][schema][category][table].includes(column)) {
                 tempState[dataBlockId][schema][category][table].push(column)
                 state.selectedAddressObj = tempState
             }
@@ -311,7 +401,7 @@ const CanvasModel =  {
 
         let tempState = state.selectedAddressObj;
 
-        if(typeof tempState[dataBlockId] === 'undefined') {
+        if (typeof tempState[dataBlockId] === 'undefined') {
             tempState[dataBlockId] = {
                 [schema]: {
                     [category]: {
@@ -319,13 +409,13 @@ const CanvasModel =  {
                     }
                 }
             }
-        } else if(typeof tempState[dataBlockId][schema] === 'undefined') {
+        } else if (typeof tempState[dataBlockId][schema] === 'undefined') {
             tempState[dataBlockId][schema] = {
                 [category]: {
                     [table]: []
                 }
             }
-        } else if (typeof tempState[dataBlockId][schema][category] === 'undefined'){
+        } else if (typeof tempState[dataBlockId][schema][category] === 'undefined') {
             tempState[dataBlockId][schema][category] = {
                 [table]: []
             }
@@ -337,7 +427,7 @@ const CanvasModel =  {
     }),
 
     selectAllColumnAddresses: thunk((actions, {bulkAddress, dataBlockId}) => {
-        if(!bulkAddress || !bulkAddress.length) return
+        if (!bulkAddress || !bulkAddress.length) return
         bulkAddress.forEach((address) => actions.addSelectedColumnAddress({
             newAddress: address,
             dataBlockId: dataBlockId
@@ -345,7 +435,7 @@ const CanvasModel =  {
     }),
 
     deselectAllColumnAddress: thunk((actions, {bulkAddress, dataBlockId}) => {
-        if(!bulkAddress || !bulkAddress.length) return
+        if (!bulkAddress || !bulkAddress.length) return
         bulkAddress.forEach((address) => actions.removeSelectedColumnAddress({
             addressToRemove: address,
             dataBlockId: dataBlockId
@@ -357,7 +447,7 @@ const CanvasModel =  {
         const selectedAddressObj = getState().selectedAddressObj;
         const {schema, category, table, column} = columnAddressSplitter(columnAddress);
 
-        if(selectedAddressObj[dataBlockId][schema][category][table].includes(column)){
+        if (selectedAddressObj[dataBlockId][schema][category][table].includes(column)) {
             actions.removeSelectedColumnAddress({
                 addressToRemove: columnAddress,
                 dataBlockId: dataBlockId,
@@ -371,7 +461,7 @@ const CanvasModel =  {
     }),
 
     // Data Blocks
-    addDataBlock: action((state, newDataBlock)=>{
+    addDataBlock: action((state, newDataBlock) => {
         state.dataBlocks = [...state.dataBlocks, newDataBlock]
     }),
 
@@ -379,12 +469,13 @@ const CanvasModel =  {
         state.dataBlocks = dataBlocks;
     }),
 
-    updateDataBlock: thunk((actions, updatedBlock,{getState})=> {
+    updateDataBlock: thunk((actions, updatedBlock, {getState}) => {
         const {dataBlocks} = getState();
         const blocks = dataBlocks.map((curEl) => {
-            if(curEl.dataBlockId === updatedBlock.dataBlockId){
-                return updatedBlock
-            }else {
+            if (curEl.dataBlockId === updatedBlock.dataBlockId) {
+                const updateDTO = new DataBlockDTO({...updatedBlock})
+                return updateDTO
+            } else {
                 return curEl
             }
         });
@@ -392,8 +483,13 @@ const CanvasModel =  {
         actions.convertDataBlocksIntoElement()
     }),
 
+    removeDataBlock: thunk((actions, dataBlockId, {getState}) => {
+        const temp = getState().dataBlocks.filter((el) => el.dataBlockId !== dataBlockId);
+        actions.setDataBlocks(temp);
+    }),
+
     // Transformation Block
-    addTransformationBlock: action((state, newTransformationBlock)=>{
+    addTransformationBlock: action((state, newTransformationBlock) => {
         state.transformationBlocks = [...state.transformationBlocks, newTransformationBlock]
     }),
 
@@ -401,12 +497,13 @@ const CanvasModel =  {
         state.transformationBlocks = transformationBlocks;
     }),
 
-    updateTransformationBlock: thunk((actions, updatedBlock,{getState})=> {
+    updateTransformationBlock: thunk((actions, updatedBlock, {getState}) => {
         const {transformationBlocks} = getState();
         const blocks = transformationBlocks.map((curEl) => {
-            if(curEl.transformationBlockId === updatedBlock.transformationBlockId){
-                return updatedBlock
-            }else {
+            if (curEl.transformationBlockId === updatedBlock.transformationBlockId) {
+                const updatedBlockDTO = new TransformationBlockDTO({...updatedBlock});
+                return updatedBlockDTO
+            } else {
                 return curEl
             }
         });
@@ -414,6 +511,10 @@ const CanvasModel =  {
         actions.convertTransformationBlockIntoElement();
     }),
 
+    removeTransformationBlock: thunk((actions, transformationBlockId, {getState}) => {
+        const temp = getState().transformationBlocks.filter((el) => el.transformationBlockId !== transformationBlockId);
+        actions.setTransformationBlocks(temp);
+    }),
 }
 
 const columnAddressSplitter = (columnAddress) => {
@@ -450,6 +551,12 @@ const getLabelByDataCatalogId = (catalogId) => {
         default:
             return 'Invalid Label'
     }
+}
+
+const getElementById = (elements, elementId) => {
+    const selected = elements.filter((el) => el.id === elementId);
+    if (selected.length === 1) return selected[0];
+    return null;
 }
 
 export default CanvasModel;

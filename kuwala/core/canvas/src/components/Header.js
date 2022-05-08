@@ -6,7 +6,7 @@ import NotificationPanel from "./NotificationPanel";
 
 export default () => {
     const { toggleNotification } = useStoreActions(actions => actions.common)
-    const { dataBlocks, elements } = useStoreState(state => state.canvas)
+    const { dataBlocks, elements, transformationBlocks } = useStoreState(state => state.canvas)
     const [currentPage] = useState(useLocation().pathname)
 
     const notifications = 0;
@@ -49,7 +49,7 @@ export default () => {
                             `}
                              style={{height: 44, width: 44}}
                         />
-                        <label className={'mt-2'}>Data Overview</label>
+                        <label className={'mt-2 select-none'}>Data Overview</label>
                     </Link>
 
                     <Link
@@ -63,7 +63,7 @@ export default () => {
                                 rounded-full`}
                             style={{height: 44, width: 44}}
                         />
-                        <label className={'mt-2'}>Canvas</label>
+                        <label className={'mt-2 select-none'}>Canvas</label>
                     </Link>
                 </div>
 
@@ -103,6 +103,10 @@ export default () => {
                     <div className="relative">
                         <button
                             className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 focus:outline-none focus:ring"
+                            onClick={() => {
+                                console.log(dataBlocks);
+                                console.log(transformationBlocks);
+                            }}
                         >
                             <svg
                                 className="w-6 h-6 text-gray-500"
