@@ -79,6 +79,7 @@ const Button = ({
         icon=undefined,
         text=undefined,
         draggable=false,
+        type='button'
     }) => {
     return <button
         className={cn(
@@ -90,6 +91,7 @@ const Button = ({
         disabled={disabled}
         onClick={onClick}
         draggable={draggable}
+        type={type}
     >
         {
             loading

@@ -14,6 +14,7 @@ module.exports = {
         'kuwala-gray': '#BDBDBD',
         'kuwala-light-green': '#99DDD8',
         'kuwala-purple': '#8B83BA',
+        'kuwala-light-purple': '#D0CDE3',
       },
       spacing: {
         '92': '26rem',

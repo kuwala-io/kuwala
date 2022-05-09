@@ -10,6 +10,7 @@ import TransformationBlockDTO from '../../dto/TransformationBlockDTO';
 import DataBlockDTO from '../../dto/DataBlockDTO';
 import {TRANSFORMATION_BLOCK, DATA_BLOCK,} from '../../../constants/nodeTypes';
 import {CONNECTION_EDGE} from '../../../constants/edgeTypes';
+import {getElementById} from "../../../utils/ElementUtils";
 
 const CanvasModel = {
     elements: [],
@@ -563,14 +564,6 @@ const getLabelByDataCatalogId = (catalogId) => {
             return 'Snowflake'
         default:
             return 'Invalid Label'
-    }
-}
-
-const getElementById = (elements, elementId) => {
-    try {
-        return elements.find((el) => el.id === elementId);
-    } catch (error) {
-        console.error(`Couldn't find element with id ${elementId}`)
     }
 }
 

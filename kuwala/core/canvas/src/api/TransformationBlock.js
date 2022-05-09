@@ -1,6 +1,7 @@
 import baseAxios from "./BaseAxios";
 
 import {
+    DATA_BLOCK,
     TRANSFORMATION_BLOCK,
 } from "../constants/api"
 
@@ -13,4 +14,17 @@ export function getTransformationBlockPreview ({transformationBlockId, params}){
         `${TRANSFORMATION_BLOCK}/${transformationBlockId}/preview`,
         {params}
     )
+}
+
+export function updateTransformationBlockColumns ({transformationBlockId, data}) {
+    return baseAxios.put(
+        `${TRANSFORMATION_BLOCK}/${transformationBlockId}`,
+        data
+    );
+}
+
+export function refreshTransformationBlock ({transformationBlockId}) {
+    return baseAxios.put(
+        `${TRANSFORMATION_BLOCK}/${transformationBlockId}/refresh`
+    );
 }

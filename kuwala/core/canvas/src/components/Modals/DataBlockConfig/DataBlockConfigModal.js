@@ -507,6 +507,7 @@ export default ({isOpen}) => {
                         await upsertDataBlock()
                     }}
                     loading={isNodeSaveLoading}
+                    disabled={isNodeSaveLoading}
                     text={'Save'}
                 />
             </div>

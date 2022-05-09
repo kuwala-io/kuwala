@@ -69,8 +69,8 @@ export default ({isOpen}) => {
 
     useEffect(()=> {
         if(catalogCategories.length) {
-            const tfId = catalogCategories[selectedTransformationIndex].id
-            fetchCatalogBodyItems(tfId).then(null);
+            const category = catalogCategories[selectedTransformationIndex]
+            fetchCatalogBodyItems(category).then(null);
         }
     }, [selectedTransformationIndex])
 
@@ -106,11 +106,12 @@ export default ({isOpen}) => {
         toggleTransformationCatalogModal();
     }
 
-    const fetchCatalogBodyItems = async (transformationId) => {
+    const fetchCatalogBodyItems = async (category) => {
         try{
+            const transformationId = category.id;
             const res = await getAllItemsInCategory(transformationId);
             if(res.status === 200){
-                catalogOptionsIntoDTO(res.data);
+                catalogOptionsIntoDTO(res.data, category);
             } else {
                 setCatalogOptions([]);
             }
@@ -119,12 +120,13 @@ export default ({isOpen}) => {
         }
     }
 
-    const catalogOptionsIntoDTO = (apiResponse) => {
+    const catalogOptionsIntoDTO = (apiResponse, category) => {
         let tempOptions = [];
         apiResponse.forEach((el) => {
             const tfCatalogDTO = new TransformationCatalogDTO({
                 id: el.id,
                 category: el.category,
+                categoryIcon: category.icon,
                 name: el.name,
                 icon: el.icon,
                 description: el.description,

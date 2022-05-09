@@ -5,6 +5,8 @@ import {getDataBlockPreview} from "../../api/DataBlockApi";
 import {getDataDictionary} from "../../utils/SchemaUtils";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faTimes} from "@fortawesome/free-solid-svg-icons";
+import {DATA_BLOCK, TRANSFORMATION_BLOCK} from "../../constants/nodeTypes";
+import {getTransformationBlockPreview} from "../../api/TransformationBlock";
 
 const Table = ({columns, data}) => {
     const memoizedCols = useMemo(()=> {
@@ -55,13 +57,53 @@ export default () => {
 
     const fetchPreviewFromSavedDataBlocks = async () => {
         if(selectedElement) {
-            if(selectedElement.data.dataBlock) {
+            if(selectedElement.type === DATA_BLOCK) {
                 setIsDataPreviewLoading(true)
                 const block = selectedElement.data.dataBlock
                 try {
 
                     const res = await getDataBlockPreview({
                         dataBlockId: block.dataBlockEntityId,
+                        params: {
+                            limit_columns: 300,
+                            limit_rows: 300,
+                        }
+                    });
+
+                    if(res.status === 200) {
+                        let cols = res.data.columns.map((el,i)=>{
+                            return {
+                                Header: el,
+                                accessor: el,
+                            }
+                        });
+
+                        cols = [{
+                            Header: "#",
+                            id: "row",
+                            filterable: false,
+                            width: 50,
+                            Cell: (row) => {
+                                return <div>{row.index+1}</div>;
+                            }
+                        }, ...cols]
+
+                        setBlocksPreview({
+                            columns: cols,
+                            rows: getDataDictionary(res.data.rows, res.data.columns),
+                        });
+                    }
+                }catch (e) {
+                    console.error('Failed when fetching data blocks data', e)
+                }
+                setIsDataPreviewLoading(false)
+            } else if (selectedElement.type === TRANSFORMATION_BLOCK) {
+                setIsDataPreviewLoading(true)
+                const block = selectedElement.data.transformationBlock
+                try {
+
+                    const res = await getTransformationBlockPreview({
+                        transformationBlockId: block.transformationBlockEntityId,
                         params: {
                             limit_columns: 300,
                             limit_rows: 300,

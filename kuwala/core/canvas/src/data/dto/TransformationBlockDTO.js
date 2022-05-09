@@ -11,6 +11,8 @@ module.exports = class TransformationBlockDTO {
         name,
         connectedSourceNodeIds = [],
         connectedTargetNodeIds = [],
+        isMaterializeTable=false,
+        columns=[],
      }) {
         this.transformationBlockId = transformationBlockId;
         this.transformationBlockEntityId = transformationBlockEntityId;
@@ -22,5 +24,7 @@ module.exports = class TransformationBlockDTO {
         this.name = name;
         this.connectedSourceNodeIds = connectedSourceNodeIds;
         this.connectedTargetNodeIds = connectedTargetNodeIds;
+        this.isMaterializeTable = isMaterializeTable;
+        this.columns = columns;
     }
 }
