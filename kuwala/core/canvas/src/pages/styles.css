@@ -22,3 +22,14 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.react-flow__edge-path-selector:hover { cursor: pointer }
+.react-flow__edge-path-selector:hover + .react-flow__edge-path, .react-flow__edge-path:hover  {
+  stroke: #555;
+  cursor: pointer;
+}
+.react-flow__edge-path-selector {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 36;
+}

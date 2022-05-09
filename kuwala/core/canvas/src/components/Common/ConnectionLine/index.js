@@ -26,7 +26,7 @@ export default ({
             <path
                 fill="none"
                 stroke="#222"
-                strokeWidth={4}
+                strokeWidth={6}
                 className="animated"
                 d={edgePath}
             />

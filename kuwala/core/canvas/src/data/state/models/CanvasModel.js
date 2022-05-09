@@ -159,6 +159,10 @@ const CanvasModel = {
         });
         actions.setSelectedElement(null)
     }),
+    removeElementById: thunk((actions, elementId, {getState}) => {
+        const elementToRemove = getElementById(getState().elements, elementId);
+        actions.removeNode([elementToRemove]);
+    }),
     connectNodes: thunk((actions, params, {getState}) => {
         const edgeToAdd = {
             ...params,
@@ -191,19 +195,23 @@ const CanvasModel = {
         let sourceDTO, targetDTO;
         if(sourceElement.type === DATA_BLOCK) {
             sourceDTO = sourceElement.data.dataBlock;
+            sourceDTO.connectedTargetNodeIds.push(target);
+            actions.updateDataBlock(sourceDTO);
         } else if (sourceElement.type === TRANSFORMATION_BLOCK) {
             sourceDTO = sourceElement.data.transformationBlock;
+            sourceDTO.connectedTargetNodeIds.push(target);
+            actions.updateTransformationBlock(sourceDTO);
         }
-        sourceDTO.connectedTargetNodeIds.push(target);
-        actions.updateDataBlock(sourceDTO);
 
         if(targetElement.type === DATA_BLOCK) {
             targetDTO = targetElement.data.dataBlock;
+            targetDTO.connectedSourceNodeIds.push(source);
+            actions.updateDataBlock(targetDTO);
         } else if (targetElement.type === TRANSFORMATION_BLOCK) {
             targetDTO = targetElement.data.transformationBlock;
+            targetDTO.connectedSourceNodeIds.push(source);
+            actions.updateTransformationBlock(targetDTO);
         }
-        targetDTO.connectedSourceNodeIds.push(source);
-        actions.updateDataBlock(targetDTO);
     }),
 
     removeConnectedEdgeFromBlock: thunk((actions, {source, target}, {getState}) => {
@@ -215,22 +223,27 @@ const CanvasModel = {
         if(sourceElement) {
             if(sourceElement.type === DATA_BLOCK) {
                 sourceDTO = sourceElement.data.dataBlock;
+                sourceDTO.connectedTargetNodeIds = sourceDTO.connectedTargetNodeIds.filter((el) => el !== target);
+                actions.updateDataBlock(sourceDTO);
             } else if (sourceElement.type === TRANSFORMATION_BLOCK) {
                 sourceDTO = sourceElement.data.transformationBlock;
+                sourceDTO.connectedTargetNodeIds = sourceDTO.connectedTargetNodeIds.filter((el) => el !== target);
+                actions.updateTransformationBlock(sourceDTO);
             }
-            sourceDTO.connectedTargetNodeIds = sourceDTO.connectedTargetNodeIds.filter((el) => el !== target);
-            actions.updateDataBlock(sourceDTO);
+
         }
 
         // Removing the source dto from target block
         if(targetElement) {
             if(targetElement.type === DATA_BLOCK) {
                 targetDTO = targetElement.data.dataBlock;
+                targetDTO.connectedSourceNodeIds = targetDTO.connectedSourceNodeIds.filter((el) => el !== source);
+                actions.updateDataBlock(targetDTO);
             } else if (targetElement.type === TRANSFORMATION_BLOCK) {
                 targetDTO = targetElement.data.transformationBlock;
+                targetDTO.connectedSourceNodeIds = targetDTO.connectedSourceNodeIds.filter((el) => el !== source);
+                actions.updateTransformationBlock(targetDTO);
             }
-            targetDTO.connectedSourceNodeIds = targetDTO.connectedSourceNodeIds.filter((el) => el !== source);
-            actions.updateDataBlock(targetDTO);
         }
     }),
 

@@ -3,7 +3,6 @@ import {useStoreActions, useStoreState} from "easy-peasy";
 import DataBlocksHandler from "./NodeHandlers/DataBlocksHandler";
 import AddSourcesGreen from "../../icons/add_sources_green.png";
 import {Link} from "react-router-dom";
-import {v4} from "uuid";
 
 export default ({reactFlowWrapper}) => {
     const { dataSource } = useStoreState(state => state.canvas);
@@ -30,7 +29,7 @@ export default ({reactFlowWrapper}) => {
                         onClickAddDataBlock={onClickAddDataBlock}
                         dataSource={dataSource}
                         reactFlowWrapper={reactFlowWrapper}
-                        key={v4()}
+                        key={dataSource.dataCatalogItemId}
                 />
             default:
                 return null
