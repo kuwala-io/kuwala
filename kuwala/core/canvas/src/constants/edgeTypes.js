@@ -1,0 +1,1 @@
+export const CONNECTION_EDGE = 'CONNECTION_EDGE';

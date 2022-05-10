@@ -30,14 +30,18 @@ export default ({
         size='md',
         color='kuwalaGreen'
     }) => {
+
+    let style = {};
+    if(size !== 'fill') {
+        style.width = baseSize[size].width;
+        style.height = baseSize[size].height;
+    }
+    style.color = COLOR_MAP[color];
+
     return (
         <FontAwesomeIcon
             icon={icon}
-            style={{
-                width: baseSize[size].width,
-                height: baseSize[size].height,
-                color: COLOR_MAP[color],
-            }}
+            style={style}
             className={'user-select-none'}
             draggable={false}
         />
