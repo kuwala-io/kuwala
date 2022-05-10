@@ -12,19 +12,23 @@ module.exports = class DataBlocksDTO {
         name,
         dataCatalogType,
         dataSetName,
-        selectedAddressString
+        selectedAddressString,
+         connectedSourceNodeIds = [],
+         connectedTargetNodeIds = [],
     }) {
-        this.tableName = tableName
-        this.schemaName = schemaName
-        this.dataSetName = dataSetName
-        this.dataBlockId = dataBlockId
-        this.dataBlockEntityId = dataBlockEntityId
-        this.isConfigured = isConfigured
-        this.dataSourceDTO = dataSourceDTO
-        this.dataSourceId = dataSourceId
-        this.columns = columns
-        this.name = name
-        this.dataCatalogType = dataCatalogType
-        this.selectedAddressString = selectedAddressString
+        this.tableName = tableName;
+        this.schemaName = schemaName;
+        this.dataSetName = dataSetName;
+        this.dataBlockId = dataBlockId;
+        this.dataBlockEntityId = dataBlockEntityId;
+        this.isConfigured = isConfigured;
+        this.dataSourceDTO = dataSourceDTO;
+        this.dataSourceId = dataSourceId;
+        this.columns = columns;
+        this.name = name;
+        this.dataCatalogType = dataCatalogType;
+        this.selectedAddressString = selectedAddressString;
+        this.connectedSourceNodeIds = connectedSourceNodeIds;
+        this.connectedTargetNodeIds = connectedTargetNodeIds;
     }
 }
