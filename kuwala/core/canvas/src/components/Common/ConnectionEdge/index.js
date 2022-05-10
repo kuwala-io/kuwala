@@ -2,7 +2,7 @@ import React from 'react';
 import {getBezierPath, getEdgeCenter} from 'react-flow-renderer';
 import {KUWALA_GREEN, KUWALA_LIGHT_GREEN} from "../../../constants/styling";
 import {useStoreActions} from "easy-peasy";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import Icon from "../Icon";
 
 export default function CustomEdge({
            id,
@@ -68,7 +68,11 @@ export default function CustomEdge({
                     `}
                     onClick={() => removeElementById(id)}
                 >
-                    <FontAwesomeIcon icon={'times'}/>
+                    <Icon
+                        icon={'times'}
+                        color={'white'}
+                        size={'fill'}
+                    />
                 </button>
             </foreignObject>
         </>
