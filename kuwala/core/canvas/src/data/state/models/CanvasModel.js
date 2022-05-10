@@ -567,9 +567,11 @@ const getLabelByDataCatalogId = (catalogId) => {
 }
 
 const getElementById = (elements, elementId) => {
-    const selected = elements.filter((el) => el.id === elementId);
-    if (selected.length === 1) return selected[0];
-    return null;
+    try {
+        return elements.find((el) => el.id === elementId);
+    } catch (error) {
+        console.error(`Couldn't find element with id ${elementId}`)
+    }
 }
 
 export default CanvasModel;

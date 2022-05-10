@@ -7,19 +7,6 @@ const TransformationBlock = ({data, id}) => {
     const {toggleDataView, setSelectedElementByTransformationBlockId} = useStoreActions(actions => actions.canvas);
     const {elements} = useStoreActions(state => state.canvas);
 
-    const checkForConnectedDataBlock = () => {
-        let isConnected = false;
-        if(elements) {
-            elements.forEach((el) => {
-                if(el.source && el.target === id) {
-                    isConnected = true;
-                }
-                console.log(el)
-            });
-        }
-        return isConnected;
-    }
-
     return (
         <Block
             leftHandleActive={true}
