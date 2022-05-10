@@ -29,6 +29,7 @@ export default ({reactFlowWrapper}) => {
                         onClickAddDataBlock={onClickAddDataBlock}
                         dataSource={dataSource}
                         reactFlowWrapper={reactFlowWrapper}
+                        key={dataSource.dataCatalogItemId}
                 />
             default:
                 return null

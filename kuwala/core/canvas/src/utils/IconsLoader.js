@@ -13,6 +13,7 @@ import {
     faCheckCircle,
     faTimesCircle,
     faCogs,
+    faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 export default () => {
     library.add(
@@ -28,6 +29,7 @@ export default () => {
         faPlus,
         faCheckCircle,
         faTimesCircle,
-        faCogs
+        faCogs,
+        faTimes
     )
 }

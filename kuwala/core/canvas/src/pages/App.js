@@ -14,6 +14,8 @@ import NodeConfigModal from "../components/Modals/DataBlockConfig/DataBlockConfi
 import TransformationCatalogModal from "../components/Modals/TransformationCatalog/TransformationCatalogModal";
 import loadIcons from "../utils/IconsLoader";
 import TransformationConfigModal from "../components/Modals/TransformationConfigModal/TransformationConfigModal";
+import ConnectionLine from "../components/Common/ConnectionLine";
+import ConnectionEdge from "../components/Common/ConnectionEdge"
 
 export default function () {
     const reactFlowWrapper = useRef(null);
@@ -55,6 +57,7 @@ export default function () {
                 >
                     <ReactFlow
                         elements={elements}
+                        connectionLineComponent={ConnectionLine}
                         onConnect={onConnect}
                         onElementsRemove={onElementsRemove}
                         onElementClick={(event, elements) => {
@@ -68,6 +71,9 @@ export default function () {
                         nodeTypes={{
                             TRANSFORMATION_BLOCK: TransformationBlock,
                             DATA_BLOCK: DataBlock,
+                        }}
+                        edgeTypes={{
+                            CONNECTION_EDGE: ConnectionEdge
                         }}
                         selectNodesOnDrag={false}
                         onLoad={onLoad}

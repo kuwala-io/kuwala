@@ -8,7 +8,9 @@ module.exports = class TransformationBlockDTO {
         transformationCatalog,
         inputBlockIds,
         macroParameters,
-        name
+        name,
+        connectedSourceNodeIds = [],
+        connectedTargetNodeIds = [],
      }) {
         this.transformationBlockId = transformationBlockId;
         this.transformationBlockEntityId = transformationBlockEntityId;
@@ -18,5 +20,7 @@ module.exports = class TransformationBlockDTO {
         this.inputBlockIds = inputBlockIds;
         this.macroParameters = macroParameters;
         this.name = name;
+        this.connectedSourceNodeIds = connectedSourceNodeIds;
+        this.connectedTargetNodeIds = connectedTargetNodeIds;
     }
 }
