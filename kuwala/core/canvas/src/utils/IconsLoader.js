@@ -2,34 +2,36 @@ import {library} from "@fortawesome/fontawesome-svg-core";
 import {
     faAlignLeft,
     faCalculator,
+    faCheckCircle,
     faClock,
+    faCogs,
     faFilter,
-    faLink,
-    faMapMarkedAlt,
-    faShuffle,
     faGreaterThan,
     faGreaterThanEqual,
+    faLink,
+    faMapMarkedAlt,
     faPlus,
-    faCheckCircle,
-    faTimesCircle,
-    faCogs,
+    faShuffle,
+    faSyncAlt,
     faTimes,
+    faTimesCircle
 } from "@fortawesome/free-solid-svg-icons";
 export default () => {
     library.add(
-        faClock,
         faAlignLeft,
         faCalculator,
-        faMapMarkedAlt,
-        faLink,
+        faCheckCircle,
+        faClock,
+        faCogs,
         faFilter,
-        faShuffle,
         faGreaterThan,
         faGreaterThanEqual,
+        faLink,
+        faMapMarkedAlt,
         faPlus,
-        faCheckCircle,
-        faTimesCircle,
-        faCogs,
-        faTimes
+        faShuffle,
+        faSyncAlt,
+        faTimes,
+        faTimesCircle
     )
 }

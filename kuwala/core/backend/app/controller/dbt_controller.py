@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import subprocess
 
+from fastapi import HTTPException
 import oyaml as yaml
 
 
@@ -53,3 +54,21 @@ def create_empty_dbt_project(data_source_id: str, warehouse: str, target_dir: st
         file.close()
 
     subprocess.call("dbt deps", cwd=f"{target_dir}/{data_source_id}", shell=True)
+
+
+def run_dbt_models(dbt_dir: str, dbt_model_names: list[str]):
+    output = subprocess.run(
+        f"dbt run --select {' '.join(dbt_model_names)} --profiles-dir .",
+        cwd=dbt_dir,
+        shell=True,
+        capture_output=True,
+    )
+    number_of_errors = int(
+        output.stdout.decode("utf8").split("ERROR=")[1].split("SKIP=")[0][:-1]
+    )
+
+    if number_of_errors:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Failed to run dbt model with {number_of_errors} {'errors' if number_of_errors > 1 else 'error'}",
+        )

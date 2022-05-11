@@ -5,11 +5,10 @@ import controller.data_source.bigquery as bigquery_controller
 import controller.data_source.postgres as postgres_controller
 import controller.data_source.snowflake as snowflake_controller
 from database.crud.common import get_object_by_id
-from database.database import get_db
 import database.models.data_source as models
 from database.schemas.data_source import ConnectionParameters
 from database.utils.encoder import list_of_dicts_to_dict
-from fastapi import Depends, HTTPException
+from fastapi import HTTPException
 import oyaml as yaml
 from sqlalchemy.orm import Session
 
@@ -35,7 +34,7 @@ def get_controller(data_catalog_item_id: str):
 
 def get_data_source_and_data_catalog_item_id(
     data_source_id: str,
-    db: Session = Depends(get_db),
+    db: Session,
 ) -> tuple[models.DataSource, str]:
     data_catalog_items = ["bigquery", "postgres", "snowflake"]
     data_source = get_object_by_id(
@@ -68,7 +67,7 @@ def get_connection_parameters(data_source: models.DataSource) -> ConnectionParam
 def test_connection(
     data_source_id: str,
     connection_parameters: ConnectionParameters,
-    db: Session = Depends(get_db),
+    db: Session,
 ) -> bool:
     data_source, data_catalog_item_id = get_data_source_and_data_catalog_item_id(
         data_source_id=data_source_id, db=db
@@ -78,7 +77,7 @@ def test_connection(
     return controller.test_connection(connection_parameters=connection_parameters)
 
 
-def get_schema(data_source_id: str, db: Session = Depends(get_db)):
+def get_schema(data_source_id: str, db: Session):
     data_source, data_catalog_item_id = get_data_source_and_data_catalog_item_id(
         db=db, data_source_id=data_source_id
     )
@@ -93,7 +92,7 @@ def get_columns(
     schema_name: str,
     dataset_name: str,
     table_name: str,
-    db: Session = Depends(get_db),
+    db: Session,
 ):
     columns = None
     data_source, data_catalog_item_id = get_data_source_and_data_catalog_item_id(
@@ -130,7 +129,7 @@ def get_table_preview(
     columns: Optional[list[str]],
     limit_columns: int,
     limit_rows: int,
-    db: Session = Depends(get_db),
+    db: Session,
 ):
     data_source, data_catalog_item_id = get_data_source_and_data_catalog_item_id(
         db=db, data_source_id=data_source_id

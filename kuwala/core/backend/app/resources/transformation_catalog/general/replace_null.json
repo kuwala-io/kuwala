@@ -1,0 +1,85 @@
+{
+  "id": "replace_null",
+  "category": "general",
+  "name": "Replace null",
+  "icon": "paste",
+  "description": "With this transformation, you can replace null values in a column with a given value.",
+  "required_column_types": [],
+  "optional_column_types": ["text", "numeric", "date", "timestamp", "boolean"],
+  "min_number_of_input_blocks": 1,
+  "max_number_of_input_blocks": 1,
+  "macro_parameters": [
+    {
+      "id": "column",
+      "name": "Column",
+      "type": "text"
+    },
+    {
+      "id": "replacement_value",
+      "name": "Replacement value",
+      "type": "text"
+    }
+  ],
+  "examples_before": [
+    {
+      "columns": [
+        "order_number",
+        "basket_size",
+        "shipping_cost"
+      ],
+      "rows": [
+        [
+          "63472",
+          "39.99",
+          "4.99"
+        ],
+        [
+          "63473",
+          "74.97",
+          "NULL"
+        ],
+        [
+          "63474",
+          "99.99",
+          "4.99"
+        ],
+        [
+          "63475",
+          "9.99",
+          "NULL"
+        ]
+      ]
+    }
+  ],
+  "examples_after": [
+    {
+      "columns": [
+        "order_number",
+        "basket_size",
+        "shipping_cost"
+      ],
+      "rows": [
+        [
+          "63472",
+          "39.99",
+          "4.99"
+        ],
+        [
+          "63473",
+          "74.97",
+          "4.99"
+        ],
+        [
+          "63474",
+          "99.99",
+          "4.99"
+        ],
+        [
+          "63475",
+          "9.99",
+          "4.99"
+        ]
+      ]
+    }
+  ]
+}

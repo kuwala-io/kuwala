@@ -4,7 +4,7 @@ The Kuwala canvas enables you to build complex analytics workflows without needi
 data sources, apply transformations on top of them, and finally load them into a model or export them to your favourite
 BI tool.
 
-To Run the Project:
+To run the Project, execute the following commands from inside the `kuwala/core/canvas`:
 
 1. Make sure that you have `node` installed on your machine
 2. npm ci
