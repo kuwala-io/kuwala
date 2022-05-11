@@ -1,4 +1,4 @@
-{% macro add_columns(dbt_model, columns, result_name) %}
+{% macro add_columns(dbt_model, block_columns, columns, result_name) %}
     {% set rel = '{{ ref("' + dbt_model + '") }}' %}
 
     {%- set calculation -%}
@@ -6,14 +6,14 @@
     {%- endset -%}
 
     {% set query %}
-        -- KUWALA_TRANSFORMATION_START
         SELECT *, {{ calculation[:-3] }} AS {{ result_name }}
         FROM {{ rel }}
-        -- KUWALA_TRANSFORMATION_END
     {% endset %}
 
+    {% set result = get_result_query(block_columns, query) %}
+
     {% if execute %}
-        {{ log(query, info=True) }}
-        {% do return(query) %}
+        {{ log(result, info=True) }}
+        {% do return(result) %}
     {% endif %}
 {% endmacro %}

@@ -130,3 +130,38 @@ We are using dbt for doing transformations on top of data warehouses, so we are 
 - table_name
 
 </details>
+
+## Transformations
+
+To add a new transformation, follow these instructions: TBD
+
+The following transformations are currently available:
+
+- General
+  <details>
+    <summary>Group by</summary>
+  
+    Hint: Syntax for aggregated columns is `COLUMN_NAME` + "KUWALA_AGG" + `COLUMN_AGG`.
+  </details>
+  
+  - Is false
+  - Is not null
+  - Is true
+  - Remove duplicates
+  - Replace null
+- Merging
+  - Join by ID
+  - Union
+- Numeric
+  - Add columns
+  - Compare with number
+  - Manipulate numbers
+  - Text to number
+- Text
+  - Contains keyword
+  - Filter by keywords
+  - Filter by regex
+  - Replace string
+- Time
+  - Compare with date
+  - Get date

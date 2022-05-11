@@ -1,0 +1,90 @@
+{
+  "id": "replace_string",
+  "category": "text",
+  "name": "Replace string",
+  "icon": "sync-alt",
+  "description": "With this transformation, you can replace parts of a string in a column with a new string.",
+  "required_column_types": ["text"],
+  "optional_column_types": [],
+  "min_number_of_input_blocks": 1,
+  "max_number_of_input_blocks": 1,
+  "macro_parameters": [
+    {
+      "id": "column",
+      "name": "Column",
+      "type": "text"
+    },
+    {
+      "id": "old_string",
+      "name": "Old string",
+      "type": "text"
+    },
+    {
+      "id": "new_string",
+      "name": "New string",
+      "type": "text"
+    }
+  ],
+  "examples_before": [
+    {
+      "columns": [
+        "first_name",
+        "last_name",
+        "country"
+      ],
+      "rows": [
+        [
+          "John",
+          "Doe",
+          "US"
+        ],
+        [
+          "Laura",
+          "Santos",
+          "Spain"
+        ],
+        [
+          "Marc",
+          "Johnson",
+          "US"
+        ],
+        [
+          "Luisa",
+          "Jacobs",
+          "EN"
+        ]
+      ]
+    }
+  ],
+  "examples_after": [
+    {
+      "columns": [
+        "first_name",
+        "last_name",
+        "country"
+      ],
+      "rows": [
+        [
+          "John",
+          "Doe",
+          "US"
+        ],
+        [
+          "Laura",
+          "Santos",
+          "ES"
+        ],
+        [
+          "Marc",
+          "Johnson",
+          "US"
+        ],
+        [
+          "Luisa",
+          "Jacobs",
+          "EN"
+        ]
+      ]
+    }
+  ]
+}

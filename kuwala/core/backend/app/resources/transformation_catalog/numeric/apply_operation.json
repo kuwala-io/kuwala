@@ -1,0 +1,102 @@
+{
+  "id": "apply_operation",
+  "category": "numeric",
+  "name": "Apply operation",
+  "icon": "calculator",
+  "description": "With this transformation, you can manipulate a numeric column by applying basic arithmetic operations.",
+  "required_column_types": ["numeric"],
+  "optional_column_types": [],
+  "min_number_of_input_blocks": 1,
+  "max_number_of_input_blocks": 1,
+  "macro_parameters": [
+    {
+      "id": "column",
+      "name": "Column",
+      "type": "text"
+    }, {
+      "id": "operator",
+      "name": "Operator",
+      "type": "text",
+      "options": [
+        {
+          "id": "add",
+          "name": "Add"
+        }, {
+          "id": "subtract",
+          "name": "Subtract"
+        }, {
+          "id": "multiply",
+          "name": "Multiply"
+        }, {
+          "id": "divide",
+          "name": "Divide"
+        }
+      ]
+    }, {
+      "id": "value",
+      "name": "Value",
+      "type": "numeric"
+    }, {
+      "id": "result_name",
+      "name": "Result name",
+      "type": "text"
+    }
+  ],
+  "examples_before": [
+    {
+      "columns": [
+        "order_number",
+        "weight_in_kg"
+      ],
+      "rows": [
+        [
+          "63472",
+          "1.2"
+        ],
+        [
+          "63473",
+          "0.6"
+        ],
+        [
+          "63474",
+          "0.75"
+        ],
+        [
+          "63475",
+          "2.0"
+        ]
+      ]
+    }
+  ],
+  "examples_after": [
+    {
+      "columns": [
+        "order_number",
+        "weight_in_kg",
+        "weight_in_g"
+      ],
+      "rows": [
+        [
+          "63472",
+          "1.2",
+          "1200"
+        ],
+        [
+          "63473",
+          "0.6",
+          "600"
+        ],
+        [
+          "63474",
+          "0.75",
+          "750"
+        ],
+        [
+          "63475",
+          "2.0",
+          "2000"
+        ]
+      ]
+    }
+  ]
+}

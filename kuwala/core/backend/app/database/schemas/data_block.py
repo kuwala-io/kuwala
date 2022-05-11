@@ -29,6 +29,5 @@ class DataBlockCreate(BaseModel):
 
 
 class DataBlockUpdate(BaseModel):
-    id: str
     name: Optional[str] = None
     columns: Optional[List[str]] = None

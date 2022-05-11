@@ -1,11 +1,9 @@
-{% macro compare_with_number(dbt_model, block_columns, column, comparator, comparison_value) %}
-    {% set comparator_value = get_comparator_value(comparator) %}
+{% macro get_date(dbt_model, block_columns, column, result_name) %}
     {% set rel = '{{ ref("' + dbt_model + '") }}' %}
 
     {% set query %}
-        SELECT *
+        SELECT *, DATE({{ column }}) AS {{ result_name }}
         FROM {{ rel }}
-        WHERE {{ column }} {{ comparator_value }} {{ comparison_value }}
     {% endset %}
 
     {% set result = get_result_query(block_columns, query) %}
