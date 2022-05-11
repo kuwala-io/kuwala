@@ -36,12 +36,15 @@ def create_data_block(
     return data_block
 
 
-@router.put("/")
+@router.put("/{data_block_id}")
 def update_data_block(
+    data_block_id: str,
     data_block: DataBlockUpdate,
     db: Session = Depends(get_db),
 ):
-    return data_block_controller.update_data_block(data_block=data_block, db=db)
+    return data_block_controller.update_data_block(
+        data_block_id=data_block_id, data_block=data_block, db=db
+    )
 
 
 @router.get("/{data_block_id}/preview")

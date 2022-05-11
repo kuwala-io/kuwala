@@ -1,17 +1,17 @@
-{% macro union(dbt_model_left, dbt_model_right) %}
+{% macro union(block_columns, dbt_model_left, dbt_model_right) %}
     {% set rel_left = '{{ ref("' + dbt_model_left + '") }}' %}
     {% set rel_right = '{{ ref("' + dbt_model_right + '") }}' %}
 
     {% set query %}
-        -- KUWALA_TRANSFORMATION_START
         SELECT * FROM {{ rel_left }}
         UNION
         SELECT * FROM {{ rel_right }}
-        -- KUWALA_TRANSFORMATION_END
     {% endset %}
 
+    {% set result = get_result_query(block_columns, query) %}
+
     {% if execute %}
-        {{ log(query, info=True) }}
-        {% do return(query) %}
+        {{ log(result, info=True) }}
+        {% do return(result) %}
     {% endif %}
 {% endmacro %}

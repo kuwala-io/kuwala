@@ -1,0 +1,62 @@
+{
+  "id": "text_to_number",
+  "category": "numeric",
+  "name": "Text to number",
+  "icon": "align-left",
+  "description": "With this transformation, you can transform a column containing numbers as text to numeric values if possible which is necessary to apply numeric transformations to that column.",
+  "required_column_types": ["text"],
+  "optional_column_types": [],
+  "min_number_of_input_blocks": 1,
+  "max_number_of_input_blocks": 1,
+  "macro_parameters": [
+    {
+      "id": "column",
+      "name": "Column",
+      "type": "text"
+    }
+  ],
+  "examples_before": [
+    {
+      "columns": [
+        "candidate_id",
+        "years_of_experience"
+      ],
+      "rows": [
+        [
+          "63472",
+          "3"
+        ],
+        [
+          "63473",
+          "5-7"
+        ],
+        [
+          "63474",
+          " 10"
+        ]
+      ]
+    }
+  ],
+  "examples_after": [
+    {
+      "columns": [
+        "candidate_id",
+        "years_of_experience"
+      ],
+      "rows": [
+        [
+          "63472",
+          "3"
+        ],
+        [
+          "63473",
+          "NULL"
+        ],
+        [
+          "63474",
+          "10"
+        ]
+      ]
+    }
+  ]
+}

@@ -5,7 +5,7 @@
   "icon": "link",
   "description": "With this transformation, you can join two tables by ID.",
   "required_column_types": [],
-  "optional_column_types": ["text", "date", "numeric", "boolean"],
+  "optional_column_types": ["text", "numeric", "date", "timestamp", "boolean"],
   "min_number_of_input_blocks": 2,
   "max_number_of_input_blocks": 2,
   "macro_parameters": [

@@ -1,0 +1,70 @@
+{
+  "id": "is_not_null",
+  "category": "general",
+  "name": "Is not null",
+  "icon": "check-circle",
+  "description": "With this transformation, you can filter a table based on a column that should not be null.",
+  "required_column_types": [],
+  "optional_column_types": ["text", "numeric", "date", "timestamp", "boolean"],
+  "min_number_of_input_blocks": 1,
+  "max_number_of_input_blocks": 1,
+  "macro_parameters": [
+    {
+      "id": "column",
+      "name": "Column",
+      "type": "text"
+    }
+  ],
+  "examples_before": [
+    {
+      "columns": [
+        "order_number",
+        "order_value",
+        "cancelled"
+      ],
+      "rows": [
+        [
+          "63472",
+          "39.99",
+          "false"
+        ],
+        [
+          "63473",
+          "NULL",
+          "NULL"
+        ],
+        [
+          "63474",
+          "NULL",
+          "false"
+        ],
+        [
+          "63475",
+          "9.99",
+          "NULL"
+        ]
+      ]
+    }
+  ],
+  "examples_after": [
+    {
+      "columns": [
+        "order_number",
+        "order_value",
+        "cancelled"
+      ],
+      "rows": [
+        [
+          "63472",
+          "39.99",
+          "false"
+        ],
+        [
+          "63475",
+          "9.99",
+          "NULL"
+        ]
+      ]
+    }
+  ]
+}

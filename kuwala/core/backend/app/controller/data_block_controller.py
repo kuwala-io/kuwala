@@ -6,13 +6,13 @@ from controller.data_source.data_source import (
     get_data_source_and_data_catalog_item_id,
     get_table_preview,
 )
+from controller.dbt_controller import run_dbt_models
 from controller.utils.yaml_utils import (
     terminal_output_to_base_model,
     terminal_output_to_source_yaml,
 )
-import database.crud.common as crud
-from database.crud.common import generate_object_id
-import database.models.data_block as models
+from database.crud.common import generate_object_id, get_object_by_id, update_attributes
+from database.models.data_block import DataBlock
 from database.schemas.data_block import DataBlockCreate, DataBlockUpdate
 import oyaml as yaml
 from sqlalchemy.orm import Session
@@ -54,7 +54,14 @@ def create_source_yaml(dbt_dir: str, schema_name: str, update_yaml: bool = False
         file.close()
 
 
-def create_base_model(dbt_dir: str, schema_name: str, table_name: str):
+def create_base_model(
+    dbt_dir: str,
+    data_source_id: str,
+    schema_name: str,
+    dataset_name: str,
+    table_name: str,
+    db: Session,
+):
     base_model_name = f"stg_{schema_name}_{table_name}"
     dbt_base_model_path = (
         f"{dbt_dir}/models/staging/{schema_name}/{base_model_name}.sql"
@@ -70,7 +77,14 @@ def create_base_model(dbt_dir: str, schema_name: str, table_name: str):
         shell=True,
         capture_output=True,
     )
-    base_model = terminal_output_to_base_model(output=output)
+    base_model = terminal_output_to_base_model(
+        output=output,
+        data_source_id=data_source_id,
+        schema_name=schema_name,
+        dataset_name=dataset_name,
+        table_name=table_name,
+        db=db,
+    )
 
     with open(dbt_base_model_path, "w+") as file:
         file.write(base_model)
@@ -137,8 +151,11 @@ def create_data_block(data_block: DataBlockCreate, db: Session):
     _, data_catalog_item_id = get_data_source_and_data_catalog_item_id(
         data_source_id=data_block.data_source_id, db=db
     )
+    data_source_id = data_block.data_source_id
+    dataset_name = data_block.dataset_name
     schema_name = data_block.schema_name
     table_name = data_block.table_name
+    columns = list(map(lambda c: c.lower(), data_block.columns))
 
     if data_catalog_item_id == "bigquery":
         schema_name = data_block.dataset_name
@@ -147,12 +164,17 @@ def create_data_block(data_block: DataBlockCreate, db: Session):
         schema_name = data_block.schema_name.lower()
         table_name = data_block.table_name.lower()
 
-    dbt_dir = get_dbt_dir(data_source_id=data_block.data_source_id)
+    dbt_dir = get_dbt_dir(data_source_id=data_source_id)
 
     create_source_yaml(dbt_dir=dbt_dir, schema_name=schema_name)
 
     base_model_name = create_base_model(
-        dbt_dir=dbt_dir, schema_name=schema_name, table_name=table_name
+        dbt_dir=dbt_dir,
+        data_source_id=data_source_id,
+        schema_name=schema_name,
+        dataset_name=dataset_name,
+        table_name=table_name,
+        db=db,
     )
     data_block_id = generate_object_id()
     model_name = create_model(
@@ -161,14 +183,10 @@ def create_data_block(data_block: DataBlockCreate, db: Session):
         name=data_block.name,
         schema_name=schema_name,
         table_name=table_name,
-        columns=data_block.columns,
+        columns=columns,
     )
 
-    subprocess.call(
-        f"dbt run --select {base_model_name} {model_name} --profiles-dir .",
-        cwd=dbt_dir,
-        shell=True,
-    )
+    run_dbt_models(dbt_dir=dbt_dir, dbt_model_names=[base_model_name, model_name])
     create_model_yaml(
         dbt_dir=dbt_dir,
         schema_name=schema_name,
@@ -180,8 +198,8 @@ def create_data_block(data_block: DataBlockCreate, db: Session):
 
 
 def update_data_block_name(
-    db: Session, dbt_dir: str, data_block: models.DataBlock, updated_name: str
-) -> models.DataBlock:
+    db: Session, dbt_dir: str, data_block: DataBlock, updated_name: str
+) -> DataBlock:
     updated_model_name = generate_model_name(updated_name, data_block_id=data_block.id)
     _, data_catalog_item_id = get_data_source_and_data_catalog_item_id(
         data_source_id=data_block.data_source_id, db=db
@@ -215,7 +233,7 @@ def update_data_block_name(
             yaml.safe_dump(model_yml, write_file, indent=4)
             write_file.close()
 
-    return crud.update_attributes(
+    return update_attributes(
         db=db,
         db_object=data_block,
         attributes=[
@@ -226,7 +244,7 @@ def update_data_block_name(
 
 
 def update_data_block_columns(
-    db: Session, dbt_dir: str, data_block: models.DataBlock, updated_columns: [str]
+    db: Session, dbt_dir: str, data_block: DataBlock, updated_columns: [str]
 ):
     _, data_catalog_item_id = get_data_source_and_data_catalog_item_id(
         data_source_id=data_block.data_source_id, db=db
@@ -245,11 +263,7 @@ def update_data_block_columns(
         columns=updated_columns,
         generate_name=False,
     )
-    subprocess.call(
-        f"dbt run --select {data_block.dbt_model} --profiles-dir .",
-        cwd=dbt_dir,
-        shell=True,
-    )
+    run_dbt_models(dbt_dir=dbt_dir, dbt_model_names=[data_block.dbt_model])
     create_model_yaml(
         dbt_dir=dbt_dir,
         schema_name=schema_name,
@@ -257,17 +271,15 @@ def update_data_block_columns(
         table_name=data_block.table_name,
     )
 
-    return crud.update_attributes(
+    return update_attributes(
         db=db,
         db_object=data_block,
         attributes=[dict(name="columns", value=updated_columns)],
     )
 
 
-def update_data_block(data_block: DataBlockUpdate, db: Session):
-    db_data_block = crud.get_object_by_id(
-        db=db, model=models.DataBlock, object_id=data_block.id
-    )
+def update_data_block(data_block_id: str, data_block: DataBlockUpdate, db: Session):
+    db_data_block = get_object_by_id(db=db, model=DataBlock, object_id=data_block_id)
     dbt_dir = get_dbt_dir(data_source_id=db_data_block.data_source_id)
 
     if data_block.name:
@@ -278,11 +290,7 @@ def update_data_block(data_block: DataBlockUpdate, db: Session):
             updated_name=data_block.name,
         )
 
-        subprocess.call(
-            f"dbt run --select {db_data_block.dbt_model} --profiles-dir .",
-            cwd=dbt_dir,
-            shell=True,
-        )
+        run_dbt_models(dbt_dir=dbt_dir, dbt_model_names=[db_data_block.dbt_model])
 
     if data_block.columns:
         db_data_block = update_data_block_columns(
@@ -301,9 +309,7 @@ def get_data_block_preview(
     limit_columns: int = None,
     limit_rows: int = None,
 ):
-    data_block = crud.get_object_by_id(
-        db=db, model=models.DataBlock, object_id=data_block_id
-    )
+    data_block = get_object_by_id(db=db, model=DataBlock, object_id=data_block_id)
     data_source, _ = get_data_source_and_data_catalog_item_id(
         db=db, data_source_id=data_block.data_source_id
     )
