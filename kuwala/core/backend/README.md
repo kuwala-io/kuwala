@@ -148,14 +148,16 @@ The following transformations are currently available:
   - Is not null
   - Is true
   - Remove duplicates
+  - Remove null
   - Replace null
 - Merging
   - Join by ID
   - Union
 - Numeric
   - Add columns
+  - Apply operation
   - Compare with number
-  - Manipulate numbers
+  - Divide columns
   - Text to number
 - Text
   - Contains keyword

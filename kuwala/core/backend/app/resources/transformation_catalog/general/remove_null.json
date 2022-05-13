@@ -1,0 +1,70 @@
+{
+  "id": "remove_null",
+  "category": "general",
+  "name": "Remove null",
+  "icon": "filter",
+  "description": "With this transformation, you can filter a table based on a column that should not be null.",
+  "required_column_types": [],
+  "optional_column_types": ["text", "numeric", "date", "timestamp", "boolean"],
+  "min_number_of_input_blocks": 1,
+  "max_number_of_input_blocks": 1,
+  "macro_parameters": [
+    {
+      "id": "column",
+      "name": "Column",
+      "type": "text"
+    }
+  ],
+  "examples_before": [
+    {
+      "columns": [
+        "order_number",
+        "order_value",
+        "cancelled"
+      ],
+      "rows": [
+        [
+          "63472",
+          "39.99",
+          "false"
+        ],
+        [
+          "63473",
+          "NULL",
+          "true"
+        ],
+        [
+          "63474",
+          "99.99",
+          "false"
+        ],
+        [
+          "63475",
+          "NULL",
+          "false"
+        ]
+      ]
+    }
+  ],
+  "examples_after": [
+    {
+      "columns": [
+        "order_number",
+        "order_value",
+        "cancelled"
+      ],
+      "rows": [
+        [
+          "63472",
+          "39.99",
+          "false"
+        ],
+        [
+          "63474",
+          "99.99",
+          "false"
+        ]
+      ]
+    }
+  ]
+}
