@@ -1,0 +1,93 @@
+{
+  "id": "divide_columns",
+  "category": "numeric",
+  "name": "Divide columns",
+  "icon": "divide",
+  "description": "With this transformation, you can divide one column by another and store the result in a new one.",
+  "required_column_types": ["numeric"],
+  "optional_column_types": [],
+  "min_number_of_input_blocks": 1,
+  "max_number_of_input_blocks": 1,
+  "macro_parameters": [
+    {
+      "id": "dividend_column",
+      "name": "Dividend",
+      "type": "text"
+    }, {
+      "id": "divisor_column",
+      "name": "Divisor",
+      "type": "text"
+    }, {
+      "id": "result_name",
+      "name": "Result name",
+      "type": "text"
+    }
+  ],
+  "examples_before": [
+    {
+      "columns": [
+        "customer_id",
+        "lifetime_order_amount",
+        "number_of_orders"
+      ],
+      "rows": [
+        [
+          "63472",
+          "358.42",
+          "3"
+        ],
+        [
+          "63473",
+          "56.23",
+          "1"
+        ],
+        [
+          "63474",
+          "4367.83",
+          "12"
+        ],
+        [
+          "63475",
+          "10337.45",
+          "6"
+        ]
+      ]
+    }
+  ],
+  "examples_after": [
+    {
+      "columns": [
+        "customer_id",
+        "lifetime_order_amount",
+        "number_of_orders",
+        "average_order_amount"
+      ],
+      "rows": [
+        [
+          "63472",
+          "358.42",
+          "3",
+          "119.47"
+        ],
+        [
+          "63473",
+          "56.23",
+          "1",
+          "56.23"
+        ],
+        [
+          "63474",
+          "4367.83",
+          "12",
+          "363.99"
+        ],
+        [
+          "63475",
+          "10337.45",
+          "6",
+          "1722.91"
+        ]
+      ]
+    }
+  ]
+}

@@ -4,7 +4,7 @@
     {% set columns_string = get_columns_string(column_names, column) %}
 
     {% set query %}
-        SELECT {{ columns_string }}, CASE WHEN {{ column }} IS NOT NULL THEN {{ column }} ELSE {{ replacement_value }} END AS {{ column }}
+        SELECT {{ columns_string }}, CASE WHEN {{ column }} IS NOT NULL THEN {{ column }} ELSE {% if replacement_value is string %}'{{ replacement_value }}'{% else %}{{ replacement_value }}{% endif %} END AS {{ column }}
         FROM {{ rel }}
     {% endset %}
 
