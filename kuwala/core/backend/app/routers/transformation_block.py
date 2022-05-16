@@ -1,3 +1,4 @@
+import controller.data_source.data_source as data_source_controller
 import controller.transformation_block_controller as transformation_block_controller
 import database.crud.transformation_block as crud
 from database.database import get_db
@@ -26,12 +27,21 @@ def create_transformation_block(
     ) = transformation_block_controller.create_transformation_block(
         transformation_block=transformation_block, db=db
     )
+    columns = data_source_controller.get_columns(
+        data_source_id=data_source_id,
+        schema_name="dbt_kuwala",
+        dataset_name="dbt_kuwala",
+        table_name=model_name,
+        db=db,
+    )
+    columns = list(map(lambda c: c["column"], columns))
     transformation_block = crud.create_transformation_block(
         db=db,
         transformation_block=transformation_block,
         data_source_id=data_source_id,
         generated_id=transformation_block_id,
         dbt_model=model_name,
+        columns=columns,
     )
 
     return transformation_block
