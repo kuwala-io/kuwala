@@ -5,7 +5,6 @@ import Block from "../../Common/Block";
 const TransformationBlock = ({data, id}) => {
     const {toggleTransformationConfigModal} = useStoreActions(actions => actions.common);
     const {toggleDataView, setSelectedElementByTransformationBlockId} = useStoreActions(actions => actions.canvas);
-    const {elements} = useStoreActions(state => state.canvas);
 
     return (
         <Block
@@ -14,7 +13,6 @@ const TransformationBlock = ({data, id}) => {
             blockColor={'kuwalaPurple'}
             hideLeftHandle={false}
             hideRightHandle={false}
-
             primaryButtonDisabled={!(data.transformationBlock.connectedSourceNodeIds.length >= data.transformationCatalog.minNumberOfInputBlocks)}
             primaryButtonOnClick={() => {
                 toggleTransformationConfigModal();
@@ -22,7 +20,6 @@ const TransformationBlock = ({data, id}) => {
             }}
             secondaryButtonDisabled={!data.transformationBlock.isConfigured}
             secondaryButtonOnClick={toggleDataView}
-
             title={data.transformationBlock.name}
             data={data}
             icon={data.transformationBlock.transformationCatalog.icon}

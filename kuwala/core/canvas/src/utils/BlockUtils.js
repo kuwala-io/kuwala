@@ -34,3 +34,19 @@ export function getEntityElementEntityBlockId (element) {
     }
     return null;
 }
+
+export function getBlockByEntityId(elements, entityId) {
+    const dataBlock = elements.find((el) => el.type === DATA_BLOCK && el.data.dataBlock.dataBlockEntityId === entityId);
+
+    if (!dataBlock) {
+        const transformationBlock = elements.find((el) => el.type === TRANSFORMATION_BLOCK && el.data.transformationBlock.transformationBlockEntityId === entityId);
+
+        if (transformationBlock) {
+            return transformationBlock;
+        }
+
+        return null;
+    }
+
+    return dataBlock;
+}

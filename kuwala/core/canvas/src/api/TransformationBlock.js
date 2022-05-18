@@ -1,7 +1,6 @@
 import baseAxios from "./BaseAxios";
 
 import {
-    DATA_BLOCK,
     TRANSFORMATION_BLOCK,
 } from "../constants/api"
 

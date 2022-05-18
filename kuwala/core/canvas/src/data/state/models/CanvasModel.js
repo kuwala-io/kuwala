@@ -67,6 +67,7 @@ const CanvasModel = {
         })
         state.elements = updatedElements
     }),
+
     convertDataBlocksIntoElement: thunk(async (actions, nodeToRemove, {getState}) => {
         const {dataBlocks, elements} = getState();
         dataBlocks.forEach((block) => {

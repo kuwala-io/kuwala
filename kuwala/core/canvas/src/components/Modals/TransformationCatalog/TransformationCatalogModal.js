@@ -167,9 +167,10 @@ export default ({isOpen}) => {
         }
     }
 
-    const renderCatalogItem = (catalogItem,index) => {
+    const renderCatalogItem = (catalogItem, index) => {
         return (
             <Button
+                key={index}
                 onClick={()=>{
                             setSelectedCatalogOption(null);
                             setSelectedTransformationIndex(index)
@@ -230,6 +231,7 @@ export default ({isOpen}) => {
     const renderOptionItem = (optionItem, index) => {
         return (
             <Button
+                key={index}
                 solid={false}
                 color={'kuwalaPurple'}
                 onClick={()=>{
@@ -272,7 +274,7 @@ export default ({isOpen}) => {
                     <div className={Classes.OptionDetailsParameterAndExample}>
                         <div className={Classes.OptionDetailsParameterContainer}>
                             <p>Parameters</p>
-                            {optionItem.macroParameters.map((el) => <li>{el.name}</li>)}
+                            {optionItem.macroParameters.map((el, i) => <li key={i}>{el.name}</li>)}
                         </div>
                         <div className={Classes.OptionDetailsExampleContainer}>
                             {renderExampleTableWrapper(optionItem)}

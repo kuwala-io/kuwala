@@ -16,7 +16,7 @@
     },
     {
       "id": "keywords",
-      "name": "Keyword",
+      "name": "Keywords",
       "type": "list[text]"
     }
   ],

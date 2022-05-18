@@ -19,7 +19,6 @@ const Table = ({columns, data}) => {
 
     let pageSize;
     if (data.length >= 300) pageSize = 300
-    else if (data.length <= 20) pageSize = 20;
     else pageSize = data.length;
 
     return (
