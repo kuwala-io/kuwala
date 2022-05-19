@@ -6,7 +6,7 @@ Every new issue, question, or comment is a contribution and very welcome!
 ## Join us on Slack
 
 The best first step to get involved is to join the 
-[Kuwala Community on Slack](https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-pXKFBjbnl7_P3nXtwca5ag). 
+[Kuwala Community on Slack](https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-2cdhReNACXDkLhuh0jFzZw). 
 There we discuss everything related to our roadmap, development, and support.
 A quick hello in the `#why-i-joined` channel is the best way to start a conversation.
 

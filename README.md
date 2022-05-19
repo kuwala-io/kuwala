@@ -1,10 +1,10 @@
-[![Slack](https://img.shields.io/badge/slack-chat-orange.svg)](https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-pXKFBjbnl7_P3nXtwca5ag)
+[![Slack](https://img.shields.io/badge/slack-chat-orange.svg)](https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-2cdhReNACXDkLhuh0jFzZw)
 ![License](https://img.shields.io/github/license/kuwala-io/kuwala)
 
 <img src="./docs/images/kuwala_header_github.png" width="100%" />
 
 <p align="center">
-  <a href="https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-pXKFBjbnl7_P3nXtwca5ag"><img src="./docs/images/slack_join_button_github.png" height="96" /></a>
+  <a href="https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-2cdhReNACXDkLhuh0jFzZw"><img src="./docs/images/slack_join_button_github.png" height="96" /></a>
   <a href="https://github.com/orgs/kuwala-io/projects/3/views/6"><img src="./docs/images/roadmap_button_github.png" height="96" /></a>
 </p>
 
@@ -147,7 +147,7 @@ involvement!
 ## Be part of our community
 
 The best first step to get involved is to join the 
-[Kuwala Community on Slack](https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-pXKFBjbnl7_P3nXtwca5ag). 
+[Kuwala Community on Slack](https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-2cdhReNACXDkLhuh0jFzZw). 
 There we discuss everything related to our roadmap, development, and support. 
 
 ## Contribute to the project
@@ -160,7 +160,7 @@ Please refer to our [contribution guidelines](https://github.com/kuwala-io/kuwal
   Link  | Description    
 -------------|-------------
 [Blog](https://kuwala.io/blog/) | Read all our blog articles related to the stuff we are doing here. 
-[Join Slack](https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-pXKFBjbnl7_P3nXtwca5ag) | Our Slack channel with over 170 data engineers and many discussions.
+[Join Slack](https://join.slack.com/t/kuwala-community/shared_invite/zt-l5b2yjfp-2cdhReNACXDkLhuh0jFzZw) | Our Slack channel with over 170 data engineers and many discussions.
 [Jupyter notebook - Popularity correlation](https://mybinder.org/v2/gh/kuwala-io/kuwala_examples/1def41ded01dbb67ecada9dc227c834cd93d0721?urlpath=lab%2Ftree%2Fnotebooks%2F1.%20Popularity%20Correlation.ipynb) | Open a Jupyter notebook on Binder and merge external popularity data with Uber traversals by making use of convenient dbt functions. 
 [Podcast](https://anchor.fm/kuwala-io) | Listen to our community podcast and maybe join us on the next show.
 [Digital coffee break](https://calendly.com/kuwala_io/kuwala-community-chat?month=2022-02) | Are you looking for new inspiring tech talks? Book a digital coffee chit-chat with one member of the core team.
