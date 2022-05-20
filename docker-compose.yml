@@ -27,11 +27,12 @@ services:
       - '5433:5433'
     volumes:
       - ./kuwala/tmp/kuwala/backend/db/postgresql/data:/var/lib/postgresql/data
+    command: -p 5433
     profiles:
       - network
       - backend
       - backend_database
-    command: -p 5433
+      - kuwala
 
   # docker-compose --profile backend up
   backend:
@@ -45,11 +46,24 @@ services:
       - DATABASE_PASSWORD=password
       - DATABASE_NAME=kuwala
       - DATABASE_HOST=backend_database
+    volumes:
+      - ./kuwala/tmp/kuwala/backend/dbt:/opt/tmp/kuwala/backend/dbt
     profiles:
       - network
       - backend
-    volumes:
-      - ./kuwala/tmp/kuwala/backend/dbt:/opt/tmp/kuwala/backend/dbt
+      - kuwala
+
+  # docker-compose --profile frontend up
+  frontend:
+    container_name: frontend
+    depends_on: [ backend ]
+    image: kuwala/core:frontend-0.2.0-alpha
+    ports:
+      - '3000:3000'
+    profiles:
+      - network
+      - frontend
+      - kuwala
 
   # docker-compose --profile database up
   postgres:

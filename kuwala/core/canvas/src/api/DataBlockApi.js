@@ -8,8 +8,8 @@ export function createNewDataBlock (data) {
     return baseAxios.post(DATA_BLOCK, data);
 }
 
-export function updateDataBlockEntity (data) {
-    return baseAxios.put(DATA_BLOCK, data);
+export function updateDataBlockEntity (dataBlockId, data) {
+    return baseAxios.put(`${DATA_BLOCK}/${dataBlockId}`, data);
 }
 
 export function getDataBlockPreview ({dataBlockId, params}){

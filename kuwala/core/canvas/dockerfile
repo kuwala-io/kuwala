@@ -1,0 +1,9 @@
+FROM node:16
+
+COPY ./core/canvas /opt/core/canvas
+
+WORKDIR /opt/core/canvas
+
+RUN npm ci
+
+ENTRYPOINT ["npm", "start"]

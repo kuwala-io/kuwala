@@ -185,8 +185,21 @@ def create_data_block(data_block: DataBlockCreate, db: Session):
         table_name=table_name,
         columns=columns,
     )
+    base_model_rows = get_table_preview(
+        data_source_id=data_source_id,
+        schema_name="dbt_kuwala",
+        dataset_name="dbt_kuwala",
+        table_name=base_model_name,
+        columns=None,
+        limit_columns=1,
+        limit_rows=1,
+        db=db,
+    )
+    dbt_model_names = (
+        [base_model_name, model_name] if not base_model_rows else [model_name]
+    )
 
-    run_dbt_models(dbt_dir=dbt_dir, dbt_model_names=[base_model_name, model_name])
+    run_dbt_models(dbt_dir=dbt_dir, dbt_model_names=dbt_model_names)
     create_model_yaml(
         dbt_dir=dbt_dir,
         schema_name=schema_name,

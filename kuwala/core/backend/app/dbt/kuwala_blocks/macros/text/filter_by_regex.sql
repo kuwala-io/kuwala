@@ -5,9 +5,9 @@
         SELECT *
         FROM {{ rel }}
         {% if target.type == 'bigquery' %}
-            WHERE REGEXP_CONTAINS({{ column }}, '{{ regex }}')
+            WHERE REGEXP_CONTAINS({{ column }}, '{{ decode_yaml_parameter(regex) }}')
         {% else %}
-            WHERE {{ column }} ~ '{{ regex }}'
+            WHERE {{ column }} ~ '{{ decode_yaml_parameter(regex) }}'
         {% endif %}
     {% endset %}
 

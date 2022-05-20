@@ -43,7 +43,7 @@ const Modal =  ({isOpen, children, closeModalAction}) => {
                             onClick={closeModalAction}
                         />
                     </div>
-                    {children}
+                    {isOpen ? children : undefined}
                 </div>
             </div>
         </div>

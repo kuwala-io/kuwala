@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import {getColumns, getSchema, getTablePreview} from "../../../api/DataSourceApi";
-
 import "./node-config-modal.css"
 import {generateParamsByDataSourceType, preCreateSchemaExplorer, getDataDictionary, populateSchema} from '../../../utils/SchemaUtils'
 import {
@@ -11,14 +10,15 @@ import {
 } from "../../../utils/TableSelectorUtils";
 import {createNewDataBlock, updateDataBlockEntity} from "../../../api/DataBlockApi";
 import DataBlockDTO from "../../../data/dto/DataBlockDTO";
-import SchemaExplorer from "../../SchemaExplorer";
-import Explorer from "../../Explorer";
 import {SELECTOR_DISPLAY, PREVIEW_DISPLAY} from "../../../constants/components";
 import Modal from "../../Common/Modal";
-import Button from "../../Common/Button";
 import {DATA_BLOCK} from "../../../constants/nodeTypes";
+import DataBlockConfigBody from './DataBlockConfigBody';
+import DataBlockConfigFooter from "./DataBlockConfigFooter";
+import DataBlockConfigHeader from './DataBlockConfigHeader';
 
-export default ({isOpen}) => {
+
+const DataBlockConfigModal = ({isOpen}) => {
     const {
         selectAllColumnAddresses,
         updateDataBlock
@@ -32,7 +32,7 @@ export default ({isOpen}) => {
     const [isTableLoading, setIsTableLoading] = useState(false);
     const [selectorDisplay, setSelectorDisplay] = useState(SELECTOR_DISPLAY);
     const [isNodeSaveLoading, setIsNodeSaveLoading] = useState(false);
-    const [dataBlockName, setDataBlockName] = useState('-');
+    const [dataBlockName, setDataBlockName] = useState(undefined);
     const [tableDataPreview, setTableDataPreview] = useState({
         columns: [],
         rows: []
@@ -68,6 +68,10 @@ export default ({isOpen}) => {
             prePopulateSelectorExplorer().then(null)
         }
     }, [selectorDisplay])
+
+    const onNameChange = (event) => {
+        setDataBlockName(event.target.value);
+    }
 
     const upsertDataBlock = async () => {
         setIsNodeSaveLoading(true);
@@ -254,169 +258,6 @@ export default ({isOpen}) => {
         setIsSchemaLoading(false)
     }
 
-    const ConfigHeader = () => {
-        if (!selectedElement) {
-            return <></>
-        } else {
-            return (
-                <div className={'flex flex-row px-6 py-2'}>
-                    <div className={'flex flex-col items-center'}>
-                        <div
-                            className={'flex flex-col justify-center items-center bg-white rounded-xl drop-shadow-lg relative p-4 w-24 h-24'}
-                        >
-                            <img
-                                src={selectedElement.data.dataSource.logo}
-                                style={{height: 48, width: 48}}
-                                draggable={false}
-                            />
-                            <span className={'mt-1 text-sm'}>{selectedElement.data.dataSource.name}</span>
-                            <div
-                                className={`
-                                    absolute right-0 top-0 p-1 border rounded-full w-5 h-5 -mr-2 -mt-2
-                                    ${selectedElement.data.dataSource.connected ? "bg-kuwala-green" : "bg-red-400"}
-                            `}
-                            />
-                        </div>
-                    </div>
-
-                    <div className={'flex flex-col ml-6 space-y-2 bottom-0 justify-end mb-2'}>
-                        <span className={'px-3 py-1 bg-kuwala-light-green text-kuwala-green font-semibold rounded-lg w-36'}>
-                            Data block
-                        </span>
-
-                        <div className={'flex flex-row items-center'}>
-                            <label className={'font-semibold'}>Name:</label>
-                            <input
-                                type="text"
-                                value={`${dataBlockName}`}
-                                onChange={(e) => {
-                                    setDataBlockName(e.target.value)
-                                }}
-                                className={`
-                                    form-control
-                                    block
-                                    w-full                                   
-                                    ml-2
-                                    px-2
-                                    py-0.5
-                                    text-base
-                                    font-light
-                                    text-gray-700
-                                    bg-gray-100 bg-clip-padding
-                                    border border-solid border-kuwala-green
-                                    rounded-lg
-                                    transition
-                                    ease-in-out
-                                    m-0
-                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
-                                `}
-                            />
-                        </div>
-                    </div>
-                </div>
-            )
-        }
-    }
-
-    const ConfigBody = () => {
-        if (!selectedElement) {
-            return (
-                <div>
-                    Undefined data source, try to re open the node configuration.
-                </div>
-            )
-        } else {
-            return (
-                <div className={'flex flex-col flex-auto px-6 pt-2 pb-4 h-full overflow-y-auto'}>
-                    <div className={'flex flex-row bg-white border-2 border-kuwala-green rounded-t-lg h-full w-full'}>
-                        <div className={'flex flex-col bg-white w-3/12 border border-kuwala-green h-full'}>
-                            <SchemaExplorer
-                                schemaExplorerType={selectorDisplay}
-                                isSchemaLoading={isSchemaLoading}
-                                schemaList={schemaList}
-                                selectedTable={selectedTable}
-                                setSchema={setSchema}
-                                setSelectedTable={setSelectedTable}
-
-                                setColumnsPreview={setColumnsPreview}
-                                setTableDataPreview={setTableDataPreview}
-
-                                setIsTableLoading={setIsTableLoading}
-
-                                dataSource={selectedElement.data.dataSource}
-                            />
-                        </div>
-                        <div className={'flex flex-col bg-white w-9/12 rounded-tr-lg'}>
-                            <div className={'flex flex-col w-full h-full'}>
-                                {renderDisplaySelector()}
-                                <Explorer
-                                    displayType={selectorDisplay}
-                                    columnsPreview={columnsPreview}
-                                    tableDataPreview={tableDataPreview}
-                                    isTableLoading={isTableLoading}
-                                    selectedTable={selectedTable}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )
-        }
-    }
-
-    const renderDisplaySelector = () => {
-        return <div className={'flex flex-row justify-center items-center p-8'}>
-            <div className={'flex flex-row '}>
-                <div
-                    className={`
-                          border-b-2 border-t-2 border-l-2 border-kuwala-green
-                          flex
-                          items-center
-                          justify-center
-                          block
-                          text-xs
-                          leading-tight
-                          rounded-l-lg
-                          w-24
-                          py-2
-                          focus:outline-none focus:ring-0
-                          cursor-pointer
-                          font-bold
-                          ${selectorDisplay === SELECTOR_DISPLAY ? 'bg-kuwala-green text-white' : 'bg-white text-kuwala-green'}
-                      `}
-                    onClick={()=>{
-                        setSelectorDisplay(SELECTOR_DISPLAY)
-                    }}
-                    draggable={false}>
-                    Selection
-                </div>
-                <div
-                    className={`
-                                  border-b-2 border-t-2 border-r-2 border-kuwala-green
-                                  flex
-                                  items-center
-                                  justify-center
-                                  block
-                                  text-xs
-                                  leading-tight
-                                  rounded-r-lg
-                                  w-24
-                                  py-2
-                                  focus:outline-none focus:ring-0
-                                  cursor-pointer
-                                  font-bold
-                              ${selectorDisplay === PREVIEW_DISPLAY ? 'bg-kuwala-green text-white' : 'bg-white text-kuwala-green'}
-                          `}
-                    onClick={()=>{
-                        setSelectorDisplay(PREVIEW_DISPLAY)
-                    }}
-                    draggable={false}>
-                    Preview
-                </div>
-            </div>
-        </div>
-    }
-
     const prePopulatePreviewExplorer = async () => {
         setIsTableLoading(true)
         const params = generateParamsByDataSourceType(selectedElement.data.dataSource.dataCatalogItemId, selectedTable)
@@ -495,36 +336,44 @@ export default ({isOpen}) => {
         setSelectorDisplay(SELECTOR_DISPLAY);
     }
 
-    const ConfigFooter = () => {
-        return (
-            <div className={'flex flex-row justify-between px-6 pb-4'}>
-                <Button
-                    onClick={toggleConfigModalWrapper}
-                    text={'Back'}
-                />
-                <Button
-                    onClick={async () => {
-                        await upsertDataBlock()
-                    }}
-                    loading={isNodeSaveLoading}
-                    text={'Save'}
-                />
-            </div>
-        )
-    }
-
     return (
         <Modal
             isOpen={isOpen}
             closeModalAction={toggleConfigModalWrapper}
         >
-            {selectedElement && selectedElement.type === DATA_BLOCK ? (
-                <>
-                    <ConfigHeader/>
-                    <ConfigBody/>
-                    <ConfigFooter/>
-                </>
-            ) : <></>}
+            <DataBlockConfigHeader
+                selectedElement={selectedElement}
+                dataBlockName={dataBlockName}
+                onNameChange={onNameChange}
+            />
+
+            <DataBlockConfigBody
+                columnsPreview={columnsPreview}
+                isSchemaLoading={isSchemaLoading}
+                isTableLoading={isTableLoading}
+                schemaList={schemaList}
+                selectedElement={selectedElement}
+                selectedTable={selectedTable}
+                selectorDisplay={selectorDisplay}
+                setColumnsPreview={setColumnsPreview}
+                setIsTableLoading={setIsTableLoading}
+                setSchema={setSchema}
+                setSelectedTable={setSelectedTable}
+                setSelectorDisplay={setSelectorDisplay}
+                setTableDataPreview={setTableDataPreview}
+                tableDataPreview={tableDataPreview}
+            />
+
+            <DataBlockConfigFooter
+                onClickBack={toggleConfigModalWrapper}
+                onClickSave={async () => {
+                    await upsertDataBlock()
+                }}
+                saveButtonLoading={isNodeSaveLoading}
+                saveButtonDisabled={isNodeSaveLoading || !selectedTable}
+            />
         </Modal>
     )
 }
+
+export default DataBlockConfigModal;
