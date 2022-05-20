@@ -27,6 +27,8 @@ def create_transformation_block(
         columns=columns,
         dbt_model=dbt_model,
         materialize_as_table=transformation_block.materialize_as_table,
+        position_x=transformation_block.position_x,
+        position_y=transformation_block.position_y,
     )
 
     add_and_commit_to_db(db=db, model=db_data_block)

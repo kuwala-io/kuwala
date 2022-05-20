@@ -21,14 +21,7 @@ def create_data_block(
     )
     data_block = crud.create_data_block(
         db=db,
-        data_block=DataBlockCreate(
-            data_source_id=data_block.data_source_id,
-            name=data_block.name,
-            table_name=data_block.table_name,
-            schema_name=data_block.schema_name,
-            dataset_name=data_block.dataset_name,
-            columns=data_block.columns,
-        ),
+        data_block=data_block,
         generated_id=data_block_id,
         dbt_model=model_name,
     )

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, String
+from sqlalchemy import Column, ForeignKey, Numeric, String
 from sqlalchemy.dialects.postgresql import ARRAY
 
 from ..database import Base
@@ -15,3 +15,5 @@ class DataBlock(Base):
     schema_name = Column(String, nullable=True)
     dataset_name = Column(String, nullable=True)
     columns = Column(ARRAY(String), nullable=True)
+    position_x = Column(Numeric, nullable=False)
+    position_y = Column(Numeric, nullable=False)
