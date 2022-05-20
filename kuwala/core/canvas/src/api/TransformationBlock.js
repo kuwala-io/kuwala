@@ -14,3 +14,16 @@ export function getTransformationBlockPreview ({transformationBlockId, params}){
         {params}
     )
 }
+
+export function updateTransformationBlockColumns ({transformationBlockId, data}) {
+    return baseAxios.put(
+        `${TRANSFORMATION_BLOCK}/${transformationBlockId}`,
+        data
+    );
+}
+
+export function refreshTransformationBlock ({transformationBlockId}) {
+    return baseAxios.put(
+        `${TRANSFORMATION_BLOCK}/${transformationBlockId}/refresh`
+    );
+}

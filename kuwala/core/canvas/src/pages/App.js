@@ -1,29 +1,24 @@
 import React, {useRef, useEffect} from 'react';
-import ReactFlow, {
-    ReactFlowProvider,
-    Controls,
-} from 'react-flow-renderer';
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
-import DataView from "../components/DataView";
 import {useStoreActions, useStoreState} from 'easy-peasy';
-import DataBlock from "../components/Nodes/DataBlock";
-import TransformationBlock from "../components/Nodes/TransformationBlock/TransformationBlock";
 import {Link} from "react-router-dom";
-import NodeConfigModal from "../components/Modals/DataBlockConfig/DataBlockConfigModal";
+import DataBlockConfigModal from "../components/Modals/DataBlockConfig/DataBlockConfigModal";
 import TransformationCatalogModal from "../components/Modals/TransformationCatalog/TransformationCatalogModal";
 import loadIcons from "../utils/IconsLoader";
-import TransformationConfigModal from "../components/Modals/TransformationConfigModal/TransformationConfigModal";
-import ConnectionLine from "../components/Common/ConnectionLine";
-import ConnectionEdge from "../components/Common/ConnectionEdge"
+import TransformationBlockConfigModal from "../components/Modals/TransformationBlockConfig/TransformationBlockConfigModal";
+import Canvas from "../components/Canvas";
 
-export default function () {
+const App = () => {
     const reactFlowWrapper = useRef(null);
-
     const {elements, selectedElement, dataSource, openDataView} = useStoreState(state => state.canvas);
     const {openConfigModal, openTransformationCatalogModal, openTransformationConfigModal} = useStoreState(state => state.common);
     const {
-        setSelectedElement, removeNode, connectNodes, setOpenDataView, getDataSources,
+        setSelectedElement,
+        removeNode,
+        connectNodes,
+        setOpenDataView,
+        getDataSources,
         convertDataBlocksIntoElement
     } = useStoreActions(actions => actions.canvas);
     const {
@@ -49,49 +44,20 @@ export default function () {
     };
 
     const renderFlow = () => {
-        if(dataSource.length > 0) {
-            return <ReactFlowProvider>
-                <main
-                    className='flex h-full w-full flex-col max-h-screen relative'
-                    ref={reactFlowWrapper}
-                >
-                    <ReactFlow
-                        elements={elements}
-                        connectionLineComponent={ConnectionLine}
-                        onConnect={onConnect}
-                        onElementsRemove={onElementsRemove}
-                        onElementClick={(event, elements) => {
-                            setOpenDataView(false)
-                            setSelectedElement(elements)
-                        }}
-                        onPaneClick={()=> {
-                            setSelectedElement(null)
-                            setOpenDataView(false)
-                        }}
-                        nodeTypes={{
-                            TRANSFORMATION_BLOCK: TransformationBlock,
-                            DATA_BLOCK: DataBlock,
-                        }}
-                        edgeTypes={{
-                            CONNECTION_EDGE: ConnectionEdge
-                        }}
-                        selectNodesOnDrag={false}
-                        onLoad={onLoad}
-                        onDragOver={onDragOver}
-                        defaultPosition={[500,150]}
-                    >
-                        <Controls
-                            style={{
-                                right: 20,
-                                left: 'auto',
-                                zIndex: 20,
-                                bottom: openDataView ?'calc(45% + 10px)' : 20,
-                            }}
-                        />
-                    </ReactFlow>
-                    {openDataView ? <DataView/> : null}
-                </main>
-            </ReactFlowProvider>
+        if (dataSource.length > 0) {
+            return (
+                <Canvas
+                    elements={elements}
+                    onConnect={onConnect}
+                    onDragOver={onDragOver}
+                    onElementsRemove={onElementsRemove}
+                    onLoad={onLoad}
+                    openDataView={openDataView}
+                    reactFlowWrapper={reactFlowWrapper}
+                    setOpenDataView={setOpenDataView}
+                    setSelectedElement={setSelectedElement}
+                />
+            );
         } else {
             return (
                 <div className={'flex flex-col items-center justify-center bg-kuwala-bg-gray w-full h-full'}>
@@ -116,17 +82,19 @@ export default function () {
                     />
                     {renderFlow()}
                 </div>
-                <NodeConfigModal
+                <DataBlockConfigModal
                     isOpen={openConfigModal}
                     configData={selectedElement}
                 />
                 <TransformationCatalogModal
                     isOpen={openTransformationCatalogModal}
                 />
-                <TransformationConfigModal
+                <TransformationBlockConfigModal
                     isOpen={openTransformationConfigModal}
                 />
             </div>
         </div>
     )
 }
+
+export default App;

@@ -1,3 +1,4 @@
+import logging
 import os
 from typing import Optional
 
@@ -10,6 +11,7 @@ from database.schemas.data_source import ConnectionParameters
 from database.utils.encoder import list_of_dicts_to_dict
 from fastapi import HTTPException
 import oyaml as yaml
+import psycopg2.errors
 from sqlalchemy.orm import Session
 
 
@@ -137,33 +139,38 @@ def get_table_preview(
     connection_parameters = get_connection_parameters(data_source)
     data = None
 
-    if data_catalog_item_id == "postgres":
-        data = postgres_controller.get_table_preview(
-            connection_parameters=connection_parameters,
-            schema_name=schema_name,
-            table_name=table_name,
-            columns=columns,
-            limit_columns=limit_columns,
-            limit_rows=limit_rows,
-        )
-    elif data_catalog_item_id == "bigquery":
-        data = bigquery_controller.get_table_preview(
-            connection_parameters=connection_parameters,
-            dataset_name=dataset_name,
-            table_name=table_name,
-            columns=columns,
-            limit_columns=limit_columns,
-            limit_rows=limit_rows,
-        )
-    elif data_catalog_item_id == "snowflake":
-        data = snowflake_controller.get_table_preview(
-            connection_parameters=connection_parameters,
-            schema_name=schema_name,
-            table_name=table_name,
-            columns=columns,
-            limit_columns=limit_columns,
-            limit_rows=limit_rows,
-        )
+    try:
+        if data_catalog_item_id == "postgres":
+            data = postgres_controller.get_table_preview(
+                connection_parameters=connection_parameters,
+                schema_name=schema_name,
+                table_name=table_name,
+                columns=columns,
+                limit_columns=limit_columns,
+                limit_rows=limit_rows,
+            )
+        elif data_catalog_item_id == "bigquery":
+            data = bigquery_controller.get_table_preview(
+                connection_parameters=connection_parameters,
+                dataset_name=dataset_name,
+                table_name=table_name,
+                columns=columns,
+                limit_columns=limit_columns,
+                limit_rows=limit_rows,
+            )
+        elif data_catalog_item_id == "snowflake":
+            data = snowflake_controller.get_table_preview(
+                connection_parameters=connection_parameters,
+                schema_name=schema_name,
+                table_name=table_name,
+                columns=columns,
+                limit_columns=limit_columns,
+                limit_rows=limit_rows,
+            )
+    except psycopg2.errors.UndefinedTable:
+        pass
+    except Exception as e:
+        logging.error(e)
 
     return data
 

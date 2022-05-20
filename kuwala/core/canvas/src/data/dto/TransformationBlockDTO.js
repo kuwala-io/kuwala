@@ -1,6 +1,5 @@
 module.exports = class TransformationBlockDTO {
-    constructor
-    ({
+    constructor ({
         transformationBlockId,
         transformationBlockEntityId,
         isConfigured,
@@ -11,7 +10,9 @@ module.exports = class TransformationBlockDTO {
         name,
         connectedSourceNodeIds = [],
         connectedTargetNodeIds = [],
-     }) {
+        materializeTable=false,
+        columns=[],
+    }) {
         this.transformationBlockId = transformationBlockId;
         this.transformationBlockEntityId = transformationBlockEntityId;
         this.isConfigured = isConfigured;
@@ -22,5 +23,7 @@ module.exports = class TransformationBlockDTO {
         this.name = name;
         this.connectedSourceNodeIds = connectedSourceNodeIds;
         this.connectedTargetNodeIds = connectedTargetNodeIds;
+        this.materializeTable = materializeTable;
+        this.columns = columns;
     }
 }

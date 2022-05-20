@@ -67,50 +67,54 @@ const renderIconIfExists = (icon) => {
 }
 
 const Button = ({
-        size="base",
-        className,
-        color="kuwalaGreen",
-        disabled=false,
-        onClick,
-        loading=false,
-        solid=true,
-        selected=false,
-        alignment='start',
-        icon=undefined,
-        text=undefined,
-        draggable=false,
-    }) => {
-    return <button
-        className={cn(
-            `font-semibold cursor-pointer`,
-            baseSize[size],
-            disabled ? getStyleForDisabled(disabled) : getButtonStylesBySolid(solid, color, selected),
-            className,
-        )}
-        disabled={disabled}
-        onClick={onClick}
-        draggable={draggable}
-    >
-        {
-            loading
-            ?
-                (
-                    <Spinner/>
-                )
-            :
-                (
-                    <div className={`
-                        flex flex-row items-center space-x-2
-                        ${alignment ? 'justify-'+alignment : ''}
-                    `}>
-                        {renderIconIfExists(icon)}
-                        <span>
-                            {text}
-                        </span>
-                    </div>
-                )
-        }
-    </button>
-}
+    size="base",
+    className,
+    color="kuwalaGreen",
+    disabled=false,
+    onClick,
+    loading=false,
+    solid=true,
+    selected=false,
+    alignment='start',
+    icon=undefined,
+    text=undefined,
+    draggable=false,
+    type='button'
+}) => {
+    return (
+        <button
+            className={cn(
+                `font-semibold cursor-pointer`,
+                baseSize[size],
+                disabled ? getStyleForDisabled(disabled) : getButtonStylesBySolid(solid, color, selected),
+                className,
+            )}
+            disabled={disabled}
+            onClick={onClick}
+            draggable={draggable}
+            type={type}
+        >
+            {
+                loading
+                ?
+                    (
+                        <Spinner/>
+                    )
+                :
+                    (
+                        <div className={`
+                            flex flex-row items-center space-x-2
+                            ${alignment ? 'justify-'+alignment : ''}
+                        `}>
+                            {renderIconIfExists(icon)}
+                            <span>
+                                {text}
+                            </span>
+                        </div>
+                    )
+            }
+        </button>
+    );
+};
 
 export default Button;

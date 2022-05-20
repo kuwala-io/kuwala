@@ -69,8 +69,8 @@ export default ({isOpen}) => {
 
     useEffect(()=> {
         if(catalogCategories.length) {
-            const tfId = catalogCategories[selectedTransformationIndex].id
-            fetchCatalogBodyItems(tfId).then(null);
+            const category = catalogCategories[selectedTransformationIndex]
+            fetchCatalogBodyItems(category).then(null);
         }
     }, [selectedTransformationIndex])
 
@@ -106,11 +106,12 @@ export default ({isOpen}) => {
         toggleTransformationCatalogModal();
     }
 
-    const fetchCatalogBodyItems = async (transformationId) => {
+    const fetchCatalogBodyItems = async (category) => {
         try{
+            const transformationId = category.id;
             const res = await getAllItemsInCategory(transformationId);
             if(res.status === 200){
-                catalogOptionsIntoDTO(res.data);
+                catalogOptionsIntoDTO(res.data, category);
             } else {
                 setCatalogOptions([]);
             }
@@ -119,12 +120,13 @@ export default ({isOpen}) => {
         }
     }
 
-    const catalogOptionsIntoDTO = (apiResponse) => {
+    const catalogOptionsIntoDTO = (apiResponse, category) => {
         let tempOptions = [];
         apiResponse.forEach((el) => {
             const tfCatalogDTO = new TransformationCatalogDTO({
                 id: el.id,
                 category: el.category,
+                categoryIcon: category.icon,
                 name: el.name,
                 icon: el.icon,
                 description: el.description,
@@ -165,9 +167,10 @@ export default ({isOpen}) => {
         }
     }
 
-    const renderCatalogItem = (catalogItem,index) => {
+    const renderCatalogItem = (catalogItem, index) => {
         return (
             <Button
+                key={index}
                 onClick={()=>{
                             setSelectedCatalogOption(null);
                             setSelectedTransformationIndex(index)
@@ -228,6 +231,7 @@ export default ({isOpen}) => {
     const renderOptionItem = (optionItem, index) => {
         return (
             <Button
+                key={index}
                 solid={false}
                 color={'kuwalaPurple'}
                 onClick={()=>{
@@ -270,7 +274,7 @@ export default ({isOpen}) => {
                     <div className={Classes.OptionDetailsParameterAndExample}>
                         <div className={Classes.OptionDetailsParameterContainer}>
                             <p>Parameters</p>
-                            {optionItem.macroParameters.map((el) => <li>{el.name}</li>)}
+                            {optionItem.macroParameters.map((el, i) => <li key={i}>{el.name}</li>)}
                         </div>
                         <div className={Classes.OptionDetailsExampleContainer}>
                             {renderExampleTableWrapper(optionItem)}

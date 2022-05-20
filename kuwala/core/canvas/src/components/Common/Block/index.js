@@ -18,7 +18,7 @@ const Block = ({
         hideRightHandle,
         data,
         icon,
-        img,
+        img
     }) => {
     const renderLeftPane = () => {
         if(!hideLeftHandle) {
@@ -27,8 +27,8 @@ const Block = ({
                     className={Classes.HandleBaseClass}
                     style={{
                         backgroundColor: leftHandleActive ? COLOR_MAP[blockColor] : KUWALA_GRAY,
-                        width: 36,
-                        left: -30,
+                        width: 32,
+                        left: -24,
                         height: '100%',
                         borderRadius: 0,
                         border: 'medium none',
@@ -54,8 +54,8 @@ const Block = ({
                     className={Classes.HandleBaseClass}
                     style={{
                         backgroundColor: rightHandleActive ? COLOR_MAP[blockColor] : KUWALA_GRAY,
-                        width: 36,
-                        right: -30,
+                        width: 32,
+                        right: -24,
                         height: '100%',
                         borderRadius: 0,
                         border: 'medium none',
@@ -89,7 +89,7 @@ const Block = ({
         } else {
             return (
                 <Icon
-                    size={'lg'}
+                    size={'md'}
                     icon={icon}
                     color={blockColor}
                 />

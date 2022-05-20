@@ -15,7 +15,13 @@ import {
     faShuffle,
     faSyncAlt,
     faTimes,
-    faTimesCircle
+    faTimesCircle,
+    faQuestion,
+    faCheck,
+    faCalendarDay,
+    faWindowRestore,
+    faPaste,
+    faLayerGroup
 } from "@fortawesome/free-solid-svg-icons";
 export default () => {
     library.add(
@@ -34,6 +40,16 @@ export default () => {
         faShuffle,
         faSyncAlt,
         faTimes,
-        faTimesCircle
+        faTimesCircle,
+        faCheckCircle,
+        faTimesCircle,
+        faCogs,
+        faTimes,
+        faQuestion,
+        faCheck,
+        faCalendarDay,
+        faWindowRestore,
+        faPaste,
+        faLayerGroup
     )
 }
