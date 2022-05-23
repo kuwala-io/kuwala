@@ -313,6 +313,16 @@ def update_data_block(data_block_id: str, data_block: DataBlockUpdate, db: Sessi
             updated_columns=data_block.columns,
         )
 
+    if data_block.position_x and data_block.position_y:
+        db_data_block = update_attributes(
+            db=db,
+            db_object=db_data_block,
+            attributes=[
+                dict(name="position_x", value=data_block.position_x),
+                dict(name="position_y", value=data_block.position_y),
+            ],
+        )
+
     return db_data_block
 
 

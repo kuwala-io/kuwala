@@ -12,6 +12,8 @@ class TransformationBlockBase(BaseModel):
     name: str
     columns: List[str]
     materialize_as_table: bool
+    position_x: float
+    position_y: float
 
 
 class TransformationBlock(TransformationBlockBase):
@@ -30,7 +32,11 @@ class TransformationBlockCreate(BaseModel):
     macro_parameters: List[MacroParameter]
     name: str
     materialize_as_table: bool
+    position_x: float
+    position_y: float
 
 
 class TransformationBlockUpdate(BaseModel):
     columns: Optional[List[str]] = None
+    position_x: float
+    position_y: float

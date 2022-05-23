@@ -29,6 +29,7 @@ from fastapi import FastAPI
 import fastapi.exceptions
 from fastapi.middleware.cors import CORSMiddleware
 from routers import (
+    block,
     data_block,
     data_catalog,
     data_source,
@@ -56,6 +57,7 @@ app.add_middleware(
 )
 
 # Set up routers
+app.include_router(block.router)
 app.include_router(data_block.router)
 app.include_router(data_catalog.router)
 app.include_router(data_source.router)

@@ -56,9 +56,14 @@ We make the results exportable to Google Sheets and in the future also available
 
 ### Canvas
 
-The canvas environment is currently WIP. But you can already get an idea of how it is going to look like with our
-[prototype](https://www.figma.com/proto/Dbpnc4yGV19ppRhr9k5BsU/Kuwala_UI?node-id=1494%3A112067&scaling=scale-down-width&starting-point-node-id=1494%3A112067)
-and checkout our [roadmap]() for updates.
+With the canvas you can connect to your data warehouse and start building data pipelines. To start the canvas, simply
+run the following command from inside the root directory:
+
+```zsh
+docker-compose --profile kuwala up
+```
+
+Now open http://localhost:3000 in your browser, and you are good to go. 🚀
 
 ### Third-party data connectors
 
@@ -73,7 +78,7 @@ database. The following pipelines are integrated:
 
 ### Jupyter environment & CLI
 
-Before the canvas is built, we have a Jupyter environment with convenience functions to work with the third-party data 
+Before the canvas is built out completely, we have a Jupyter environment with convenience functions to work with the third-party data 
 pipelines. To easily run the data pipelines, you can use the CLI.
 
 #### Quickstart & Demo
