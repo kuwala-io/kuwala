@@ -120,8 +120,8 @@ const DataBlockConfigModal = ({isOpen}) => {
                                 dataSourceId: selectedSource.id,
                                 columns: res.data.columns,
                                 name: res.data.name,
-                                position_x: res.data.position_x,
-                                position_y: res.data.position_y,
+                                positionX: res.data.position_x,
+                                positionY: res.data.position_y,
                                 dataCatalogType: selectedSource.dataCatalogItemId,
                                 selectedAddressString: selectedTable,
                             });

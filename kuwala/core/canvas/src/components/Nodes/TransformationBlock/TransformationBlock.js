@@ -9,7 +9,7 @@ const TransformationBlock = ({data, id}) => {
     return (
         <Block
             leftHandleActive={true}
-            rightHandleActive={data.transformationBlock.isConfigured || false}
+            rightHandleActive={data.transformationBlock.isConfigured}
             blockColor={'kuwalaPurple'}
             hideLeftHandle={false}
             hideRightHandle={false}

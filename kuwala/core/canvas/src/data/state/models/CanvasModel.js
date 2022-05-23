@@ -13,8 +13,9 @@ import {CONNECTION_EDGE} from '../../../constants/edgeTypes';
 import {
     getElementByConnectionEdgeParams,
     getElementById,
-    getElementByTransformationBlockEntityId, getElementsByDataBlockEntityIds, getElementsByTransformationBlockEntityIds
+    getElementsByEntityIds,
 } from "../../../utils/ElementUtils";
+import {getBlockByEntityId} from "../../../utils/BlockUtils";
 
 const CanvasModel = {
     elements: [],
@@ -104,10 +105,10 @@ const CanvasModel = {
                     y: Math.random() * window.innerHeight / 2,
                 };
 
-                if(nodeInfo.data.dataBlock.position_x && nodeInfo.data.dataBlock.position_x) {
+                if(nodeInfo.data.dataBlock.positionX && nodeInfo.data.dataBlock.positionY) {
                     position = {
-                        x: nodeInfo.data.dataBlock.position_x,
-                        y: nodeInfo.data.dataBlock.position_y
+                        x: nodeInfo.data.dataBlock.positionX,
+                        y: nodeInfo.data.dataBlock.positionY
                     }
                 }
 
@@ -200,10 +201,10 @@ const CanvasModel = {
         const elements = getState().elements;
 
         // Check if existing connections already exists
-        const isConnectionExists = getElementByConnectionEdgeParams(elements, params);
+        const connectionExists = getElementByConnectionEdgeParams(elements, params);
         const target = getElementById(elements, params.target);
         if(target && target.type === TRANSFORMATION_BLOCK ) {
-            if(target.data.transformationBlock.connectedSourceNodeIds.length < target.data.transformationCatalog.maxNumberOfInputBlocks && !isConnectionExists) {
+            if(target.data.transformationBlock.connectedSourceNodeIds.length < target.data.transformationCatalog.maxNumberOfInputBlocks && !connectionExists) {
                 actions.addConnectedEdgeToBlock({
                     source: params.source,
                     target: params.target
@@ -564,11 +565,9 @@ const CanvasModel = {
         const {elements, transformationBlocks} = getState();
 
         for (const tfBlock of transformationBlocks) {
-            const currentElement = getElementByTransformationBlockEntityId(elements, tfBlock.transformationBlockEntityId);
-            const dataBlocksElement = getElementsByDataBlockEntityIds(elements, tfBlock.inputBlockIds);
-            const transformationBlocksElement = getElementsByTransformationBlockEntityIds(elements, tfBlock.inputBlockIds);
-            const connectedElement = [...dataBlocksElement, ...transformationBlocksElement];
-            for (const sourceElement of connectedElement) {
+            const currentElement = getBlockByEntityId(elements, tfBlock.transformationBlockEntityId);
+            const connectedElements = getElementsByEntityIds(elements, tfBlock.inputBlockIds);
+            for (const sourceElement of connectedElements) {
                 const tempParams = {
                     source: sourceElement.id,
                     sourceHandle: null,

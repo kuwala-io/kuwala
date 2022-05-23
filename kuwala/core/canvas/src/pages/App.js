@@ -27,7 +27,7 @@ import Spinner from "../components/Common/Spinner";
 const App = () => {
     const reactFlowWrapper = useRef(null);
     const {elements, selectedElement, dataSource, openDataView} = useStoreState(state => state.canvas);
-    const {openConfigModal, openTransformationCatalogModal, openTransformationConfigModal, isConnectionLoaded, isExistingBlockLoaded} = useStoreState(state => state.common);
+    const {openConfigModal, openTransformationCatalogModal, openTransformationConfigModal, connectionLoaded, existingBlockLoaded} = useStoreState(state => state.common);
     const {
         setSelectedElement,
         removeNode,
@@ -56,21 +56,21 @@ const App = () => {
 
     useEffect(async () => {
         if (dataSource.length > 0) {
-            if(!isExistingBlockLoaded) {
+            if(!existingBlockLoaded) {
                 setLoadingBlocks(true);
                 await loadExistingBlocks();
                 setExistingBlockLoaded(true);
                 setLoadingBlocks(false);
             }
         }
-    }, [dataSource]);
+    }, [dataSource, existingBlockLoaded]);
 
     useEffect(() => {
-        if(!isConnectionLoaded && isExistingBlockLoaded) {
+        if(!connectionLoaded && existingBlockLoaded) {
             loadConnections();
             setConnectionLoaded(true);
         }
-    }, [isExistingBlockLoaded])
+    }, [existingBlockLoaded, connectionLoaded])
 
     const loadExistingBlocks = async () => {
         if (dataSource.length > 0) {

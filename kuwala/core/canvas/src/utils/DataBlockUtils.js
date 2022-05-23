@@ -27,8 +27,8 @@ export function getDataBlockAddressString ({dataBlockResponse, dataSource, schem
 
 export function fromAPIResponseToDTO ({dataBlockResponse, dataSource, schema}) {
     const dto = new DataBlockDTO({
-        position_x: dataBlockResponse.position_x,
-        position_y: dataBlockResponse.position_y,
+        positionX: dataBlockResponse.position_x,
+        positionY: dataBlockResponse.position_y,
         tableName: dataBlockResponse.table_name,
         schemaName: dataBlockResponse.schema_name,
         dataSetName: dataBlockResponse.dataset_name,

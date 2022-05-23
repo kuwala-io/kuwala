@@ -1,5 +1,6 @@
 import {DATA_BLOCK, TRANSFORMATION_BLOCK} from "../constants/nodeTypes";
 import {CONNECTION_EDGE} from "../constants/edgeTypes";
+import {getBlockByEntityId} from "./BlockUtils";
 
 export function getElementById (elements, elementId) {
     try {
@@ -17,40 +18,12 @@ export function getElementByIds (elements, elementIds) {
     }
 }
 
-export function getElementByDataBlockEntityId (elements, dataBlockEntityId) {
-    try {
-        return elements.filter((el) => el.type === DATA_BLOCK && el.data.dataBlock.dataBlockEntityId === dataBlockEntityId);
-    } catch (error) {
-        console.error(`Couldn't find element with id ${dataBlockEntityId}`)
+export function getElementsByEntityIds (elements, entityIds) {
+    let results = [];
+    for (const id of entityIds) {
+        results.push(getBlockByEntityId(elements, id));
     }
-}
-
-export function getElementsByDataBlockEntityIds (elements, dataBlockEntityIds) {
-    try {
-        const filtered = elements.filter((el) => {
-            return el.type === DATA_BLOCK && dataBlockEntityIds.includes(el.data.dataBlock.dataBlockEntityId);
-        });
-        return [...filtered];
-    } catch (error) {
-        console.error(`Couldn't find element in ids ${dataBlockEntityIds}`)
-    }
-}
-
-export function getElementsByTransformationBlockEntityIds (elements, transformationBlockEntityIds) {
-    try {
-        const filtered = elements.filter((el) => el.type === TRANSFORMATION_BLOCK && transformationBlockEntityIds.includes(el.data.transformationBlock.transformationBlockEntityId));
-        return [...filtered];
-    } catch (error) {
-        console.error(`Couldn't find element in ids ${transformationBlockEntityIds}`)
-    }
-}
-
-export function getElementByTransformationBlockEntityId (elements, transformationBlockId) {
-    try {
-        return elements.find((el) => el.type === TRANSFORMATION_BLOCK && el.data.transformationBlock.transformationBlockEntityId === transformationBlockId);
-    } catch (error) {
-        console.error(`Couldn't find element with transformationBlockEntityId ${transformationBlockId}`)
-    }
+    return results
 }
 
 export function getElementByConnectionEdgeParams (elements, params) {
