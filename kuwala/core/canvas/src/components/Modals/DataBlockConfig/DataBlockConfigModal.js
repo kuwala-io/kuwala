@@ -88,6 +88,8 @@ const DataBlockConfigModal = ({isOpen}) => {
                         data_source_id: selectedSource.id,
                         name: dataBlockName,
                         columns: newSelectedColumns,
+                        position_x: selectedElement.position.x,
+                        position_y: selectedElement.position.y,
                     }
 
                     switch (selectedSource.dataCatalogItemId) {
@@ -118,6 +120,8 @@ const DataBlockConfigModal = ({isOpen}) => {
                                 dataSourceId: selectedSource.id,
                                 columns: res.data.columns,
                                 name: res.data.name,
+                                position_x: res.data.position_x,
+                                position_y: res.data.position_y,
                                 dataCatalogType: selectedSource.dataCatalogItemId,
                                 selectedAddressString: selectedTable,
                             });
@@ -134,7 +138,6 @@ const DataBlockConfigModal = ({isOpen}) => {
                 } else {
                     // Update block
                     const updatePayload = {
-                        id: block.dataBlockEntityId,
                         name: dataBlockName,
                         columns: newSelectedColumns
                     }
@@ -154,7 +157,7 @@ const DataBlockConfigModal = ({isOpen}) => {
                     }
 
                     try {
-                        const res = await updateDataBlockEntity(updatePayload);
+                        const res = await updateDataBlockEntity(block.dataBlockEntityId,updatePayload);
                         if(res.status === 200) {
                             const dto = new DataBlockDTO({
                                 tableName: updatePayload.table_name,

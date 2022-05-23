@@ -67,10 +67,14 @@ export default ({onDragStart, onClickAddDataBlock, dataSource, reactFlowWrapper}
             onDragEnd={(event)=> {
                 event.preventDefault();
                 const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+                const position_x = event.clientX - reactFlowBounds.left;
+                const position_y = event.clientY - reactFlowBounds.top;
                 const position = reactFlowInstance.project({
-                    x: event.clientX - reactFlowBounds.left,
-                    y: event.clientY - reactFlowBounds.top,
+                    x: position_x,
+                    y: position_y,
                 });
+                dataBlock.position_y = position_y
+                dataBlock.position_x = position_x
                 addDataBlock(dataBlock)
                 addNode({
                     ...nodeInfo,

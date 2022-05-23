@@ -8,6 +8,8 @@ const CommonModel =  {
     openTransformationConfigModal: false,
     reactFlowInstance: null,
     openTransformationCatalogModal: false,
+    isConnectionLoaded: false,
+    isExistingBlockLoaded: false,
 
     toggleNotification: action((state) => {
         state.notificationOpen = !state.notificationOpen
@@ -19,6 +21,14 @@ const CommonModel =  {
 
     setReactFlowInstance: action((state, instance)=> {
        state.reactFlowInstance = instance;
+    }),
+
+    setConnectionLoaded: action((state, loaded) => {
+        state.isConnectionLoaded = loaded;
+    }),
+
+    setExistingBlockLoaded: action((state, loaded) => {
+        state.isExistingBlockLoaded = loaded;
     }),
 
     toggleConfigModal: action((state) => {
