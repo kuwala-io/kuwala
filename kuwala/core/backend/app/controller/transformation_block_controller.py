@@ -342,6 +342,16 @@ def update_transformation_block(
             updated_columns=transformation_block.columns,
         )
 
+    if transformation_block.position_x and transformation_block.position_y:
+        db_transformation_block = update_attributes(
+            db=db,
+            db_object=db_transformation_block,
+            attributes=[
+                dict(name="position_x", value=transformation_block.position_x),
+                dict(name="position_y", value=transformation_block.position_y),
+            ],
+        )
+
     return db_transformation_block
 
 

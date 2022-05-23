@@ -1,4 +1,4 @@
-from sqlalchemy import JSON, Boolean, Column, ForeignKey, String
+from sqlalchemy import JSON, Boolean, Column, ForeignKey, Numeric, String
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.mutable import MutableList
 
@@ -19,3 +19,5 @@ class TransformationBlock(Base):
     columns = Column(ARRAY(String), nullable=False)
     dbt_model = Column(String, nullable=False)
     materialize_as_table = Column(Boolean, default=False)
+    position_x = Column(Numeric, nullable=False)
+    position_y = Column(Numeric, nullable=False)

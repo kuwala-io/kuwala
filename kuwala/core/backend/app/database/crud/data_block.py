@@ -17,6 +17,8 @@ def create_data_block(
         schema_name=data_block.schema_name,
         dataset_name=data_block.dataset_name,
         columns=data_block.columns,
+        position_x=data_block.position_x,
+        position_y=data_block.position_y,
     )
 
     add_and_commit_to_db(db=db, model=db_data_block)
