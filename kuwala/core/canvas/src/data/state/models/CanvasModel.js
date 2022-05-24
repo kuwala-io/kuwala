@@ -281,6 +281,18 @@ const CanvasModel = {
     addElement: action((state, elementToAdd) => {
         state.elements = [...state.elements, elementToAdd]
     }),
+    updateElementById: thunk((actions, elementToUpdate, {getState}) => {
+        const {elements} = getState();
+        const tempEl = elements.map((el) => {
+            if (el.id === elementToUpdate.id) {
+                const updatedEl = elementToUpdate
+                return updatedEl
+            } else {
+                return el
+            }
+        });
+        actions.setElements(tempEl);
+    }),
     setSelectedElement: action((state, selectedNode) => {
         state.selectedElement = selectedNode
     }),

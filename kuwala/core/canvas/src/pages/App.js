@@ -41,6 +41,7 @@ const App = () => {
         setTransformationBlocks,
         updateTransformationBlock,
         loadConnections,
+        updateElementById
     } = useStoreActions(actions => actions.canvas);
     const {
         setReactFlowInstance,
@@ -161,6 +162,7 @@ const App = () => {
                 }
             });
         }
+        updateElementById(element);
     }
 
     const onNodeDragStop = async (event, node) => {
