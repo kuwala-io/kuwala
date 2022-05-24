@@ -122,7 +122,9 @@ const TransformationBlockConfigModal = ({isOpen}) => {
                     }
                 }),
                 name: values.transformationBlockName,
-                materialize_as_table: values.materializeTable
+                materialize_as_table: values.materializeTable,
+                position_x: selectedElement.position.x,
+                position_y: selectedElement.position.y,
             }
 
             try {
@@ -140,7 +142,10 @@ const TransformationBlockConfigModal = ({isOpen}) => {
                         transformationCatalogItemId: selectedElement.data.transformationBlock.transformationCatalogItemId,
                         transformationBlockEntityId: res.data.id,
                         materializeTable: values.materializeTable,
-                        columns: res.data.columns
+                        columns: res.data.columns,
+                        positionX: res.data.position_x,
+                        positionY: res.data.position_y,
+                        inputBlockIds: connectedBlocks,
                     })
                     updateTransformationBlock(dto);
                     toggleTransformationConfigModal();

@@ -103,10 +103,6 @@ export default () => {
                     <div className="relative">
                         <button
                             className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 focus:outline-none focus:ring"
-                            onClick={() => {
-                                console.log(dataBlocks);
-                                console.log(transformationBlocks);
-                            }}
                         >
                             <svg
                                 className="w-6 h-6 text-gray-500"

@@ -15,7 +15,7 @@ export function getTransformationBlockPreview ({transformationBlockId, params}){
     )
 }
 
-export function updateTransformationBlockColumns ({transformationBlockId, data}) {
+export function updateTransformationBlockEntity ({transformationBlockId, data}) {
     return baseAxios.put(
         `${TRANSFORMATION_BLOCK}/${transformationBlockId}`,
         data

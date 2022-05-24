@@ -12,6 +12,9 @@ module.exports = class TransformationBlockDTO {
         connectedTargetNodeIds = [],
         materializeTable=false,
         columns=[],
+        positionX,
+        positionY,
+
     }) {
         this.transformationBlockId = transformationBlockId;
         this.transformationBlockEntityId = transformationBlockEntityId;
@@ -25,5 +28,7 @@ module.exports = class TransformationBlockDTO {
         this.connectedTargetNodeIds = connectedTargetNodeIds;
         this.materializeTable = materializeTable;
         this.columns = columns;
+        this.positionX = positionX;
+        this.positionY = positionY;
     }
 }
