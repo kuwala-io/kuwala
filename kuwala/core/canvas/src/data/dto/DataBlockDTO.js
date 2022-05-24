@@ -13,8 +13,10 @@ module.exports = class DataBlocksDTO {
         dataCatalogType,
         dataSetName,
         selectedAddressString,
-         connectedSourceNodeIds = [],
-         connectedTargetNodeIds = [],
+        connectedSourceNodeIds = [],
+        connectedTargetNodeIds = [],
+        positionX,
+        positionY,
     }) {
         this.tableName = tableName;
         this.schemaName = schemaName;
@@ -30,5 +32,7 @@ module.exports = class DataBlocksDTO {
         this.selectedAddressString = selectedAddressString;
         this.connectedSourceNodeIds = connectedSourceNodeIds;
         this.connectedTargetNodeIds = connectedTargetNodeIds;
+        this.positionX = positionX;
+        this.positionY = positionY;
     }
 }

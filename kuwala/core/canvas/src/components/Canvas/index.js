@@ -10,6 +10,7 @@ const Canvas = ({
     elements,
     onConnect,
     onDragOver,
+    onNodeDragStop,
     onElementsRemove,
     onLoad,
     openDataView,
@@ -32,6 +33,7 @@ const Canvas = ({
                         setOpenDataView(false)
                         setSelectedElement(elements)
                     }}
+                    onNodeDragStop={onNodeDragStop}
                     onPaneClick={()=> {
                         setSelectedElement(null)
                         setOpenDataView(false)

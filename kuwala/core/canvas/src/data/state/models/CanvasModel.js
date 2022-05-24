@@ -10,7 +10,12 @@ import TransformationBlockDTO from '../../dto/TransformationBlockDTO';
 import DataBlockDTO from '../../dto/DataBlockDTO';
 import {TRANSFORMATION_BLOCK, DATA_BLOCK,} from '../../../constants/nodeTypes';
 import {CONNECTION_EDGE} from '../../../constants/edgeTypes';
-import {getElementById} from "../../../utils/ElementUtils";
+import {
+    getElementByConnectionEdgeParams,
+    getElementById,
+    getElementsByEntityIds,
+} from "../../../utils/ElementUtils";
+import {getBlockByEntityId} from "../../../utils/BlockUtils";
 
 const CanvasModel = {
     elements: [],
@@ -77,6 +82,7 @@ const CanvasModel = {
             elements.forEach((curEl) => {
                 if (curEl.type !== DATA_BLOCK) return;
                 if (curEl.data.dataBlock.dataBlockId === block.dataBlockId) dupeFlag = true;
+                if (curEl.data.dataBlock.dataBlockEntityId === block.dataBlockEntityId) dupeFlag = true;
             });
 
             const nodeInfo = {
@@ -94,12 +100,21 @@ const CanvasModel = {
                 actions.updateNodePayloadByDataBlock({updatedNodeInfo: nodeInfo, dataBlockId: block.dataBlockId})
             } else {
                 // Else add new node
+                let position = {
+                    x: -100,
+                    y: Math.random() * window.innerHeight / 2,
+                };
+
+                if(nodeInfo.data.dataBlock.positionX && nodeInfo.data.dataBlock.positionY) {
+                    position = {
+                        x: nodeInfo.data.dataBlock.positionX,
+                        y: nodeInfo.data.dataBlock.positionY
+                    }
+                }
+
                 actions.addNode({
                     ...nodeInfo,
-                    position: {
-                        x: -100,
-                        y: Math.random() * window.innerHeight / 2,
-                    },
+                    position
                 })
             }
         });
@@ -114,6 +129,7 @@ const CanvasModel = {
             elements.forEach((curEl) => {
                 if (curEl.type !== TRANSFORMATION_BLOCK) return;
                 if ((curEl.data.transformationBlock.transformationBlockId === block.transformationBlockId)) dupeFlag = true;
+                if ((curEl.data.transformationBlock.transformationBlockEntityId === block.transformationBlockEntityId)) dupeFlag = true;
             });
 
             const nodeInfo = {
@@ -135,12 +151,22 @@ const CanvasModel = {
                 })
             } else {
                 // Else add new node
+
+                let position = {
+                    x: -100,
+                    y: Math.random() * window.innerHeight / 2,
+                };
+
+                if(nodeInfo.data.transformationBlock.positionX && nodeInfo.data.transformationBlock.positionY) {
+                    position = {
+                        x: nodeInfo.data.transformationBlock.positionX,
+                        y: nodeInfo.data.transformationBlock.positionY
+                    }
+                }
+
                 actions.addNode({
                     ...nodeInfo,
-                    position: {
-                        x: -100,
-                        y: Math.random() * window.innerHeight / 2,
-                    },
+                    position,
                 })
             }
         });
@@ -174,16 +200,16 @@ const CanvasModel = {
         }
         const elements = getState().elements;
 
-        // Check target maximum number of connections
+        // Check if existing connections already exists
+        const connectionExists = getElementByConnectionEdgeParams(elements, params);
         const target = getElementById(elements, params.target);
         if(target && target.type === TRANSFORMATION_BLOCK ) {
-            if(target.data.transformationBlock.connectedSourceNodeIds.length < target.data.transformationCatalog.maxNumberOfInputBlocks) {
+            if(target.data.transformationBlock.connectedSourceNodeIds.length < target.data.transformationCatalog.maxNumberOfInputBlocks && !connectionExists) {
                 actions.addConnectedEdgeToBlock({
                     source: params.source,
                     target: params.target
                 });
-
-                actions.setElements(addEdge(edgeToAdd, elements));
+                actions.addElement(edgeToAdd);
             } else {
                 alert('Maximum number of connections reached!');
             }
@@ -251,6 +277,21 @@ const CanvasModel = {
 
     setElements: action((state, elements) => {
         state.elements = elements
+    }),
+    addElement: action((state, elementToAdd) => {
+        state.elements = [...state.elements, elementToAdd]
+    }),
+    updateElementById: thunk((actions, elementToUpdate, {getState}) => {
+        const {elements} = getState();
+        const tempEl = elements.map((el) => {
+            if (el.id === elementToUpdate.id) {
+                const updatedEl = elementToUpdate
+                return updatedEl
+            } else {
+                return el
+            }
+        });
+        actions.setElements(tempEl);
     }),
     setSelectedElement: action((state, selectedNode) => {
         state.selectedElement = selectedNode
@@ -529,6 +570,25 @@ const CanvasModel = {
     removeTransformationBlock: thunk((actions, transformationBlockId, {getState}) => {
         const temp = getState().transformationBlocks.filter((el) => el.transformationBlockId !== transformationBlockId);
         actions.setTransformationBlocks(temp);
+    }),
+
+    // Loader
+    loadConnections: thunk(async (actions, transformationBlockId, {getState}) => {
+        const {elements, transformationBlocks} = getState();
+
+        for (const tfBlock of transformationBlocks) {
+            const currentElement = getBlockByEntityId(elements, tfBlock.transformationBlockEntityId);
+            const connectedElements = getElementsByEntityIds(elements, tfBlock.inputBlockIds);
+            for (const sourceElement of connectedElements) {
+                const tempParams = {
+                    source: sourceElement.id,
+                    sourceHandle: null,
+                    target: currentElement.id,
+                    targetHandle: null
+                }
+                actions.connectNodes(tempParams)
+            }
+        }
     }),
 }
 
