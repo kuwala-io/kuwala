@@ -1,0 +1,21 @@
+changed the things matti requested
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# Committer: Florian Grüning <floriangruning@Florians-MBP.kuwalla.lan>
+#
+# On branch docs/canvas
+# Your branch is up to date with 'origin/docs/canvas'.
+#
+# Changes to be committed:
+#	modified:   README.md
+#	modified:   docs/images/header_github_kuwala_new.png
+#
+# Changes not staged for commit:
+#	deleted:    kuwala/core/canvas/.env
+#
+# Untracked files:
+#	:
+#	kuwala/core/backend/app/.env
+#
