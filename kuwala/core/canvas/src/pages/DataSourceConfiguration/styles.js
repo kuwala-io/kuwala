@@ -1,0 +1,33 @@
+const styles = {
+    bigQueryParams: 'w-full focus:outline-none h-fit max-h-[400px]',
+    bigQueryParamsContainer: 'w-full px-4 py-2 border-2 border-kuwala-green text-gray-800 rounded-lg mt-4 overflow-y-auto flex flex-col min-h-[200px] max-h-[400px]',
+    bigQueryParamsPlaceholder: 'w-full whitespace-pre-line text-gray-400',
+    bigQueryParamsPlaceholderLine: 'ml-4',
+    bigQueryDocsLink: 'text-kuwala-green',
+    bigQueryFormContainer: 'flex flex-col w-full',
+    bigQueryFormSubtitle: 'text-md font-normal',
+    bigQueryFormTitle: 'text-lg capitalize font-semibold',
+    configurationContainer: 'mt-6 space-x-8 overflow-y-auto mx-20',
+    connectionControlsContainer: 'flex flex-row justify-between items-baseline',
+    connectionParameterInput: 'w-full px-4 py-2 border-2 border-kuwala-green text-gray-800 rounded-lg focus:outline-none',
+    connectionParameterInputContainer: 'w-5/6',
+    connectionParameterName: 'text-lg capitalize font-bold',
+    connectionParameterNameContainer: 'w-1/6',
+    connectionTestButtonContainer: 'flex flex-row align-middle items-center justify-center mt-6',
+    connectionTestResult: 'ml-8 text-md font-semibold',
+    dataSourceConfigForm: 'flex flex-row h-full w-full items-center space-y-8',
+    dataSourceConfigFormContainer: 'flex flex-col bg-white px-8 py-4 rounded-lg h-full',
+    dataSourceConnectionStatus: 'absolute right-0 top-0 p-1 border rounded-full w-7 h-7 -mr-2 -mt-2',
+    dataSourceContainer: 'flex flex-col justify-center items-center bg-white rounded-xl drop-shadow-lg relative mr-12 h-[148px] aspect-square',
+    dataSourceLogo: 'h-[72px] aspect-square',
+    dataSourceName: 'mt-1 font-semibold',
+    headerContainer: 'flex flex-row mt-12 px-20',
+    footerContainer: 'flex px-20 mb-8 mt-8',
+    pageContainer: 'flex flex-col h-screen antialiased text-gray-900',
+    pageContentContainer: 'flex flex-col h-full w-full bg-kuwala-bg-gray',
+    subtitle: 'font-light text-xl mt-3',
+    title: 'font-semibold text-3xl',
+    titleContainer: 'flex flex-col justify-center'
+}
+
+export default styles;

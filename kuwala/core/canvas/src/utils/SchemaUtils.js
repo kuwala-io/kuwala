@@ -1,6 +1,3 @@
-import {getTablePreview} from "../api/DataSourceApi";
-import React from "react";
-
 export const populateSchema = (rawSchema, dataSourceDTO) => {
     switch (dataSourceDTO.dataCatalogItemId) {
         case 'postgres':
@@ -62,13 +59,16 @@ export const generateParamsByDataSourceType = (type, addressString) => {
 
 export const getDataDictionary = (data, headers) => {
     let dictionary = [];
-    data.map((row,i) => {
+
+    data.forEach((row,i) => {
         let obj = {};
-        row.map((cell, j) => {
+
+        row.forEach((cell, j) => {
             obj[headers[j]] = typeof data[i][j] === 'object' || typeof data[i][j] === 'boolean' ? JSON.stringify(data[i][j]) : data[i][j];
-        })
-        dictionary.push(obj)
-    })
+        });
+        dictionary.push(obj);
+    });
+
     return dictionary;
 };
 

@@ -1,6 +1,11 @@
+from relationships import (
+    data_to_transformation_block_association_table,
+    transformation_to_transformation_block_association_table,
+)
 from sqlalchemy import JSON, Boolean, Column, ForeignKey, Numeric, String
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.mutable import MutableList
+from sqlalchemy.orm import backref, relationship
 
 from ..database import Base
 
@@ -21,3 +26,20 @@ class TransformationBlock(Base):
     materialize_as_table = Column(Boolean, default=False)
     position_x = Column(Numeric, nullable=False)
     position_y = Column(Numeric, nullable=False)
+    parent_data_blocks = relationship(
+        "DataBlock",
+        secondary=data_to_transformation_block_association_table,
+        back_populates="children",
+    )
+    parent_transformation_blocks = relationship(
+        "TransformationBlock",
+        secondary=transformation_to_transformation_block_association_table,
+        primaryjoin=transformation_to_transformation_block_association_table.c.child_id
+        == id,
+        secondaryjoin=transformation_to_transformation_block_association_table.c.parent_id
+        == id,
+        backref=backref(
+            "children_transformation_blocks", cascade="all, delete", join_depth=2
+        ),
+        join_depth=2,
+    )

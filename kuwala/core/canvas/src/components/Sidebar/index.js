@@ -7,16 +7,18 @@ import {Link} from "react-router-dom";
 import AddSourcesGreen from "../../icons/add_sources_green.png";
 import NodeHandlerContainer from "./NodeHandlerContainer";
 
-export default ({reactFlowWrapper}) => {
-    const { dataSource } = useStoreState(state => state.canvas);
-    const { toggleBlockCatalogModal } = useStoreActions(actions => actions.common);
+const Sidebar = ({reactFlowWrapper}) => {
+    const { dataSources } = useStoreState(({ dataSources }) => dataSources);
+    const { toggleTransformationCatalogModal } = useStoreActions(actions => actions.common);
 
     const renderDataSources = () => {
-        if(dataSource.length > 0) {
-            return <NodeHandlerContainer
-                reactFlowWrapper={reactFlowWrapper}
-            />
-        }else {
+        if (dataSources.length > 0) {
+            return (
+                <NodeHandlerContainer
+                    reactFlowWrapper={reactFlowWrapper}
+                />
+            );
+        } else {
             return (
                 <Link
                     to={"/data-catalog"}
@@ -62,7 +64,7 @@ export default ({reactFlowWrapper}) => {
                     }
                 >
                     {/* Header and Toggle */}
-                    <div className={`flex items-center justify-center flex-shrink-0 p-2 ${dataSource.length > 0 ? '' : 'hidden'}`}>
+                    <div className={`flex items-center justify-center flex-shrink-0 p-2 ${dataSources.length > 0 ? '' : 'hidden'}`}>
                         <span className={`p-2 text-xl font-semibold tracking-wider whitespace-nowrap select-none`}>
                             <span>Data Sources</span>
                         </span>
@@ -75,12 +77,8 @@ export default ({reactFlowWrapper}) => {
                 </aside>
             </div>
 
-            <div className={`
-                relative
-                ${dataSource.length > 0 ? '' : 'hidden'}
-            `}>
+            <div className={`relative ${dataSources.length > 0 ? '' : 'hidden'}`}>
                 <button
-                    to={'/data-catalog'}
                     className={`
                             ml-4
                             mt-4
@@ -97,11 +95,13 @@ export default ({reactFlowWrapper}) => {
                             text-center
                             select-none
                         `}
-                    onClick={toggleBlockCatalogModal}
+                    onClick={toggleTransformationCatalogModal}
                 >
                     +
                 </button>
             </div>
         </div>
     )
-}
+};
+
+export default Sidebar;

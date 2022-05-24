@@ -10,10 +10,11 @@ module.exports = {
       colors: {
         'kuwala-red': '#F5989D',
         'kuwala-green': '#00A99D',
+        'kuwala-purple': '#8B83BA',
         'kuwala-bg-gray': '#F9F9F9',
         'kuwala-gray': '#BDBDBD',
         'kuwala-light-green': '#99DDD8',
-        'kuwala-purple': '#8B83BA',
+        'kuwala-light-red': '#F4D2D5FF',
         'kuwala-light-purple': '#D0CDE3',
       },
       spacing: {

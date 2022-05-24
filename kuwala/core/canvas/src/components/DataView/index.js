@@ -81,7 +81,7 @@ export default () => {
                             Header: "#",
                             id: "row",
                             filterable: false,
-                            width: 50,
+                            width: 48,
                             Cell: (row) => {
                                 return <div>{row.index+1}</div>;
                             }
@@ -121,7 +121,7 @@ export default () => {
                             Header: "#",
                             id: "row",
                             filterable: false,
-                            width: 50,
+                            width: 48,
                             Cell: (row) => {
                                 return <div>{row.index+1}</div>;
                             }

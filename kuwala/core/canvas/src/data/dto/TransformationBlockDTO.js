@@ -4,7 +4,7 @@ module.exports = class TransformationBlockDTO {
         transformationBlockEntityId,
         isConfigured,
         transformationCatalogItemId,
-        transformationCatalog,
+        transformationCatalogItem,
         inputBlockIds,
         macroParameters,
         name,
@@ -20,7 +20,7 @@ module.exports = class TransformationBlockDTO {
         this.transformationBlockEntityId = transformationBlockEntityId;
         this.isConfigured = isConfigured;
         this.transformationCatalogItemId = transformationCatalogItemId;
-        this.transformationCatalog = transformationCatalog;
+        this.transformationCatalogItem = transformationCatalogItem;
         this.inputBlockIds = inputBlockIds;
         this.macroParameters = macroParameters;
         this.name = name;

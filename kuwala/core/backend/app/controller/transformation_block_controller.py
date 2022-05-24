@@ -13,7 +13,12 @@ from controller.utils.yaml_utils import (
     terminal_output_to_dbt_model,
     terminal_output_to_source_yaml,
 )
-from database.crud.common import generate_object_id, get_object_by_id, update_attributes
+from database.crud.common import (
+    delete_object,
+    generate_object_id,
+    get_object_by_id,
+    update_attributes,
+)
 from database.database import Base
 from database.models.data_block import DataBlock
 from database.models.transformation_block import TransformationBlock
@@ -389,5 +394,11 @@ def refresh_transformation_block(transformation_block_id: str, db: Session):
     create_model_yaml(
         dbt_dir=dbt_dir, dbt_model_dir=dbt_model_dir, dbt_model_name=dbt_model_name
     )
+
+    return dict(success=True)
+
+
+def delete_transformation_block(transformation_block_id: str, db: Session):
+    delete_object(db=db, model=TransformationBlock, object_id=transformation_block_id)
 
     return dict(success=True)

@@ -1,0 +1,27 @@
+const styles = {
+    addDataSourceButton: 'flex flex-row bg-white items-center px-4 py-4 rounded-lg space-x-2 w-fit',
+    addDataSourceButtonContainer: 'mt-6',
+    addDataSourceButtonIcon: 'h-[48px] aspect-square',
+    addDataSourceButtonText: 'text-lg',
+    bodyContainer: 'flex flex-1 justify-between flex-col w-full bg-kuwala-bg-gray',
+    bodyContentContainer: 'flex flex-col px-20',
+    dataSourceButtonsContainer: 'flex flex-row justify-end space-x-4 px-8',
+    dataSourceLogo: 'h-[48px] aspect-square',
+    dataSourceName: 'ml-10 text-lg font-medium',
+    dataSourceNameContainer: 'flex flex-row ml-8 items-center',
+    dataSourcesContainer: 'relative mt-12 space-x-8',
+    dataSourcesTable: 'w-full flex flex-col rounded-lg overflow-hidden',
+    footerContainer: 'flex flex-row-reverse px-20 mb-12',
+    headerContainer: 'flex flex-col mt-8',
+    pageContainer: 'flex flex-col h-screen antialiased text-gray-900',
+    spinnerContainer: 'flex flex-1 text-kuwala-green justify-center items-center',
+    statusContainer: 'flex justify-center',
+    subtitle: 'font-light text-xl mt-3',
+    tableHeader: 'text-lg text-center flex w-full bg-kuwala-green',
+    tableHeaderColumn: 'px-6 py-3 flex flex-1 text-white align-center',
+    tableRow: 'items-center bg-white text-center flex',
+    tableRowCell: 'py-6 flex-1',
+    title: 'font-semibold text-3xl',
+};
+
+export default styles;
