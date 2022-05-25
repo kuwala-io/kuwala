@@ -310,7 +310,6 @@ const App = () => {
                     isOpen={openConfigModal}
                     configData={selectedElement}
                 />
-
                 <BlockCatalogModal
                     isOpen={openBlockCatalogModal}
                 />

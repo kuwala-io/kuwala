@@ -174,6 +174,52 @@ def get_table_preview(
 
     return data
 
+def save_result(
+    data_source_id: str,
+    schema_name: str,
+    dataset_name: str,
+    table_name: str,
+    columns: Optional[list[str]],
+    result_dir: str,
+    db: Session,
+):
+    data_source, data_catalog_item_id = get_data_source_and_data_catalog_item_id(
+        db=db, data_source_id=data_source_id
+    )
+    connection_parameters = get_connection_parameters(data_source)
+
+    try:
+        if data_catalog_item_id == "postgres":
+            postgres_controller.save_result(
+                connection_parameters=connection_parameters,
+                schema_name=schema_name,
+                table_name=table_name,
+                columns=columns,
+                result_dir=result_dir
+            )
+        elif data_catalog_item_id == "bigquery":
+            bigquery_controller.save_result(
+                connection_parameters=connection_parameters,
+                dataset_name=dataset_name,
+                table_name=table_name,
+                columns=columns,
+                result_dir=result_dir
+            )
+        elif data_catalog_item_id == "snowflake":
+            snowflake_controller.save_result(
+                connection_parameters=connection_parameters,
+                schema_name=schema_name,
+                table_name=table_name,
+                columns=columns,
+                result_dir=result_dir
+            )
+    except psycopg2.errors.UndefinedTable:
+        pass
+    except Exception as e:
+        logging.error(e)
+
+    return None
+
 
 def update_dbt_connection_parameters(
     data_source: models.DataSource, connection_parameters: ConnectionParameters

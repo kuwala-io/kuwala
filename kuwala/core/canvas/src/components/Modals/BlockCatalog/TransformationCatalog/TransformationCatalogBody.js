@@ -59,7 +59,6 @@ const TransformationCatalogBody = ({selectedTransformationIndex, catalogOptions,
                     <div className={Classes.BlockCatalogOptionsContainer}>
                         {renderTransformationOptions(catalogOptions)}
                     </div>
-
                     <div className={Classes.SelectedOptionDetailsContainer}>
                         <div className={Classes.OptionDetailsContainer}>
                             {renderSelectedOptionDetails()}
@@ -94,7 +93,6 @@ const TransformationCatalogBody = ({selectedTransformationIndex, catalogOptions,
                             {optionItem.name}
                         </span>
                     </div>
-
                     <p className={'mt-2'}>
                         {optionItem.description}
                     </p>
@@ -109,7 +107,6 @@ const TransformationCatalogBody = ({selectedTransformationIndex, catalogOptions,
                             <p>Parameters</p>
                             {optionItem.macroParameters.map((el, i) => <li key={i}>{el.name}</li>)}
                         </div>
-
                         <div className={Classes.OptionDetailsExampleContainer}>
                             {renderExampleTableWrapper(optionItem)}
                         </div>

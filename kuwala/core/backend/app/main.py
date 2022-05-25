@@ -23,6 +23,7 @@ from database.models import data_source as data_source_models
 from database.models import export_catalog as export_catalog_models
 from database.models import export_catalog_category as export_catalog_category_models
 from database.models import transformation_block as transformation_block_models
+from database.models import export_block as export_block_models
 from database.models import transformation_catalog as transformation_catalog_models
 from database.schemas import (
     transformation_catalog_category as transformation_catalog_category_schemas,
@@ -42,6 +43,7 @@ from routers import (
     export_catalog,
     transformation_block,
     transformation_catalog,
+    export_block
 )
 import sqlalchemy.exc
 import uvicorn
@@ -71,6 +73,7 @@ app.include_router(data_source.router)
 app.include_router(transformation_block.router)
 app.include_router(transformation_catalog.router)
 app.include_router(export_catalog.router)
+app.include_router(export_block.router)
 
 
 # Cannot be placed under `database/database.py` as it would create a circular import
@@ -92,6 +95,7 @@ def populate_db():
             transformation_block_models.Base.metadata.create_all(bind=Engine)
             export_catalog_models.Base.metadata.create_all(bind=Engine)
             export_catalog_category_models.Base.metadata.create_all(bind=Engine)
+            export_block_models.Base.metadata.create_all(bind=Engine)
 
             connected_to_db = True
         except sqlalchemy.exc.OperationalError as e:

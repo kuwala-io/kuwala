@@ -3,6 +3,7 @@ import functools
 from database.schemas.data_source import ConnectionParameters
 from fastapi import HTTPException
 import snowflake.connector
+import csv
 
 
 def map_connection_parameters(connection_parameters: ConnectionParameters):
@@ -54,6 +55,31 @@ def send_query(
     connection.close()
 
     return result
+
+def save_query(
+    connection_parameters: ConnectionParameters,
+    query: str = None,
+    destination_file: str = None,
+) -> list:
+    connection = get_connection(connection_parameters=connection_parameters)
+    cursor = connection.cursor()
+
+    cursor.execute(query)
+
+    rows = cursor.fetchall()
+
+    column_names = [i[0] for i in cursor.description]
+    fp = open(destination_file, 'w+')
+    myFile = csv.writer(fp, lineterminator='\n')
+    myFile.writerow(column_names)
+    myFile.writerows(rows)
+    fp.close()
+
+    cursor.close()
+    connection.close()
+    print('finished downloading')
+
+    return True
 
 
 def test_connection(connection_parameters: ConnectionParameters) -> bool:
@@ -170,6 +196,50 @@ def get_table_preview(
     columns = rows.pop(0)
 
     return dict(columns=columns, rows=rows)
+
+
+def save_result(
+        connection_parameters: ConnectionParameters,
+        schema_name: str,
+        table_name: str,
+        columns: list[str],
+        result_dir: str,
+):
+    if not schema_name:
+        raise HTTPException(
+            status_code=400, detail="Missing query parameter: 'schema_name'"
+        )
+
+    if not columns:
+        columns_query = f"""
+            SELECT *
+            FROM {schema_name}.{table_name}
+            LIMIT 0
+        """
+        columns = send_query(
+            connection_parameters=connection_parameters, query=columns_query
+        )
+
+        columns_string = functools.reduce(
+            lambda c1, c2: f"{c1}, {c2}", columns[0][0:]
+        )
+    else:
+        columns_string = functools.reduce(
+            lambda c1, c2: f"{c1}, {c2}", columns[0:]
+        )
+
+    rows_query = f"""
+        SELECT {columns_string}
+        FROM {schema_name}.{table_name}
+    """
+
+    save_query(
+        connection_parameters=connection_parameters,
+        destination_file=result_dir,
+        query=rows_query
+    )
+
+    return None
 
 
 def update_dbt_connection_parameters(

@@ -32,9 +32,9 @@ def get_connection(connection_parameters: ConnectionParameters):
 
 
 def send_query(
-    connection_parameters: ConnectionParameters,
-    query: str = None,
-    path_to_query_file: str = None,
+        connection_parameters: ConnectionParameters,
+        query: str = None,
+        path_to_query_file: str = None,
 ) -> list:
     connection = get_connection(connection_parameters=connection_parameters)
     cursor = connection.cursor()
@@ -55,6 +55,23 @@ def send_query(
     connection.close()
 
     return result
+
+
+def save_query(
+        connection_parameters: ConnectionParameters,
+        query: str = None,
+        destination_file: str = None,
+) -> list:
+    connection = get_connection(connection_parameters=connection_parameters)
+    cursor = connection.cursor()
+
+    output_query = 'copy ({0}) to stdout with csv header'.format(query)
+
+    with open(destination_file, 'w+') as f:
+        cursor.copy_expert(output_query, f)
+
+    cursor.close()
+    connection.close()
 
 
 def test_connection(connection_parameters: ConnectionParameters) -> bool:
@@ -114,7 +131,7 @@ def get_schema(connection_parameters: ConnectionParameters):
 
 
 def get_keys(
-    table_name: str, key_type: str, connection_parameters: ConnectionParameters
+        table_name: str, key_type: str, connection_parameters: ConnectionParameters
 ):
     query = f"""
         SELECT c.column_name
@@ -140,7 +157,7 @@ def get_keys(
 
 
 def get_columns(
-    connection_parameters: ConnectionParameters, schema_name: str, table_name: str
+        connection_parameters: ConnectionParameters, schema_name: str, table_name: str
 ):
     columns_query = f"""
             SELECT column_name, data_type
@@ -156,12 +173,12 @@ def get_columns(
 
 
 def get_table_preview(
-    connection_parameters: ConnectionParameters,
-    schema_name: str,
-    table_name: str,
-    columns: list[str],
-    limit_columns: int,
-    limit_rows: int,
+        connection_parameters: ConnectionParameters,
+        schema_name: str,
+        table_name: str,
+        columns: list[str],
+        limit_columns: int,
+        limit_rows: int,
 ) -> dict:
     if not schema_name:
         raise HTTPException(
@@ -215,8 +232,50 @@ def get_table_preview(
     )
 
 
+def save_result(
+        connection_parameters: ConnectionParameters,
+        schema_name: str,
+        table_name: str,
+        columns: list[str],
+        result_dir: str,
+):
+    if not schema_name:
+        raise HTTPException(
+            status_code=400, detail="Missing query parameter: 'schema_name'"
+        )
+
+    if not columns:
+        columns_query = f"""
+            SELECT *
+            FROM {schema_name}.{table_name}
+            LIMIT 0
+        """
+        columns = send_query(
+            connection_parameters=connection_parameters, query=columns_query
+        )
+
+        columns_string = functools.reduce(
+            lambda c1, c2: f"{c1}, {c2}", columns[0][0:]
+        )
+    else:
+        columns_string = functools.reduce(
+            lambda c1, c2: f"{c1}, {c2}", columns[0:]
+        )
+
+    rows_query = f"""
+        SELECT {columns_string}
+        FROM {schema_name}.{table_name}
+    """
+    save_query(
+        connection_parameters=connection_parameters,
+        query=rows_query,
+        destination_file=result_dir
+    )
+    return None
+
+
 def update_dbt_connection_parameters(
-    profile_yaml: dict, connection_parameters: ConnectionParameters
+        profile_yaml: dict, connection_parameters: ConnectionParameters
 ) -> dict:
     dev_profile = profile_yaml["kuwala"]["outputs"]["dev"]
     dev_profile["host"] = connection_parameters.host

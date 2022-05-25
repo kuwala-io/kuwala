@@ -1,4 +1,5 @@
 import functools
+import os
 
 from database.schemas.data_source import ConnectionParameters
 from fastapi import HTTPException
@@ -58,9 +59,9 @@ def get_schema(connection_parameters: ConnectionParameters):
 
 
 def get_columns(
-    connection_parameters: ConnectionParameters,
-    dataset_name: str,
-    table_name: str,
+        connection_parameters: ConnectionParameters,
+        dataset_name: str,
+        table_name: str,
 ):
     credentials = get_credentials(connection_parameters=connection_parameters)
     client = bigquery.Client(credentials=credentials)
@@ -74,12 +75,12 @@ def get_columns(
 
 
 def get_table_preview(
-    connection_parameters: ConnectionParameters,
-    dataset_name: str,
-    table_name: str,
-    columns: list[str],
-    limit_columns: int = 200,
-    limit_rows: int = 300,
+        connection_parameters: ConnectionParameters,
+        dataset_name: str,
+        table_name: str,
+        columns: list[str],
+        limit_columns: int = 200,
+        limit_rows: int = 300,
 ) -> dict:
     if not dataset_name:
         raise HTTPException(
@@ -118,8 +119,48 @@ def get_table_preview(
     return dict(columns=columns[0:limit_columns], rows=rows)
 
 
+def save_result(
+        connection_parameters: ConnectionParameters,
+        dataset_name: str,
+        table_name: str,
+        columns: list[str],
+        result_dir: str,
+):
+    if not dataset_name:
+        raise HTTPException(
+            status_code=400, detail="Missing query parameter: 'dataset_name'"
+        )
+
+    credentials = get_credentials(connection_parameters=connection_parameters)
+    client = bigquery.Client(credentials=credentials)
+    table_ref = f"{credentials.project_id}.{dataset_name}.{table_name}"
+
+    if not columns:
+        table = client.get_table(table=table_ref)
+        columns = list(map(lambda s: s.name, table.schema))
+
+    columns_string = functools.reduce(
+        lambda c1, c2: f"{c1}, {c2}", columns[0:]
+    )
+    rows_query = f"""
+        SELECT {columns_string}
+        FROM {table_ref}
+    """
+
+    dataframe = (
+        client.query(rows_query)
+            .result()
+            .to_dataframe(
+            create_bqstorage_client=True,
+        )
+    )
+    dataframe.to_csv(result_dir)
+
+    return None
+
+
 def update_dbt_connection_parameters(
-    profile_yaml: dict, connection_parameters: ConnectionParameters
+        profile_yaml: dict, connection_parameters: ConnectionParameters
 ) -> dict:
     credentials_json = connection_parameters.credentials_json
     dev_profile = profile_yaml["kuwala"]["outputs"]["dev"]
