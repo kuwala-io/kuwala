@@ -1,20 +1,20 @@
-import React, {useEffect, useState} from "react";
+import React, {Fragment, useEffect, useState} from "react";
 import {useStoreActions} from "easy-peasy";
 import {
     getAllTransformationCatalogCategories,
     getAllItemsInCategory
-} from "../../../api/TransformationCatalog";
+} from "../../../../api/TransformationCatalog";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faShuffle} from "@fortawesome/free-solid-svg-icons";
-import {getDataDictionary} from "../../../utils/SchemaUtils";
+import {getDataDictionary} from "../../../../utils/SchemaUtils";
 import ReactTable from "react-table-6";
 import "./transformation-example-table.css";
-import Modal from "../../Common/Modal";
-import Button from "../../Common/Button";
-import Classes from "./TransformationCatalogStyle";
+import Modal from "../../../Common/Modal";
+import Button from "../../../Common/Button";
+import Classes from "../ExportCatalog/ExportCatalogStyle";
 import cn from "classnames";
-import TransformationBlockDTO from "../../../data/dto/TransformationBlockDTO";
-import TransformationCatalogDTO from "../../../data/dto/TransformationCatalogDTO";
+import TransformationBlockDTO from "../../../../data/dto/TransformationBlockDTO";
+import TransformationCatalogDTO from "../../../../data/dto/TransformationCatalogDTO";
 import {v4} from "uuid";
 
 const ExampleTable = ({columns, rows}) => {
@@ -146,14 +146,6 @@ export default ({isOpen}) => {
     const CatalogSelector = () => {
         return (
             <div className={Classes.CatalogContainer}>
-                <div className={Classes.CatalogContent}>
-                    <FontAwesomeIcon
-                        icon={faShuffle}
-                        className={'h-6 w-6'}
-                    />
-                    <span className={'font-semibold'}>Transformation Blocks</span>
-                </div>
-
                 <div className={Classes.CatalogListContainer}>
                     {renderCatalogList()}
                 </div>
@@ -382,13 +374,10 @@ export default ({isOpen}) => {
     }
 
     return (
-        <Modal
-            isOpen={isOpen}
-            closeModalAction={toggleTransformationCatalogModal}
-        >
+        <Fragment>
             <CatalogSelector/>
             <CatalogBody/>
             <CatalogFooter/>
-        </Modal>
+        </Fragment>
     )
 }

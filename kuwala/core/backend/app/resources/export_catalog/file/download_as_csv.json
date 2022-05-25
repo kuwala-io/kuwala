@@ -1,0 +1,21 @@
+{
+  "id": "download_as_csv",
+  "category": "file",
+  "name": "Download as CSV",
+  "icon": "file-csv",
+  "description": "With this export, you can export the result of a block into a CSV File",
+  "min_number_of_input_blocks": 1,
+  "max_number_of_input_blocks": 1,
+  "macro_parameters": [
+    {
+      "id": "file_name",
+      "name": "File name",
+      "type": "text"
+    },
+    {
+      "id": "delimiter",
+      "name": "Delimiter",
+      "type": "text"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 const classes =  {
-    CatalogContainer: `flex flex-col flex-shrink-0 justify-between px-6 py-4 rounded-t-md`,
+    CatalogContainer: `flex flex-col flex-shrink-0 justify-between px-6 py-2 rounded-t-md`,
     CatalogContent: `flex flex-row w-64 space-x-4 items-center px-4 py-3 bg-kuwala-green text-white rounded-lg`,
-    CatalogListContainer: `flex flex-row space-x-4 items-center mt-4`,
+    CatalogListContainer: `flex flex-row space-x-4 items-center mt-0`,
     CatalogBodyContainer: `flex flex-col flex-auto overflow-y-scroll relative px-6 pt-2 pb-4`,
     CatalogBodyAlertText: `flex flex-col w-full h-full text-xl font-light justify-center items-center rounded-tr-lg`,
     SelectedTransformationContainer: `flex flex-row bg-white h-full w-full`,
@@ -9,7 +9,7 @@ const classes =  {
     SelectedOptionDetailsContainer: `flex flex-col bg-white w-9/12 rounded-tr-lg`,
     OptionDetailsContainer: `flex flex-col w-full h-full`,
     OptionDetailsAlertText: `flex flex-col w-full h-full text-xl font-light justify-center items-center rounded-tr-lg`,
-    OptionDetailsContent: `flex flex-col w-full h-full border-2 border-kuwala-purple rounded-lg p-6 overflow-y-auto`,
+    OptionDetailsContent: `flex flex-col w-full h-full border-2 border-kuwala-red rounded-lg p-6 overflow-y-auto`,
     RequiredColumnBase: `flex flex-row space-x-2 items-center`,
     OptionDetailsParameterAndExample: `flex flex-row mt-4 h-full space-x-6`,
     OptionDetailsParameterContainer: `flex flex-col w-2/12`,

@@ -4,7 +4,7 @@ import Header from "../components/Header";
 import {useStoreActions, useStoreState} from 'easy-peasy';
 import {Link} from "react-router-dom";
 import DataBlockConfigModal from "../components/Modals/DataBlockConfig/DataBlockConfigModal";
-import TransformationCatalogModal from "../components/Modals/TransformationCatalog/TransformationCatalogModal";
+import TransformationCatalogModal from "../components/Modals/ActionCatalog/TransformationCatalog/TransformationCatalogModal";
 import loadIcons from "../utils/IconsLoader";
 import TransformationBlockConfigModal from "../components/Modals/TransformationBlockConfig/TransformationBlockConfigModal";
 import Canvas from "../components/Canvas";
@@ -22,6 +22,7 @@ import {
 } from "../utils/TransformationCatalogUtils";
 import {getSchema} from "../api/DataSourceApi";
 import Spinner from "../components/Common/Spinner";
+import ActionModal from "../components/Modals/ActionCatalog/ActionModal";
 
 
 const App = () => {
@@ -224,7 +225,7 @@ const App = () => {
                     isOpen={openConfigModal}
                     configData={selectedElement}
                 />
-                <TransformationCatalogModal
+                <ActionModal
                     isOpen={openTransformationCatalogModal}
                 />
                 <TransformationBlockConfigModal
