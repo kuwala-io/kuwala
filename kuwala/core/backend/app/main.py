@@ -17,19 +17,19 @@ from database.database import Engine, get_db
 from database.models import (
     transformation_catalog_category as transformation_catalog_category_models,
 )
-from database.models import export_catalog_category as export_catalog_category_models
 from database.models import data_block as data_block_models
 from database.models import data_catalog as data_catalog_models
 from database.models import data_source as data_source_models
+from database.models import export_catalog as export_catalog_models
+from database.models import export_catalog_category as export_catalog_category_models
 from database.models import transformation_block as transformation_block_models
 from database.models import transformation_catalog as transformation_catalog_models
-from database.models import export_catalog as export_catalog_models
 from database.schemas import (
     transformation_catalog_category as transformation_catalog_category_schemas,
 )
-from database.schemas import export_catalog_category as export_catalog_category_schemas
-from database.schemas import export_catalog as export_catalog_schemas
 from database.schemas import data_catalog as data_catalog_schemas
+from database.schemas import export_catalog as export_catalog_schemas
+from database.schemas import export_catalog_category as export_catalog_category_schemas
 from database.schemas import transformation_catalog as transformation_catalog_schemas
 from fastapi import FastAPI
 import fastapi.exceptions
@@ -39,9 +39,9 @@ from routers import (
     data_block,
     data_catalog,
     data_source,
+    export_catalog,
     transformation_block,
     transformation_catalog,
-    export_catalog
 )
 import sqlalchemy.exc
 import uvicorn
@@ -170,7 +170,9 @@ def populate_db():
     )
 
     for export_cat in transformation_catalog_categories:
-        transformations = list(map(lambda tr: f"{export_cat}/{tr}", os.listdir(export_cat)))
+        transformations = list(
+            map(lambda tr: f"{export_cat}/{tr}", os.listdir(export_cat))
+        )
 
         for ex in transformations:
             file = open(ex)
@@ -203,9 +205,7 @@ def populate_db():
                     )
 
     # Add export catalog categories to database
-    file = open(
-        os.path.join(script_dir, "./resources/export_catalog/categories.json")
-    )
+    file = open(os.path.join(script_dir, "./resources/export_catalog/categories.json"))
     export_catalog_categories = json.load(file)
 
     for export_cat in export_catalog_categories:
@@ -227,9 +227,7 @@ def populate_db():
                 )
 
     # Add export catalog items into database
-    export_catalog_path = os.path.join(
-        script_dir, "./resources/export_catalog"
-    )
+    export_catalog_path = os.path.join(script_dir, "./resources/export_catalog")
     export_catalog_categories = list(
         filter(
             lambda d: os.path.isdir(d),
@@ -268,6 +266,7 @@ def populate_db():
                             macro_parameters=json.dumps(ex["macro_parameters"]),
                         ),
                     )
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

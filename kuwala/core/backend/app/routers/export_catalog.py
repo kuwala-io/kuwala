@@ -16,9 +16,7 @@ router = APIRouter(
 
 @router.get(
     "/category",
-    response_model=list[
-        schemas_export_catalog_category.ExportCatalogCategory
-    ],
+    response_model=list[schemas_export_catalog_category.ExportCatalogCategory],
 )
 def get_all_export_categories(db: Session = Depends(get_db)):
     return get_all_objects(
@@ -31,9 +29,7 @@ def get_all_export_categories(db: Session = Depends(get_db)):
     "/category/{category_id}/items",
     response_model=list[schemas_export_catalog.ExportCatalogItem],
 )
-def get_all_export_category_items(
-    category_id: str, db: Session = Depends(get_db)
-):
+def get_all_export_category_items(category_id: str, db: Session = Depends(get_db)):
     items = get_all_objects(
         db=db,
         model=models_export_catalog.ExportCatalogItem,
