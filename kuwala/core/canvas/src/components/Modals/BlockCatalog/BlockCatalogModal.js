@@ -6,22 +6,22 @@ import TransformationCatalogModal from "./TransformationCatalog/TransformationCa
 import ExportCatalogModal from "./ExportCatalog/ExportCatalogModal";
 
 export default ({isOpen}) => {
-    const { toggleTransformationCatalogModal } = useStoreActions(actions => actions.common);
+    const { toggleBlockCatalogModal } = useStoreActions(actions => actions.common);
     const [selectedAction, setSelectedAction] = useState(0);
 
     const actions = [{
-        id: 'tfBlockAction',
+        id: 'transformationBlockCatalog',
         text: 'Transformation Blocks',
         icon: 'shuffle',
         color: 'kuwalaGreen',
     }, {
-        id: 'exBlockAction',
+        id: 'exportBlockCatalog',
         text: 'Export Blocks',
         icon: 'share-from-square',
         color: 'kuwalaGreen',
     }]
 
-    const ActionSelector = () => {
+    const BlockCatalogSelector = () => {
         return (
             <div className={`flex flex-row space-x-4 flex-shrink-0 items-center px-6 py-4 rounded-t-md`}>
                 {
@@ -42,7 +42,7 @@ export default ({isOpen}) => {
         )
     }
 
-    const renderActionsBody = () => {
+    const renderBlockCatalogBody = () => {
         switch (selectedAction){
             case 0:
                 return <TransformationCatalogModal/>
@@ -54,10 +54,10 @@ export default ({isOpen}) => {
     return (
         <Modal
             isOpen={isOpen}
-            closeModalAction={toggleTransformationCatalogModal}
+            closeModalAction={toggleBlockCatalogModal}
         >
-            <ActionSelector/>
-            {renderActionsBody()}
+            <BlockCatalogSelector/>
+            {renderBlockCatalogBody()}
         </Modal>
     )
 }

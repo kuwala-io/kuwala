@@ -7,7 +7,7 @@ const CommonModel =  {
     openConfigModal: false,
     openTransformationConfigModal: false,
     reactFlowInstance: null,
-    openTransformationCatalogModal: false,
+    openBlockCatalogModal: false,
     connectionLoaded: false,
     existingBlockLoaded: false,
 
@@ -15,8 +15,8 @@ const CommonModel =  {
         state.notificationOpen = !state.notificationOpen
     }),
 
-    toggleTransformationConfigModal: action((state) => {
-        state.openTransformationConfigModal = !state.openTransformationConfigModal;
+    toggleBlockCatalogModal: action((state) => {
+        state.openBlockCatalogModal = !state.openBlockCatalogModal;
     }),
 
     setReactFlowInstance: action((state, instance)=> {

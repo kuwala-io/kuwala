@@ -2,12 +2,12 @@ import React, {Fragment, useEffect, useState} from "react";
 import {useStoreActions} from "easy-peasy";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Button from "../../../Common/Button";
-import Classes from "./ExportCatalogStyle";
+import Classes from "../CommonBlockCatalogModalStyle";
 import ExportCatalogDTO from "../../../../data/dto/ExportCatalogDTO";
 import {getAllExportCatalogCategories, getAllItemsInExportCategory} from "../../../../api/ExportCatalog";
 
-export default ({isOpen}) => {
-    const { toggleTransformationCatalogModal } = useStoreActions(actions => actions.common);
+export default () => {
+    const { toggleBlockCatalogModal } = useStoreActions(actions => actions.common);
     const [selectedExportIndex, setSelectedExportIndex] = useState(null);
     const [catalogCategories, setCatalogCategories] = useState([]);
     const [catalogOptions, setCatalogOptions] = useState([]);
@@ -124,13 +124,13 @@ export default ({isOpen}) => {
         if (selectedExportIndex === null || catalogOptions.length === 0) {
             return (
                 <div>
-                    No <span className={'text-kuwala-red'}>transformation</span> options found.
+                    There are currently no <span className={'text-kuwala-red'}>blocks</span> available in this category.
                 </div>
             )
         } else {
             return (
-                <div className={Classes.SelectedTransformationContainer}>
-                    <div className={Classes.TransformationOptionsContainer}>
+                <div className={Classes.SelectedBlockCatalogContainer}>
+                    <div className={Classes.BlockCatalogOptionsContainer}>
                         {renderOptions(catalogOptions)}
                     </div>
                     <div className={Classes.SelectedOptionDetailsContainer}>
@@ -167,14 +167,14 @@ export default ({isOpen}) => {
         if(selectedCatalogOption === null){
             return (
                 <div className={Classes.OptionDetailsAlertText}>
-                    <p>To see the <span className={'text-kuwala-red'}>details</span> of a export block,</p>
+                    <p>To see the <span className={'text-kuwala-red'}>details</span> of an export block,</p>
                     <p>select one from the left</p>
                 </div>
             )
         } else {
             const optionItem = catalogOptions[selectedCatalogOption];
             return (
-                <div className={Classes.OptionDetailsContent}>
+                <div className={Classes.ExportOptionDetailsContent}>
                     <div className={'text-kuwala-red space-x-4'}>
                         <FontAwesomeIcon icon={optionItem.icon}/>
                         <span className={'font-semibold'}>
@@ -200,7 +200,7 @@ export default ({isOpen}) => {
         return (
             <div className={Classes.ModalFooterContainer}>
                 <Button
-                    onClick={toggleTransformationCatalogModal}
+                    onClick={toggleBlockCatalogModal}
                     text={'Back'}
                 />
                 <Button

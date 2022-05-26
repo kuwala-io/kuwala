@@ -5,13 +5,11 @@ import {
     getAllItemsInCategory
 } from "../../../../api/TransformationCatalog";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faShuffle} from "@fortawesome/free-solid-svg-icons";
 import {getDataDictionary} from "../../../../utils/SchemaUtils";
 import ReactTable from "react-table-6";
 import "./transformation-example-table.css";
-import Modal from "../../../Common/Modal";
 import Button from "../../../Common/Button";
-import Classes from "../ExportCatalog/ExportCatalogStyle";
+import Classes from "../CommonBlockCatalogModalStyle";
 import cn from "classnames";
 import TransformationBlockDTO from "../../../../data/dto/TransformationBlockDTO";
 import TransformationCatalogDTO from "../../../../data/dto/TransformationCatalogDTO";
@@ -55,8 +53,8 @@ const ExampleTable = ({columns, rows}) => {
     )
 }
 
-export default ({isOpen}) => {
-    const { toggleTransformationCatalogModal } = useStoreActions(actions => actions.common);
+export default () => {
+    const { toggleBlockCatalogModal } = useStoreActions(actions => actions.common);
     const { convertTransformationBlockIntoElement, addTransformationBlock } = useStoreActions(actions => actions.canvas);
     const [selectedTransformationIndex, setSelectedTransformationIndex] = useState(null);
     const [catalogCategories, setCatalogCategories] = useState([]);
@@ -103,7 +101,7 @@ export default ({isOpen}) => {
 
         addTransformationBlock(tfBlockDTO);
         convertTransformationBlockIntoElement();
-        toggleTransformationCatalogModal();
+        toggleBlockCatalogModal();
     }
 
     const fetchCatalogBodyItems = async (category) => {
@@ -197,13 +195,13 @@ export default ({isOpen}) => {
         if (selectedTransformationIndex === null || catalogOptions.length === 0) {
             return (
                 <div>
-                    No <span className={'text-kuwala-red'}>transformation</span> options found.
+                    There are currently no <span className={'text-kuwala-red'}>blocks</span> available in this category.
                 </div>
             )
         } else {
             return (
-                <div className={Classes.SelectedTransformationContainer}>
-                    <div className={Classes.TransformationOptionsContainer}>
+                <div className={Classes.SelectedBlockCatalogContainer}>
+                    <div className={Classes.BlockCatalogOptionsContainer}>
                         {renderTransformationOptions(catalogOptions)}
                     </div>
                     <div className={Classes.SelectedOptionDetailsContainer}>
@@ -247,7 +245,7 @@ export default ({isOpen}) => {
         } else {
             const optionItem = catalogOptions[selectedCatalogOption];
             return (
-                <div className={Classes.OptionDetailsContent}>
+                <div className={Classes.TransformationOptionDetailsContent}>
                     <div className={'text-kuwala-purple space-x-4'}>
                         <FontAwesomeIcon icon={optionItem.icon}/>
                         <span className={'font-semibold'}>
@@ -361,7 +359,7 @@ export default ({isOpen}) => {
         return (
             <div className={Classes.ModalFooterContainer}>
                 <Button
-                    onClick={toggleTransformationCatalogModal}
+                    onClick={toggleBlockCatalogModal}
                     text={'Back'}
                 />
                 <Button
