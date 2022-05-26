@@ -22,13 +22,13 @@ import {
 } from "../utils/TransformationCatalogUtils";
 import {getSchema} from "../api/DataSourceApi";
 import Spinner from "../components/Common/Spinner";
-import ActionModal from "../components/Modals/BlockCatalog/BlockCatalogModal";
+import BlockCatalogModal from "../components/Modals/BlockCatalog/BlockCatalogModal";
 
 
 const App = () => {
     const reactFlowWrapper = useRef(null);
     const {elements, selectedElement, dataSource, openDataView} = useStoreState(state => state.canvas);
-    const {openConfigModal, openTransformationCatalogModal, openTransformationConfigModal, connectionLoaded, existingBlockLoaded} = useStoreState(state => state.common);
+    const {openConfigModal, openBlockCatalogModal, openTransformationConfigModal, connectionLoaded, existingBlockLoaded} = useStoreState(state => state.common);
     const {
         setSelectedElement,
         removeNode,
@@ -225,8 +225,8 @@ const App = () => {
                     isOpen={openConfigModal}
                     configData={selectedElement}
                 />
-                <ActionModal
-                    isOpen={openTransformationCatalogModal}
+                <BlockCatalogModal
+                    isOpen={openBlockCatalogModal}
                 />
                 <TransformationBlockConfigModal
                     isOpen={openTransformationConfigModal}
