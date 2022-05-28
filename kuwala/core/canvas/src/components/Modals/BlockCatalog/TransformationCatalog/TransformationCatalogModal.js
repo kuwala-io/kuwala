@@ -25,6 +25,20 @@ export default () => {
     }, [])
 
     useEffect(()=> {
+        const fetchCatalogBodyItems = async (category) => {
+            try{
+                const transformationId = category.id;
+                const res = await getAllItemsInCategory(transformationId);
+                if(res.status === 200){
+                    catalogOptionsIntoDTO(res.data, category);
+                } else {
+                    setCatalogOptions([]);
+                }
+            }catch(e) {
+                console.error('Failed to get transformation catalog', e);
+            }
+        }
+
         if(catalogCategories.length) {
             const category = catalogCategories[selectedTransformationIndex]
             fetchCatalogBodyItems(category).then(null);
@@ -61,20 +75,6 @@ export default () => {
         addTransformationBlock(tfBlockDTO);
         convertTransformationBlockIntoElement();
         toggleBlockCatalogModal();
-    }
-
-    const fetchCatalogBodyItems = async (category) => {
-        try{
-            const transformationId = category.id;
-            const res = await getAllItemsInCategory(transformationId);
-            if(res.status === 200){
-                catalogOptionsIntoDTO(res.data, category);
-            } else {
-                setCatalogOptions([]);
-            }
-        }catch(e) {
-            console.error('Failed to get transformation catalog', e);
-        }
     }
 
     const catalogOptionsIntoDTO = (apiResponse, category) => {
@@ -120,7 +120,6 @@ export default () => {
                 selectedCatalogOption={selectedCatalogOption}
                 toggleBlockCatalogModal={toggleBlockCatalogModal}
                 addToCanvas={async () => {
-                    console.log("Trigger add to canvas");
                     await addToCanvas()
                 }}
             />

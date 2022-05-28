@@ -137,21 +137,21 @@ def populate_db():
     )
     transformation_catalog_categories = json.load(file)
 
-    for export_cat in transformation_catalog_categories:
+    for tcc in transformation_catalog_categories:
         try:
             get_object_by_id(
                 db=db,
                 model=transformation_catalog_category_models.TransformationCatalogCategory,
-                object_id=export_cat["id"],
+                object_id=tcc["id"],
             )
         except fastapi.exceptions.HTTPException as e:
             if e.status_code == 404:
                 create_transformation_catalog_category(
                     db=db,
                     transformation_catalog_category=transformation_catalog_category_schemas.TransformationCatalogCategoryCreate(
-                        id=export_cat["id"],
-                        name=export_cat["name"],
-                        icon=export_cat["icon"],
+                        id=tcc["id"],
+                        name=tcc["name"],
+                        icon=tcc["icon"],
                     ),
                 )
 
@@ -169,38 +169,38 @@ def populate_db():
         )
     )
 
-    for export_cat in transformation_catalog_categories:
+    for tcc in transformation_catalog_categories:
         transformations = list(
-            map(lambda tr: f"{export_cat}/{tr}", os.listdir(export_cat))
+            map(lambda tr: f"{tcc}/{tr}", os.listdir(tcc))
         )
 
-        for ex in transformations:
-            file = open(ex)
-            ex = json.load(file)
+        for t in transformations:
+            file = open(t)
+            t = json.load(file)
 
             try:
                 get_object_by_id(
                     db=db,
                     model=transformation_catalog_models.TransformationCatalogItem,
-                    object_id=ex["id"],
+                    object_id=t["id"],
                 )
             except fastapi.exceptions.HTTPException as e:
                 if e.status_code == 404:
                     create_transformation_catalog_item(
                         db=db,
                         transformation_catalog_item=transformation_catalog_schemas.TransformationCatalogItemCreate(
-                            id=ex["id"],
-                            category=ex["category"],
-                            name=ex["name"],
-                            icon=ex["icon"],
-                            description=ex["description"],
-                            required_column_types=ex["required_column_types"],
-                            optional_column_types=ex["optional_column_types"],
-                            min_number_of_input_blocks=ex["min_number_of_input_blocks"],
-                            max_number_of_input_blocks=ex["max_number_of_input_blocks"],
-                            macro_parameters=json.dumps(ex["macro_parameters"]),
-                            examples_before=json.dumps(ex["examples_before"]),
-                            examples_after=json.dumps(ex["examples_after"]),
+                            id=t["id"],
+                            category=t["category"],
+                            name=t["name"],
+                            icon=t["icon"],
+                            description=t["description"],
+                            required_column_types=t["required_column_types"],
+                            optional_column_types=t["optional_column_types"],
+                            min_number_of_input_blocks=t["min_number_of_input_blocks"],
+                            max_number_of_input_blocks=t["max_number_of_input_blocks"],
+                            macro_parameters=json.dumps(t["macro_parameters"]),
+                            examples_before=json.dumps(t["examples_before"]),
+                            examples_after=json.dumps(t["examples_after"]),
                         ),
                     )
 
@@ -230,16 +230,16 @@ def populate_db():
     export_catalog_path = os.path.join(script_dir, "./resources/export_catalog")
     export_catalog_categories = list(
         filter(
-            lambda d: os.path.isdir(d),
+            lambda export_dir: os.path.isdir(export_dir),
             map(
-                lambda d: f"{export_catalog_path}/{d}",
+                lambda export_dir: f"{export_catalog_path}/{export_dir}",
                 os.listdir(export_catalog_path),
             ),
         )
     )
 
     for export_cat in export_catalog_categories:
-        exports = list(map(lambda tr: f"{export_cat}/{tr}", os.listdir(export_cat)))
+        exports = list(map(lambda ex_dir: f"{export_cat}/{ex_dir}", os.listdir(export_cat)))
 
         for ex in exports:
             file = open(ex)

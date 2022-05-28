@@ -3,7 +3,7 @@
   "category": "file",
   "name": "Download as CSV",
   "icon": "file-csv",
-  "description": "With this export, you can export the result of a block into a CSV File",
+  "description": "With this export block, you can download the result of a transformation or data block as a CSV file.",
   "min_number_of_input_blocks": 1,
   "max_number_of_input_blocks": 1,
   "macro_parameters": [
@@ -15,7 +15,15 @@
     {
       "id": "delimiter",
       "name": "Delimiter",
-      "type": "text"
+      "type": "text",
+      "options": [
+        {
+          "id": "comma",
+          "name": ","
+        }, {
+          "id": "semicolon",
+          "name": ";"
+        }]
     }
   ]
 }

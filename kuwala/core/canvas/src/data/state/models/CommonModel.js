@@ -39,6 +39,10 @@ const CommonModel =  {
         state.openTransformationCatalogModal = !state.openTransformationCatalogModal
     }),
 
+    toggleTransformationConfigModal: action((state) => {
+        state.openTransformationConfigModal = !state.openTransformationConfigModal
+    }),
+
 }
 
 export default CommonModel

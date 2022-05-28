@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useState} from "react";
+import React, {Fragment, useCallback, useEffect, useState} from "react";
 import {useStoreActions} from "easy-peasy";
 import ExportCatalogDTO from "../../../../data/dto/ExportCatalogDTO";
 import {getAllExportCatalogCategories, getAllItemsInExportCategory} from "../../../../api/ExportCatalog";
@@ -22,7 +22,7 @@ export default () => {
             const category = catalogCategories[selectedExportIndex]
             fetchCatalogBodyItems(category).then(null);
         }
-    }, [selectedExportIndex])
+    }, [selectedExportIndex, catalogCategories])
 
     const initExportCatalogs = async () => {
         try{

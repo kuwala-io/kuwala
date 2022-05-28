@@ -13,7 +13,7 @@ const ExportCatalogSelector = ({setSelectedCatalogOption, setSelectedExportIndex
                 }}
                 selected={selectedExportIndex === index}
                 solid={false}
-                color={'kuwalaRed'}
+                color={'kuwalaPurple'}
                 icon={catalogItem.icon}
                 text={catalogItem.name}
             />
