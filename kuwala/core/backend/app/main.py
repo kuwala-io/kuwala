@@ -7,6 +7,8 @@ from time import sleep
 
 from database.crud.common import get_object_by_id
 from database.crud.data_catalog import create_data_catalog_item
+from database.crud.export_catalog import create_export_catalog_item
+from database.crud.export_catalog_category import create_export_catalog_category
 from database.crud.transformation_catalog import create_transformation_catalog_item
 from database.crud.transformation_catalog_category import (
     create_transformation_catalog_category,
@@ -18,12 +20,16 @@ from database.models import (
 from database.models import data_block as data_block_models
 from database.models import data_catalog as data_catalog_models
 from database.models import data_source as data_source_models
+from database.models import export_catalog as export_catalog_models
+from database.models import export_catalog_category as export_catalog_category_models
 from database.models import transformation_block as transformation_block_models
 from database.models import transformation_catalog as transformation_catalog_models
 from database.schemas import (
     transformation_catalog_category as transformation_catalog_category_schemas,
 )
 from database.schemas import data_catalog as data_catalog_schemas
+from database.schemas import export_catalog as export_catalog_schemas
+from database.schemas import export_catalog_category as export_catalog_category_schemas
 from database.schemas import transformation_catalog as transformation_catalog_schemas
 from fastapi import FastAPI
 import fastapi.exceptions
@@ -33,6 +39,7 @@ from routers import (
     data_block,
     data_catalog,
     data_source,
+    export_catalog,
     transformation_block,
     transformation_catalog,
 )
@@ -63,6 +70,7 @@ app.include_router(data_catalog.router)
 app.include_router(data_source.router)
 app.include_router(transformation_block.router)
 app.include_router(transformation_catalog.router)
+app.include_router(export_catalog.router)
 
 
 # Cannot be placed under `database/database.py` as it would create a circular import
@@ -82,6 +90,8 @@ def populate_db():
             transformation_catalog_category_models.Base.metadata.create_all(bind=Engine)
             transformation_catalog_models.Base.metadata.create_all(bind=Engine)
             transformation_block_models.Base.metadata.create_all(bind=Engine)
+            export_catalog_models.Base.metadata.create_all(bind=Engine)
+            export_catalog_category_models.Base.metadata.create_all(bind=Engine)
 
             connected_to_db = True
         except sqlalchemy.exc.OperationalError as e:
@@ -189,6 +199,71 @@ def populate_db():
                             macro_parameters=json.dumps(t["macro_parameters"]),
                             examples_before=json.dumps(t["examples_before"]),
                             examples_after=json.dumps(t["examples_after"]),
+                        ),
+                    )
+
+    # Add export catalog categories to database
+    file = open(os.path.join(script_dir, "./resources/export_catalog/categories.json"))
+    export_catalog_categories = json.load(file)
+
+    for export_cat in export_catalog_categories:
+        try:
+            get_object_by_id(
+                db=db,
+                model=export_catalog_category_models.ExportCatalogCategory,
+                object_id=export_cat["id"],
+            )
+        except fastapi.exceptions.HTTPException as e:
+            if e.status_code == 404:
+                create_export_catalog_category(
+                    db=db,
+                    export_catalog_category=export_catalog_category_schemas.ExportCatalogCategoryCreate(
+                        id=export_cat["id"],
+                        name=export_cat["name"],
+                        icon=export_cat["icon"],
+                    ),
+                )
+
+    # Add export catalog items into database
+    export_catalog_path = os.path.join(script_dir, "./resources/export_catalog")
+    export_catalog_categories = list(
+        filter(
+            lambda export_dir: os.path.isdir(export_dir),
+            map(
+                lambda export_dir: f"{export_catalog_path}/{export_dir}",
+                os.listdir(export_catalog_path),
+            ),
+        )
+    )
+
+    for export_cat in export_catalog_categories:
+        exports = list(
+            map(lambda ex_dir: f"{export_cat}/{ex_dir}", os.listdir(export_cat))
+        )
+
+        for ex in exports:
+            file = open(ex)
+            ex = json.load(file)
+
+            try:
+                get_object_by_id(
+                    db=db,
+                    model=export_catalog_models.ExportCatalogItem,
+                    object_id=ex["id"],
+                )
+            except fastapi.exceptions.HTTPException as e:
+                if e.status_code == 404:
+                    create_export_catalog_item(
+                        db=db,
+                        export_catalog_item=export_catalog_schemas.ExportCatalogItemCreate(
+                            id=ex["id"],
+                            category=ex["category"],
+                            name=ex["name"],
+                            icon=ex["icon"],
+                            description=ex["description"],
+                            min_number_of_input_blocks=ex["min_number_of_input_blocks"],
+                            max_number_of_input_blocks=ex["max_number_of_input_blocks"],
+                            macro_parameters=json.dumps(ex["macro_parameters"]),
                         ),
                     )
 

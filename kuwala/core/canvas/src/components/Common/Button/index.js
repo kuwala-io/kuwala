@@ -7,6 +7,7 @@ const baseSize = {
     longXs: "px-4 py-1 rounded-lg",
     sm: "px-4 py-1.5 rounded-md",
     base: "px-4 py-2 rounded-md",
+    mid: "px-6 py-3 rounded-md",
     lg: "px-8 py-4 rounded-lg"
 };
 
