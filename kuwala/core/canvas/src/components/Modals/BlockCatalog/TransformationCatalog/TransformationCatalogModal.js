@@ -43,7 +43,7 @@ export default () => {
             const category = catalogCategories[selectedTransformationIndex]
             fetchCatalogBodyItems(category).then(null);
         }
-    }, [selectedTransformationIndex])
+    }, [selectedTransformationIndex, catalogCategories])
 
     const initTransformationCatalogs = async () => {
         try{

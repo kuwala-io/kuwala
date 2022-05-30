@@ -18,6 +18,20 @@ export default () => {
     }, [])
 
     useEffect(()=> {
+        const fetchCatalogBodyItems = async (category) => {
+            try{
+                const categoryId = category.id;
+                const res = await getAllItemsInExportCategory(categoryId);
+                if(res.status === 200){
+                    catalogOptionsIntoDTO(res.data, category);
+                } else {
+                    setCatalogOptions([]);
+                }
+            }catch(e) {
+                console.error('Failed to get export catalog', e);
+            }
+        }
+
         if(catalogCategories.length) {
             const category = catalogCategories[selectedExportIndex]
             fetchCatalogBodyItems(category).then(null);
@@ -31,20 +45,6 @@ export default () => {
                 setCatalogCategories(res.data);
             } else {
                 setCatalogCategories([]);
-            }
-        }catch(e) {
-            console.error('Failed to get export catalog', e);
-        }
-    }
-
-    const fetchCatalogBodyItems = async (category) => {
-        try{
-            const categoryId = category.id;
-            const res = await getAllItemsInExportCategory(categoryId);
-            if(res.status === 200){
-                catalogOptionsIntoDTO(res.data, category);
-            } else {
-                setCatalogOptions([]);
             }
         }catch(e) {
             console.error('Failed to get export catalog', e);
