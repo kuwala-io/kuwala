@@ -82,7 +82,7 @@ const CanvasModel = {
             elements.forEach((curEl) => {
                 if (curEl.type !== DATA_BLOCK) return;
                 if (curEl.data.dataBlock.dataBlockId === block.dataBlockId) dupeFlag = true;
-                if (curEl.data.dataBlock.dataBlockEntityId === block.dataBlockEntityId) dupeFlag = true;
+                if ((curEl.data.dataBlock.dataBlockEntityId === block.dataBlockEntityId) && block.dataBlockEntityId !== null) dupeFlag = true;
             });
 
             const nodeInfo = {
@@ -129,7 +129,9 @@ const CanvasModel = {
             elements.forEach((curEl) => {
                 if (curEl.type !== TRANSFORMATION_BLOCK) return;
                 if ((curEl.data.transformationBlock.transformationBlockId === block.transformationBlockId)) dupeFlag = true;
-                if ((curEl.data.transformationBlock.transformationBlockEntityId === block.transformationBlockEntityId)) dupeFlag = true;
+                if ((curEl.data.transformationBlock.transformationBlockEntityId === block.transformationBlockEntityId) && block.transformationBlockEntityId !== null) {
+                    dupeFlag = true
+                }
             });
 
             const nodeInfo = {

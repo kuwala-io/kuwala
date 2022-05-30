@@ -1,0 +1,12 @@
+[
+  {
+    "id": "file",
+    "name": "File",
+    "icon": "file-export"
+  },
+  {
+    "id": "bi_tool",
+    "name": "BI Tool",
+    "icon": "chart-pie"
+  }
+]
