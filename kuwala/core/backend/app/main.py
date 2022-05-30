@@ -170,9 +170,7 @@ def populate_db():
     )
 
     for tcc in transformation_catalog_categories:
-        transformations = list(
-            map(lambda tr: f"{tcc}/{tr}", os.listdir(tcc))
-        )
+        transformations = list(map(lambda tr: f"{tcc}/{tr}", os.listdir(tcc)))
 
         for t in transformations:
             file = open(t)
@@ -239,7 +237,9 @@ def populate_db():
     )
 
     for export_cat in export_catalog_categories:
-        exports = list(map(lambda ex_dir: f"{export_cat}/{ex_dir}", os.listdir(export_cat)))
+        exports = list(
+            map(lambda ex_dir: f"{export_cat}/{ex_dir}", os.listdir(export_cat))
+        )
 
         for ex in exports:
             file = open(ex)
