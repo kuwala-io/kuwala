@@ -4,7 +4,7 @@ import Header from "../components/Header";
 import {useStoreActions, useStoreState} from 'easy-peasy';
 import {Link} from "react-router-dom";
 import DataBlockConfigModal from "../components/Modals/DataBlockConfig/DataBlockConfigModal";
-import TransformationCatalogModal from "../components/Modals/TransformationCatalog/TransformationCatalogModal";
+import TransformationCatalogModal from "../components/Modals/BlockCatalog/TransformationCatalog/TransformationCatalogModal";
 import loadIcons from "../utils/IconsLoader";
 import TransformationBlockConfigModal from "../components/Modals/TransformationBlockConfig/TransformationBlockConfigModal";
 import Canvas from "../components/Canvas";
@@ -22,12 +22,13 @@ import {
 } from "../utils/TransformationCatalogUtils";
 import {getSchema} from "../api/DataSourceApi";
 import Spinner from "../components/Common/Spinner";
+import BlockCatalogModal from "../components/Modals/BlockCatalog/BlockCatalogModal";
 
 
 const App = () => {
     const reactFlowWrapper = useRef(null);
     const {elements, selectedElement, dataSource, openDataView} = useStoreState(state => state.canvas);
-    const {openConfigModal, openTransformationCatalogModal, openTransformationConfigModal, connectionLoaded, existingBlockLoaded} = useStoreState(state => state.common);
+    const {openConfigModal, openBlockCatalogModal, openTransformationConfigModal, connectionLoaded, existingBlockLoaded} = useStoreState(state => state.common);
     const {
         setSelectedElement,
         removeNode,
@@ -224,8 +225,8 @@ const App = () => {
                     isOpen={openConfigModal}
                     configData={selectedElement}
                 />
-                <TransformationCatalogModal
-                    isOpen={openTransformationCatalogModal}
+                <BlockCatalogModal
+                    isOpen={openBlockCatalogModal}
                 />
                 <TransformationBlockConfigModal
                     isOpen={openTransformationConfigModal}

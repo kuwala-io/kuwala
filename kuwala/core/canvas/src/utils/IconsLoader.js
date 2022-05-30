@@ -21,7 +21,11 @@ import {
     faCalendarDay,
     faWindowRestore,
     faPaste,
-    faLayerGroup
+    faLayerGroup,
+    faShareFromSquare,
+    faFileExport,
+    faChartPie,
+    faFileCsv
 } from "@fortawesome/free-solid-svg-icons";
 export default () => {
     library.add(
@@ -50,6 +54,10 @@ export default () => {
         faCalendarDay,
         faWindowRestore,
         faPaste,
-        faLayerGroup
+        faLayerGroup,
+        faShareFromSquare,
+        faFileExport,
+        faChartPie,
+        faFileCsv
     )
 }

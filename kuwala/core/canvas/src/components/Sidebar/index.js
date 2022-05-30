@@ -9,7 +9,7 @@ import NodeHandlerContainer from "./NodeHandlerContainer";
 
 export default ({reactFlowWrapper}) => {
     const { dataSource } = useStoreState(state => state.canvas);
-    const { toggleTransformationCatalogModal } = useStoreActions(actions => actions.common);
+    const { toggleBlockCatalogModal } = useStoreActions(actions => actions.common);
 
     const renderDataSources = () => {
         if(dataSource.length > 0) {
@@ -97,7 +97,7 @@ export default ({reactFlowWrapper}) => {
                             text-center
                             select-none
                         `}
-                    onClick={toggleTransformationCatalogModal}
+                    onClick={toggleBlockCatalogModal}
                 >
                     +
                 </button>
