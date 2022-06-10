@@ -68,8 +68,8 @@ const TransformationBlockModel = {
             } else {
                 // Else add new node
                 let position = {
-                    x: -100,
-                    y: Math.random() * window.innerHeight / 2,
+                    x: 400,
+                    y: 400,
                 };
 
                 if (nodeInfo.data.transformationBlock.positionX && nodeInfo.data.transformationBlock.positionY) {

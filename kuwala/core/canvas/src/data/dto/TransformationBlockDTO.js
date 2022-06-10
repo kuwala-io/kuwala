@@ -10,7 +10,7 @@ module.exports = class TransformationBlockDTO {
         name,
         connectedSourceNodeIds = [],
         connectedTargetNodeIds = [],
-        materializeTable=false,
+        materializeTable= false,
         columns=[],
         positionX,
         positionY,

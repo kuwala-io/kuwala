@@ -9,7 +9,7 @@ import NodeHandlerContainer from "./NodeHandlerContainer";
 
 const Sidebar = ({reactFlowWrapper}) => {
     const { dataSources } = useStoreState(({ dataSources }) => dataSources);
-    const { toggleTransformationCatalogModal } = useStoreActions(actions => actions.common);
+    const { toggleBlockCatalogModal } = useStoreActions(({ common }) => common);
 
     const renderDataSources = () => {
         if (dataSources.length > 0) {
@@ -95,7 +95,7 @@ const Sidebar = ({reactFlowWrapper}) => {
                             text-center
                             select-none
                         `}
-                    onClick={toggleTransformationCatalogModal}
+                    onClick={toggleBlockCatalogModal}
                 >
                     +
                 </button>

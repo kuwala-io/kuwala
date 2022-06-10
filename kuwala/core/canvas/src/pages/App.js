@@ -4,7 +4,7 @@ import Header from "../components/Header";
 import {useStoreActions, useStoreState} from 'easy-peasy';
 import {Link, useLocation} from "react-router-dom";
 import DataBlockConfigModal from "../components/Modals/DataBlockConfig/DataBlockConfigModal";
-import TransformationCatalogModal from "../components/Modals/TransformationCatalog/TransformationCatalogModal";
+import BlockCatalogModal from "../components/Modals/BlockCatalog/BlockCatalogModal";
 import loadIcons from "../utils/IconsLoader";
 import TransformationBlockConfigModal from "../components/Modals/TransformationBlockConfig/TransformationBlockConfigModal";
 import Canvas from "../components/Canvas";
@@ -33,7 +33,7 @@ const App = () => {
         connectionLoaded,
         existingBlockLoaded,
         openConfigModal,
-        openTransformationCatalogModal,
+        openBlockCatalogModal,
         openTransformationConfigModal,
     } = useStoreState(({ common }) => common);
     const { dataSources } = useStoreState(({ dataSources }) => dataSources);
@@ -311,8 +311,8 @@ const App = () => {
                     configData={selectedElement}
                 />
 
-                <TransformationCatalogModal
-                    isOpen={openTransformationCatalogModal}
+                <BlockCatalogModal
+                    isOpen={openBlockCatalogModal}
                 />
 
                 <TransformationBlockConfigModal
