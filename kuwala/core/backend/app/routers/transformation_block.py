@@ -1,12 +1,15 @@
 import controller.data_source.data_source as data_source_controller
 import controller.transformation_block_controller as transformation_block_controller
+from database.crud.common import get_object_by_id
 import database.crud.transformation_block as crud
 from database.database import get_db
+from database.models.data_block import DataBlock
+from database.models.transformation_block import TransformationBlock
 from database.schemas.transformation_block import (
     TransformationBlockCreate,
     TransformationBlockUpdate,
 )
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 router = APIRouter(
@@ -44,6 +47,28 @@ def create_transformation_block(
         columns=columns,
     )
 
+    for input_block_id in transformation_block.input_block_ids:
+        try:
+            parent_data_block = get_object_by_id(
+                db=db, model=DataBlock, object_id=input_block_id
+            )
+
+            transformation_block.parent_data_blocks.append(parent_data_block)
+        except HTTPException as e:
+            if e.status_code == 404:
+                parent_transformation_block = get_object_by_id(
+                    db=db, model=TransformationBlock, object_id=input_block_id
+                )
+
+                transformation_block.parent_transformation_blocks.append(
+                    parent_transformation_block
+                )
+            else:
+                raise e
+
+    db.commit()
+    db.refresh(transformation_block)
+
     return transformation_block
 
 
@@ -80,5 +105,14 @@ def refresh_transformation_block(
     transformation_block_id: str, db: Session = Depends(get_db)
 ):
     return transformation_block_controller.refresh_transformation_block(
+        transformation_block_id=transformation_block_id, db=db
+    )
+
+
+@router.delete("/{transformation_block_id}")
+def delete_transformation_block(
+    transformation_block_id: str, db: Session = Depends(get_db)
+):
+    return transformation_block_controller.delete_transformation_block(
         transformation_block_id=transformation_block_id, db=db
     )

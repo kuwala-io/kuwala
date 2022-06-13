@@ -1,7 +1,7 @@
-import React from "react";
+import React, {Fragment} from "react";
 import {prePopulate, tableAddressSplitter} from "../../utils/TableSelectorUtils";
 import {getColumns} from "../../api/DataSourceApi";
-import {SELECTOR_DISPLAY, PREVIEW_DISPLAY} from "../../constants/components";
+import {SELECTOR_DISPLAY} from "../../constants/components";
 import {getTablePreview} from "../../api/DataSourceApi";
 import {getDataDictionary, generateParamsByDataSourceType, getDatabaseTitleValue} from "../../utils/SchemaUtils";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -13,32 +13,93 @@ import {
     faTable
 } from "@fortawesome/free-solid-svg-icons";
 import {useStoreState} from "easy-peasy";
+import styles from "./styles";
+import Spinner from "../Common/Spinner";
 
-export default (
-    {
-        schemaExplorerType,
-        selectedTable,
-        setSelectedTable,
-        isSchemaLoading,
-        schemaList,
-        setSchema,
-        setIsTableLoading,
-        setColumnsPreview,
-        setTableDataPreview,
-        dataSource,
-    }) => {
-    const {selectedAddressObj, selectedElement} = useStoreState((state) => state.canvas)
+const mapTablePreview = async ({
+    category,
+    dataSourceId,
+    params,
+    schema,
+    selectedAddressObj,
+    selectedElement,
+    table
+}) => {
+    let selectedCols = [];
 
-    const tableColumnSelectorOnClick = async ({addressString}) => {
-        setSelectedTable(addressString);
+    try {
+        selectedCols = selectedAddressObj[selectedElement.data.dataBlock.dataBlockId][schema][category][table];
+    } catch (e) {}
+
+    if (selectedCols.length > 0) {
+        params.columns = selectedCols
+    }
+
+    let previewResponse;
+
+    try {
+        previewResponse = await getTablePreview({
+            id: dataSourceId,
+            params
+        });
+    } catch (error) {
+        console.error(error);
+
+        return;
+    }
+
+    let columns = previewResponse.data.columns.map((el) => {
+        return {
+            Header: el,
+            accessor: el,
+            minWidth: 160
+        }
+    });
+
+    columns = [{
+        Header: "#",
+        id: "row",
+        filterable: false,
+        width: 48,
+        Cell: (row) => {
+            return <div key={row.index}>{row.index+1}</div>;
+        }
+    }, ...columns]
+
+    return {
+        columns,
+        rows: getDataDictionary(previewResponse.data.rows, previewResponse.data.columns),
+    };
+}
+
+const SchemaExplorer = ({
+    schemaExplorerType,
+    selectedTable,
+    setSelectedTable,
+    isSchemaLoading,
+    schemaList,
+    setSchema,
+    setIsTableLoading,
+    setColumnsPreview,
+    setTableDataPreview,
+    dataSource,
+}) => {
+    const { selectedElement } = useStoreState(({ canvas }) => canvas);
+    const { selectedAddressObj } = useStoreState(({ dataBlocks }) => dataBlocks);
+
+    const tableColumnSelectorOnClick = async ({ addressString }) => {
         setIsTableLoading(true);
+        setSelectedTable(addressString);
+
         const params = generateParamsByDataSourceType(dataSource.dataCatalogItemId, addressString);
+
         try {
             const res = await getColumns({
                 id: dataSource.id,
                 params
             });
-            if(res.status === 200) {
+
+            if (res.status === 200) {
                 setColumnsPreview({
                     columns: [],
                     rows: prePopulate(res.data, addressString),
@@ -47,88 +108,54 @@ export default (
         } catch (e) {
             console.error('Failed to populate by selected block', e)
         }
+
         setIsTableLoading(false);
     }
 
     const tablePreviewSelectorOnClick  = async ({addressString}) => {
-        setSelectedTable(addressString)
-        setIsTableLoading(true)
-        const params = generateParamsByDataSourceType(dataSource.dataCatalogItemId, addressString)
+        setIsTableLoading(true);
+        setSelectedTable(addressString);
+
+        const params = generateParamsByDataSourceType(dataSource.dataCatalogItemId, addressString);
         const {schema, table, category} = tableAddressSplitter(addressString);
-
-        let selectedCols = []
-        try {
-            selectedCols = selectedAddressObj[selectedElement.data.dataBlock.dataBlockId][schema][category][table];
-        } catch (e) {
-            selectedCols = [];
-            console.info('No selected columns')
-        }
-
-        if(typeof selectedCols === 'undefined') selectedCols = [];
-        if(selectedCols.length > 0) {
-            params.columns = selectedCols
-        }
-
-        const res = await getTablePreview({
-            id: dataSource.id,
-            params
+        const dataPreview = await mapTablePreview({
+            category,
+            dataSourceId: dataSource.id,
+            params,
+            schema,
+            selectedAddressObj,
+            selectedElement,
+            table
         });
 
-        if(res.status === 200) {
-            let cols = res.data.columns.map((el,i)=>{
-                return {
-                    Header: el,
-                    accessor: el,
-                }
-            });
-
-            cols = [{
-                Header: "#",
-                id: "row",
-                filterable: false,
-                width: 50,
-                Cell: (row) => {
-                    return <div>{row.index+1}</div>;
-                }
-            }, ...cols]
-
-            setTableDataPreview({
-                columns: cols,
-                rows: getDataDictionary(res.data.rows, res.data.columns),
-            });
-        }
-        setIsTableLoading(false)
+        setTableDataPreview(dataPreview);
+        setIsTableLoading(false);
     }
 
     const renderDataPreviewTree = () => {
         return (
-            <>
-                <div className={'bg-kuwala-green w-full pl-4 py-2 text-white font-semibold'}>
+            <Fragment>
+                <div className={styles.titleContainer}>
                     Database: {getDatabaseTitleValue(dataSource)}
                 </div>
-                <div className={'overflow-y-scroll overflow-x-auto h-full w-full'}>
+
+                <div className={styles.schemaContainer}>
                     {isSchemaLoading
                         ?
-                        <div className="flex flex-col w-full h-full justify-center items-center">
-                            <div
-                                className="spinner-border animate-spin inline-block w-16 h-16 border-4 text-kuwala-green rounded-full"
-                                role="status">
-                                <span className="visually-hidden">Loading...</span>
-                            </div>
+                        <div className={styles.spinnerContainer}>
+                            <Spinner size={'xl'} />
                         </div>
                         :
-                        schemaList.map(el => renderSchemaBlock(el))
+                        schemaList.map((element, index) => renderSchemaBlock(element, index))
                     }
                 </div>
-            </>
+            </Fragment>
         )
     }
 
-    const renderSchemaBlock = (schema) => {
+    const renderSchemaBlock = (schema, index) => {
         return (
-            // PARENT CONTAINER
-            <div className={'flex flex-col w-full bg-white'}>
-                {/* SCHEMA */}
+            <div key={index} className={styles.schemaBlockContainer}>
                 {generateSchemaParent(schema)}
                 {schema.isOpen ? generateCategories(schema.categories, schema.schema) : null}
             </div>
@@ -138,24 +165,26 @@ export default (
     const generateSchemaParent = (schemaObject) => {
         return (
             <div
-                className={'flex flex-row items-center pl-4 pr-8 py-2 cursor-pointer w-full'}
+                className={styles.schemaBlock}
                 onClick={() => {
-                    toggleTreeItem(schemaObject.schema)
+                    toggleTreeItem(schemaObject.schema);
                 }}
             >
-                <span className={'mr-4'}>
+                <span className={styles.iconContainer}>
                     <FontAwesomeIcon
+                        className={styles.icon}
                         icon={schemaObject.isOpen ? faAngleDown : faAngleRight}
-                        style={{minWidth: 16, height: 16}}
                     />
                 </span>
-                <span className={'mr-4'}>
+
+                <span className={styles.iconContainer}>
                     <FontAwesomeIcon
+                        className={styles.icon}
                         icon={faList}
-                        style={{minWidth: 16, height: 16}}
                     />
                 </span>
-                <span className={'font-semibold text-md'}>
+
+                <span className={styles.rowName}>
                     {schemaObject.schema}
                 </span>
             </div>
@@ -164,81 +193,81 @@ export default (
 
     const generateCategories = (categories, parentSchema) => {
         return (
-            categories.map((el, i) => {
+            categories.map((el) => {
                 const currentKey = `${parentSchema}@${el.category}`
+
                 return (
                     <div
                         key={currentKey}
-                        className={`cursor-pointer min-w-max`}
+                        className={styles.categoriesOuterContainer}
                     >
                         <div
-                            className={'flex flex-row items-center pl-12 pr-8 py-2 bg-white w-full'}
+                            className={styles.categoriesInnerContainer}
                             onClick={() => {
                                 toggleTreeItem(currentKey)
                             }}
                         >
-                        <span className={'mr-4 cursor-pointer'}>
-                            <FontAwesomeIcon
-                                icon={el.isOpen ? faAngleDown : faAngleRight}
-                                style={{minWidth: 16, height: 16}}
-                            />
-                        </span>
-                            <span className={'mr-4'}>
-                            <FontAwesomeIcon
-                                icon={faFolderClosed}
-                                style={{minWidth: 16, height: 16}}
-                            />
-                        </span>
-                            <span className={'font-semibold text-md'}>
-                            {el.category}
-                        </span>
+                            <span className={styles.iconContainer}>
+                                <FontAwesomeIcon
+                                    className={styles.icon}
+                                    icon={el.isOpen ? faAngleDown : faAngleRight}
+                                />
+                            </span>
+
+                            <span className={styles.iconContainer}>
+                                <FontAwesomeIcon
+                                    className={styles.icon}
+                                    icon={faFolderClosed}
+                                />
+                            </span>
+
+                            <span className={styles.rowName}>
+                                {el.category}
+                            </span>
                         </div>
+
                         {el.isOpen ?
                             el.tables.map(el => generateCategoryTables(el, currentKey))
                             : null
                         }
                     </div>
-                )
+                );
             })
-        )
-    }
+        );
+    };
 
-    const getOnClickEventByType = ({addressString}) => {
-        if(schemaExplorerType === SELECTOR_DISPLAY) {
-            tableColumnSelectorOnClick({
-                addressString: addressString,
-            })
-        }else {
-            tablePreviewSelectorOnClick({
-                addressString: addressString,
-            })
+    const getOnClickEventByType = async ({ addressString }) => {
+        if (schemaExplorerType === SELECTOR_DISPLAY) {
+            await tableColumnSelectorOnClick({ addressString });
+        } else {
+            await tablePreviewSelectorOnClick({ addressString });
         }
     }
 
     const generateCategoryTables = (tableName, parent) => {
-        const tableKey = `${parent}@${tableName}`
+        const tableKey = `${parent}@${tableName}`;
+
         return (
             <div
                 className={`
-                    flex flex-row items-center pl-20 pr-8 py-2
-                    cursor-pointer
-                    min-w-max
-                    ${tableKey === selectedTable ? `bg-kuwala-green text-white` : `bg-white text-black`}
+                    ${styles.tableRow}
+                    ${tableKey === selectedTable ? ` bg-kuwala-green text-white` : ` bg-white text-black`}
                 `}
                 key={tableKey}
-                onClick={()=>{
-                    getOnClickEventByType({
+                onClick={async () => {
+                    await getOnClickEventByType({
                         addressString: tableKey
-                    })
+                    });
                 }}
             >
-                <span className={'mr-4'}>
+                <span className={styles.iconContainer}>
                     <FontAwesomeIcon
+                        className={styles.icon}
                         icon={faTable}
-                        style={{minWidth: 16, minHeight: 16}}
                     />
                 </span>
-                <span className={'font-semibold text-md w-full'}>
+
+                <span className={styles.rowName}>
                     {tableName}
                 </span>
             </div>
@@ -249,27 +278,30 @@ export default (
         const arr = addressString.split('@')
         const schemaAddress = arr[0]
         const categoryAddress = arr[1]
-
         let tempSchema;
-        if(categoryAddress && schemaAddress) {
+
+        if (categoryAddress && schemaAddress) {
             tempSchema = schemaList.map((el) => {
                 if (el.schema === schemaAddress) {
                     return {
                         ...el,
                         categories: el.categories.map((cat) => {
                             if (cat.category === categoryAddress){
-                                cat.isOpen = !cat.isOpen
+                                cat.isOpen = !cat.isOpen;
                             }
-                            return cat
+
+                            return cat;
                         })
                     }
                 }
-                return el
-            })
+
+                return el;
+            });
         } else {
             tempSchema = schemaList.map((el) => {
                 if (el.schema === schemaAddress){
-                    el.isOpen = !el.isOpen
+                    el.isOpen = !el.isOpen;
+
                     if (el.isOpen === false) {
                         return {
                             ...el,
@@ -277,16 +309,23 @@ export default (
                                 cat.isOpen = false
                                 return cat
                             })
-                        }
+                        };
                     }
                 }
-                return el
+
+                return el;
             })
         }
-        setSchema(tempSchema)
+
+        setSchema(tempSchema);
     }
 
     return (
         renderDataPreviewTree()
     )
 }
+
+export {
+    mapTablePreview,
+    SchemaExplorer
+};

@@ -53,3 +53,8 @@ def get_data_block_preview(
         limit_rows=limit_rows,
         db=db,
     )
+
+
+@router.delete("/{data_block_id}")
+def delete_data_block(data_block_id: str, db: Session = Depends(get_db)):
+    return data_block_controller.delete_data_block(data_block_id=data_block_id, db=db)

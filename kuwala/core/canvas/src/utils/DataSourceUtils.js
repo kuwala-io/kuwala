@@ -1,3 +1,3 @@
-export function getDataSourceDTOById ({dataSource, id}) {
-    return dataSource.find((el) =>  el.id === id);
+export function getDataSourceDTOById ({ dataSources, id }) {
+    return dataSources.find((el) =>  el.id === id);
 }

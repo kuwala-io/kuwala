@@ -1,5 +1,5 @@
 import Modal from "../../Common/Modal";
-import React, {Fragment, useEffect, useState} from "react";
+import React, {Fragment, useCallback, useEffect, useState} from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import { TRANSFORMATION_BLOCK } from "../../../constants/nodeTypes";
 import {Formik, useFormikContext} from "formik";
@@ -14,28 +14,28 @@ import TransformationBlockConfigHeader from './TransformationBlockConfigHeader'
 import TransformationBlockConfigFooter from './TransformationBlockConfigFooter'
 
 const TransformationBlockConfigModal = ({isOpen}) => {
-    const {toggleTransformationConfigModal} = useStoreActions(actions => actions.common);
-    const {updateTransformationBlock} = useStoreActions(actions => actions.canvas);
-    const {selectedElement, elements} = useStoreState(state => state.canvas);
+    const { addNode, setElements } = useStoreActions(({ canvas }) => canvas);
+    const { toggleTransformationConfigModal } = useStoreActions(({ common }) => common);
+    const { updateTransformationBlock } = useStoreActions(({ transformationBlocks}) => transformationBlocks);
+    const { selectedElement, elements } = useStoreState(({ canvas }) => canvas);
     const [transformationBlockName, setTransformationBlockName] = useState(undefined);
     const [showToolTip, setShowToolTip] = useState(false);
     const [isTransformationBlockSaveLoading, setIsTransformationBlockSaveLoading] = useState(false);
     const [submitData, setSubmitData] = useState(null);
+    const initNodeName = useCallback(() => {
+        if (selectedElement && selectedElement.type === TRANSFORMATION_BLOCK) {
+            setTransformationBlockName(selectedElement.data.transformationBlock.name)
+        } else {
+            setTransformationBlockName(undefined);
+        }
+    }, [selectedElement]);
 
     useEffect( () => {
         initNodeName()
-    }, [selectedElement])
+    }, [initNodeName])
 
     const onNameChange = (event) => {
         setTransformationBlockName(event.target.value);
-    }
-
-    const initNodeName = () => {
-        if(selectedElement && selectedElement.type === TRANSFORMATION_BLOCK) {
-            setTransformationBlockName(selectedElement.data.transformationBlock.name)
-        }else {
-            setTransformationBlockName('');
-        }
     }
 
     const FormikWrapper = ({children}) => {
@@ -50,7 +50,7 @@ const TransformationBlockConfigModal = ({isOpen}) => {
 
             return { ...param, value }
         }
-        let params = selectedElement.data.transformationCatalog.macroParameters.map(mapParameter);
+        let params = selectedElement.data.transformationCatalogItem.macroParameters.map(mapParameter);
 
         if(selectedElement.data.transformationBlock.isConfigured) {
             params = selectedElement.data.transformationBlock.macroParameters;
@@ -113,7 +113,7 @@ const TransformationBlockConfigModal = ({isOpen}) => {
                 parameters: values.parameters.map(mapParameter)
             }
             const data = {
-                transformation_catalog_item_id: selectedElement.data.transformationCatalog.id,
+                transformation_catalog_item_id: selectedElement.data.transformationCatalogItem.id,
                 input_block_ids: connectedBlocks,
                 macro_parameters: parsedValues.parameters.map((el) => {
                     return {
@@ -132,7 +132,7 @@ const TransformationBlockConfigModal = ({isOpen}) => {
 
                 if(res.status === 200) {
                     const dto = new TransformationBlockDTO({
-                        transformationCatalog: selectedElement.data.transformationCatalog,
+                        transformationCatalogItem: selectedElement.data.transformationCatalogItem,
                         name: values.transformationBlockName,
                         connectedSourceNodeIds: selectedElement.data.transformationBlock.connectedSourceNodeIds,
                         transformationBlockId: selectedElement.data.transformationBlock.transformationBlockId,
@@ -147,7 +147,7 @@ const TransformationBlockConfigModal = ({isOpen}) => {
                         positionY: res.data.position_y,
                         inputBlockIds: connectedBlocks,
                     })
-                    updateTransformationBlock(dto);
+                    updateTransformationBlock({ addNode, elements, setElements, updatedBlock: dto });
                     toggleTransformationConfigModal();
                     setTransformationBlockName(values.transformationBlockName);
                 }

@@ -1,6 +1,5 @@
 module.exports = class DataBlocksDTO {
-    constructor
-    ({
+    constructor ({
         tableName,
         schemaName,
         dataBlockId,

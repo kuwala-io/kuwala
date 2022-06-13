@@ -1,5 +1,5 @@
 import React, {Fragment, useEffect, useState} from "react";
-import {useStoreActions} from "easy-peasy";
+import {useStoreActions, useStoreState} from "easy-peasy";
 import {
     getAllTransformationCatalogCategories,
     getAllItemsInCategory
@@ -12,9 +12,14 @@ import TransformationCatalogFooter from "./TransformationCatalogFooter";
 import TransformationCatalogSelector from "./TransformationCatalogSelector";
 import TransformationCatalogBody from "./TransformationCatalogBody";
 
-export default () => {
-    const { toggleBlockCatalogModal } = useStoreActions(actions => actions.common);
-    const { convertTransformationBlockIntoElement, addTransformationBlock } = useStoreActions(actions => actions.canvas);
+const TransformationCatalogModal = () => {
+    const { elements } = useStoreState(({ canvas }) => canvas);
+    const { toggleBlockCatalogModal } = useStoreActions(({ common }) => common);
+    const { addNode, setElements } = useStoreActions(({ canvas }) => canvas);
+    const {
+        addTransformationBlock,
+        convertTransformationBlockIntoElement
+    } = useStoreActions(({ transformationBlocks }) => transformationBlocks);
     const [selectedTransformationIndex, setSelectedTransformationIndex] = useState(null);
     const [catalogCategories, setCatalogCategories] = useState([]);
     const [catalogOptions, setCatalogOptions] = useState([]);
@@ -26,34 +31,36 @@ export default () => {
 
     useEffect(()=> {
         const fetchCatalogBodyItems = async (category) => {
-            try{
+            try {
                 const transformationId = category.id;
                 const res = await getAllItemsInCategory(transformationId);
-                if(res.status === 200){
+
+                if (res.status === 200) {
                     catalogOptionsIntoDTO(res.data, category);
                 } else {
                     setCatalogOptions([]);
                 }
-            }catch(e) {
+            } catch(e) {
                 console.error('Failed to get transformation catalog', e);
             }
         }
 
-        if(catalogCategories.length) {
-            const category = catalogCategories[selectedTransformationIndex]
+        if (catalogCategories.length && selectedTransformationIndex !== null) {
+            const category = catalogCategories[selectedTransformationIndex];
+
             fetchCatalogBodyItems(category).then(null);
         }
     }, [selectedTransformationIndex, catalogCategories])
 
     const initTransformationCatalogs = async () => {
-        try{
+        try {
             const res = await getAllTransformationCatalogCategories();
             if(res.status === 200){
                 setCatalogCategories(res.data);
             } else {
                 setCatalogCategories([]);
             }
-        }catch(e) {
+        } catch(e) {
             console.error('Failed to get transformation catalog', e);
         }
     }
@@ -65,15 +72,16 @@ export default () => {
             transformationBlockId: v4(),
             transformationBlockEntityId: null,
             isConfigured: false,
+            transformationCatalogItem: tfCatalogDTO,
             transformationCatalogItemId: tfCatalogDTO.id,
             transformationCatalog: tfCatalogDTO,
             inputBlockIds: null,
             macroParameters: null,
-            name: tfCatalogDTO.name,
+            name: tfCatalogDTO.name
         });
 
         addTransformationBlock(tfBlockDTO);
-        convertTransformationBlockIntoElement();
+        convertTransformationBlockIntoElement({ addNode, elements, setElements });
         toggleBlockCatalogModal();
     }
 
@@ -125,4 +133,6 @@ export default () => {
             />
         </Fragment>
     )
-}
+};
+
+export default TransformationCatalogModal;

@@ -2,7 +2,15 @@ import React from "react";
 import Icon from "../../Common/Icon";
 import ConfigurationForm from './ConfigurationForm'
 
-const TransformationBlockConfigBody = ({ elements, selectedElement, setFieldValue, setShowToolTip, setSubmitData, showToolTip, values }) => {
+const TransformationBlockConfigBody = ({
+   elements,
+   selectedElement,
+   setFieldValue,
+   setShowToolTip,
+   setSubmitData,
+   showToolTip,
+   values
+}) => {
     const renderConfigBodySettings = ({ setFieldValue, values }) => {
         return (
             <div className={'flex flex-row items-center space-x-4'}>
@@ -21,9 +29,11 @@ const TransformationBlockConfigBody = ({ elements, selectedElement, setFieldValu
                         ) : undefined
                     }
                 </div>
+
                 <span className={'text-md'}>
                     Save as Table
                 </span>
+
                 <div
                     className={'w-7 h-7 bg-kuwala-light-purple rounded-full cursor-pointer flex flex-col items-center justify-center relative'}
                     onMouseEnter={() => {
@@ -62,16 +72,16 @@ const TransformationBlockConfigBody = ({ elements, selectedElement, setFieldValu
                     <Icon
                         size={'sm'}
                         color={'kuwalaPurple'}
-                        icon={selectedElement.data.transformationCatalog.icon}
+                        icon={selectedElement.data.transformationCatalogItem.icon}
                     />
 
                     <span className={'text-lg text-kuwala-purple font-semibold'}>
-                        {selectedElement.data.transformationCatalog.name}
+                        {selectedElement.data.transformationCatalogItem.name}
                     </span>
                 </div>
 
                 <span className={'mt-2 text-md'}>
-                    {selectedElement.data.transformationCatalog.description}
+                    {selectedElement.data.transformationCatalogItem.description}
                 </span>
             </div>
         )
