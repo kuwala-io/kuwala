@@ -1,12 +1,15 @@
-import React, { DragEvent } from 'react';
+import React from 'react';
 import DataBlockDTO from "../../../data/dto/DataBlockDTO";
 import {v4} from "uuid";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import {DATA_BLOCK} from "../../../constants/nodeTypes";
+import {getLabelByDataCatalogId} from "../../../utils/DataBlockUtils";
 
-export default ({onDragStart, onClickAddDataBlock, dataSource, reactFlowWrapper}) => {
-    const {convertDataBlocksIntoElement, addDataBlock, addNode} = useStoreActions((actions) => actions.canvas)
-    const {reactFlowInstance} = useStoreState((state) => state.common)
+const DataBlocksHandler = ({onDragStart, onClickAddDataBlock, dataSource, reactFlowWrapper}) => {
+    const { addNode, setElements } = useStoreActions(({ canvas }) => canvas);
+    const { addDataBlock, convertDataBlocksIntoElements } = useStoreActions(({ dataBlocks }) => dataBlocks);
+    const { reactFlowInstance } = useStoreState(({ common }) => common);
+    const { elements } = useStoreState(({ canvas }) => canvas);
 
     const dataBlock = new DataBlockDTO({
         tableName: null,
@@ -22,19 +25,6 @@ export default ({onDragStart, onClickAddDataBlock, dataSource, reactFlowWrapper}
         dataCatalogType: dataSource.dataCatalogItemId,
         selectedAddressString: null,
     });
-
-    const getLabelByDataCatalogId = (catalogId) => {
-        switch (catalogId){
-            case('postgres'):
-                return 'Postgres'
-            case('bigquery'):
-                return 'BigQuery'
-            case('snowflake'):
-                return 'Snowflake'
-            default:
-                return 'Invalid Label'
-        }
-    }
 
     const nodeInfo = {
         type: DATA_BLOCK,
@@ -61,8 +51,8 @@ export default ({onDragStart, onClickAddDataBlock, dataSource, reactFlowWrapper}
             `}
             onDragStart={(event) => onDragStart(event, nodeInfo)}
             onClick={() => {
-                onClickAddDataBlock(dataBlock)
-                convertDataBlocksIntoElement()
+                onClickAddDataBlock(dataBlock);
+                convertDataBlocksIntoElements({ addNode, elements, setElements });
             }}
             onDragEnd={(event)=> {
                 event.preventDefault();
@@ -73,13 +63,14 @@ export default ({onDragStart, onClickAddDataBlock, dataSource, reactFlowWrapper}
                     x: position_x,
                     y: position_y,
                 });
-                dataBlock.position_y = position_y
-                dataBlock.position_x = position_x
-                addDataBlock(dataBlock)
+                dataBlock.position_y = position_y;
+                dataBlock.position_x = position_x;
+
+                addDataBlock(dataBlock);
                 addNode({
                     ...nodeInfo,
                     position: position
-                })
+                });
             }}
             draggable
         >
@@ -98,3 +89,5 @@ export default ({onDragStart, onClickAddDataBlock, dataSource, reactFlowWrapper}
         </div>
     )
 }
+
+export default DataBlocksHandler;

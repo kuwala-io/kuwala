@@ -1,6 +1,4 @@
-import { action, thunk } from "easy-peasy";
-import {removeElements, addEdge} from 'react-flow-renderer'
-import {useState} from "react";
+import { action } from "easy-peasy";
 
 const CommonModel =  {
     notificationOpen: false,

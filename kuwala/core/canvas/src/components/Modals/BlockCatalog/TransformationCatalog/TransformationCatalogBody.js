@@ -9,7 +9,7 @@ import ReactTable from "react-table-6";
 const TransformationCatalogBody = ({selectedTransformationIndex, catalogOptions, setSelectedCatalogOption, selectedCatalogOption}) => {
 
     const ExampleTable = ({columns, rows}) => {
-        let populatedColumns = columns.map((el,i)=>{
+        let populatedColumns = columns.map((el)=>{
             return {
                 Header: el,
                 accessor: el,
@@ -59,6 +59,7 @@ const TransformationCatalogBody = ({selectedTransformationIndex, catalogOptions,
                     <div className={Classes.BlockCatalogOptionsContainer}>
                         {renderTransformationOptions(catalogOptions)}
                     </div>
+
                     <div className={Classes.SelectedOptionDetailsContainer}>
                         <div className={Classes.OptionDetailsContainer}>
                             {renderSelectedOptionDetails()}
@@ -74,7 +75,7 @@ const TransformationCatalogBody = ({selectedTransformationIndex, catalogOptions,
     }
 
     const renderSelectedOptionDetails = () => {
-        if(selectedCatalogOption === null){
+        if (selectedCatalogOption === null){
             return (
                 <div className={Classes.OptionDetailsAlertText}>
                     <p>To see the <span className={'text-kuwala-purple'}>details</span> of a transformation block,</p>
@@ -83,14 +84,17 @@ const TransformationCatalogBody = ({selectedTransformationIndex, catalogOptions,
             )
         } else {
             const optionItem = catalogOptions[selectedCatalogOption];
+
             return (
                 <div className={Classes.TransformationOptionDetailsContent}>
                     <div className={'text-kuwala-purple space-x-4'}>
-                        <FontAwesomeIcon icon={optionItem.icon}/>
+                        <FontAwesomeIcon icon={optionItem.icon} />
+
                         <span className={'font-semibold'}>
                             {optionItem.name}
                         </span>
                     </div>
+
                     <p className={'mt-2'}>
                         {optionItem.description}
                     </p>
@@ -105,6 +109,7 @@ const TransformationCatalogBody = ({selectedTransformationIndex, catalogOptions,
                             <p>Parameters</p>
                             {optionItem.macroParameters.map((el, i) => <li key={i}>{el.name}</li>)}
                         </div>
+
                         <div className={Classes.OptionDetailsExampleContainer}>
                             {renderExampleTableWrapper(optionItem)}
                         </div>
@@ -117,23 +122,25 @@ const TransformationCatalogBody = ({selectedTransformationIndex, catalogOptions,
     const renderColumnType = (requiredColumnTypesData, optionalColumnTypesData) => {
         let requiredColumnTypes, optionalColumnTypes;
 
-        if(requiredColumnTypesData.length) {
+        if (requiredColumnTypesData.length) {
             requiredColumnTypes = (
                 <div className={cn(Classes.RequiredColumnBase, 'mt-6')}>
-                        <span>
-                            Required column types:
-                        </span>
+                    <span>
+                        Required column types:
+                    </span>
+
                     {renderBadgeList(requiredColumnTypesData)}
                 </div>
             )
         }
 
-        if(optionalColumnTypesData.length) {
+        if (optionalColumnTypesData.length) {
             optionalColumnTypes = (
                 <div className={cn(Classes.RequiredColumnBase, 'mt-2')}>
-                        <span>
-                            Optional column types:
-                        </span>
+                    <span>
+                        Optional column types:
+                    </span>
+
                     {renderBadgeList(optionalColumnTypesData)}
                 </div>
             )
@@ -169,9 +176,9 @@ const TransformationCatalogBody = ({selectedTransformationIndex, catalogOptions,
                 <span className={cn(Classes.ExampleBase,'my-2')}>
                    {text}
                 </span>
-                {examplesData.map((el) => {
+                {examplesData.map((el, i) => {
                     return (
-                        <div className={'flex flex-col mb-2'}>
+                        <div key={i} className={'flex flex-col mb-2'}>
                             <ExampleTable
                                 columns={el.columns}
                                 rows={el.rows}
@@ -185,9 +192,9 @@ const TransformationCatalogBody = ({selectedTransformationIndex, catalogOptions,
 
     const renderBadgeList = (badgeStringList) => {
         if(!badgeStringList || !badgeStringList.length) return
-        return badgeStringList.map((el) => {
+        return badgeStringList.map((el, i) => {
             return (
-                <div className={Classes.BadgeBase}>
+                <div key={i} className={Classes.BadgeBase}>
                     {el}
                 </div>
             )
@@ -198,6 +205,7 @@ const TransformationCatalogBody = ({selectedTransformationIndex, catalogOptions,
         return (
             <Button
                 key={index}
+                alignment={'start'}
                 solid={false}
                 color={'kuwalaPurple'}
                 onClick={()=>{
@@ -215,7 +223,7 @@ const TransformationCatalogBody = ({selectedTransformationIndex, catalogOptions,
             {
                 selectedTransformationIndex !== null
                     ?
-                    <SelectedTransformationCatalog/>
+                    <SelectedTransformationCatalog />
                     :
                     <div className={Classes.CatalogBodyAlertText}>
                         <p>To pick a transformation block,</p>

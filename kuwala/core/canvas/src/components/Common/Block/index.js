@@ -1,25 +1,42 @@
-import Classes from "../../Nodes/TransformationBlock/TransformationBlockStyle";
+import Classes from "./BlockStyle";
 import Icon from "../Icon";
 import Button from "../Button";
 import {Handle} from "react-flow-renderer";
 import {COLOR_MAP, KUWALA_GRAY} from "../../../constants/styling";
 import React from "react";
+import CloseButton from "../CloseButton";
 
 const Block = ({
         blockColor,
-        title,
+        data,
+        hideLeftHandle,
+        hideRightHandle,
+        icon,
+        img,
+        leftHandleActive,
+        onDelete,
         primaryButtonDisabled,
         primaryButtonOnClick,
+        rightHandleActive,
         secondaryButtonDisabled,
         secondaryButtonOnClick,
-        leftHandleActive,
-        hideLeftHandle,
-        rightHandleActive,
-        hideRightHandle,
-        data,
-        icon,
-        img
-    }) => {
+        selected,
+        title,
+}) => {
+    const getBorderColor = (jsx = false) => {
+        let color;
+
+        switch (blockColor) {
+            case 'kuwalaPurple':
+                color = jsx ? COLOR_MAP[blockColor] : 'kuwala-purple';
+                break;
+            default:
+                color = jsx ? COLOR_MAP[blockColor] : 'kuwala-green';
+        }
+
+        return jsx ? color : `border-${color}`;
+    }
+
     const renderLeftPane = () => {
         if(!hideLeftHandle) {
             return (
@@ -30,8 +47,8 @@ const Block = ({
                         width: 32,
                         left: -24,
                         height: '100%',
-                        borderRadius: 0,
-                        border: 'medium none',
+                        borderWidth: selected ? 2 : 0,
+                        borderColor: getBorderColor(true),
                         borderTopLeftRadius: 12,
                         borderBottomLeftRadius: 12,
                         borderTopRightRadius: 0,
@@ -58,7 +75,8 @@ const Block = ({
                         right: -24,
                         height: '100%',
                         borderRadius: 0,
-                        border: 'medium none',
+                        borderWidth: selected ? 2 : 0,
+                        borderColor: getBorderColor(true),
                         borderTopRightRadius: 12,
                         borderBottomRightRadius: 12,
                     }}
@@ -97,13 +115,19 @@ const Block = ({
         }
     }
 
-    return (
-        <div
-            className={Classes.BlockWrapper}
-        >
-            {/* BODY */}
+    const renderDeleteButton = () => {
+        return (
+            <div className={Classes.DeleteButtonClass}>
+                <CloseButton onClick={onDelete} />
+            </div>
+        )
+    }
+
+    const renderBody = () => {
+        return (
             <div className={Classes.BlockBodyContainer}>
                 {renderImgOrIcon()}
+
                 <div className={Classes.BlockContentWrapper}>
                     <div className={Classes.BlockTitle}>
                         <span>{title}</span>
@@ -127,10 +151,20 @@ const Block = ({
                             disabled={secondaryButtonDisabled}
                         />
                     </div>
-
                 </div>
+
+                {renderDeleteButton()}
             </div>
+        );
+    }
+
+
+    return (
+        <div
+            className={`${Classes.BlockWrapper} ${selected ? 'border-2' : 'border-0'} ${getBorderColor()}`}
+        >
             {renderLeftPane()}
+            {renderBody()}
             {renderRightHandle()}
         </div>
     )

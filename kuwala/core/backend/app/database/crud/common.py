@@ -37,3 +37,10 @@ def update_attributes(db: Session, db_object: Base, attributes: [dict]) -> Base:
     db.refresh(db_object)
 
     return db_object
+
+
+def delete_object(db: Session, model: Base, object_id: str):
+    db_object = get_object_by_id(db=db, model=model, object_id=object_id)
+
+    db.delete(db_object)
+    db.commit()

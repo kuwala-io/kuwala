@@ -44,7 +44,7 @@ export default () => {
                 <button className="p-2 rounded-md focus:outline-none focus:ring" onClick={toggleNotification}>
                     <svg
                         className="w-6 h-6 text-gray-600"
-                        xmlns="http://www.w3.org/2000/svg"j
+                        xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"

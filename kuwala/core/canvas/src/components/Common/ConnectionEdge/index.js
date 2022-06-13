@@ -5,16 +5,16 @@ import {useStoreActions} from "easy-peasy";
 import Icon from "../Icon";
 
 export default function CustomEdge({
-           id,
-           sourceX,
-           sourceY,
-           targetX,
-           targetY,
-           sourcePosition,
-           targetPosition,
-           markerEnd,
-           selected
-       }) {
+   id,
+   sourceX,
+   sourceY,
+   targetX,
+   targetY,
+   sourcePosition,
+   targetPosition,
+   markerEnd,
+   selected
+}) {
     const edgePath = getBezierPath({
         sourceX,
         sourceY,
@@ -30,7 +30,12 @@ export default function CustomEdge({
         targetX,
         targetY,
     });
-    const {removeElementById} = useStoreActions((actions => actions.canvas));
+    const { removeElementById } = useStoreActions(({ canvas }) => canvas);
+    const { removeDataBlock, updateDataBlock } = useStoreActions(({ dataBlocks }) => dataBlocks);
+    const {
+        removeTransformationBlock,
+        updateTransformationBlock
+    } = useStoreActions(({ transformationBlocks }) => transformationBlocks);
 
     return (
         <>
@@ -66,7 +71,13 @@ export default function CustomEdge({
                         text-white font-semibold 
                         hover:bg-kuwala-green active:shadow-lg
                     `}
-                    onClick={() => removeElementById(id)}
+                    onClick={() => removeElementById({
+                        elementId: id,
+                        removeDataBlock,
+                        removeTransformationBlock,
+                        updateDataBlock,
+                        updateTransformationBlock
+                    })}
                 >
                     <Icon
                         icon={'times'}

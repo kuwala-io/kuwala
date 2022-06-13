@@ -12,20 +12,24 @@ import React from "react";
 
 const ConfigurationForm = ({ elements, selectedElement, setFieldValue, values }) => {
     const renderNullOption = (optionText) => {
-        return <option className={Classes.DropdownItem} value={null}>
-            {optionText}
-        </option>
-    }
+        return (
+            <option className={Classes.DropdownItem} value={null}>
+                {optionText}
+            </option>
+        );
+    };
 
     const renderEmptyField = (placeHolder) => {
-        return <Field
-            type={'text'}
-            className={Classes.DisabledTextField}
-            placeholder={placeHolder}
-            disabled={true}
-            name={'empty'}
-        />
-    }
+        return (
+            <Field
+                type={'text'}
+                className={Classes.DisabledTextField}
+                placeholder={placeHolder}
+                disabled={true}
+                name={'empty'}
+            />
+        );
+    };
 
     const renderFormByType = ({ index, parameter, setFieldValue, values}) => {
         let formBody;
@@ -76,10 +80,13 @@ const ConfigurationForm = ({ elements, selectedElement, setFieldValue, values })
                     >
                         {renderNullOption('Select a column')}
 
-                        {options.map(el =>
+                        {options.map((element, index) =>
                             <option
+                                key={index}
                                 className={Classes.DropdownItem}
-                                value={el}>{el}
+                                value={element}
+                            >
+                                {element}
                             </option>
                         )}
                     </Field>
@@ -142,12 +149,13 @@ const ConfigurationForm = ({ elements, selectedElement, setFieldValue, values })
                     className={Classes.FieldContainer}
                 >
                     {renderNullOption('Select a block')}
-                    {listOfBlocks.map(el => {
-                        const blockId = el.type === DATA_BLOCK ? el.data.dataBlock.dataBlockEntityId : el.data.transformationBlock.transformationBlockEntityId
-                        const blockName = el.type === DATA_BLOCK ? el.data.dataBlock.name : el.data.transformationBlock.name
+                    {listOfBlocks.map((element, index) => {
+                        const blockId = element.type === DATA_BLOCK ? element.data.dataBlock.dataBlockEntityId : element.data.transformationBlock.transformationBlockEntityId
+                        const blockName = element.type === DATA_BLOCK ? element.data.dataBlock.name : element.data.transformationBlock.name
 
                         return (
                             <option
+                                key={index}
                                 className={Classes.DropdownItem}
                                 value={blockId}
                             >
@@ -188,12 +196,13 @@ const ConfigurationForm = ({ elements, selectedElement, setFieldValue, values })
                     className={Classes.FieldContainer}
                 >
                     {renderNullOption('Select a column')}
-                    {getColumnOptions(block.id).map(el =>
+                    {getColumnOptions(block.id).map((element, index) =>
                         <option
+                            key={index}
                             className={Classes.DropdownItem}
-                            value={el}
+                            value={element}
                         >
-                            {el}
+                            {element}
                         </option>
                     )}
                 </Field>
@@ -258,12 +267,13 @@ const ConfigurationForm = ({ elements, selectedElement, setFieldValue, values })
                                                     >
                                                         {renderNullOption('Select a column')}
 
-                                                        {columnOptions.map(el =>
+                                                        {columnOptions.map((element, index) =>
                                                             <option
+                                                                key={index}
                                                                 className={Classes.DropdownItem}
-                                                                value={el}
+                                                                value={element}
                                                             >
-                                                                {el}
+                                                                {element}
                                                             </option>
                                                         )}
                                                     </Field>
@@ -277,12 +287,13 @@ const ConfigurationForm = ({ elements, selectedElement, setFieldValue, values })
                                                     >
                                                         {renderNullOption('Select an aggregation')}
 
-                                                        {parameter.options.map(el =>
+                                                        {parameter.options.map((element, index) =>
                                                             <option
+                                                                key={index}
                                                                 className={Classes.DropdownItem}
-                                                                value={el.id}
+                                                                value={element.id}
                                                             >
-                                                                {el.name}
+                                                                {element.name}
                                                             </option>
                                                         )}
                                                     </Field>
@@ -311,12 +322,14 @@ const ConfigurationForm = ({ elements, selectedElement, setFieldValue, values })
                             className={Classes.FieldContainer}
                         >
                             {renderNullOption('Select an Option')}
-                            {parameter.options.map(el =>
+
+                            {parameter.options.map((element, index) =>
                                 <option
+                                    key={index}
                                     className={Classes.DropdownItem}
-                                    value={el.id}
+                                    value={element.id}
                                 >
-                                    {el.name}
+                                    {element.name}
                                 </option>
                             )}
                         </Field>

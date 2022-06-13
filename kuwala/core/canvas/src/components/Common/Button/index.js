@@ -12,9 +12,10 @@ const baseSize = {
 };
 
 const primaryVariant = {
-    kuwalaGreen: "bg-kuwala-green text-white hover:text-stone-300",
-    kuwalaRed: "bg-kuwala-red text-white hover:text-stone-300",
-    kuwalaPurple: "bg-kuwala-purple text-white hover:text-stone-300"
+    kuwalaGreen: "bg-kuwala-green text-white",
+    kuwalaRed: "bg-kuwala-red text-white",
+    kuwalaPurple: "bg-kuwala-purple text-white",
+    kuwalaGray: "bg-kuwala-gray text-white",
 }
 
 const secondaryVariant = (color, selected) => {
@@ -34,6 +35,11 @@ const secondaryVariant = (color, selected) => {
                 border border-kuwala-green space-x-2
                 ${selected ? 'bg-kuwala-green text-white' : 'bg-white text-kuwala-green'} 
                 hover:bg-kuwala-green hover:text-white cursor-pointer`
+        case('kuwalaGray'):
+            return `
+                border border-kuwala-gray space-x-2
+                ${selected ? 'bg-kuwala-gray text-white' : 'bg-white text-kuwala-gray'} 
+                hover:bg-kuwala-gray hover:text-white cursor-pointer`
         default:
             return `
                 px-4 py-2 border rounded-md border-kuwala-red space-x-2
@@ -68,6 +74,7 @@ const renderIconIfExists = (icon) => {
 }
 
 const Button = ({
+    alignment = 'center',
     size="base",
     className,
     color="kuwalaGreen",
@@ -76,16 +83,15 @@ const Button = ({
     loading=false,
     solid=true,
     selected=false,
-    alignment='start',
-    icon=undefined,
-    text=undefined,
+    icon,
+    text,
     draggable=false,
     type='button'
 }) => {
     return (
         <button
             className={cn(
-                `font-semibold cursor-pointer`,
+                `font-semibold cursor-pointer min-w-[96px] h-fit`,
                 baseSize[size],
                 disabled ? getStyleForDisabled(disabled) : getButtonStylesBySolid(solid, color, selected),
                 className,
@@ -99,15 +105,13 @@ const Button = ({
                 loading
                 ?
                     (
-                        <Spinner/>
+                        <Spinner />
                     )
                 :
                     (
-                        <div className={`
-                            flex flex-row items-center space-x-2
-                            ${alignment ? 'justify-'+alignment : ''}
-                        `}>
+                        <div className={`flex flex-row items-center space-x-2 justify-${alignment}`}>
                             {renderIconIfExists(icon)}
+
                             <span>
                                 {text}
                             </span>

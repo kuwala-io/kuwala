@@ -4,9 +4,8 @@ import {Link, useLocation} from "react-router-dom";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import NotificationPanel from "./NotificationPanel";
 
-export default () => {
+const Header = () => {
     const { toggleNotification } = useStoreActions(actions => actions.common)
-    const { dataBlocks, elements, transformationBlocks } = useStoreState(state => state.canvas)
     const [currentPage] = useState(useLocation().pathname)
 
     const notifications = 0;
@@ -127,3 +126,5 @@ export default () => {
     </>
     )
 }
+
+export default Header;

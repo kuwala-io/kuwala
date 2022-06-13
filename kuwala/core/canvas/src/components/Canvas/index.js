@@ -1,7 +1,6 @@
 import ReactFlow, {Controls, ReactFlowProvider} from "react-flow-renderer";
 import ConnectionLine from "../Common/ConnectionLine";
-import TransformationBlock from "../Nodes/TransformationBlock/TransformationBlock";
-import DataBlock from "../Nodes/DataBlock";
+import { DataBlock, TransformationBlock } from "../Blocks";
 import ConnectionEdge from "../Common/ConnectionEdge";
 import DataView from "../DataView";
 import React from "react";
