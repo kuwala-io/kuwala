@@ -7,9 +7,9 @@ const TransformationCatalogSelector = ({setSelectedCatalogOption, setSelectedTra
         return (
             <Button
                 key={index}
-                onClick={()=>{
+                onClick={() => {
                     setSelectedCatalogOption(null);
-                    setSelectedTransformationIndex(index)
+                    setSelectedTransformationIndex(index);
                 }}
                 selected={selectedTransformationIndex === index}
                 solid={false}

@@ -11,7 +11,12 @@ from controller.utils.yaml_utils import (
     terminal_output_to_base_model,
     terminal_output_to_source_yaml,
 )
-from database.crud.common import generate_object_id, get_object_by_id, update_attributes
+from database.crud.common import (
+    delete_object,
+    generate_object_id,
+    get_object_by_id,
+    update_attributes,
+)
 from database.models.data_block import DataBlock
 from database.schemas.data_block import DataBlockCreate, DataBlockUpdate
 import oyaml as yaml
@@ -353,5 +358,11 @@ def refresh_sources(data_source_id: str, schema_name: str):
     dbt_dir = get_dbt_dir(data_source_id=data_source_id)
 
     create_source_yaml(dbt_dir=dbt_dir, schema_name=schema_name, update_yaml=True)
+
+    return dict(success=True)
+
+
+def delete_data_block(data_block_id: str, db: Session):
+    delete_object(db=db, model=DataBlock, object_id=data_block_id)
 
     return dict(success=True)

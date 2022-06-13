@@ -4,18 +4,18 @@ import DataBlocksHandler from "./NodeHandlers/DataBlocksHandler";
 import AddSourcesGreen from "../../icons/add_sources_green.png";
 import {Link} from "react-router-dom";
 
-export default ({reactFlowWrapper}) => {
-    const { dataSource } = useStoreState(state => state.canvas);
-    const { setNewNodeInfo } = useStoreActions(actions => actions.canvas);
-    const { addDataBlock } = useStoreActions((actions) => actions.canvas);
+const NodeHandlerContainer = ({reactFlowWrapper}) => {
+    const { dataSources } = useStoreState(({ dataSources }) => dataSources);
+    const { setNewNodeInfo } = useStoreActions(({ canvas }) => canvas);
+    const { addDataBlock } = useStoreActions(({ dataBlocks }) => dataBlocks);
 
     const onDragStart = (event, newNodeInfo) => {
         setNewNodeInfo(newNodeInfo)
         event.dataTransfer.effectAllowed = 'move';
     };
 
-    const onClickAddDataBlock = (dataBlocks) => {
-        addDataBlock(dataBlocks)
+    const onClickAddDataBlock = (dataBlock) => {
+        addDataBlock(dataBlock);
     }
 
     const getHandlerTemplate = (dataSource) => {
@@ -23,14 +23,15 @@ export default ({reactFlowWrapper}) => {
             case 'postgres':
             case 'bigquery':
             case 'snowflake':
-                return <
-                    DataBlocksHandler
+                return (
+                    <DataBlocksHandler
                         onDragStart={onDragStart}
                         onClickAddDataBlock={onClickAddDataBlock}
                         dataSource={dataSource}
                         reactFlowWrapper={reactFlowWrapper}
                         key={dataSource.dataCatalogItemId}
-                />
+                    />
+                );
             default:
                 return null
         }
@@ -39,11 +40,11 @@ export default ({reactFlowWrapper}) => {
     return (
         <div className={'flex flex-col justify-center items-center select-none space-y-6'}>
             {
-                dataSource.filter((el) => el.connected).map((dataSource) => {
-                    const handlerToRender = getHandlerTemplate(dataSource);
-                    return handlerToRender
+                dataSources.filter((el) => el.connected).map((dataSource) => {
+                    return getHandlerTemplate(dataSource);
                 })
             }
+
             <Link
                 to={"/data-catalog"}
                 className={`mt-12`}
@@ -60,3 +61,5 @@ export default ({reactFlowWrapper}) => {
         </div>
     )
 }
+
+export default NodeHandlerContainer;

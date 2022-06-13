@@ -1,8 +1,8 @@
 import TransformationBlockDTO from "../data/dto/TransformationBlockDTO";
 
-export function fromAPIResponseToTransformationBlockDTO ({transformationBlockResponse, transformationCatalog}) {
+export function fromAPIResponseToTransformationBlockDTO ({transformationBlockResponse, transformationCatalogItem}) {
     const dto = new TransformationBlockDTO({
-        transformationCatalog: transformationCatalog,
+        transformationCatalogItem,
         name: transformationBlockResponse.name,
         connectedSourceNodeIds: [],
         transformationBlockId: transformationBlockResponse.id,
@@ -20,12 +20,14 @@ export function fromAPIResponseToTransformationBlockDTO ({transformationBlockRes
     dto.macroParameters = dto.macroParameters.map((el) => {
         return {
             ...el,
-            name: capitalizeFirstLetter(el.id)
+            name: getParameterName(el.id, transformationCatalogItem)
         }
     })
     return dto
 }
 
-function capitalizeFirstLetter (string) {
-    return string[0].toUpperCase() + string.substring(1)
+function getParameterName (parameterId, transformationCatalogItem) {
+    let parameter = transformationCatalogItem.macroParameters.find(p => p.id === parameterId);
+
+    return parameter.name;
 }

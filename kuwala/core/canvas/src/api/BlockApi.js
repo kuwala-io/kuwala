@@ -1,6 +1,6 @@
 import baseAxios from "./BaseAxios";
 import {BLOCK} from "../constants/api";
 
-export function getAllExistingBlocks (){
+export async function getAllExistingBlocks (){
     return baseAxios.get(BLOCK)
 }

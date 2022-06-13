@@ -1,29 +1,30 @@
-import SchemaExplorer from "../../SchemaExplorer";
-import Explorer from "../../Explorer";
+import { SchemaExplorer } from "../../../SchemaExplorer";
+import Explorer from "../../../Explorer";
 import React from "react";
-import { Switcher } from '../../Common'
-import { SELECTOR_DISPLAY, PREVIEW_DISPLAY } from "../../../constants/components";
+import { Switcher } from '../../../Common'
+import { SELECTOR_DISPLAY, PREVIEW_DISPLAY } from "../../../../constants/components";
+import styles from "./styles";
 
 const DataBlockConfigBody = ({
-    columnsPreview,
-    isSchemaLoading,
-    isTableLoading,
-    schemaList,
-    selectedElement,
-    selectedTable,
-    selectorDisplay,
-    setColumnsPreview,
-    setIsTableLoading,
-    setSchema,
-    setSelectedTable,
-    setSelectorDisplay,
-    setTableDataPreview,
-    tableDataPreview
-}) => {
+     columnsPreview,
+     isSchemaLoading,
+     isTableLoading,
+     schemaList,
+     selectedElement,
+     selectedTable,
+     selectorDisplay,
+     setColumnsPreview,
+     setIsTableLoading,
+     setSchema,
+     setSelectedTable,
+     setSelectorDisplay,
+     setTableDataPreview,
+     tableDataPreview
+ }) => {
     return (
-        <div className={'flex flex-col flex-auto px-6 pt-2 pb-4 h-full overflow-y-auto'}>
-            <div className={'flex flex-row bg-white border-2 border-kuwala-green rounded-t-lg h-full w-full'}>
-                <div className={'flex flex-col bg-white w-3/12 border border-kuwala-green h-full'}>
+        <div className={styles.outerContainer}>
+            <div className={styles.innerContainer}>
+                <div className={styles.schemaContainer}>
                     <SchemaExplorer
                         schemaExplorerType={selectorDisplay}
                         isSchemaLoading={isSchemaLoading}
@@ -37,8 +38,9 @@ const DataBlockConfigBody = ({
                         dataSource={selectedElement.data.dataSource}
                     />
                 </div>
-                <div className={'flex flex-col bg-white w-9/12 rounded-tr-lg'}>
-                    <div className={'flex flex-col w-full h-full'}>
+
+                <div className={styles.configOuterContainer}>
+                    <div className={styles.configInnerContainer}>
                         <Switcher
                             leftId={SELECTOR_DISPLAY}
                             leftText={"Selection"}

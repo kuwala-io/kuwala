@@ -1,5 +1,5 @@
 import React from "react";
-import { TextInput } from '../../Common'
+import { Tag, TextInput } from '../../Common'
 
 const DataBlockConfigHeader = ({ selectedElement, dataBlockName, onNameChange }) => {
     return (
@@ -25,9 +25,7 @@ const DataBlockConfigHeader = ({ selectedElement, dataBlockName, onNameChange })
             </div>
 
             <div className={'flex flex-col ml-6 space-y-2 bottom-0 justify-end mb-2'}>
-                <span className={'px-3 py-1 bg-kuwala-light-green text-kuwala-green font-semibold rounded-lg w-36'}>
-                    Data block
-                </span>
+                <Tag text={'Data block'} />
 
                 <TextInput value={dataBlockName} onChange={onNameChange} label={'Name'} />
             </div>

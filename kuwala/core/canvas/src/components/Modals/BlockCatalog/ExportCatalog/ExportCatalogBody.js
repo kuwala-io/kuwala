@@ -69,6 +69,7 @@ const ExportCatalogBody = ({selectedExportIndex, catalogOptions, selectedCatalog
             <Button
                 key={index}
                 solid={false}
+                alignment={'start'}
                 color={'kuwalaRed'}
                 onClick={()=>{
                     setSelectedCatalogOption(index)
