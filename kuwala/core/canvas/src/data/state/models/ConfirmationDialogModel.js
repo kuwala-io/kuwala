@@ -1,4 +1,4 @@
-import {action} from "easy-peasy";
+import {action, thunk} from "easy-peasy";
 
 const ConfirmationDialogModel = {
     confirmText: undefined,
@@ -41,6 +41,15 @@ const ConfirmationDialogModel = {
     }),
     setTitle: action((state, title) => {
         state.title = title;
+    }),
+    setTexts: thunk((
+        { setConfirmText, setDismissText, setMessage, setTitle },
+        { confirmText, dismissText, message, title },
+    ) => {
+        setConfirmText(confirmText);
+        setDismissText(dismissText);
+        setMessage(message);
+        setTitle(title);
     }),
 }
 

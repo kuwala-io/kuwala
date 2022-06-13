@@ -14,13 +14,10 @@ const DataBlock = ({data, id}) => {
     const {
         closeDialog,
         openDialog,
-        setConfirmText,
-        setDismissText,
         setLoading,
-        setMessage,
         setOnConfirm,
         setRefreshBlocks,
-        setTitle
+        setTexts,
     } = useStoreActions(({ confirmationDialog }) => confirmationDialog)
     const { removeDataBlock, updateDataBlock } = useStoreActions(({ dataBlocks }) => dataBlocks);
     const {
@@ -35,11 +32,13 @@ const DataBlock = ({data, id}) => {
 
     const onDelete = () => {
         if (data.dataBlock.dataBlockEntityId) {
-            setConfirmText('Delete');
-            setDismissText('Cancel');
-            setMessage('Deleting this block will also delete all blocks that depend on it. Are you sure you want to continue?');
+            setTexts({
+                confirmText: 'Delete',
+                dismissText: 'Cancel',
+                message: 'Deleting this data block will also delete all blocks that depend on it. Are you sure you want to continue?',
+                title: 'Attention!'
+            })
             setOnConfirm(onConfirm);
-            setTitle('Attention!');
             openDialog();
         } else {
             removeNodes({
