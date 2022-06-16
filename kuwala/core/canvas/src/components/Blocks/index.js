@@ -1,4 +1,5 @@
 import DataBlock from './DataBlock';
 import TransformationBlock from './TransformationBlock';
+import ExportBlock from './ExportBlock';
 
-export { DataBlock, TransformationBlock };
+export { DataBlock, TransformationBlock, ExportBlock };

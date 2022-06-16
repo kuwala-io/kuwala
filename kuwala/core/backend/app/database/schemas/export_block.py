@@ -36,6 +36,5 @@ class ExportBlockCreate(BaseModel):
 
 class ExportBlockUpdate(BaseModel):
     name: Optional[str] = None
-    columns: Optional[List[str]] = None
     position_x: float = None
     position_y: float = None

@@ -9,4 +9,5 @@ export const TRANSFORMATION_CATALOG_CATEGORY = TRANSFORMATION_CATALOG + '/catego
 export const EXPORT_CATALOG = BASE_URL + '/export-catalog';
 export const EXPORT_CATALOG_CATEGORY = EXPORT_CATALOG + '/category';
 export const TRANSFORMATION_BLOCK = BASE_URL + '/block/transformation';
+export const EXPORT_BLOCK = BASE_URL + '/block/export';
 export const BLOCK = BASE_URL + '/block';

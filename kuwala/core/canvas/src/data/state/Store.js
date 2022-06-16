@@ -6,6 +6,7 @@ import ConfirmationDialogModel from './models/ConfirmationDialogModel';
 import DataBlockModel from './models/DataBlockModel';
 import DataSourceModel from "./models/DataSourceModel";
 import TransformationBlockModel from './models/TransformationBlockModel';
+import ExportBlockModel from './models/ExportBlockModel';
 
 const storeModel = {
     canvas: CanvasModel,
@@ -13,7 +14,8 @@ const storeModel = {
     confirmationDialog: ConfirmationDialogModel,
     dataBlocks: DataBlockModel,
     dataSources: DataSourceModel,
-    transformationBlocks: TransformationBlockModel
+    transformationBlocks: TransformationBlockModel,
+    exportBlocks: ExportBlockModel,
 };
 
 const Store = createStore(storeModel);

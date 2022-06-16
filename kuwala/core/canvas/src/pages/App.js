@@ -10,7 +10,7 @@ import TransformationBlockConfigModal from "../components/Modals/TransformationB
 import Canvas from "../components/Canvas";
 import {getAllExistingBlocks} from "../api/BlockApi";
 import {getDataSourceDTOById} from "../utils/DataSourceUtils";
-import {DATA_BLOCK, TRANSFORMATION_BLOCK} from "../constants/nodeTypes";
+import {DATA_BLOCK, TRANSFORMATION_BLOCK, EXPORT_BLOCK} from "../constants/nodeTypes";
 import {updateDataBlockEntity} from "../api/DataBlockApi";
 import {updateTransformationBlockEntity} from "../api/TransformationBlock";
 import {fromAPIResponseToDTO} from "../utils/DataBlockUtils";
@@ -23,6 +23,11 @@ import {
 import {getSchema} from "../api/DataSourceApi";
 import Spinner from "../components/Common/Spinner";
 import {ConfirmationDialog} from "../components/Common";
+import ExportBlockConfigModal from "../components/Modals/ExportBlockConfig/ExportBlockConfigModal";
+import {getAllExportCatalogCategories, getAllItemsInExportCategory} from "../api/ExportCatalog";
+import {convertExportCatalogResponseToDTO, getExportCatalogById} from "../utils/ExportCatalogUtils";
+import {fromAPIResponseToExportBlockDTO} from "../utils/ExportBlockUtils";
+import {updateExportBlockEntity} from "../api/ExportBlock";
 
 
 const App = () => {
@@ -35,9 +40,11 @@ const App = () => {
         openConfigModal,
         openBlockCatalogModal,
         openTransformationConfigModal,
+        openExportConfigModal
     } = useStoreState(({ common }) => common);
     const { dataSources } = useStoreState(({ dataSources }) => dataSources);
     const { transformationBlocks } = useStoreState(({ transformationBlocks }) => transformationBlocks);
+    const { exportBlocks } = useStoreState(({ exportBlocks }) => exportBlocks);
     const {
         confirmText,
         dismissText,
@@ -75,6 +82,13 @@ const App = () => {
         updateTransformationBlock,
         updateTransformationBlockPosition
     } = useStoreActions(({ transformationBlocks }) => transformationBlocks);
+    const {
+        convertExportBlockIntoElement,
+        setExportBlocks,
+        removeExportBlock,
+        updateExportBlock,
+        updateExportBlockPosition
+    } = useStoreActions(({ exportBlocks }) => exportBlocks);
     const {
         setConnectionLoaded,
         setExistingBlockLoaded,
@@ -129,16 +143,40 @@ const App = () => {
         setTransformationBlocks(dtoList);
         convertTransformationBlockIntoElement({ addNode, elements, setElements });
     }, [addNode, convertTransformationBlockIntoElement, elements, setElements, setTransformationBlocks]);
+    const loadExportBlocks = useCallback(async (rawExportBlocks) => {
+        const categories = await getAllExportCatalogCategories();
+        let listOfCatalogItems = [];
+
+        for (const cat of categories.data) {
+            const catalogItems = await getAllItemsInExportCategory(cat.id);
+            listOfCatalogItems.push(...catalogItems.data);
+        }
+
+        const dtoList = rawExportBlocks.map((el) => fromAPIResponseToExportBlockDTO({
+            exportCatalogItem: convertExportCatalogResponseToDTO(
+                getExportCatalogById({
+                    exportCatalog: listOfCatalogItems,
+                    id: el.export_catalog_item_id,
+                })
+            ),
+            exportBlockResponse: el
+        }));
+
+        setExportBlocks(dtoList);
+        convertExportBlockIntoElement({ addNode, elements, setElements });
+    }, [addNode, convertExportBlockIntoElement, elements, setElements, setExportBlocks]);
+
     const loadExistingBlocks = useCallback(async () => {
         if (dataSources.length > 0) {
             const res = await getAllExistingBlocks();
             const { data, status } = res;
 
             if (status === 200 && data) {
-                const { data_blocks, transformation_blocks } = data;
+                const { data_blocks, transformation_blocks, export_blocks } = data;
 
                 await loadDataBlocks(data_blocks, dataSources);
                 await loadTransformationBlocks(transformation_blocks);
+                await loadExportBlocks(export_blocks);
 
                 setExistingBlockLoaded(true);
             }
@@ -189,7 +227,7 @@ const App = () => {
 
     useEffect(() => {
         if (!connectionLoaded && existingBlockLoaded) {
-            loadConnections({ transformationBlocks, updateDataBlock, updateTransformationBlock });
+            loadConnections({ transformationBlocks, exportBlocks, updateDataBlock, updateTransformationBlock, updateExportBlock });
             setConnectionLoaded(true);
         }
     }, [
@@ -199,16 +237,19 @@ const App = () => {
         setConnectionLoaded,
         transformationBlocks,
         updateDataBlock,
-        updateTransformationBlock
+        updateTransformationBlock,
+        exportBlocks
     ]);
 
-    const onConnect = (params) => connectNodes({ params, updateDataBlock, updateTransformationBlock });
+    const onConnect = (params) => connectNodes({ params, updateDataBlock, updateTransformationBlock, updateExportBlock });
     const onElementsRemove = (elementsToRemove) => removeNodes({
         nodesToRemove: elementsToRemove,
         removeDataBlock,
         removeTransformationBlock,
+        removeExportBlock,
         updateDataBlock,
-        updateTransformationBlock
+        updateTransformationBlock,
+        updateExportBlock
     });
     const onLoad = (_reactFlowInstance) => setReactFlowInstance(_reactFlowInstance);
     const onDragOver = (event) => {
@@ -248,6 +289,24 @@ const App = () => {
                     });
                 }
             });
+        } else if (element.type === EXPORT_BLOCK && element.data.exportBlock.isConfigured) {
+            updateExportBlockEntity({
+                exportBlockEntityId: element.data.exportBlock.exportBlockEntityId,
+                data: {
+                    position_y: element.position.y,
+                    position_x: element.position.x,
+                }
+            }).then((res) => {
+                if (res.status === 200) {
+                    const { id, position_x, position_y } = res.data;
+
+                    updateExportBlockPosition({
+                        transformationBlockId: id,
+                        positionX: position_x,
+                        positionY: position_y
+                    });
+                }
+            })
         }
 
         updateElementById(element);
@@ -316,6 +375,10 @@ const App = () => {
 
                 <TransformationBlockConfigModal
                     isOpen={openTransformationConfigModal}
+                />
+
+                <ExportBlockConfigModal
+                    isOpen={openExportConfigModal}
                 />
 
                 <ConfirmationDialog

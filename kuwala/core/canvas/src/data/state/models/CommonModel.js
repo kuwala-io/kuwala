@@ -4,6 +4,7 @@ const CommonModel =  {
     notificationOpen: false,
     openConfigModal: false,
     openTransformationConfigModal: false,
+    openExportConfigModal: false,
     reactFlowInstance: null,
     openBlockCatalogModal: false,
     connectionLoaded: false,
@@ -39,6 +40,10 @@ const CommonModel =  {
 
     toggleTransformationConfigModal: action((state) => {
         state.openTransformationConfigModal = !state.openTransformationConfigModal
+    }),
+
+    toggleExportConfigModal: action((state) => {
+        state.openExportConfigModal = !state.openExportConfigModal
     }),
 
 }

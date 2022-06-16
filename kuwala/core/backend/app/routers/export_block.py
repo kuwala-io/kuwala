@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from database.schemas.export_block import (
     ExportBlockCreate,
+    ExportBlockUpdate
 )
 from fastapi.responses import FileResponse
 
@@ -33,6 +34,19 @@ def create_export_block(
     )
 
     return export_block
+
+
+@router.put("/{export_block_id}")
+def update_export_block(
+        export_block_id: str,
+        export_block_update: ExportBlockUpdate,
+        db: Session = Depends(get_db)
+):
+    return export_block_controller.update_export_block(
+        export_block_id=export_block_id,
+        export_block=export_block_update,
+        db=db,
+    )
 
 
 @router.get("/{export_block_id}/trigger")

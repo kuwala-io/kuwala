@@ -17,9 +17,11 @@ const Block = ({
         onDelete,
         primaryButtonDisabled,
         primaryButtonOnClick,
+        primaryButtonText="Configure",
         rightHandleActive,
         secondaryButtonDisabled,
         secondaryButtonOnClick,
+        secondaryButtonText="Preview",
         selected,
         title,
 }) => {
@@ -27,6 +29,9 @@ const Block = ({
         let color;
 
         switch (blockColor) {
+            case 'kuwalaRed':
+                color = jsx ? COLOR_MAP[blockColor] : 'kuwala-red';
+                break;
             case 'kuwalaPurple':
                 color = jsx ? COLOR_MAP[blockColor] : 'kuwala-purple';
                 break;
@@ -138,7 +143,7 @@ const Block = ({
                             color={blockColor}
                             solid={false}
                             size={'longXs'}
-                            text={'Configure'}
+                            text={primaryButtonText}
                             onClick={primaryButtonOnClick}
                             disabled={primaryButtonDisabled}
                         />
@@ -146,7 +151,7 @@ const Block = ({
                             color={blockColor}
                             solid={true}
                             size={'longXs'}
-                            text={'Preview'}
+                            text={secondaryButtonText}
                             onClick={secondaryButtonOnClick}
                             disabled={secondaryButtonDisabled}
                         />

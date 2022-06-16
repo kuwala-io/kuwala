@@ -32,6 +32,7 @@ export default function CustomEdge({
     });
     const { removeElementById } = useStoreActions(({ canvas }) => canvas);
     const { removeDataBlock, updateDataBlock } = useStoreActions(({ dataBlocks }) => dataBlocks);
+    const { removeExportBlock, updateExportBlock } = useStoreActions(({ exportBlocks }) => exportBlocks);
     const {
         removeTransformationBlock,
         updateTransformationBlock
@@ -75,8 +76,10 @@ export default function CustomEdge({
                         elementId: id,
                         removeDataBlock,
                         removeTransformationBlock,
+                        removeExportBlock,
                         updateDataBlock,
-                        updateTransformationBlock
+                        updateTransformationBlock,
+                        updateExportBlock
                     })}
                 >
                     <Icon

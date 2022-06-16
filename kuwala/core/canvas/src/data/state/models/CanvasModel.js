@@ -1,7 +1,7 @@
 import { action, thunk } from "easy-peasy";
 import {v4} from "uuid";
 import {removeElements} from 'react-flow-renderer';
-import {TRANSFORMATION_BLOCK, DATA_BLOCK,} from '../../../constants/nodeTypes';
+import {TRANSFORMATION_BLOCK, DATA_BLOCK, EXPORT_BLOCK,} from '../../../constants/nodeTypes';
 import {CONNECTION_EDGE} from '../../../constants/edgeTypes';
 import {
     getElementByConnectionEdgeParams,
@@ -26,7 +26,7 @@ const CanvasModel = {
     }),
     removeNodes: thunk((
         { removeConnectedEdgeFromBlock, setElements, setSelectedElement },
-        { nodesToRemove, removeDataBlock, removeTransformationBlock, updateDataBlock, updateTransformationBlock },
+        { nodesToRemove, removeDataBlock, removeTransformationBlock, updateDataBlock, updateTransformationBlock, updateExportBlock },
         { getState }
     ) => {
         const { elements } = getState();
@@ -42,7 +42,8 @@ const CanvasModel = {
                     source: nodeToRemove.source,
                     target: nodeToRemove.target,
                     updateDataBlock,
-                    updateTransformationBlock
+                    updateTransformationBlock,
+                    updateExportBlock
                 });
             }
         });
@@ -50,7 +51,7 @@ const CanvasModel = {
     }),
     removeElementById: thunk((
         { removeNodes },
-        { elementId, removeDataBlock, removeTransformationBlock, updateDataBlock, updateTransformationBlock },
+        { elementId, removeDataBlock, removeTransformationBlock, removeExportBlock, updateDataBlock, updateTransformationBlock, updateExportBlock },
         { getState }
     ) => {
         const { elements } = getState();
@@ -60,13 +61,15 @@ const CanvasModel = {
             nodesToRemove: [elementToRemove],
             removeDataBlock,
             removeTransformationBlock,
+            removeExportBlock,
             updateDataBlock,
-            updateTransformationBlock
+            updateTransformationBlock,
+            updateExportBlock
         });
     }),
     connectNodes: thunk((
         { addConnectedEdgeToBlock, addElement },
-        { params, updateDataBlock, updateTransformationBlock },
+        { params, updateDataBlock, updateTransformationBlock, updateExportBlock },
         { getState }
     ) => {
         const edgeToAdd = {
@@ -91,17 +94,32 @@ const CanvasModel = {
                     source,
                     target,
                     updateDataBlock,
-                    updateTransformationBlock
+                    updateTransformationBlock,
+                    updateExportBlock
                 });
                 addElement(edgeToAdd);
             } else {
                 alert('Maximum number of connections reached!');
             }
+        } else if ( targetElement && targetElement.type === EXPORT_BLOCK) {
+            if (
+                targetElement.data.exportBlock.connectedSourceNodeIds.length < targetElement.data.exportCatalogItem.maxNumberOfInputBlocks &&
+                !connectionExists
+            ) {
+                addConnectedEdgeToBlock({
+                    source,
+                    target,
+                    updateDataBlock,
+                    updateTransformationBlock,
+                    updateExportBlock
+                });
+                addElement(edgeToAdd);
+            }
         }
     }),
     addConnectedEdgeToBlock: thunk((
         { addNode, setElements },
-        { source, target, updateDataBlock, updateTransformationBlock },
+        { source, target, updateDataBlock, updateTransformationBlock, updateExportBlock },
         { getState }
     ) => {
         const { elements } = getState();
@@ -119,6 +137,11 @@ const CanvasModel = {
 
             sourceDTO.connectedTargetNodeIds.push(target);
             updateTransformationBlock({ addNode, elements, setElements, updatedBlock: sourceDTO });
+        } else if (sourceElement.type === EXPORT_BLOCK) {
+            sourceDTO = sourceElement.data.exportBlock;
+
+            sourceDTO.connectedTargetNodeIds.push(target);
+            updateExportBlock({ addNode, elements, setElements, updatedBlock: sourceDTO });
         }
 
         if(targetElement.type === DATA_BLOCK) {
@@ -129,11 +152,15 @@ const CanvasModel = {
             targetDTO = targetElement.data.transformationBlock;
             targetDTO.connectedSourceNodeIds.push(source);
             updateTransformationBlock({ addNode, elements, setElements, updatedBlock: targetDTO });
+        } else if (targetElement.type === EXPORT_BLOCK) {
+            targetDTO = targetElement.data.exportBlock;
+            targetDTO.connectedSourceNodeIds.push(source);
+            updateExportBlock({ addNode, elements, setElements, updatedBlock: targetDTO });
         }
     }),
     removeConnectedEdgeFromBlock: thunk((
         { addNode, setElements },
-        { source, target, updateDataBlock, updateTransformationBlock },
+        { source, target, updateDataBlock, updateTransformationBlock, updateExportBlock },
         { getState }
     ) => {
         const { elements } = getState();
@@ -151,6 +178,10 @@ const CanvasModel = {
                 sourceDTO = sourceElement.data.transformationBlock;
                 sourceDTO.connectedTargetNodeIds = sourceDTO.connectedTargetNodeIds.filter((el) => el !== target);
                 updateTransformationBlock({ addNode, elements, setElements, updatedBlock: sourceDTO });
+            } else if (sourceElement.type === EXPORT_BLOCK) {
+                sourceDTO = sourceElement.data.exportBlock;
+                sourceDTO.connectedTargetNodeIds = sourceDTO.connectedTargetNodeIds.filter((el) => el !== target);
+                updateExportBlock({ addNode, elements, setElements, updatedBlock: sourceDTO });
             }
 
         }
@@ -165,6 +196,10 @@ const CanvasModel = {
                 targetDTO = targetElement.data.transformationBlock;
                 targetDTO.connectedSourceNodeIds = targetDTO.connectedSourceNodeIds.filter((el) => el !== source);
                 updateTransformationBlock({ addNode, elements, setElements, updatedBlock: targetDTO });
+            } else if (targetElement.type === EXPORT_BLOCK) {
+                targetDTO = targetElement.data.exportBlock;
+                targetDTO.connectedSourceNodeIds = targetDTO.connectedSourceNodeIds.filter((el) => el !== source);
+                updateExportBlock({ addNode, elements, setElements, updatedBlock: targetDTO });
             }
         }
     }),
@@ -211,6 +246,17 @@ const CanvasModel = {
 
         state.selectedElement = selectedElement[0]
     }),
+    setSelectedElementByExportBlockId: action((state, selectedExportBlockId) => {
+        const { elements } = state;
+        const selectedElement = elements.filter((el) =>
+            el.type === EXPORT_BLOCK &&
+            (el.data.exportBlock.exportBlockId === selectedExportBlockId)
+        );
+
+        if (!selectedElement.length) return
+
+        state.selectedElement = selectedElement[0]
+    }),
     setNewNodeInfo: action((state, newNodeInfo) => {
         state.newNodeInfo = newNodeInfo
     }),
@@ -222,7 +268,7 @@ const CanvasModel = {
     }),
     loadConnections: thunk(async (
         { connectNodes },
-        { transformationBlocks, updateDataBlock, updateTransformationBlock},
+        { transformationBlocks, exportBlocks, updateDataBlock, updateTransformationBlock, updateExportBlock},
         { getState }
     ) => {
         const { elements } = getState();
@@ -239,9 +285,26 @@ const CanvasModel = {
                     targetHandle: null
                 }
 
-                connectNodes({ params: tmpParams, updateDataBlock, updateTransformationBlock });
+                connectNodes({ params: tmpParams, updateDataBlock, updateTransformationBlock, updateExportBlock });
             }
         }
+
+        for (const exportBlock of exportBlocks) {
+            const currentElement = getBlockByEntityId(elements, exportBlock.exportBlockEntityId);
+            const connectedElements = getElementsByEntityIds(elements, exportBlock.inputBlockIds);
+
+            for (const sourceElement of connectedElements) {
+                const tmpParams = {
+                    source: sourceElement.id,
+                    sourceHandle: null,
+                    target: currentElement.id,
+                    targetHandle: null
+                }
+
+                connectNodes({ params: tmpParams, updateDataBlock, updateTransformationBlock, updateExportBlock });
+            }
+        }
+
     })
 }
 

@@ -1,4 +1,4 @@
-from relationships import (
+from database.models.relationships import (
     data_to_transformation_block_association_table,
     transformation_to_transformation_block_association_table,
 )
