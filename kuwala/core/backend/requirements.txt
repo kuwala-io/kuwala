@@ -5,7 +5,6 @@ dbt-postgres==1.0.3
 fastapi==0.74.1
 google-cloud-bigquery==2.34.1
 oyaml==1.0
-pandas==1.4.1
 psycopg2==2.9.3
 shortuuid==1.0.8
 SQLAlchemy==1.4.31
