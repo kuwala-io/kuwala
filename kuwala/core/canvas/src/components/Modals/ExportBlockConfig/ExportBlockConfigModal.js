@@ -1,7 +1,7 @@
 import Modal from "../../Common/Modal";
 import React, {Fragment, useCallback, useEffect, useState} from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
-import {EXPORT_BLOCK, TRANSFORMATION_BLOCK} from "../../../constants/nodeTypes";
+import {EXPORT_BLOCK} from "../../../constants/nodeTypes";
 import {Formik, useFormikContext} from "formik";
 import { getEntityElementEntityBlockId } from "../../../utils/BlockUtils";
 import {getElementByIds} from "../../../utils/ElementUtils";

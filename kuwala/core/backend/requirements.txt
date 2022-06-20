@@ -13,4 +13,4 @@ uvicorn[standard]==0.17.5
 snowflake-connector-python==2.7.3
 dbt-snowflake==1.0.0
 pandas==1.4.2
-pyarrow==8.0.0
+pyarrow==6.0.1

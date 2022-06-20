@@ -1,7 +1,6 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {useStoreActions, useStoreState} from "easy-peasy";
 import Block from "../../Common/Block";
-import {deleteTransformationBlock} from "../../../api/TransformationBlock";
 import {triggerExportBlock} from "../../../api/ExportBlock";
 
 const ExportBlock = ({data, id}) => {
