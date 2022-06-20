@@ -1,4 +1,4 @@
-from sqlalchemy import JSON, Boolean, Column, ForeignKey, Numeric, String
+from sqlalchemy import JSON, Column, ForeignKey, Numeric, String
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.mutable import MutableList
 

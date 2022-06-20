@@ -8,7 +8,6 @@ from controller.transformation_block_controller import (
     get_input_block,
 )
 from database.crud.common import generate_object_id, get_object_by_id, update_attributes
-from database.models.data_source import DataSource
 from database.models.export_block import ExportBlock
 from database.schemas.export_block import ExportBlockCreate, ExportBlockUpdate
 from fastapi import HTTPException

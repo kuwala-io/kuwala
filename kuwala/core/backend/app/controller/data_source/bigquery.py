@@ -1,5 +1,4 @@
 import functools
-import os
 
 from database.schemas.data_source import ConnectionParameters
 from database.utils.delimiter import get_delimiter_by_id
