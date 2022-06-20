@@ -39,9 +39,7 @@ const ExportBlock = ({data, id}) => {
             link.click();
             link.parentNode.removeChild(link);
 
-            setTimeout(() => {
-                setExportLoading(false);
-            }, 5000)
+            setExportLoading(false);
         }
     }
 

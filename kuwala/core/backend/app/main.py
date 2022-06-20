@@ -20,10 +20,10 @@ from database.models import (
 from database.models import data_block as data_block_models
 from database.models import data_catalog as data_catalog_models
 from database.models import data_source as data_source_models
+from database.models import export_block as export_block_models
 from database.models import export_catalog as export_catalog_models
 from database.models import export_catalog_category as export_catalog_category_models
 from database.models import transformation_block as transformation_block_models
-from database.models import export_block as export_block_models
 from database.models import transformation_catalog as transformation_catalog_models
 from database.schemas import (
     transformation_catalog_category as transformation_catalog_category_schemas,
@@ -40,10 +40,10 @@ from routers import (
     data_block,
     data_catalog,
     data_source,
+    export_block,
     export_catalog,
     transformation_block,
     transformation_catalog,
-    export_block
 )
 import sqlalchemy.exc
 import uvicorn

@@ -16,17 +16,17 @@ export function fromAPIResponseToExportBlockDTO ({exportBlockResponse, exportCat
         positionY: exportBlockResponse.position_y,
         inputBlockIds: exportBlockResponse.input_block_ids,
     });
-    dto.macroParameters = dto.macroParameters.map((el) => {
+    dto.macroParameters = exportCatalogItem.macroParameters.map((el) => {
         return {
             ...el,
-            name: getParameterName(el.id, exportCatalogItem)
+            value: getParameterValue(el.id, dto.macroParameters)
         }
     })
     return dto
 }
 
-function getParameterName (parameterId, exportCatalogItem) {
-    let parameter = exportCatalogItem.macroParameters.find(p => p.id === parameterId);
+function getParameterValue (parameterId, dtoMacroParameters) {
+    let element = dtoMacroParameters.find(p => p.id === parameterId);
 
-    return parameter.name;
+    return element.value;
 }

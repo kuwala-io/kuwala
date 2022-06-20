@@ -11,9 +11,7 @@ def create_export_block(
     data_source_id: str,
     generated_id: str,
 ) -> models.ExportBlock:
-    macro_parameters = list(
-        map(lambda mp: mp.dict(), export_block.macro_parameters)
-    )
+    macro_parameters = list(map(lambda mp: mp.dict(), export_block.macro_parameters))
 
     db_export_block = models.ExportBlock(
         id=generated_id,

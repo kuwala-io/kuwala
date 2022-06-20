@@ -1,9 +1,10 @@
+import csv
 import functools
 
 from database.schemas.data_source import ConnectionParameters
+from database.utils.delimiter import get_delimiter_by_id
 from fastapi import HTTPException
 import snowflake.connector
-import csv
 
 
 def map_connection_parameters(connection_parameters: ConnectionParameters):
@@ -56,8 +57,10 @@ def send_query(
 
     return result
 
+
 def save_query(
     connection_parameters: ConnectionParameters,
+    delimiter_id: str,
     query: str = None,
     destination_file: str = None,
 ) -> list:
@@ -69,15 +72,15 @@ def save_query(
     rows = cursor.fetchall()
 
     column_names = [i[0] for i in cursor.description]
-    fp = open(destination_file, 'w+')
-    myFile = csv.writer(fp, lineterminator='\n')
+    fp = open(destination_file, "w+")
+    delimiter = get_delimiter_by_id(delimiter_id=delimiter_id)
+    myFile = csv.writer(fp, lineterminator="\n", delimiter=delimiter)
     myFile.writerow(column_names)
     myFile.writerows(rows)
     fp.close()
 
     cursor.close()
     connection.close()
-    print('finished downloading')
 
     return True
 
@@ -199,11 +202,12 @@ def get_table_preview(
 
 
 def save_result(
-        connection_parameters: ConnectionParameters,
-        schema_name: str,
-        table_name: str,
-        columns: list[str],
-        result_dir: str,
+    connection_parameters: ConnectionParameters,
+    schema_name: str,
+    table_name: str,
+    columns: list[str],
+    result_dir: str,
+    delimiter_id: str,
 ):
     if not schema_name:
         raise HTTPException(
@@ -220,13 +224,9 @@ def save_result(
             connection_parameters=connection_parameters, query=columns_query
         )
 
-        columns_string = functools.reduce(
-            lambda c1, c2: f"{c1}, {c2}", columns[0][0:]
-        )
+        columns_string = functools.reduce(lambda c1, c2: f"{c1}, {c2}", columns[0][0:])
     else:
-        columns_string = functools.reduce(
-            lambda c1, c2: f"{c1}, {c2}", columns[0:]
-        )
+        columns_string = functools.reduce(lambda c1, c2: f"{c1}, {c2}", columns[0:])
 
     rows_query = f"""
         SELECT {columns_string}
@@ -236,7 +236,8 @@ def save_result(
     save_query(
         connection_parameters=connection_parameters,
         destination_file=result_dir,
-        query=rows_query
+        query=rows_query,
+        delimiter_id=delimiter_id,
     )
 
     return None

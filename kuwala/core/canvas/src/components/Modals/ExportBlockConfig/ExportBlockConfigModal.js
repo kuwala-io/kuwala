@@ -92,7 +92,6 @@ const ExportBlockConfigModal = ({isOpen}) => {
     }
 
     const upsertExportBlock = async ({values}) => {
-        console.log(values);
         setIsExportBlockSaveLoading(true);
         const connectedElements = getElementByIds(elements, selectedElement.data.exportBlock.connectedSourceNodeIds);
         const connectedBlocks = connectedElements.map((el) => getEntityElementEntityBlockId(el));
@@ -150,7 +149,6 @@ const ExportBlockConfigModal = ({isOpen}) => {
                     setExportBlockName(values.exportBlockName);
                 }
             } catch(e){
-                console.log(e)
                 alert('Failed to create export block')
             } finally {
                 setIsExportBlockSaveLoading(false);
@@ -165,7 +163,6 @@ const ExportBlockConfigModal = ({isOpen}) => {
 
     const ConfigBodyAndFooter = React.memo(() => {
         const { setFieldValue, submitForm, values  } = useFormikContext();
-
         return (
             <Fragment>
                 <ExportBlockConfigBody

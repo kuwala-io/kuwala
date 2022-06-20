@@ -174,13 +174,15 @@ def get_table_preview(
 
     return data
 
-def save_result(
+
+def save_as_csv(
     data_source_id: str,
     schema_name: str,
     dataset_name: str,
     table_name: str,
     columns: Optional[list[str]],
     result_dir: str,
+    delimiter_id: str,
     db: Session,
 ):
     data_source, data_catalog_item_id = get_data_source_and_data_catalog_item_id(
@@ -195,7 +197,8 @@ def save_result(
                 schema_name=schema_name,
                 table_name=table_name,
                 columns=columns,
-                result_dir=result_dir
+                result_dir=result_dir,
+                delimiter_id=delimiter_id,
             )
         elif data_catalog_item_id == "bigquery":
             bigquery_controller.save_result(
@@ -203,7 +206,8 @@ def save_result(
                 dataset_name=dataset_name,
                 table_name=table_name,
                 columns=columns,
-                result_dir=result_dir
+                result_dir=result_dir,
+                delimiter_id=delimiter_id,
             )
         elif data_catalog_item_id == "snowflake":
             snowflake_controller.save_result(
@@ -211,7 +215,8 @@ def save_result(
                 schema_name=schema_name,
                 table_name=table_name,
                 columns=columns,
-                result_dir=result_dir
+                result_dir=result_dir,
+                delimiter_id=delimiter_id,
             )
     except psycopg2.errors.UndefinedTable:
         pass

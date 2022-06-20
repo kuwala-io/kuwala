@@ -1,28 +1,23 @@
 import os
-from fastapi import HTTPException
 import time
 
-from database.schemas.export_block import (
-    ExportBlockCreate,
-    ExportBlockUpdate
-)
-from sqlalchemy.orm import Session
-from database.crud.common import generate_object_id, get_object_by_id, update_attributes
+from controller.data_source.data_source import save_as_csv
 from controller.transformation_block_controller import (
     get_base_blocks,
     get_data_source_id,
-    get_input_block
+    get_input_block,
 )
-from database.models.export_block import ExportBlock
+from database.crud.common import generate_object_id, get_object_by_id, update_attributes
 from database.models.data_source import DataSource
-from controller.data_source.data_source import (
-    save_result
-)
+from database.models.export_block import ExportBlock
+from database.schemas.export_block import ExportBlockCreate, ExportBlockUpdate
+from fastapi import HTTPException
+from sqlalchemy.orm import Session
 
 
 def create_export_block(
-        export_block: ExportBlockCreate,
-        db: Session,
+    export_block: ExportBlockCreate,
+    db: Session,
 ):
     export_block_id = generate_object_id()
     base_data_blocks, base_transformation_blocks = get_base_blocks(
@@ -34,9 +29,9 @@ def create_export_block(
 
 
 def update_export_block(
-        export_block_id: str,
-        export_block: ExportBlockUpdate,
-        db: Session,
+    export_block_id: str,
+    export_block: ExportBlockUpdate,
+    db: Session,
 ):
     db_export_block = get_object_by_id(
         db=db, model=ExportBlock, object_id=export_block_id
@@ -56,17 +51,15 @@ def update_export_block(
 
 
 def download_as_csv(
-        export_block_id: str,
-        db: Session,
+    export_block_id: str,
+    db: Session,
 ):
-    export_block = get_object_by_id(
-        db=db, model=ExportBlock, object_id=export_block_id
-    )
+    export_block = get_object_by_id(db=db, model=ExportBlock, object_id=export_block_id)
     data_source_id = export_block.data_source_id
 
     args = dict()
     for mp in export_block.macro_parameters:
-        args[mp['id']] = mp['value']
+        args[mp["id"]] = mp["value"]
 
     if len(export_block.input_block_ids) >= 2:
         raise HTTPException(
@@ -74,18 +67,14 @@ def download_as_csv(
             detail="Export block based on two different data blocks is currently not supported",
         )
 
-    data_block = get_input_block(
-        object_id=export_block.input_block_ids[0],
-        db=db
-    )
+    data_block = get_input_block(object_id=export_block.input_block_ids[0], db=db)
 
     # Save result into temporary dir
     result_dir = get_result_dir(
-        data_source_id=data_source_id,
-        file_name=args["file_name"]
+        data_source_id=data_source_id, file_name=args["file_name"]
     )
     if type(data_block).__name__ == "TransformationBlock":
-        save_result(
+        save_as_csv(
             data_source_id=data_block.data_source_id,
             schema_name="dbt_kuwala",
             dataset_name="dbt_kuwala",
@@ -93,9 +82,10 @@ def download_as_csv(
             columns=data_block.columns,
             result_dir=result_dir,
             db=db,
+            delimiter_id=args["delimiter"],
         )
     elif type(data_block).__name__ == "DataBlock":
-        save_result(
+        save_as_csv(
             data_source_id=data_block.data_source_id,
             schema_name=data_block.schema_name,
             dataset_name=data_block.dataset_name,
@@ -103,10 +93,11 @@ def download_as_csv(
             result_dir=result_dir,
             columns=data_block.columns,
             db=db,
+            delimiter_id=args["delimiter"],
         )
 
     # Trigger download for temporary file
-    return result_dir, args["file_name"], 'text/csv'
+    return result_dir, args["file_name"], "text/csv"
 
 
 def get_result_dir(data_source_id: str, file_name: str) -> str:
