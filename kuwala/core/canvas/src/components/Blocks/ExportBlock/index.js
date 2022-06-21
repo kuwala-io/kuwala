@@ -19,26 +19,30 @@ const ExportBlock = ({data, id}) => {
     // TODO: Create export action by export method
     const triggerExport = async () => {
         if (selectedElement) {
-            setExportLoading(true);
-            const res = await triggerExportBlock({
-                exportBlockId: selectedElement.data.exportBlock.exportBlockEntityId
-            });
+            try {
+                setExportLoading(true);
+                const res = await triggerExportBlock({
+                    exportBlockId: selectedElement.data.exportBlock.exportBlockEntityId
+                });
 
-            let file_name = selectedElement.data.exportBlock.macroParameters.find(el => el.id === 'file_name').value;
-            file_name = file_name.replace(/\.[^/.]+$/, "") // Remove extension
+                let file_name = selectedElement.data.exportBlock.macroParameters.find(el => el.id === 'file_name').value;
+                file_name = file_name.replace(/\.[^/.]+$/, "") // Remove extension
 
-            const url = window.URL.createObjectURL(new Blob([res.data]));
-            const link = document.createElement("a");
-            link.href = url;
-            link.setAttribute(
-                "download",
-                `${file_name}.csv`
-            );
-            document.body.appendChild(link);
-            link.click();
-            link.parentNode.removeChild(link);
-
-            setExportLoading(false);
+                const url = window.URL.createObjectURL(new Blob([res.data]));
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute(
+                    "download",
+                    `${file_name}.csv`
+                );
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode.removeChild(link);
+            } catch (e) {
+                console.error(e);
+            } finally {
+                setExportLoading(false);
+            }
         }
     }
 
@@ -56,6 +60,7 @@ const ExportBlock = ({data, id}) => {
             secondaryButtonDisabled={!data.exportBlock.isConfigured || exportLoading}
             secondaryButtonOnClick={triggerExport}
             secondaryButtonText={"Export"}
+            secondaryButtonLoading={exportLoading}
             title={data.exportBlock.name}
             data={data}
             icon={data.exportBlock.exportCatalogItem.icon}

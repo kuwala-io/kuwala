@@ -1,4 +1,5 @@
-import controller.export_block_controller as export_block_controller
+import controller.export_block.export_block as export_block_controller
+import controller.export_block.csv as export_block_csv
 import database.crud.export_block as crud
 from database.database import get_db
 from database.schemas.export_block import ExportBlockCreate, ExportBlockUpdate
@@ -48,7 +49,7 @@ def trigger_download(
     export_block_id: str,
     db: Session = Depends(get_db),
 ):
-    file_path, file_name, media_type = export_block_controller.download_as_csv(
+    file_path, file_name, media_type = export_block_csv.download_as_csv(
         export_block_id=export_block_id, db=db
     )
 

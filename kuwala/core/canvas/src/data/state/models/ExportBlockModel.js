@@ -1,8 +1,7 @@
 import {action, thunk} from "easy-peasy";
-import {EXPORT_BLOCK, TRANSFORMATION_BLOCK} from "../../../constants/nodeTypes";
+import {EXPORT_BLOCK} from "../../../constants/nodeTypes";
 import {getNodeTypeByDataCatalogId} from "../utils";
 import ExportBlockDTO from "../../dto/ExportBlockDTO";
-import TransformationBlockDTO from "../../dto/TransformationBlockDTO";
 
 const ExportBlockModel = {
     exportBlocks: [],
@@ -47,7 +46,7 @@ const ExportBlockModel = {
         exportBlocks.forEach((block) => {
             let dupeFlag = false;
 
-            // Check if transformation block already converted into node
+            // Check if export block already converted into node
             elements.forEach((curEl) => {
                 if (curEl.type !== EXPORT_BLOCK) return;
                 if ((curEl.data.exportBlock.exportBlockId === block.exportBlockId)) dupeFlag = true;

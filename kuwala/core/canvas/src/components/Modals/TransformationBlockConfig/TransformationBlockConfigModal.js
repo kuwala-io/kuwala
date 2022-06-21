@@ -8,10 +8,10 @@ import {createTransformationBlock} from "../../../api/TransformationBlock";
 import {getElementByIds} from "../../../utils/ElementUtils";
 import TransformationBlockDTO from "../../../data/dto/TransformationBlockDTO";
 import "react-datepicker/dist/react-datepicker.css";
-import moment from "moment";
 import TransformationBlockConfigBody from './TransformationBlockConfigBody'
 import TransformationBlockConfigHeader from './TransformationBlockConfigHeader'
 import TransformationBlockConfigFooter from './TransformationBlockConfigFooter'
+import {mapParametersForUpsert} from "../../../utils/MacroParameterUtils";
 
 const TransformationBlockConfigModal = ({isOpen}) => {
     const { addNode, setElements } = useStoreActions(({ canvas }) => canvas);
@@ -95,22 +95,11 @@ const TransformationBlockConfigModal = ({isOpen}) => {
         setIsTransformationBlockSaveLoading(true);
         const connectedElements = getElementByIds(elements, selectedElement.data.transformationBlock.connectedSourceNodeIds);
         const connectedBlocks = connectedElements.map((el) => getEntityElementEntityBlockId(el));
-        const mapParameter = (param) => {
-            let value = param.value;
-
-            if (param.type === 'date') {
-                value = moment(param.value).format('YYYY-MM-DD')
-            } else if (param.id === 'aggregated_columns') {
-                value = param.value.map(({ column, aggregation }) => `${column}KUWALA_AGG${aggregation}`);
-            }
-
-            return { ...param, value };
-        }
 
         if (!selectedElement.data.transformationBlock.transformationBlockEntityId) {
             const parsedValues = {
                 ...values,
-                parameters: values.parameters.map(mapParameter)
+                parameters: values.parameters.map(mapParametersForUpsert)
             }
             const data = {
                 transformation_catalog_item_id: selectedElement.data.transformationCatalogItem.id,

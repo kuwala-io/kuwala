@@ -58,7 +58,7 @@ def send_query(
     return result
 
 
-def save_query(
+def write_query_result_to_file(
     connection_parameters: ConnectionParameters,
     query: str = None,
     destination_file: str = None,
@@ -270,7 +270,8 @@ def save_result(
         SELECT {columns_string}
         FROM {schema_name}.{table_name}
     """
-    save_query(
+
+    write_query_result_to_file(
         connection_parameters=connection_parameters,
         query=rows_query,
         destination_file=result_dir,

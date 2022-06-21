@@ -1,13 +1,12 @@
 import React, {useState} from "react";
 import KuwalaLogo from "../icons/kuwala_logo.png";
 import {Link, useLocation} from "react-router-dom";
-import {useStoreActions, useStoreState} from "easy-peasy";
+import {useStoreActions} from "easy-peasy";
 import NotificationPanel from "./NotificationPanel";
 
 const Header = () => {
     const { toggleNotification } = useStoreActions(actions => actions.common)
     const [currentPage] = useState(useLocation().pathname)
-    const { elements } = useStoreState(({ canvas }) => canvas);
 
     const notifications = 0;
 
@@ -103,9 +102,6 @@ const Header = () => {
                     <div className="relative">
                         <button
                             className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 focus:outline-none focus:ring"
-                            onClick={() => {
-                                console.log(elements)
-                            }}
                         >
                             <svg
                                 className="w-6 h-6 text-gray-500"

@@ -8,7 +8,7 @@ import {
     getElementById,
     getElementsByEntityIds,
 } from "../../../utils/ElementUtils";
-import {getBlockByEntityId} from "../../../utils/BlockUtils";
+import {getBlockByEntityId, updateBlockAggregator} from "../../../utils/BlockUtils";
 
 const CanvasModel = {
     elements: [],
@@ -85,35 +85,42 @@ const CanvasModel = {
         const { source, target } = params;
         const targetElement = getElementById(elements, target);
 
-        if (targetElement && targetElement.type === TRANSFORMATION_BLOCK ) {
-            if (
-                targetElement.data.transformationBlock.connectedSourceNodeIds.length < targetElement.data.transformationCatalogItem.maxNumberOfInputBlocks &&
-                !connectionExists
+        if (
+            targetElement &&
+            targetElement.type === TRANSFORMATION_BLOCK &&
+            targetElement.data.transformationBlock.connectedSourceNodeIds.length < targetElement.data.transformationCatalogItem.maxNumberOfInputBlocks &&
+            !connectionExists
+        ) {
+            addConnectedEdgeToBlock({
+                source,
+                target,
+                updateDataBlock,
+                updateTransformationBlock,
+                updateExportBlock
+            });
+            addElement(edgeToAdd);
+        } else if (
+            targetElement &&
+            targetElement.type === EXPORT_BLOCK &&
+            targetElement.data.exportBlock.connectedSourceNodeIds.length < targetElement.data.exportCatalogItem.maxNumberOfInputBlocks &&
+            !connectionExists
+        ) {
+            addConnectedEdgeToBlock({
+                source,
+                target,
+                updateDataBlock,
+                updateTransformationBlock,
+                updateExportBlock
+            });
+            addElement(edgeToAdd);
+        } else {
+            if (connectionExists) {
+                alert('Connection already established!');
+            } else if (
+                targetElement.data.exportBlock.connectedSourceNodeIds.length >= targetElement.data.exportCatalogItem.maxNumberOfInputBlocks ||
+                targetElement.data.transformationBlock.connectedSourceNodeIds.length >= targetElement.data.transformationCatalogItem.maxNumberOfInputBlocks
             ) {
-                addConnectedEdgeToBlock({
-                    source,
-                    target,
-                    updateDataBlock,
-                    updateTransformationBlock,
-                    updateExportBlock
-                });
-                addElement(edgeToAdd);
-            } else {
                 alert('Maximum number of connections reached!');
-            }
-        } else if ( targetElement && targetElement.type === EXPORT_BLOCK) {
-            if (
-                targetElement.data.exportBlock.connectedSourceNodeIds.length < targetElement.data.exportCatalogItem.maxNumberOfInputBlocks &&
-                !connectionExists
-            ) {
-                addConnectedEdgeToBlock({
-                    source,
-                    target,
-                    updateDataBlock,
-                    updateTransformationBlock,
-                    updateExportBlock
-                });
-                addElement(edgeToAdd);
             }
         }
     }),
@@ -129,34 +136,39 @@ const CanvasModel = {
 
         if (sourceElement.type === DATA_BLOCK) {
             sourceDTO = sourceElement.data.dataBlock;
-
-            sourceDTO.connectedTargetNodeIds.push(target);
-            updateDataBlock({ addNode, elements, setElements, updatedBlock: sourceDTO });
         } else if (sourceElement.type === TRANSFORMATION_BLOCK) {
             sourceDTO = sourceElement.data.transformationBlock;
-
-            sourceDTO.connectedTargetNodeIds.push(target);
-            updateTransformationBlock({ addNode, elements, setElements, updatedBlock: sourceDTO });
         } else if (sourceElement.type === EXPORT_BLOCK) {
             sourceDTO = sourceElement.data.exportBlock;
-
-            sourceDTO.connectedTargetNodeIds.push(target);
-            updateExportBlock({ addNode, elements, setElements, updatedBlock: sourceDTO });
         }
+
+        sourceDTO.connectedTargetNodeIds.push(target);
+        updateBlockAggregator({
+            blockType: sourceElement.type,
+            updatedBlock: sourceDTO,
+            updateDataBlock,
+            updateTransformationBlock,
+            updateExportBlock,
+            addNode, elements, setElements,
+        });
 
         if(targetElement.type === DATA_BLOCK) {
             targetDTO = targetElement.data.dataBlock;
-            targetDTO.connectedSourceNodeIds.push(source);
-            updateDataBlock({ addNode, elements, setElements, updatedBlock: targetDTO });
         } else if (targetElement.type === TRANSFORMATION_BLOCK) {
             targetDTO = targetElement.data.transformationBlock;
-            targetDTO.connectedSourceNodeIds.push(source);
-            updateTransformationBlock({ addNode, elements, setElements, updatedBlock: targetDTO });
         } else if (targetElement.type === EXPORT_BLOCK) {
             targetDTO = targetElement.data.exportBlock;
-            targetDTO.connectedSourceNodeIds.push(source);
-            updateExportBlock({ addNode, elements, setElements, updatedBlock: targetDTO });
         }
+
+        targetDTO.connectedSourceNodeIds.push(source);
+        updateBlockAggregator({
+            blockType: sourceElement.type,
+            updatedBlock: targetDTO,
+            updateDataBlock,
+            updateTransformationBlock,
+            updateExportBlock,
+            addNode, elements, setElements,
+        });
     }),
     removeConnectedEdgeFromBlock: thunk((
         { addNode, setElements },

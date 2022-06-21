@@ -18,10 +18,12 @@ const Block = ({
         primaryButtonDisabled,
         primaryButtonOnClick,
         primaryButtonText="Configure",
+        primaryButtonLoading=false,
         rightHandleActive,
         secondaryButtonDisabled,
         secondaryButtonOnClick,
         secondaryButtonText="Preview",
+        secondaryButtonLoading=false,
         selected,
         title,
 }) => {
@@ -146,6 +148,7 @@ const Block = ({
                             text={primaryButtonText}
                             onClick={primaryButtonOnClick}
                             disabled={primaryButtonDisabled}
+                            loading={primaryButtonLoading}
                         />
                         <Button
                             color={blockColor}
@@ -154,6 +157,7 @@ const Block = ({
                             text={secondaryButtonText}
                             onClick={secondaryButtonOnClick}
                             disabled={secondaryButtonDisabled}
+                            loading={secondaryButtonLoading}
                         />
                     </div>
                 </div>

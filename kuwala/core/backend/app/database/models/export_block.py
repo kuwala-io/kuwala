@@ -13,7 +13,7 @@ class ExportBlock(Base):
         String, ForeignKey("export_catalog_items.id"), nullable=False
     )
     data_source_id = Column(String, ForeignKey("data_sources.id"), nullable=False)
-    input_block_ids = Column(ARRAY(String))
+    input_block_ids = Column(ARRAY(String), nullable=False)
     macro_parameters = Column(MutableList.as_mutable(JSON), nullable=False)
     name = Column(String, nullable=False)
     position_x = Column(Numeric, nullable=False)

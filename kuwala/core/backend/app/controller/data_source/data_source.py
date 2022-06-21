@@ -223,8 +223,6 @@ def save_as_csv(
     except Exception as e:
         logging.error(e)
 
-    return None
-
 
 def update_dbt_connection_parameters(
     data_source: models.DataSource, connection_parameters: ConnectionParameters

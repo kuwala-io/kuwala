@@ -47,3 +47,26 @@ export function getBlockByEntityId(elements, entityId) {
 
     return null;
 }
+
+export function getConnectedBlockWrapper(connectedElements) {
+    return connectedElements.map((el) => getEntityElementEntityBlockId(el));
+}
+
+export function updateBlockAggregator(
+    {
+        blockType,
+        updatedBlock,
+        updateDataBlock,
+        updateExportBlock,
+        updateTransformationBlock,
+        addNode, elements, setElements,
+    }
+) {
+    if (blockType === DATA_BLOCK) {
+        updateDataBlock({ addNode, elements, setElements, updatedBlock: updatedBlock });
+    } else if (blockType === TRANSFORMATION_BLOCK) {
+        updateTransformationBlock({ addNode, elements, setElements, updatedBlock: updatedBlock });
+    } else if (blockType === EXPORT_BLOCK) {
+        updateExportBlock({ addNode, elements, setElements, updatedBlock: updatedBlock });
+    }
+}

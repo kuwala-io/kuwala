@@ -3,15 +3,15 @@ import React, {Fragment, useCallback, useEffect, useState} from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import {EXPORT_BLOCK} from "../../../constants/nodeTypes";
 import {Formik, useFormikContext} from "formik";
-import { getEntityElementEntityBlockId } from "../../../utils/BlockUtils";
+import {getConnectedBlockWrapper} from "../../../utils/BlockUtils";
 import {getElementByIds} from "../../../utils/ElementUtils";
 import ExportBlockDTO from "../../../data/dto/ExportBlockDTO";
 import "react-datepicker/dist/react-datepicker.css";
-import moment from "moment";
 import ExportBlockConfigBody from './ExportBlockConfigBody'
 import ExportBlockConfigHeader from './ExportBlockConfigHeader'
 import ExportBlockConfigFooter from './ExportBlockConfigFooter'
-import {createExportBlock} from "../../../api/ExportBlock";
+import {createExportBlock, updateExportBlockEntity} from "../../../api/ExportBlock";
+import {mapParametersForUpsert} from "../../../utils/MacroParameterUtils";
 
 const ExportBlockConfigModal = ({isOpen}) => {
     const { addNode, setElements } = useStoreActions(({ canvas }) => canvas);
@@ -78,9 +78,9 @@ const ExportBlockConfigModal = ({isOpen}) => {
                     setSubmitData(null);
                 }}
                 children={() => (
-                    <>
+                    <Fragment>
                         {children}
-                    </>
+                    </Fragment>
                 )}
             />
         )
@@ -94,23 +94,12 @@ const ExportBlockConfigModal = ({isOpen}) => {
     const upsertExportBlock = async ({values}) => {
         setIsExportBlockSaveLoading(true);
         const connectedElements = getElementByIds(elements, selectedElement.data.exportBlock.connectedSourceNodeIds);
-        const connectedBlocks = connectedElements.map((el) => getEntityElementEntityBlockId(el));
-        const mapParameter = (param) => {
-            let value = param.value;
-
-            if (param.type === 'date') {
-                value = moment(param.value).format('YYYY-MM-DD')
-            } else if (param.id === 'aggregated_columns') {
-                value = param.value.map(({ column, aggregation }) => `${column}KUWALA_AGG${aggregation}`);
-            }
-
-            return { ...param, value };
-        }
+        const connectedBlocks = getConnectedBlockWrapper(connectedElements);
 
         if (!selectedElement.data.exportBlock.exportBlockEntityId) {
             const parsedValues = {
                 ...values,
-                parameters: values.parameters.map(mapParameter)
+                parameters: values.parameters.map(mapParametersForUpsert)
             }
             const data = {
                 export_catalog_item_id: selectedElement.data.exportCatalogItem.id,
@@ -149,13 +138,49 @@ const ExportBlockConfigModal = ({isOpen}) => {
                     setExportBlockName(values.exportBlockName);
                 }
             } catch(e){
-                alert('Failed to create export block')
+                console.error(e);
             } finally {
                 setIsExportBlockSaveLoading(false);
             }
         } else {
-            // TODO: Update data block (not implemented completely in backend)
-            alert('Updating transformation blocks is currently not supported');
+            const data = {
+                name: values.exportBlockName,
+                position_x: selectedElement.position.x,
+                position_y: selectedElement.position.y,
+            }
+
+            const currentExportBlock = selectedElement.data.exportBlock;
+
+            try {
+                const res = await updateExportBlockEntity({
+                    exportBlockEntityId: currentExportBlock.exportBlockEntityId,
+                    data: data
+                });
+                if(res.status === 200) {
+                    const dto = new ExportBlockDTO({
+                        exportCatalogItem: selectedElement.data.exportCatalogItem,
+                        exportCatalogItemId: selectedElement.data.exportCatalogItemId,
+                        exportBlockEntityId: currentExportBlock.exportBlockEntityId,
+                        exportBlockId: selectedElement.data.exportBlock.exportBlockId,
+                        name: values.exportBlockName,
+                        connectedSourceNodeIds: currentExportBlock.connectedSourceNodeIds,
+                        connectedTargetNodeIds: currentExportBlock.connectedTargetNodeIds,
+                        isConfigured: true,
+                        macroParameters: currentExportBlock.macroParameters,
+                        columns: currentExportBlock.columns,
+                        positionX: res.data.position_x,
+                        positionY: res.data.position_y,
+                        inputBlockIds: currentExportBlock.inputBlockIds,
+                    })
+                    updateExportBlock({ addNode, elements, setElements, updatedBlock: dto });
+                    toggleExportConfigModal();
+                    setExportBlockName(values.exportBlockName);
+                }
+            } catch(e){
+                console.error(e);
+            } finally {
+                setIsExportBlockSaveLoading(false);
+            }
 
             setIsExportBlockSaveLoading(false);
         }

@@ -1,9 +1,10 @@
 import Button from "../../Common/Button";
 import React from "react";
+import Styles from "./ExportBlockConfigModalStyle"
 
 const ExportBlockConfigFooter = ({ isExportBlockSaveLoading, submitForm, toggleConfigModalWrapper }) => {
     return (
-        <div className={'flex flex-row justify-between px-6 pb-4'}>
+        <div className={Styles.Footer.FooterContainer}>
             <Button
                 onClick={toggleConfigModalWrapper}
                 text={'Back'}

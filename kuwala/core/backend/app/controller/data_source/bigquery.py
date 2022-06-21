@@ -155,8 +155,6 @@ def save_result(
     )
     dataframe.to_csv(result_dir, sep=get_delimiter_by_id(delimiter_id=delimiter_id))
 
-    return None
-
 
 def update_dbt_connection_parameters(
     profile_yaml: dict, connection_parameters: ConnectionParameters
