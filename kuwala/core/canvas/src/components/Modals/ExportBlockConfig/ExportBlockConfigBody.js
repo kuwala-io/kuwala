@@ -14,7 +14,7 @@ const ExportBlockConfigBody = ({
    }) => {
     const renderConfigBodyHeader = () => {
         return (
-            <div className={'flex flex-col'}>
+            <div className={Styles.Body.HeaderWrapper}>
                 <div className={Styles.Body.HeaderContainer}>
                     <Icon
                         size={'sm'}
@@ -27,7 +27,7 @@ const ExportBlockConfigBody = ({
                     </span>
                 </div>
 
-                <span className={'mt-2 text-md'}>
+                <span className={Styles.Body.HeaderDescription}>
                     {selectedElement.data.exportCatalogItem.description}
                 </span>
             </div>
@@ -38,11 +38,11 @@ const ExportBlockConfigBody = ({
         return (
             <div className={Styles.Body.ContentContainer}>
                 <div className={Styles.Body.Content}>
-                    <span className={'font-semibold mb-6'}>
+                    <span className={Styles.Body.ContentParameterStyling}>
                         Parameters
                     </span>
 
-                    <div className={'flex flex-col'}>
+                    <div className={Styles.Body.ContentConfigFormWrapper}>
                         <ConfigurationForm
                             elements={elements}
                             selectedElement={selectedElement}

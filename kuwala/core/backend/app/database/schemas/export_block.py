@@ -36,5 +36,6 @@ class ExportBlockCreate(BaseModel):
 
 class ExportBlockUpdate(BaseModel):
     name: Optional[str] = None
+    macro_parameters: Optional[List[MacroParameter]] = None
     position_x: float = None
     position_y: float = None

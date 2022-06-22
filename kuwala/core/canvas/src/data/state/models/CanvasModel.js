@@ -85,24 +85,20 @@ const CanvasModel = {
         const { source, target } = params;
         const targetElement = getElementById(elements, target);
 
+        const targetType = targetElement.type;
+        let targetBlock, catalogItem;
+        if (targetType === TRANSFORMATION_BLOCK) {
+            targetBlock = targetElement.data.transformationBlock;
+            catalogItem = targetElement.data.transformationCatalogItem;
+        } else {
+            targetBlock = targetElement.data.exportBlock;
+            catalogItem = targetElement.data.exportCatalogItem;
+        }
+
         if (
             targetElement &&
-            targetElement.type === TRANSFORMATION_BLOCK &&
-            targetElement.data.transformationBlock.connectedSourceNodeIds.length < targetElement.data.transformationCatalogItem.maxNumberOfInputBlocks &&
-            !connectionExists
-        ) {
-            addConnectedEdgeToBlock({
-                source,
-                target,
-                updateDataBlock,
-                updateTransformationBlock,
-                updateExportBlock
-            });
-            addElement(edgeToAdd);
-        } else if (
-            targetElement &&
-            targetElement.type === EXPORT_BLOCK &&
-            targetElement.data.exportBlock.connectedSourceNodeIds.length < targetElement.data.exportCatalogItem.maxNumberOfInputBlocks &&
+            [EXPORT_BLOCK, TRANSFORMATION_BLOCK].includes(targetType) &&
+            targetBlock.connectedSourceNodeIds.length < catalogItem.maxNumberOfInputBlocks &&
             !connectionExists
         ) {
             addConnectedEdgeToBlock({
@@ -117,8 +113,7 @@ const CanvasModel = {
             if (connectionExists) {
                 alert('Connection already established!');
             } else if (
-                targetElement.data.exportBlock.connectedSourceNodeIds.length >= targetElement.data.exportCatalogItem.maxNumberOfInputBlocks ||
-                targetElement.data.transformationBlock.connectedSourceNodeIds.length >= targetElement.data.transformationCatalogItem.maxNumberOfInputBlocks
+                targetBlock.connectedSourceNodeIds.length >= catalogItem.maxNumberOfInputBlocks
             ) {
                 alert('Maximum number of connections reached!');
             }

@@ -95,12 +95,13 @@ const ExportBlockConfigModal = ({isOpen}) => {
         setIsExportBlockSaveLoading(true);
         const connectedElements = getElementByIds(elements, selectedElement.data.exportBlock.connectedSourceNodeIds);
         const connectedBlocks = getConnectedBlockWrapper(connectedElements);
+        const parsedValues = {
+            ...values,
+            parameters: values.parameters.map(mapParametersForUpsert)
+        }
 
         if (!selectedElement.data.exportBlock.exportBlockEntityId) {
-            const parsedValues = {
-                ...values,
-                parameters: values.parameters.map(mapParametersForUpsert)
-            }
+
             const data = {
                 export_catalog_item_id: selectedElement.data.exportCatalogItem.id,
                 input_block_ids: connectedBlocks,
@@ -147,6 +148,12 @@ const ExportBlockConfigModal = ({isOpen}) => {
                 name: values.exportBlockName,
                 position_x: selectedElement.position.x,
                 position_y: selectedElement.position.y,
+                macro_parameters: parsedValues.parameters.map((el) => {
+                    return {
+                        id: el.id,
+                        value: el.value
+                    }
+                }),
             }
 
             const currentExportBlock = selectedElement.data.exportBlock;
@@ -166,7 +173,7 @@ const ExportBlockConfigModal = ({isOpen}) => {
                         connectedSourceNodeIds: currentExportBlock.connectedSourceNodeIds,
                         connectedTargetNodeIds: currentExportBlock.connectedTargetNodeIds,
                         isConfigured: true,
-                        macroParameters: currentExportBlock.macroParameters,
+                        macroParameters: values.parameters,
                         columns: currentExportBlock.columns,
                         positionX: res.data.position_x,
                         positionY: res.data.position_y,

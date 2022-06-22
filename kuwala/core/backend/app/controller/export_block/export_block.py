@@ -1,3 +1,5 @@
+import json
+
 from controller.transformation_block_controller import (
     get_base_blocks,
     get_data_source_id,
@@ -29,6 +31,18 @@ def update_export_block(
     db_export_block = get_object_by_id(
         db=db, model=ExportBlock, object_id=export_block_id
     )
+
+    json_str = json.dumps(export_block.macro_parameters, default=vars)
+    print(json.loads(json_str))
+
+    if export_block.macro_parameters:
+        db_export_block = update_attributes(
+            db=db,
+            db_object=db_export_block,
+            attributes=[
+                dict(name="macro_parameters", value=json.loads(json_str)),
+            ],
+        )
 
     if export_block.position_x and export_block.position_y:
         db_export_block = update_attributes(
