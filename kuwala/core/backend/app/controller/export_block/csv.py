@@ -60,5 +60,5 @@ def download_as_csv(
 def get_str_from_tuple(tup):
     try:
         return str("".join(tup))
-    except:
+    except TypeError as e:
         return None
