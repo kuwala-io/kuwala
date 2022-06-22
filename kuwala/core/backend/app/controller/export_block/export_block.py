@@ -1,5 +1,3 @@
-
-
 from controller.transformation_block_controller import (
     get_base_blocks,
     get_data_source_id,

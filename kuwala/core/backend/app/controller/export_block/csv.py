@@ -1,18 +1,15 @@
-from controller.transformation_block_controller import (
-    get_input_block,
-)
-
-from database.crud.common import get_object_by_id
 from controller.data_source.data_source import save_as_csv
+from controller.export_block.common import get_result_dir
+from controller.transformation_block_controller import get_input_block
+from database.crud.common import get_object_by_id
+from database.models.export_block import ExportBlock
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from database.models.export_block import ExportBlock
-from controller.export_block.common import get_result_dir
 
 
 def download_as_csv(
-        export_block_id: str,
-        db: Session,
+    export_block_id: str,
+    db: Session,
 ):
     export_block = get_object_by_id(db=db, model=ExportBlock, object_id=export_block_id)
     data_source_id = export_block.data_source_id
@@ -62,6 +59,6 @@ def download_as_csv(
 
 def get_str_from_tuple(tup):
     try:
-        return str(''.join(tup))
+        return str("".join(tup))
     except:
         return None
