@@ -1,6 +1,7 @@
 import functools
 
 from database.schemas.data_source import ConnectionParameters
+from database.utils.delimiter import get_delimiter_by_id
 from fastapi import HTTPException
 from google.cloud import bigquery
 from google.oauth2 import service_account
@@ -116,6 +117,43 @@ def get_table_preview(
         rows.append(list(row))
 
     return dict(columns=columns[0:limit_columns], rows=rows)
+
+
+def save_result(
+    connection_parameters: ConnectionParameters,
+    dataset_name: str,
+    table_name: str,
+    columns: list[str],
+    result_dir: str,
+    delimiter_id: str,
+):
+    if not dataset_name:
+        raise HTTPException(
+            status_code=400, detail="Missing query parameter: 'dataset_name'"
+        )
+
+    credentials = get_credentials(connection_parameters=connection_parameters)
+    client = bigquery.Client(credentials=credentials)
+    table_ref = f"{credentials.project_id}.{dataset_name}.{table_name}"
+
+    if not columns:
+        table = client.get_table(table=table_ref)
+        columns = list(map(lambda s: s.name, table.schema))
+
+    columns_string = functools.reduce(lambda c1, c2: f"{c1}, {c2}", columns[0:])
+    rows_query = f"""
+        SELECT {columns_string}
+        FROM {table_ref}
+    """
+
+    dataframe = (
+        client.query(rows_query)
+        .result()
+        .to_dataframe(
+            create_bqstorage_client=True,
+        )
+    )
+    dataframe.to_csv(result_dir, sep=get_delimiter_by_id(delimiter_id=delimiter_id))
 
 
 def update_dbt_connection_parameters(

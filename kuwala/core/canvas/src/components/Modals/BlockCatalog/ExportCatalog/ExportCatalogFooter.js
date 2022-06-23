@@ -2,7 +2,7 @@ import Classes from "../CommonBlockCatalogModalStyle";
 import Button from "../../../Common/Button";
 import React from "react";
 
-const ExportCatalogFooter = ({toggleBlockCatalogModal, selectedCatalogOption}) => {
+const ExportCatalogFooter = ({toggleBlockCatalogModal, addToCanvas, selectedCatalogOption}) => {
     return (
         <div className={Classes.ModalFooterContainer}>
             <Button
@@ -10,9 +10,7 @@ const ExportCatalogFooter = ({toggleBlockCatalogModal, selectedCatalogOption}) =
                 text={'Back'}
             />
             <Button
-                onClick={() => {
-                    alert('Add Export block to canvas')
-                }}
+                onClick={addToCanvas}
                 text={'Add to canvas'}
                 disabled={selectedCatalogOption === null}
             />
