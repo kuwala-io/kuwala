@@ -1,6 +1,6 @@
 import ReactFlow, {Controls, ReactFlowProvider} from "react-flow-renderer";
 import ConnectionLine from "../Common/ConnectionLine";
-import { DataBlock, TransformationBlock } from "../Blocks";
+import { DataBlock, TransformationBlock, ExportBlock } from "../Blocks";
 import ConnectionEdge from "../Common/ConnectionEdge";
 import DataView from "../DataView";
 import React from "react";
@@ -40,6 +40,7 @@ const Canvas = ({
                     nodeTypes={{
                         TRANSFORMATION_BLOCK: TransformationBlock,
                         DATA_BLOCK: DataBlock,
+                        EXPORT_BLOCK: ExportBlock
                     }}
                     edgeTypes={{
                         CONNECTION_EDGE: ConnectionEdge
