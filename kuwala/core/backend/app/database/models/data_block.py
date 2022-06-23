@@ -1,4 +1,4 @@
-from relationships import data_to_transformation_block_association_table
+from database.models.relationships import data_to_transformation_block_association_table
 from sqlalchemy import Column, ForeignKey, Numeric, String
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import relationship

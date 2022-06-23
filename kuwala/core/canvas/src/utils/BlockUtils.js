@@ -1,5 +1,5 @@
 import {getElementById} from "./ElementUtils";
-import {DATA_BLOCK, TRANSFORMATION_BLOCK} from "../constants/nodeTypes";
+import {DATA_BLOCK, EXPORT_BLOCK, TRANSFORMATION_BLOCK} from "../constants/nodeTypes";
 
 export function getDataBlockByElementId ({elements, elementId}) {
     const element = getElementById(elements, elementId);
@@ -37,16 +37,36 @@ export function getEntityElementEntityBlockId (element) {
 
 export function getBlockByEntityId(elements, entityId) {
     const dataBlock = elements.find((el) => el.type === DATA_BLOCK && el.data.dataBlock.dataBlockEntityId === entityId);
+    if (dataBlock) return dataBlock;
 
-    if (!dataBlock) {
-        const transformationBlock = elements.find((el) => el.type === TRANSFORMATION_BLOCK && el.data.transformationBlock.transformationBlockEntityId === entityId);
+    const transformationBlock = elements.find((el) => el.type === TRANSFORMATION_BLOCK && el.data.transformationBlock.transformationBlockEntityId === entityId);
+    if (transformationBlock) return transformationBlock;
 
-        if (transformationBlock) {
-            return transformationBlock;
-        }
+    const exportBLock = elements.find((el) => el.type === EXPORT_BLOCK && el.data.exportBlock.exportBlockEntityId === entityId);
+    if (exportBLock) return exportBLock;
 
-        return null;
+    return null;
+}
+
+export function getConnectedBlockWrapper(connectedElements) {
+    return connectedElements.map((el) => getEntityElementEntityBlockId(el));
+}
+
+export function updateBlockAggregator(
+    {
+        blockType,
+        updatedBlock,
+        updateDataBlock,
+        updateExportBlock,
+        updateTransformationBlock,
+        addNode, elements, setElements,
     }
-
-    return dataBlock;
+) {
+    if (blockType === DATA_BLOCK) {
+        updateDataBlock({ addNode, elements, setElements, updatedBlock: updatedBlock });
+    } else if (blockType === TRANSFORMATION_BLOCK) {
+        updateTransformationBlock({ addNode, elements, setElements, updatedBlock: updatedBlock });
+    } else if (blockType === EXPORT_BLOCK) {
+        updateExportBlock({ addNode, elements, setElements, updatedBlock: updatedBlock });
+    }
 }

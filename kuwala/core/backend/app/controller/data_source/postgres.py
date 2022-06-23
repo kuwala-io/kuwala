@@ -2,6 +2,7 @@ import functools
 import os
 
 from database.schemas.data_source import ConnectionParameters
+from database.utils.delimiter import get_delimiter_by_id
 from fastapi import HTTPException
 import psycopg2
 
@@ -55,6 +56,29 @@ def send_query(
     connection.close()
 
     return result
+
+
+def write_query_result_to_file(
+    connection_parameters: ConnectionParameters,
+    query: str = None,
+    destination_file: str = None,
+    delimiter_id: str = ",",
+) -> list:
+    connection = get_connection(connection_parameters=connection_parameters)
+    cursor = connection.cursor()
+
+    delimiter = get_delimiter_by_id(delimiter_id)
+    delimiter = "'{0}'".format(delimiter)
+
+    output_query = "COPY ({0}) TO stdout WITH CSV HEADER DELIMITER {1};".format(
+        query, delimiter
+    )
+
+    with open(destination_file, "w+") as f:
+        cursor.copy_expert(output_query, f)
+
+    cursor.close()
+    connection.close()
 
 
 def test_connection(connection_parameters: ConnectionParameters) -> bool:
@@ -213,6 +237,47 @@ def get_table_preview(
     return dict(
         columns=columns, primary_keys=primary_keys, foreign_keys=foreign_keys, rows=rows
     )
+
+
+def save_result(
+    connection_parameters: ConnectionParameters,
+    schema_name: str,
+    table_name: str,
+    columns: list[str],
+    result_dir: str,
+    delimiter_id: str,
+):
+    if not schema_name:
+        raise HTTPException(
+            status_code=400, detail="Missing query parameter: 'schema_name'"
+        )
+
+    if not columns:
+        columns_query = f"""
+            SELECT *
+            FROM {schema_name}.{table_name}
+            LIMIT 0
+        """
+        columns = send_query(
+            connection_parameters=connection_parameters, query=columns_query
+        )
+
+        columns_string = functools.reduce(lambda c1, c2: f"{c1}, {c2}", columns[0][0:])
+    else:
+        columns_string = functools.reduce(lambda c1, c2: f"{c1}, {c2}", columns[0:])
+
+    rows_query = f"""
+        SELECT {columns_string}
+        FROM {schema_name}.{table_name}
+    """
+
+    write_query_result_to_file(
+        connection_parameters=connection_parameters,
+        query=rows_query,
+        destination_file=result_dir,
+        delimiter_id=delimiter_id,
+    )
+    return None
 
 
 def update_dbt_connection_parameters(

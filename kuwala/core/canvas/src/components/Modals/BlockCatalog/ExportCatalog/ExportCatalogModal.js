@@ -1,10 +1,12 @@
 import React, {Fragment, useCallback, useEffect, useState} from "react";
-import {useStoreActions} from "easy-peasy";
+import {useStoreActions, useStoreState} from "easy-peasy";
 import ExportCatalogDTO from "../../../../data/dto/ExportCatalogDTO";
 import {getAllExportCatalogCategories, getAllItemsInExportCategory} from "../../../../api/ExportCatalog";
 import ExportCatalogFooter from "./ExportCatalogFooter";
 import ExportCatalogSelector from "./ExportCatalogSelector";
 import ExportCatalogBody from "./ExportCatalogBody";
+import ExportBlockDTO from "../../../../data/dto/ExportBlockDTO";
+import {v4} from "uuid";
 
 export default () => {
     const { toggleBlockCatalogModal } = useStoreActions(actions => actions.common);
@@ -12,6 +14,12 @@ export default () => {
     const [catalogCategories, setCatalogCategories] = useState([]);
     const [catalogOptions, setCatalogOptions] = useState([]);
     const [selectedCatalogOption, setSelectedCatalogOption] = useState(null);
+    const { elements } = useStoreState(({ canvas }) => canvas);
+    const { addNode, setElements } = useStoreActions(({ canvas }) => canvas);
+    const {
+        addExportBlock,
+        convertExportBlockIntoElement
+    } = useStoreActions(({ exportBlocks }) => exportBlocks);
 
     useEffect(() => {
         initExportCatalogs().then(null);
@@ -34,7 +42,9 @@ export default () => {
 
         if(catalogCategories.length) {
             const category = catalogCategories[selectedExportIndex]
-            fetchCatalogBodyItems(category).then(null);
+            if(category) {
+                fetchCatalogBodyItems(category).then(null);
+            }
         }
     }, [selectedExportIndex, catalogCategories])
 
@@ -70,6 +80,25 @@ export default () => {
         setCatalogOptions(tempOptions);
     }
 
+    const addToCanvas = () => {
+        const exportCatalogDTO = catalogOptions[selectedCatalogOption];
+
+        const exportBlockDTO = new ExportBlockDTO({
+            exportBlockId: v4(),
+            exportBlockEntityId: null,
+            isConfigured: false,
+            exportCatalogItem: exportCatalogDTO,
+            exportCatalogItemId: exportCatalogDTO.id,
+            inputBlockIds: null,
+            macroParameters: null,
+            name: exportCatalogDTO.name
+        });
+
+        addExportBlock(exportBlockDTO);
+        convertExportBlockIntoElement({ addNode, elements, setElements });
+        toggleBlockCatalogModal();
+    }
+
     return (
         <Fragment>
             <ExportCatalogSelector
@@ -89,6 +118,7 @@ export default () => {
             <ExportCatalogFooter
                 toggleBlockCatalogModal={toggleBlockCatalogModal}
                 selectedCatalogOption={selectedCatalogOption}
+                addToCanvas={addToCanvas}
             />
         </Fragment>
     )

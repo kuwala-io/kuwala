@@ -17,17 +17,17 @@ export function fromAPIResponseToTransformationBlockDTO ({transformationBlockRes
         positionY: transformationBlockResponse.position_y,
         inputBlockIds: transformationBlockResponse.input_block_ids,
     });
-    dto.macroParameters = dto.macroParameters.map((el) => {
+    dto.macroParameters = transformationCatalogItem.macroParameters.map((el) => {
         return {
             ...el,
-            name: getParameterName(el.id, transformationCatalogItem)
+            value: getParameterValue(el.id, dto.macroParameters)
         }
     })
     return dto
 }
 
-function getParameterName (parameterId, transformationCatalogItem) {
-    let parameter = transformationCatalogItem.macroParameters.find(p => p.id === parameterId);
+function getParameterValue (parameterId, dtoMacroParameters) {
+    let element = dtoMacroParameters.find(p => p.id === parameterId);
 
-    return parameter.name;
+    return element.value;
 }
