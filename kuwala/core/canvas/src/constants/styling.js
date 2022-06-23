@@ -5,9 +5,10 @@ export const KUWALA_LIGHT_RED = '#F4CACFFF';
 export const KUWALA_GRAY = '#BDBDBD';
 export const KUWALA_PURPLE = '#8B83BA';
 export const WHITE = '#fff';
+export const BLACK = '#000';
 export const KUWALA_LIGHT_PURPLE = '#D0CDE3';
-export const KUWALA_BG_GRAY = '#F9F9F9';
 export const COLOR_MAP = {
+    'black': BLACK,
     'kuwalaGreen' : KUWALA_GREEN,
     'kuwalaPurple' : KUWALA_PURPLE,
     'kuwalaLightPurple' : KUWALA_LIGHT_PURPLE,

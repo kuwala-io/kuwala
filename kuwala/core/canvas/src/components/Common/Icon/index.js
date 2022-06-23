@@ -3,6 +3,10 @@ import {COLOR_MAP} from "../../../constants/styling";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const baseSize = {
+    "xxs": {
+      width: 16,
+      height: 16
+    },
     "xs": {
         width: 24,
         height: 24,

@@ -51,20 +51,9 @@ const mapTablePreview = async ({
     let columns = previewResponse.data.columns.map((el) => {
         return {
             Header: el,
-            accessor: el,
-            minWidth: 160
+            accessor: el
         }
     });
-
-    columns = [{
-        Header: "#",
-        id: "row",
-        filterable: false,
-        width: 48,
-        Cell: (row) => {
-            return <div key={row.index}>{row.index+1}</div>;
-        }
-    }, ...columns]
 
     return {
         columns,
