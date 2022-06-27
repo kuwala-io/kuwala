@@ -17,3 +17,16 @@ export const COLOR_MAP = {
     'kuwalaLightGreen' : KUWALA_LIGHT_GREEN,
     'white': WHITE,
 };
+export const BORDER_COLOR_MAP = {
+    'kuwalaGreen': 'border-kuwala-green',
+    'kuwalaRed': 'border-kuwala-red',
+    'kuwalaPurple': 'border-kuwala-purple'
+};
+export const BACKGROUND_COLOR_MAP = {
+    'kuwalaGreen': 'bg-kuwala-green',
+    'kuwalaRed': 'bg-kuwala-red',
+    'kuwalaPurple': 'bg-kuwala-purple',
+    'kuwalaLightGreen': 'bg-kuwala-light-green',
+    'kuwalaLightRed': 'bg-kuwala-light-red',
+    'kuwalaLightPurple': 'bg-kuwala-light-purple'
+}

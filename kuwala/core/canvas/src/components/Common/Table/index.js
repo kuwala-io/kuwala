@@ -1,9 +1,10 @@
 import React, { useMemo } from "react";
-import { useBlockLayout, useResizeColumns, useSortBy, useTable} from "react-table";
+import { useFlexLayout, useResizeColumns, useSortBy, useTable} from "react-table";
 import styles from "./styles";
 import Icon from "../Icon";
+import {BACKGROUND_COLOR_MAP, BORDER_COLOR_MAP} from "../../../constants/styling";
 
-const Table = ({ columns, data }) => {
+const Table = ({ color = 'kuwalaGreen', columns, data }) => {
     const defaultColumn = useMemo(
         () => ({
             minWidth: 48,
@@ -35,7 +36,7 @@ const Table = ({ columns, data }) => {
             data,
             defaultColumn,
         },
-        useBlockLayout,
+        useFlexLayout,
         useResizeColumns,
         useSortBy
     );
@@ -64,12 +65,12 @@ const Table = ({ columns, data }) => {
 
     const renderHeader = () => {
         return (
-            <thead className={styles.headerContainer}>
+            <thead className={styles.reactTableElement}>
                 {headerGroups.map(headerGroup => (
                     <tr {...headerGroup.getHeaderGroupProps()}>
                         {headerGroup.headers.map(column => (
                             <th
-                                className={styles.headerColumn}
+                                className={`${styles.headerColumn} ${BORDER_COLOR_MAP[color]} ${BACKGROUND_COLOR_MAP[color.replace('kuwala', 'kuwalaLight')]}`}
                                 {...column.getHeaderProps(column.getSortByToggleProps())}
                             >
                                 {column.render('Header')}
@@ -85,14 +86,14 @@ const Table = ({ columns, data }) => {
 
     const renderRows = () => {
         return (
-            <tbody {...getTableBodyProps()}>
+            <tbody {...getTableBodyProps()} className={styles.reactTableElement}>
                 {rows.map((row) => {
                     prepareRow(row)
 
                     return (
                         <tr {...row.getRowProps()}>
                             {row.cells.map(cell => (
-                                <td className={styles.cell} {...cell.getCellProps()}>
+                                <td className={`${styles.cell} ${BORDER_COLOR_MAP[color]}`} {...cell.getCellProps()}>
                                     {cell.render('Cell')}
                                 </td>
                             ))}
@@ -104,8 +105,8 @@ const Table = ({ columns, data }) => {
     }
 
     return (
-        <div className={styles.tableContainer}>
-            <table {...getTableProps()}>
+        <div className={`${styles.tableContainer} ${BORDER_COLOR_MAP[color]}`}>
+            <table {...getTableProps()} className={styles.reactTableElement}>
                 {renderHeader()}
                 {renderRows()}
             </table>

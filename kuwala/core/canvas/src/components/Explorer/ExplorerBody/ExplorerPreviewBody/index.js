@@ -39,11 +39,11 @@ const ExplorerPreviewBody = ({selectedTable, selectorDisplay = PREVIEW_DISPLAY, 
         );
     }
 
-    return (
-        <div className={selectorDisplay !== SELECTOR_DISPLAY && styles.previewTableContainer}>
+    return selectorDisplay === SELECTOR_DISPLAY ?
+        <div className={styles.previewTableContainer}>
             <PreviewTable columns={tableDataPreview.columns} data={tableDataPreview.rows} />
-        </div>
-    );
+        </div> :
+        <PreviewTable columns={tableDataPreview.columns} data={tableDataPreview.rows} />;
 };
 
 export default ExplorerPreviewBody;

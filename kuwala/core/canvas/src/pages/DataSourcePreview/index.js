@@ -2,7 +2,6 @@ import React, {Fragment, useEffect, useMemo, useState} from "react";
 import Header from "../../components/Header";
 import {useLocation, useNavigate} from "react-router-dom";
 import {useStoreActions, useStoreState} from "easy-peasy";
-import "./data-source-preview-table.style.css";
 import { SchemaExplorer } from "../../components/SchemaExplorer";
 import Explorer from "../../components/Explorer";
 import {getSchema} from "../../api/DataSourceApi";

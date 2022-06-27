@@ -18,7 +18,7 @@ const TransformationCatalogBody = ({selectedTransformationIndex, catalogOptions,
         const populatedRows = getDataDictionary(rows, columns);
 
         return (
-            <Table data={populatedRows} columns={populatedColumns} />
+            <Table color={'kuwalaPurple'} data={populatedRows} columns={populatedColumns} />
         )
     }
 
