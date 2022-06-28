@@ -1,6 +1,5 @@
-import React, {Fragment, useCallback, useEffect, useState} from "react";
+import React, {Fragment} from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
-import ReactTable from "react-table-6";
 import {CheckBox, Tag} from "../../../Common";
 import styles from "./styles";
 import Spinner from "../../../Common/Spinner";
@@ -10,7 +9,6 @@ const SelectorTable = ({ data, selectedTable}) => {
     const { selectedElement } = useStoreState(({ canvas }) => canvas);
     const { selectedAddressObj } = useStoreState(({ dataBlocks }) => dataBlocks);
     const { insertOrRemoveSelectedColumnAddress } = useStoreActions(({ dataBlocks }) => dataBlocks);
-    const [columns, setColumns] = useState(undefined);
     const dataBlockId = selectedElement.data.dataBlock.dataBlockId;
     const addressArray = selectedTable.split('@');
     const schema = addressArray[0];
@@ -26,53 +24,6 @@ const SelectorTable = ({ data, selectedTable}) => {
         listOfSelectedColumn = []
     }
 
-    const getColumns = useCallback(() => {
-        return [{
-            Header: "",
-            id: "row",
-            filterable: false,
-            width: 48,
-            Cell: (row) => {
-                return (
-                    <CheckBox
-                        checked={row.original.selected}
-                        onClick={() => {
-                            insertOrRemoveSelectedColumnAddress({
-                                columnAddress: row.original.columnAddress,
-                                dataBlockId
-                            })
-                        }}
-                    />
-                );
-            }
-        }, {
-            Header: 'Name',
-            accessor: 'column',
-            Cell: (row) => {
-                return (
-                    <div className={styles.name}>
-                        {row.value}
-                    </div>
-                );
-            }
-        }, {
-            Header: 'Type',
-            accessor: 'type',
-            Cell: (row) => {
-                return (
-                    <Tag text={row.value} color={'gray'} size={'sm'} />
-                );
-            }
-        }]
-    }, [dataBlockId, insertOrRemoveSelectedColumnAddress]);
-
-    useEffect(() => {
-        if (!columns) {
-            setColumns(getColumns());
-        }
-    }, [columns, getColumns, setColumns])
-
-
     const populatedData = data.map((el)=> {
         return {
             ...el,
@@ -80,27 +31,48 @@ const SelectorTable = ({ data, selectedTable}) => {
         }
     });
 
-    let pageSize;
+    const renderHeader = () => {
+        return (
+            <div className={styles.selectorTableHeader}>
+                <div  className={styles.selectorTableCheckboxHeader} />
 
-    if (populatedData.length >= 300) pageSize = 300
-    else pageSize = populatedData.length
+                <div className={styles.selectorTableNameHeader}>name</div>
+
+                <div className={styles.selectorTableTypeHeader}>type</div>
+            </div>
+        )
+    }
+
+    const renderRow = ({ column, columnAddress, selected, type }, index) => {
+        return (
+            <div key={index} className={styles.selectorTableRow}>
+                <div className={styles.selectorTableCheckbox}>
+                    <CheckBox
+                        checked={selected}
+                        onClick={() => {
+                            insertOrRemoveSelectedColumnAddress({
+                                columnAddress: columnAddress,
+                                dataBlockId
+                            })
+                        }}
+                    />
+                </div>
+
+                <div className={styles.selectorTableName}>
+                    {column}
+                </div>
+
+                <div className={styles.selectorTableType}>
+                    <Tag text={type} color={'gray'} size={'sm'} />
+                </div>
+            </div>
+        )
+    }
 
     return (
-        <div className={'selector-explorer h-full'}>
-            <ReactTable
-                data={populatedData}
-                columns={columns || []}
-                defaultPageSize={pageSize}
-                showPagination={false}
-                showPaginationTop={false}
-                showPaginationBottom={false}
-                showPageSizeOptions={false}
-                style={{
-                    height: "100%",
-                    overFlowX: 'hidden',
-                    overFlowY: 'auto',
-                }}
-            />
+        <div className={styles.selectorTableContainer}>
+            {renderHeader()}
+            {populatedData.map(renderRow)}
         </div>
     );
 }
@@ -162,13 +134,11 @@ const ExplorerSelectorBody = ({
         }
 
         return (
-            <div className={styles.selectorTableContainer}>
-                <SelectorTable
-                    columns={columnsPreview.columns}
-                    data={columnsPreview.rows}
-                    selectedTable={selectedTable}
-                />
-            </div>
+            <SelectorTable
+                columns={columnsPreview.columns}
+                data={columnsPreview.rows}
+                selectedTable={selectedTable}
+            />
         )
     }
 

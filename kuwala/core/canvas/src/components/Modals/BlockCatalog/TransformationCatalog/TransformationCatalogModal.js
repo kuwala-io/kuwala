@@ -4,7 +4,6 @@ import {
     getAllTransformationCatalogCategories,
     getAllItemsInCategory
 } from "../../../../api/TransformationCatalog";
-import "./transformation-example-table.css";
 import TransformationBlockDTO from "../../../../data/dto/TransformationBlockDTO";
 import TransformationCatalogDTO from "../../../../data/dto/TransformationCatalogDTO";
 import {v4} from "uuid";

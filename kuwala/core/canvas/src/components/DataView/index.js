@@ -1,184 +1,127 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
-import ReactTable from "react-table-6";
 import {getDataBlockPreview} from "../../api/DataBlockApi";
 import {getDataDictionary} from "../../utils/SchemaUtils";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faTimes} from "@fortawesome/free-solid-svg-icons";
 import {DATA_BLOCK, TRANSFORMATION_BLOCK} from "../../constants/nodeTypes";
 import {getTransformationBlockPreview} from "../../api/TransformationBlock";
+import { Table } from '../Common';
+import styles from "./styles";
+import CloseButton from "../Common/CloseButton";
+import Spinner from "../Common/Spinner";
 
-const Table = ({columns, data}) => {
-    const memoizedCols = useMemo(()=> {
-        return columns
-    },[]);
-
-    const memoizedRows = useMemo(()=> {
-        return data
-    },[]);
-
-    let pageSize;
-    if (data.length >= 300) pageSize = 300
-    else pageSize = data.length;
-
-    return (
-        <ReactTable
-            data={memoizedRows}
-            columns={memoizedCols}
-            defaultPageSize={pageSize}
-            showPagination={false}
-            showPaginationTop={false}
-            showPaginationBottom={false}
-            showPageSizeOptions={false}
-            style={{
-                height: "100%",
-                overFlowX: 'hidden',
-            }}
-            className="-striped -highlight"
-        />
-    )
-}
-
-export default () => {
-    const {selectedElement, openDataView} = useStoreState(state => state.canvas );
-    const {toggleDataView} = useStoreActions(actions => actions.canvas );
+const DataView = () => {
+    const { selectedElement, openDataView } = useStoreState(({ canvas }) => canvas);
+    const {toggleDataView} = useStoreActions(({ canvas }) => canvas);
     const [isDataPreviewLoading, setIsDataPreviewLoading] = useState(false);
     const [blocksPreview, setBlocksPreview] = useState({
         columns: [],
         rows: [],
-    })
+    });
 
-    useEffect(()=> {
-        if(openDataView) {
+    const fetchDataBlockPreview = useCallback(async () => {
+        setIsDataPreviewLoading(true);
+
+        const block = selectedElement.data.dataBlock;
+
+        try {
+            const res = await getDataBlockPreview({
+                dataBlockId: block.dataBlockEntityId,
+                params: {
+                    limit_columns: 300,
+                    limit_rows: 300,
+                }
+            });
+
+            if (res.status === 200) {
+                let cols = res.data.columns.map((el) => {
+                    return {
+                        Header: el,
+                        accessor: el,
+                    }
+                });
+
+                setBlocksPreview({
+                    columns: cols,
+                    rows: getDataDictionary(res.data.rows, res.data.columns),
+                });
+            }
+        } catch (e) {
+            console.error('Failed to fetch data block preview', e)
+        } finally {
+            setIsDataPreviewLoading(false);
+        }
+    }, [selectedElement.data.dataBlock]);
+
+    const fetchTransformationBlockPreview = useCallback(async () => {
+        setIsDataPreviewLoading(true);
+
+        const block = selectedElement.data.transformationBlock;
+
+        try {
+            const res = await getTransformationBlockPreview({
+                transformationBlockId: block.transformationBlockEntityId,
+                params: {
+                    limit_columns: 300,
+                    limit_rows: 300,
+                }
+            });
+
+            if (res.status === 200) {
+                let cols = res.data.columns.map((el) => {
+                    return {
+                        Header: el,
+                        accessor: el,
+                    };
+                });
+
+                setBlocksPreview({
+                    columns: cols,
+                    rows: getDataDictionary(res.data.rows, res.data.columns),
+                });
+            }
+        } catch (e) {
+            console.error('Failed to fetch transformation block preview', e);
+        } finally {
+            setIsDataPreviewLoading(false);
+        }
+    }, [selectedElement.data.transformationBlock]);
+
+    const fetchPreviewFromSavedDataBlocks = useCallback(async () => {
+        if (selectedElement) {
+            if (selectedElement.type === DATA_BLOCK) {
+                await fetchDataBlockPreview();
+            } else if (selectedElement.type === TRANSFORMATION_BLOCK) {
+                await fetchTransformationBlockPreview();
+            }
+        }
+    }, [fetchDataBlockPreview, fetchTransformationBlockPreview, selectedElement]);
+
+    useEffect(() => {
+        if (openDataView) {
             fetchPreviewFromSavedDataBlocks().then(null)
         }
-    }, [openDataView])
-
-    const fetchPreviewFromSavedDataBlocks = async () => {
-        if(selectedElement) {
-            if(selectedElement.type === DATA_BLOCK) {
-                setIsDataPreviewLoading(true)
-                const block = selectedElement.data.dataBlock
-                try {
-
-                    const res = await getDataBlockPreview({
-                        dataBlockId: block.dataBlockEntityId,
-                        params: {
-                            limit_columns: 300,
-                            limit_rows: 300,
-                        }
-                    });
-
-                    if(res.status === 200) {
-                        let cols = res.data.columns.map((el,i)=>{
-                            return {
-                                Header: el,
-                                accessor: el,
-                            }
-                        });
-
-                        cols = [{
-                            Header: "#",
-                            id: "row",
-                            filterable: false,
-                            width: 48,
-                            Cell: (row) => {
-                                return <div>{row.index+1}</div>;
-                            }
-                        }, ...cols]
-
-                        setBlocksPreview({
-                            columns: cols,
-                            rows: getDataDictionary(res.data.rows, res.data.columns),
-                        });
-                    }
-                }catch (e) {
-                    console.error('Failed when fetching data blocks data', e)
-                }
-                setIsDataPreviewLoading(false)
-            } else if (selectedElement.type === TRANSFORMATION_BLOCK) {
-                setIsDataPreviewLoading(true)
-                const block = selectedElement.data.transformationBlock
-                try {
-
-                    const res = await getTransformationBlockPreview({
-                        transformationBlockId: block.transformationBlockEntityId,
-                        params: {
-                            limit_columns: 300,
-                            limit_rows: 300,
-                        }
-                    });
-
-                    if(res.status === 200) {
-                        let cols = res.data.columns.map((el,i)=>{
-                            return {
-                                Header: el,
-                                accessor: el,
-                            }
-                        });
-
-                        cols = [{
-                            Header: "#",
-                            id: "row",
-                            filterable: false,
-                            width: 48,
-                            Cell: (row) => {
-                                return <div>{row.index+1}</div>;
-                            }
-                        }, ...cols]
-
-                        setBlocksPreview({
-                            columns: cols,
-                            rows: getDataDictionary(res.data.rows, res.data.columns),
-                        });
-                    }
-                }catch (e) {
-                    console.error('Failed when fetching data blocks data', e)
-                }
-                setIsDataPreviewLoading(false)
-            }
-        }
-    }
+    }, [fetchPreviewFromSavedDataBlocks, openDataView])
 
     return (
-        // Table Wrapper
-        <div
-            className={`
-                flex
-                flex-col
-                bottom-0
-                h-2/5
-                w-full
-                z-10
-                absolute
-                ${selectedElement ? '' : 'hidden'}
-                `
-            }
-        >
-            <div className={'relative w-full flex-1 overflow-y-hidden overflow-x-hidden bg-stone-300'}>
-                <div className={'flex flex-row-reverse w-full items-center'}>
-                    <span className={'font-bold text-2xl mr-4 mt-1 cursor-pointer text-stone-500'}
-                        onClick={toggleDataView}
-                    >
-                        <FontAwesomeIcon icon={faTimes}/>
-                    </span>
+        selectedElement &&
+        <div className={styles.viewContainer}>
+            <div className={styles.innerContainer}>
+                <div className={styles.closeButtonContainer}>
+                    <CloseButton onClick={toggleDataView} />
                 </div>
-                <div className={'flex flex-col overflow-x-auto mx-8 mt-1 rounded-lg border-2 border-kuwala-green bg-white h-full'}>
-                    {
-                        isDataPreviewLoading
-                        ?
-                            <div className="flex flex-col w-full h-full justify-center items-center rounded-tr-lg">
-                                <div
-                                    className="spinner-border animate-spin inline-block w-24 h-24 border-4 text-kuwala-green rounded-full"
-                                    role="status">
-                                    <span className="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
-                        :
-                            <Table columns={blocksPreview.columns} data={blocksPreview.rows}/>
-                    }
-                </div>
+
+
+                {isDataPreviewLoading ?
+                    <div className={styles.spinnerContainer}>
+                        <Spinner size={'xl'} />
+                    </div> :
+                    <div className={styles.tableContainer}>
+                        <Table columns={blocksPreview.columns} data={blocksPreview.rows} />
+                    </div>
+                }
             </div>
         </div>
     )
 }
+
+export default DataView;
