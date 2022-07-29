@@ -25,6 +25,8 @@ clean-targets:         # directories to be removed by `dbt clean`
   - "dbt_modules"
 
 vars:
+  # Country to match cities
+  country: 'MT'
   # POI brand
   focus_brand: 'focus_brand_id_prefix'
   # Aggregation grid
@@ -43,10 +45,19 @@ vars:
 
 models:
   kuwala_core_transformer:
+    admin_boundaries:
+      cities:
+        +materialized: table
     poi:
       poi:
         +materialized: table
+      poi_address_city:
+        +materialized: table
+      poi_address_country:
+        +materialized: table
       poi_aggregated:
+        +materialized: table
+      poi_matched:
         +materialized: table
       poi_popularity_time_series:
         +materialized: table

@@ -1,6 +1,6 @@
 SELECT
        poi_matched.*,
-       poi_address_city.name AS poi_address_city,
+       poi_address_city.city_name AS poi_address_city,
        poi_address_country.name AS poi_address_country,
        h3_to_parent(poi_h3_index::h3index, 8) AS poi_h3_index_res_8,
        h3_to_parent(poi_h3_index::h3index, 9) AS poi_h3_index_res_9,
