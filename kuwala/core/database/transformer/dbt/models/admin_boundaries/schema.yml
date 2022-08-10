@@ -1,0 +1,36 @@
+
+version: 2
+
+models:
+  # Cities
+  - name: cities
+    description: 'List of matched city names from GeoNames against OSM admin boundaries'
+    columns:
+      - name: city_name
+        description: 'City name from GeoNames'
+        tests:
+          - not_null
+      - name: geometry
+        description: 'Geometry based on matched admin boundary'
+        tests:
+          - not_null
+  # City candidates
+  - name: city_candidates
+    description: 'List of matched city names from GeoNames against OSM admin boundaries'
+    columns:
+      - name: city_name
+        description: 'City name from GeoNames'
+        tests:
+          - not_null
+      - name: admin_boundary_name
+        description: 'Name of matched admin boundary'
+        tests:
+          - not_null
+      - name: min_levenshtein_distance
+        description: 'Levenshtein distance of GeoNames city name and admin boundary name'
+        tests:
+          - not_null
+      - name: geometry
+        description: 'Geometry of matched admin boundary'
+        tests:
+          - not_null

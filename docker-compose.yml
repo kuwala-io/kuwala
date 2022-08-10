@@ -75,7 +75,7 @@ services:
       - POSTGRES_USER=kuwala
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=kuwala
-      - POSTGRES_MULTIPLE_EXTENSIONS=postgis,hstore,postgis_topology,postgis_raster,pgrouting,h3
+      - POSTGRES_MULTIPLE_EXTENSIONS=postgis,hstore,postgis_topology,postgis_raster,pgrouting,h3,unaccent,fuzzystrmatch
     ports:
       - '5432:5432'
     volumes:

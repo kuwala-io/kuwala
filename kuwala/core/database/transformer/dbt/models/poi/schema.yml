@@ -98,25 +98,21 @@ models:
           - accepted_values:
               values: [ 15 ]
       - name: poi_address_city
-        description: 'Name of the admin boundary with the highest kuwala_admin_level containing POI coordinates'
+        description: 'Name of the city containing POI coordinates based on matched GeoNames and OSM data'
       - name: poi_address_country
         description: 'Name of admin boundary having kuwala_admin_level 1 containing POI coordinates'
 
   # POI city based on admin boundary
   - name: poi_address_city
-    description: 'Admin boundary name with highest admin level containing POI coordinates'
+    description: 'City containing POI coordinates based on matched GeoNames and OSM data'
     columns:
       - name: poi_id
         description: 'Unique ID referring to a POI'
         tests:
           - unique
           - not_null
-      - name: name
-        description: 'Name of matching admin boundary'
-        tests:
-          - not_null
-      - name: id
-        description: 'ID of matching admin boundary'
+      - name: city_name
+        description: 'Name of matching city'
         tests:
           - not_null
 

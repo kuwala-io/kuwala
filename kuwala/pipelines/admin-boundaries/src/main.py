@@ -1,7 +1,12 @@
+import sys
+
+sys.path.insert(0, "../../../common/")
+
 import argparse
 import os
 
 from admin_boundaries_controller import get_admin_boundaries
+from geonames_controller import get_geonames_cities
 from pyspark.sql import SparkSession
 
 if __name__ == "__main__":
@@ -23,6 +28,7 @@ if __name__ == "__main__":
         .newSession()
     )
 
+    get_geonames_cities(sp=spark)
     get_admin_boundaries(
         sp=spark, continent=continent, country=country, country_region=country_region
     )
